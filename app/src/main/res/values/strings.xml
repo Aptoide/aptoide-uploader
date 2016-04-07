@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <string name="app_name">Aptoide Uploader</string>
+    <string name="userHint">Username</string>
+    <string name="passHint">Password</string>
+    <string name="login">Sign In</string>
+    <string name="action_settings">Settings</string>
+    <string name="remember_login">Remember Login</string>
+    <string name="OK">OK</string>
+
+    <!-- Mensagens de erro -->
+    <string name="loginFail">Login Falhou. Username ou Password errados.</string>
+    <string name="duplicated_apk">O Apk já existe no repositório, nada a fazer.</string>
+
+    <string name="store">Store</string>
+    <string name="store_privacy">Store privacy</string>
+    <string name="public_key">Public</string>
+    <string name="private_key">Private</string>
+
+    <string name="store_username">Store username</string>
+    <string name="store_password">Store password</string>
+
+    <string name="store_without_name">Your store must have a name</string>
+    <string name="repo_creation_title">"Create your store"</string>
+    <string name="create_repo">"Create"</string>
+    <string name="cancel">Cancel</string>
+
+</resources>

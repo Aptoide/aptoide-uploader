@@ -1,0 +1,46 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="app_category_array">
+        <item>App Category</item>
+        <item>Comics</item>
+        <item>Communication</item>
+        <item>Entertainment</item>
+        <item>Finance</item>
+        <item>Health</item>
+        <item>Lifestyle</item>
+        <item>Multimedia</item>
+        <item>News &amp; Weather</item>
+        <item>Productivity</item>
+        <item>Reference</item>
+        <item>Shopping</item>
+        <item>Social</item>
+        <item>Sports</item>
+        <item>Themes</item>
+        <item>Tools</item>
+        <item>Travel</item>
+        <item>Demo</item>
+        <item>Software Libraries</item>
+        <item>Arcade &amp; Action (Games)</item>
+        <item>Brain &amp; Puzzle (Games)</item>
+        <item>Cards &amp; Casino (Games)</item>
+        <item>Casual (Games)</item>
+        <item>News &amp; Magazines</item>
+        <item>Music &amp; Audio</item>
+        <item>Photography</item>
+        <item>Personalization</item>
+        <item>Racing (Games)</item>
+        <item>Books &amp; Reference</item>
+        <item>Health &amp; Fitness</item>
+        <item>Media &amp; Video</item>
+        <item>Education</item>
+        <item>Business</item>
+        <item>Sports Games</item>
+        <item>Weather</item>
+        <item>Travel &amp; Local</item>
+        <item>Transportation</item>
+        <item>Medical</item>
+        <item>Libraries &amp; Demo</item>
+        <item>Transport</item>
+
+    </string-array>
+</resources>

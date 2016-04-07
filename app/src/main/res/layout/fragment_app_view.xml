@@ -1,0 +1,110 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout
+    android:id="@+id/apagar"
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:background="#ececec"
+    android:orientation="vertical"
+    >
+
+
+    <LinearLayout
+        android:id="@+id/grid_view_and_hint"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="vertical">
+
+        <TextView
+            android:id="@+id/select_apps_hint"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:background="#0078ab"
+            android:padding="10dp"
+            android:text="Store"
+
+            android:textSize="18dp"
+            />
+
+        <RelativeLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content">
+
+            <TextView
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_centerVertical="true"
+                android:layout_marginLeft="10dp"
+                android:text="Select apps to upload to your store"
+                android:textColor="@android:color/darker_gray"
+                />
+
+            <FrameLayout
+                android:layout_width="112dp"
+                android:layout_height="wrap_content"
+                android:layout_alignParentRight="true"
+                android:layout_marginBottom="3dp"
+                android:layout_marginLeft="3dp"
+                android:layout_marginRight="6dp"
+                android:layout_marginTop="3dp"
+                android:background="@drawable/spinner_custom_background"
+                android:padding="4dp">
+
+                <Spinner
+                    android:id="@+id/sort_spinner"
+                    android:layout_width="match_parent"
+                    android:layout_height="30dp"
+                    android:layout_marginLeft="3dp"
+                    >
+
+                </Spinner>
+
+            </FrameLayout>
+
+        </RelativeLayout>
+
+        <GridView
+            android:id="@+id/grid_view"
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:layout_below="@id/select_apps_hint"
+            android:layout_marginLeft="7dp"
+            android:layout_marginRight="7dp"
+            android:horizontalSpacing="5dp"
+            android:numColumns="3"
+            android:stretchMode="columnWidth"
+            android:verticalSpacing="5dp"
+            />
+
+    </LinearLayout>
+
+    <!--<ImageView-->
+    <!--android:id="@+id/icon_test"-->
+    <!--android:layout_width="100dp"-->
+    <!--android:layout_height="100dp" />-->
+
+    <!--<ScrollView-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent">-->
+
+    <Button
+        android:id="@+id/submitAppsButton"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_alignParentBottom="true"
+        android:background="#0078ab"
+        android:text="Submit Apps"
+        android:visibility="gone"
+        />
+
+
+    <!--</ScrollView>-->
+
+    <!--<EditText-->
+    <!--android:layout_width="match_parent"-->
+    <!--android:layout_height="match_parent"-->
+    <!--android:hint="Ola"-->
+    <!--/>-->
+
+</RelativeLayout>

@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources xmlns:android="http://schemas.android.com/apk/res/android">
+
+    <style name="SpinnerItem2" parent="Widget.AppCompat.TextView.SpinnerItem">
+        <item name="android:textColor">#fff</item>
+    </style>
+
+    <style name="Spinner.Dropdown2" parent="Widget.AppCompat.DropDownItem.Spinner">
+        <item name="android:textColor">#000</item>
+    </style>
+</resources>

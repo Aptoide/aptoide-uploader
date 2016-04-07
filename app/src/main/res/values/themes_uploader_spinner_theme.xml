@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="utf-8"?>
+
+<!-- Generated with http://android-holo-colors.com -->
+<resources>
+
+    <style name="uploader_spinner_theme" parent="@style/_uploader_spinner_theme"/>
+
+    <style name="_uploader_spinner_theme" parent="Theme.AppCompat.Light">
+
+
+    </style>
+
+</resources>
