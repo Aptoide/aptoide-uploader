@@ -40,25 +40,6 @@ public class SplashDialogFragment extends DialogFragment {
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_AppCompat_Light);
-
-//        new Thread(new Runnable() {
-//            @Override
-//            public void run() {
-//                try {
-//                    Thread.sleep(3000);
-//                    if(getActivity() != null)
-//                    getActivity().runOnUiThread(new Runnable() {
-//                        @Override
-//                        public void run() {
-//                            mCallback.checkStoredCredentialsCallback();
-//                            dismiss();
-//                        }
-//                    });
-//                } catch (InterruptedException e) {
-//                    e.printStackTrace();
-//                }
-//            }
-//        }).start();
 	}
 
 	@Override

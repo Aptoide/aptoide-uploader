@@ -61,11 +61,6 @@ public class AppsListActivity extends ActionBarActivity implements ConfirmationD
 		//Stop the activity
 		AptoideUploaderApplication.setForcedLogout(true);
 		if (Session.getActiveSession() != null) Session.getActiveSession().closeAndClearTokenInformation();
-//        GoogleApiClient mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .build();
-//
-//        if (mGoogleApiClient.isConnected())
-//            mGoogleApiClient.disconnect();
 	}
 
 	public void removeUserCredentials() {

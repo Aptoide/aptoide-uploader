@@ -140,8 +140,11 @@ public class ManelAdapter extends MultiChoiceBaseAdapter {
 
 	@Override
 	public boolean onCreateActionMode(ActionMode mode, Menu menu) {
-		MenuInflater inflater = mode.getMenuInflater();
-		inflater.inflate(R.menu.menu_actionmode, menu);
+		MenuInflater inflater = null;
+		if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.HONEYCOMB) {
+			inflater = mode.getMenuInflater();
+			inflater.inflate(R.menu.menu_actionmode, menu);
+		}
 
 		if (listener != null) {
 			listener.hide();

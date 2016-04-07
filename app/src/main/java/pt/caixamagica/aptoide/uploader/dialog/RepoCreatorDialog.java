@@ -3,7 +3,7 @@
  * Modified by Neurophobic Animal on 07/04/2016.
  */
 
-package pt.caixamagica.aptoide.uploader.tmp;
+package pt.caixamagica.aptoide.uploader.dialog;
 
 import android.app.Activity;
 import android.app.Dialog;
@@ -33,7 +33,6 @@ import pt.caixamagica.aptoide.uploader.model.UserInfo;
  */
 public class RepoCreatorDialog extends DialogFragment {
 
-	Login login;
 	LoginActivityCallback mCallback;
 	UserInfo userInfo;
 	private FragmentActivity context;

@@ -38,8 +38,8 @@ import pt.caixamagica.aptoide.uploader.liquid.Event;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetApkInfoRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.ListCategoriesRequest;
-import pt.caixamagica.aptoide.uploader.uploadService.MyBinderV3;
-import pt.caixamagica.aptoide.uploader.uploadService.UploadServiceV3;
+import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
+import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
 import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetApkInfoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
@@ -57,7 +57,7 @@ public class SubmitAppFragment extends Fragment {
 
 	protected View rootView;
 
-	UploadServiceV3 mService;
+	UploadService mService;
 
 	boolean mBound = false;
 
@@ -69,7 +69,7 @@ public class SubmitAppFragment extends Fragment {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			// We've bound to LocalService, cast the IBinder and get LocalService instance
-			MyBinderV3 binder = (MyBinderV3) service;
+			MyBinder binder = (MyBinder) service;
 			mService = binder.getService();
 			mBound = true;
 		}
@@ -148,10 +148,10 @@ public class SubmitAppFragment extends Fragment {
 		super.onStart();
 		spiceManager.start(getActivity());
 
-		Intent intent = new Intent(getActivity(), UploadServiceV3.class);
+		Intent intent = new Intent(getActivity(), UploadService.class);
 
 		getActivity().startService(intent);
-		intent = new Intent(getActivity(), UploadServiceV3.class);
+		intent = new Intent(getActivity(), UploadService.class);
 		getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}
 
@@ -229,8 +229,6 @@ public class SubmitAppFragment extends Fragment {
 			prepareInfo();
 		} else {
 			getActivity().finish();
-//            if (getFragmentManager() != null)
-//                getFragmentManager().popBackStack();
 		}
 	}
 
@@ -420,10 +418,6 @@ public class SubmitAppFragment extends Fragment {
 
 			@Override
 			public void onRequestSuccess(GetApkInfoJson getApkInfoJson) {
-
-				if (getApkInfoJson.getErrors() != null) {
-//                    System.out.println("Debug: Errors: " + getApkInfoJson.getErrors());
-				}
 
 				setAppInfo(getApkInfoJson.getMeta());
 

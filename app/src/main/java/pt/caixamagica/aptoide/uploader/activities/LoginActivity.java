@@ -6,7 +6,6 @@
 package pt.caixamagica.aptoide.uploader.activities;
 
 import android.Manifest;
-import android.accounts.Account;
 import android.accounts.AccountManager;
 import android.content.Context;
 import android.content.Intent;
@@ -53,21 +52,18 @@ import pt.caixamagica.aptoide.uploader.LoginFragment;
 import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.UploaderUtils;
 import pt.caixamagica.aptoide.uploader.components.callbacks.login.LoginActivityCallback;
+import pt.caixamagica.aptoide.uploader.dialog.RepoCreatorDialog;
 import pt.caixamagica.aptoide.uploader.model.UserInfo;
 import pt.caixamagica.aptoide.uploader.retrofit.LoginErrorException;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
 import pt.caixamagica.aptoide.uploader.retrofit.request.OAuth2AuthenticationRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UserCredentialsRequest;
-import pt.caixamagica.aptoide.uploader.retrofit.request.tmp.TmpRequest;
-import pt.caixamagica.aptoide.uploader.retrofit.request.tmp.TmpResponse;
-import pt.caixamagica.aptoide.uploader.tmp.RepoCreatorDialog;
-import pt.caixamagica.aptoide.uploader.util.LoadingFragment;
 import pt.caixamagica.aptoide.uploader.webservices.json.OAuth;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
 //public class MainActivity extends ActionBarActivity {
 public class LoginActivity extends AppCompatActivity implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener, View.OnClickListener,
-		LoginActivityCallback, LoadingFragment.LoadingCallback, SplashDialogFragment.OnHeadlineSelectedListener {
+		LoginActivityCallback, SplashDialogFragment.OnHeadlineSelectedListener {
 
 	public static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
 
@@ -144,7 +140,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 		spiceManager.start(this);
 		UploaderUtils.checkSpiceManagerPendingContent(spiceManager, "loginActivity", new OAuthPendingRequestListener(), OAuth.class);
 		UploaderUtils.checkSpiceManagerPendingContent(spiceManager, "getUserInfo", new UserCredentialsPendingRequestListener(), UserCredentialsJson.class);
-//        spiceManager.removeAllDataFromCache();
 	}
 
 	@Override
@@ -155,7 +150,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 			if (Manifest.permission.GET_ACCOUNTS.equals(permissions[i]) && grantResults[0] == android.content.pm.PackageManager.PERMISSION_GRANTED) {
 				checkStoredCredentialsCallback();
 			}
-//            splashDialogFragment.dismiss();
 			dismissSplash = true;
 		}
 	}
@@ -166,16 +160,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 			LinkedList<String> permissionsToRequest = new LinkedList<>();
 
 			if (checkSelfPermission(android.Manifest.permission.WRITE_EXTERNAL_STORAGE) == PackageManager.PERMISSION_DENIED) {
-//                requestPermissions(new String[]{Manifest.permission.READ_EXTERNAL_STORAGE}, 1);
 				permissionsToRequest.add(Manifest.permission.READ_EXTERNAL_STORAGE);
 			}
-
-//            permissionsToRequest.add(Manifest.permission.GET_ACCOUNTS);
-
-//            if (checkSelfPermission(Manifest.permission.GET_ACCOUNTS) == PackageManager.PERMISSION_DENIED) {
-////                requestPermissions(new String[]{Manifest.permission.GET_ACCOUNTS}, 1);
-//                permissionsToRequest.add(Manifest.permission.GET_ACCOUNTS);
-//            }
 
 			String[] array = new String[permissionsToRequest.size()];
 			permissionsToRequest.toArray(array);
@@ -193,11 +179,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 			userInfo = (UserInfo) savedInstanceState.getSerializable("userInfo");
 		}
 
-//        System.out.println("Debug: FirstLaunch: " + isSplashShowState() + " " + (savedInstanceState == null));
-
-//        if (savedInstanceState == null) {
 		if (isSplashShowState()) {
-			//        if(((AptoideConfigurationPartners)Aptoide.getConfiguration()).getShowSplash()) {
 			if (savedInstanceState == null) {
 				splashDialogFragment.show(getSupportFragmentManager(), "splashDialog");
 			}
@@ -207,16 +189,8 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 			} else {
 				setContentView(R.layout.activity_main);
 				setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
-
-//                    mContent = getSupportFragmentManager().getFragment(
-//                            savedInstanceState, "mContent");
-//
-//                    getSupportFragmentManager().beginTransaction()
-//                            .replace(R.id.container, mContent, "loginFragment")
-//                            .commit();
 			}
 		}
-//        }
 
 		// Google
 		mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this).addOnConnectionFailedListener(this).addApi(Plus.API).addScope(Plus.SCOPE_PLUS_LOGIN)
@@ -242,8 +216,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 	protected void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
 		outState.putSerializable("userInfo", userInfo);
-
-//        getSupportFragmentManager().putFragment(outState, "mContent", mContent);
 	}
 
 	private UserCredentialsJson getStoredUserCredentials() {
@@ -269,15 +241,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 		}
 
 		AccountManager accountManager = AccountManager.get(this);
-//        System.out.println("Debug: Acount Manager: " + accountManager.getAccountsByType("cm.aptoide.pt"));
-//        System.out.println("Debug: Acount Manager: " + accountManager.getAccountsByType("cm.aptoide.pt").length);
 		if (!AptoideUploaderApplication.isForcedLogout() && accountManager.getAccountsByType("cm.aptoide.pt").length != 0) {
 
-			Account account = null;
 			try {
-				account = accountManager.getAccountsByType("cm.aptoide.pt")[0];
-//                System.out.println("Debug: Rui: Account: " + account);
-
 				String URL = "content://cm.aptoide.pt.StubProvider";
 				Uri token_uri = Uri.parse(URL + "/token");
 				Uri repo_uri = Uri.parse(URL + "/repo");
@@ -386,34 +352,9 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 		}
 	}
 
-//    @Override
-//    public void submitAuthentication(String username, String password, OAuth2AuthenticationRequest.Mode mode, String nameForGoogle, String repo, String privacyUsername, String
-// privacyPassword) {
-//
-//        oAuth2AuthenticationRequest = new OAuth2AuthenticationRequest();
-//
-//        oAuth2AuthenticationRequest.setPassword(password);
-//        oAuth2AuthenticationRequest.setUsername(username);
-//        oAuth2AuthenticationRequest.setMode(mode);
-//        oAuth2AuthenticationRequest.setNameForGoogle(nameForGoogle);
-//
-////        if (repo != null && privacyUsername != null && privacyPassword != null && (mode == Mode.FACEBOOK || mode == Mode.GOOGLE)) {
-////            oAuth2AuthenticationRequest.setOauthCreateRepo(1);
-//            oAuth2AuthenticationRequest.setRepo(repo);
-//            oAuth2AuthenticationRequest.setPrivacy_user(privacyUsername);
-//            oAuth2AuthenticationRequest.setPrivacy_pass(privacyPassword);
-////        }
-//
-//        spiceManager.execute(oAuth2AuthenticationRequest, "loginActivity", DEFAULT_CACHE_TIME, new OAuthPendingRequestListener());
-//
-//        UploaderUtils.pushLoadingFragment(this, R.id.container, "Logging in as " + username);
-//    }
-
 	@Override
 	public void submitAuthentication(UserInfo userInfo) {
 		this.userInfo = userInfo;
-
-//        System.out.println("Debug: Submitting Authentication");
 
 		checkUserCredentialsRequest = new OAuth2AuthenticationRequest();
 
@@ -424,42 +365,14 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 		checkUserCredentialsRequest.bean.setAuthMode(userInfo.getMode());
 		checkUserCredentialsRequest.bean.setOauthUserName(userInfo.getNameForGoogle());
 
-//        if (repo != null && privacyUsername != null && privacyPassword != null && (mode == Mode.FACEBOOK || mode == Mode.GOOGLE)) {
-//            checkUserCredentialsRequest.setOauthCreateRepo(1);
 		checkUserCredentialsRequest.bean.setOauthCreateRepo(Integer.toString(userInfo.getCreateRepo()));
 		checkUserCredentialsRequest.bean.setRepo(userInfo.getRepo());
 		checkUserCredentialsRequest.bean.setPrivacy_user(userInfo.getPrivacyUsername());
 		checkUserCredentialsRequest.bean.setPrivacy_pass(userInfo.getPrivacyPassword());
-//        }
 
 		spiceManager.execute(checkUserCredentialsRequest, "loginActivity", DEFAULT_CACHE_TIME, new OAuthPendingRequestListener());
 
 		UploaderUtils.pushLoadingFragment(this, R.id.container, "Logging in as " + userInfo.getUsername());
-	}
-
-	@Override
-	public void tmp() {
-		spiceManager.execute(new TmpRequest(), new PendingRequestListener<TmpResponse>() {
-			@Override
-			public void onRequestNotFound() {
-//                System.out.println("Debug: onRequestNotFound: Tmp");
-			}
-
-			@Override
-			public void onRequestFailure(SpiceException spiceException) {
-//                System.out.println("Debug: onRequestFailure: Tmp");
-			}
-
-			@Override
-			public void onRequestSuccess(TmpResponse tmpResponse) {
-//                System.out.println("Debug: onRequestSuccess: Tmp");
-			}
-		});
-	}
-
-	@Override
-	public void loadingCanceled() {
-		spiceManager.cancelAllRequests();
 	}
 
 	private void getUserInfo(OAuth oAuth) {
@@ -468,13 +381,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 		spiceManager.execute(request, "getUserInfo", DEFAULT_CACHE_TIME, new UserCredentialsPendingRequestListener());
 	}
-//    private void getUserInfo(CheckUserCredentialsResponse checkUserCredentialsResponse) {
-//        UserCredentialsRequest request = new UserCredentialsRequest();
-//        request.setToken(checkUserCredentialsResponse.getToken());
-//
-//        spiceManager.execute(request, "getUserInfo", DEFAULT_CACHE_TIME, new UserCredentialsPendingRequestListener());
-//    }
-
 	private void switchToAppViewFragment(UserCredentialsJson userCredentialsJson) {
 		finish();
 
@@ -488,8 +394,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 	@Override
 	public void checkStoredCredentialsCallback() {
-
-//        System.out.println("Debug: FragmentSize: " + getSupportFragmentManager().getBackStackEntryCount());
 
 		UserCredentialsJson userCredentialsJson = getStoredUserCredentials();
 		if (userCredentialsJson != null) {
@@ -510,62 +414,23 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 		return AptoideUploaderApplication.firstLaunchApagar;
 	}
 
-//    public class CheckUserCredentialsPendingRequestListener implements PendingRequestListener<CheckUserCredentialsResponse> {
-//
-//        @Override
-//        public void onRequestNotFound() {
-//
-//        }
-//
-//        @Override
-//        public void onRequestFailure(SpiceException spiceException) {
-//            if (spiceException.getCause() instanceof LoginErrorException) {
-//                Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
-//                System.out.println("Debug: " + spiceException.getMessage());
-//            }
-//            UploaderUtils.popLoadingFragment(LoginActivity.this);
-//        }
-//
-//        @Override
-//        public void onRequestSuccess(CheckUserCredentialsResponse checkUserCredentialsResponse) {
-//            System.out.println("Debug: onRequestSuccess: OAuthPendingRequestListener: " + checkUserCredentialsResponse);
-//            if (checkUserCredentialsResponse == null) {
-////                UploaderUtils.popLoadingFragment(LoginActivity.this);
-//                return;
-//            }
-//
-//            // Caso o login seja efectuado com sucesso.
-//            // Isto não devia ser bem assim, mas enfim..
-//            if (!"FAIL".equals(checkUserCredentialsResponse.getStatus())) {
-//                getUserInfo(checkUserCredentialsResponse);
-//            }
-//            // Caso o login seja enviado em branco, cai aqui.
-//            else {
-//                UploaderUtils.popLoadingFragment(LoginActivity.this);
-//                Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
-//            }
-//
-//            spiceManager.removeAllDataFromCache();
-//        }
-//    }
-
 	public class OAuthPendingRequestListener implements PendingRequestListener<OAuth> {
 
 		@Override
 		public void onRequestFailure(SpiceException spiceException) {
-//            System.out.println("Debug: onRequestFailure: OAuthPendingRequestListener");
 			if (spiceException.getCause() instanceof LoginErrorException) {
 				Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
-//                System.out.println("Debug: " + spiceException.getMessage());
 			}
 			UploaderUtils.popLoadingFragment(LoginActivity.this);
 		}
 
 		@Override
+		public void onRequestNotFound() {
+		}
+
+		@Override
 		public void onRequestSuccess(final OAuth oAuth) {
-//            System.out.println("Debug: onRequestSuccess: OAuthPendingRequestListener: " + oAuth);
 			if (oAuth == null) {
-//                UploaderUtils.popLoadingFragment(LoginActivity.this);
 				return;
 			}
 
@@ -581,11 +446,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 			}
 
 			spiceManager.removeAllDataFromCache();
-		}
-
-		@Override
-		public void onRequestNotFound() {
-//            System.out.println("Debug: onRequestNotFound: OAuthPendingRequestListener");
 		}
 	}
 
@@ -609,13 +469,11 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 		@Override
 		public void onRequestFailure(SpiceException spiceException) {
-//            System.out.println("Debug: onRequestFailure: UserCredentialsPendingRequestListener");
 			UploaderUtils.popLoadingFragment(LoginActivity.this);
 		}
 
 		@Override
 		public void onRequestSuccess(UserCredentialsJson userCredentialsJson) {
-//            System.out.println("Debug: onRequestSuccess: UserCredentialsPendingRequestListener: " + userCredentialsJson);
 
 			if (userCredentialsJson == null) {
 				UploaderUtils.popLoadingFragment(LoginActivity.this);
@@ -623,9 +481,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 			}
 
 			if (userCredentialsJson.getRepo() == null) {
-//                System.out.println("Debug: " + userCredentialsJson);
-//                System.out.println("Debug: " + userCredentialsJson.getUsername());
-//                System.out.println("Debug: " + userCredentialsJson.getEmail());
 				RepoCreatorDialog.showRepoCreatorDialog(LoginActivity.this, userInfo);
 				Toast.makeText(LoginActivity.this, "The account doesn't have a store associated, please create one.", Toast.LENGTH_LONG).show();
 				UploaderUtils.popLoadingFragment(LoginActivity.this);
@@ -640,7 +495,6 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 		@Override
 		public void onRequestNotFound() {
-//            System.out.println("Debug: onRequestNotFound: UserCredentialsPendingRequestListener");
 		}
 	}
 }

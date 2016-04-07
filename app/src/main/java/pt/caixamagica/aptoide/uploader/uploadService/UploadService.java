@@ -37,13 +37,13 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 /**
  * Created by neuro on 07-03-2015.
  */
-public class UploadServiceV3 extends Service {
+public class UploadService extends Service {
 
 	public static final String UPLOADER_CANCEL = "cancel";
 
 	public static final String UPLOADER_RETRY = "retry";
 	static int i = 1;
-	private final MyBinderV3 myBinderV3 = new MyBinderV3(this);
+	private final MyBinder myBinder = new MyBinder(this);
 
 	protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploadService.class);
 
@@ -84,7 +84,7 @@ public class UploadServiceV3 extends Service {
 		if (this.userCredentialsJson == null) this.userCredentialsJson = userCredentialsJson;
 
 		// Parece me a mim k esta intent não serve para nada.... ou pode nao servir.
-		Intent intent = new Intent(getApplication(), UploadServiceV3.class);
+		Intent intent = new Intent(getApplication(), UploadService.class);
 		intent.putExtra("userCredentialsJson", userCredentialsJson);
 		intent.putExtra("packageInfo", packageInfo);
 		intent.putExtra("appName", packageInfo.getLabel());
@@ -131,7 +131,6 @@ public class UploadServiceV3 extends Service {
 
 					// Don't show notification if the problem is lack of info
 					if (isDummyUploadError(uploadAppToRepoJson.getErrors())) {
-//						setFillMissingInfoNotification(uploadAppToRepoRequest.getPackageName(), uploadAppToRepoRequest.getLabel());
 						setFillMissingInfoNotification(uploadAppToRepoRequest, selectablePackageInfo);
 						return;
 					}
@@ -271,7 +270,7 @@ public class UploadServiceV3 extends Service {
 
 	@Override
 	public IBinder onBind(Intent intent) {
-		return myBinderV3;
+		return myBinder;
 	}
 
 	@Override
@@ -342,9 +341,9 @@ public class UploadServiceV3 extends Service {
 	}
 
 	private PendingIntent buildRetryIntent(String apkName) {
-		Intent intent = new Intent(getApplicationContext(), UploadServiceV3.class);
+		Intent intent = new Intent(getApplicationContext(), UploadService.class);
 
-		intent.setAction(UploadServiceV3.UPLOADER_RETRY);
+		intent.setAction(UploadService.UPLOADER_RETRY);
 
 		intent.putExtra("packageName", apkName);
 
@@ -360,9 +359,9 @@ public class UploadServiceV3 extends Service {
 		// Gera um ID único para prevenir reutilização de PendingIntent.
 		int reqCode = (int) System.currentTimeMillis() / 1000;
 
-		Intent intent = new Intent(this, UploadServiceV3.class);
+		Intent intent = new Intent(this, UploadService.class);
 
-		intent.setAction(UploadServiceV3.UPLOADER_CANCEL);
+		intent.setAction(UploadService.UPLOADER_CANCEL);
 		intent.putExtra("packageName", packageName);
 
 		return PendingIntent.getService(this, reqCode, intent, 0);

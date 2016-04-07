@@ -10,8 +10,4 @@ import pt.caixamagica.aptoide.uploader.model.UserInfo;
 public interface LoginActivityCallback {
 
 	void submitAuthentication(UserInfo userInfo);
-//    public void submitAuthentication(String username, String password, OAuth2AuthenticationRequest.Mode mode, String nameForGoogle, String repo, String privateName, String
-// privatePassword);
-
-	void tmp();
 }

@@ -37,22 +37,12 @@ public class OAuth2AuthenticationRequest extends RetrofitSpiceRequest<OAuth, OAu
 	@Override
 	public OAuth loadDataFromNetwork() throws Exception {
 
-//        if (!getMode().equals(Mode.APTOIDE)) {
-//            setUsername(null);
-//        }
-
 		ObjectMapper objectMapper = new ObjectMapper();
 		objectMapper.setSerializationInclusion(JsonInclude.Include.NON_NULL);
 		String s = objectMapper.writeValueAsString(bean);
 
 		HashMap hashMap = objectMapper.convertValue(bean, HashMap.class);
 		s = objectMapper.writeValueAsString(hashMap);
-
-//        System.out.println("Debug: JsonShit: " + s);
-//        System.out.println("Debug: JsonShit: " + bean.getAuthMode());
-
-//        System.out.println("Debug: loadDataFromNetwork: ");
-//        System.out.println("Debug: " + toString());
 
 		HashMap<String, String> parameters = new HashMap<String, String>();
 		parameters.put("grant_type", "password");
@@ -81,11 +71,9 @@ public class OAuth2AuthenticationRequest extends RetrofitSpiceRequest<OAuth, OAu
 		}
 
 		if (bean.getRepo() != null && (bean.getAuthMode() == Mode.facebook || bean.getAuthMode() == Mode.google)) {
-//            System.out.println("Debug: Passei no público");
 			parameters.put("oauthCreateRepo", "1");
 			parameters.put("repo", bean.getRepo());
 			if (bean.getPrivacy_user() != null && bean.getPrivacy_pass() != null) {
-//                System.out.println("Debug: Passei no Privado");
 				parameters.put("privacy_user", bean.getPrivacy_user());
 				parameters.put("privacy_pass", bean.getPrivacy_pass());
 			}
@@ -94,7 +82,6 @@ public class OAuth2AuthenticationRequest extends RetrofitSpiceRequest<OAuth, OAu
 		OAuth response = null;
 
 		try {
-//            response = getService().oauth2Authentication(parameters);
 			response = getService().oauth2Authentication(hashMap);
 		} catch (RetrofitError error) {
 			error.printStackTrace();
@@ -104,22 +91,6 @@ public class OAuth2AuthenticationRequest extends RetrofitSpiceRequest<OAuth, OAu
 
 		return response;
 	}
-
-//    public String getUsername() {
-//        return username;
-//    }
-//
-//    public void setUsername(String username) {
-//        this.username = username;
-//    }
-//
-//    public String getPassword() {
-//        return password;
-//    }
-//
-//    public void setPassword(String password) {
-//        this.password = password;
-//    }
 
 	public enum Mode {
 		aptoide, google, facebook;
@@ -152,17 +123,7 @@ public class OAuth2AuthenticationRequest extends RetrofitSpiceRequest<OAuth, OAu
 		// Private store
 		@Getter @Setter private String privacy_user;
 		@Getter @Setter private String privacy_pass;
-		//        @JsonProperty("authMode")
-//        @Getter @Setter private String mode;
 		@Getter @Setter private Mode authMode;
 		@Getter @Setter private String nameForGoogle;
-
-//        public String getAuthMode() {
-//            return mode.toString();
-//        }
-//
-//        public void setAuthMode(String authMode) {
-//            mode = Mode.valueOf(authMode.toUpperCase());
-//        }
 	}
 }

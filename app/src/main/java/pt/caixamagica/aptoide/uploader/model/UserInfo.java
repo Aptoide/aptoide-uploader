@@ -22,7 +22,6 @@ public class UserInfo implements Serializable {
 	private String password;
 	private String oauthToken;
 	private OAuth2AuthenticationRequest.Mode mode;
-	//    private CheckUserCredentialsRequest.Mode mode;
 	private String nameForGoogle;
 	private String repo;
 	private String privacyUsername;

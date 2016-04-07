@@ -7,7 +7,6 @@ package pt.caixamagica.aptoide.uploader;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Parcelable;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -17,7 +16,7 @@ import lombok.Setter;
  */
 @Getter
 @Setter
-public class SelectablePackageInfo extends PackageInfo implements Parcelable {
+public class SelectablePackageInfo extends PackageInfo {
 
 	private final PackageInfo info;
 

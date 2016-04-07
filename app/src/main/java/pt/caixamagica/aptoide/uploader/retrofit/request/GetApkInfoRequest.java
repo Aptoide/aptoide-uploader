@@ -5,7 +5,6 @@
 
 package pt.caixamagica.aptoide.uploader.retrofit.request;
 
-import android.text.TextUtils;
 import android.util.Pair;
 
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
@@ -59,10 +58,6 @@ public class GetApkInfoRequest extends RetrofitSpiceRequest<GetApkInfoJson, GetA
 		parameters.put("mode", "json");
 
 		if (repo != null) parameters.put("repo", repo);
-
-		String join = TextUtils.join(",", options);
-
-		options = new ArrayList<>();
 
 		if (apkPath != null) {
 			parameters.put("identif", "md5sum:" + UploaderUtils.md5Calc(new File(apkPath)));

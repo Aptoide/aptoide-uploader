@@ -120,8 +120,6 @@ public class LoginFragment extends Fragment {
 			@Override
 			public void onClick(View v) {
 				switchtoSignUpFragment();
-//                RepoCreatorDialog.showRepoCreatorDialog(getActivity(), "joonao");
-//                mCallback.tmp();
 			}
 		});
 	}
@@ -268,7 +266,6 @@ public class LoginFragment extends Fragment {
 				password = textView.getText().toString();
 
 				if (!username.equals("") && !password.equals("")) {
-//                    mCallback.submitAuthentication(username, password, null, null, null, null, null);
 					mCallback.submitAuthentication(new UserInfo(username, password, null, null, null, null, null, null, 0));
 
 					((TextView) rootView.findViewById(R.id.signing_in_text)).setText("Signing in as\n" + username);
@@ -281,6 +278,6 @@ public class LoginFragment extends Fragment {
 
 	private void switchtoSignUpFragment() {
 		Fragment signUpFragment = new SignUpFragment();
-		getFragmentManager().beginTransaction().replace(R.id.container, signUpFragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_FADE).addToBackStack("signUp").commit();
+		getFragmentManager().beginTransaction().replace(R.id.container, signUpFragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack("signUp").commit();
 	}
 }

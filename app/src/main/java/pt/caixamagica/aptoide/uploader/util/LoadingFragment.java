@@ -22,18 +22,11 @@ import pt.caixamagica.aptoide.uploader.R;
  */
 public class LoadingFragment extends Fragment {
 
-	LoadingCallback mCallback;
-
 	@Setter String text;
 
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		try {
-			mCallback = (LoadingCallback) activity;
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString() + " must implement LoadingCallback");
-		}
 	}
 
 	@Override
@@ -51,10 +44,5 @@ public class LoadingFragment extends Fragment {
 	public void onSaveInstanceState(Bundle outState) {
 		outState.putString("text", text);
 		super.onSaveInstanceState(outState);
-	}
-
-	public interface LoadingCallback {
-
-		void loadingCanceled();
 	}
 }

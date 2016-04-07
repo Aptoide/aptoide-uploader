@@ -47,9 +47,9 @@ public class RequestProgressListener implements com.octo.android.robospice.reque
 		// Gera um ID único para prevenir reutilização de PendingIntent.
 		int reqCode = (int) System.currentTimeMillis() / 1000;
 
-		Intent intent = new Intent(context, UploadServiceV3.class);
+		Intent intent = new Intent(context, UploadService.class);
 
-		intent.setAction(UploadServiceV3.UPLOADER_CANCEL);
+		intent.setAction(UploadService.UPLOADER_CANCEL);
 
 		intent.putExtra("packageName", packageInfo.packageName);
 

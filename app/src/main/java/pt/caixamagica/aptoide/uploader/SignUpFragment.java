@@ -154,7 +154,6 @@ public class SignUpFragment extends Fragment {
 			public void onRequestSuccess(SignUpJson signUpJson) {
 				if (signUpJson.getErrors() == null) {
 					// Loja criada com sucesso, redirecciona para a AppsView
-//                    mCallback.submitAuthentication(signUpRequest.getEmail(), passwordEditText.getText().toString(), null, null,null, null, null);
 					mCallback.submitAuthentication(new UserInfo(signUpRequest.getEmail(), passwordEditText.getText().toString(), null, null, null, null, null, null, 0));
 				} else {
 					List<String> errors = new LinkedList<>();

@@ -46,8 +46,8 @@ import java.util.LinkedList;
 import java.util.List;
 
 import pt.caixamagica.aptoide.uploader.dialog.ConfirmationDialog;
-import pt.caixamagica.aptoide.uploader.uploadService.MyBinderV3;
-import pt.caixamagica.aptoide.uploader.uploadService.UploadServiceV3;
+import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
+import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
 /**
@@ -73,7 +73,7 @@ public class FragmentAppView extends Fragment {
 
 	private ManelAdapter adapter;
 	private boolean mBound = false;
-	private UploadServiceV3 mService;
+	private UploadService mService;
 	/**
 	 * Defines callbacks for service binding, passed to bindService()
 	 */
@@ -82,7 +82,7 @@ public class FragmentAppView extends Fragment {
 		@Override
 		public void onServiceConnected(ComponentName className, IBinder service) {
 			// We've bound to LocalService, cast the IBinder and get LocalService instance
-			MyBinderV3 binder = (MyBinderV3) service;
+			MyBinder binder = (MyBinder) service;
 			mService = binder.getService();
 			mBound = true;
 		}
@@ -255,58 +255,20 @@ public class FragmentAppView extends Fragment {
 
 					@Override
 					public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
-//                selected = sp.getSelectedItem().toString();
-//                if (!selected.equals("Country"))
-//                    spinner_item = selected;
-//                System.out.println(selected);
-
-//                if (sp.getSelectedItemPosition() < 0) {
-//                    sp.setSelection(0);
-//                }
-
-//                System.out.println("Debug: " + arg0.getClass());
-//                System.out.println("Debug: " + arg0.getSelectedView());
-//                System.out.println("Debug: " + arg0.getEmptyView());
-//                System.out.println("Debug: " + arg0.getRootView().getClass());
-//                System.out.println("Debug: " + arg1.getClass());
-
-//                        if (firstRun) {
-//                            firstRun = false;
-//                            return;
-//                        }
-
-//                if (spinnerMartelado < sp.getCount()) {
-//                    spinnerMartelado++;
-//                    return;
-//                }
-
-						setid();
 
 						if (arg2 == 0) {
-//                            System.out.println("Debug: Sort By Date");
 							sortByFirstInstall();
 						}
 
 						if (arg2 == 1) {
-//                            System.out.println("Debug: Sort By Date");
 							sortByName();
 						}
 
 						adapter.uncheckAll();
-
-//                        System.out.println("Debug: " + arg2);
-//                        System.out.println("Debug: " + R.id.sort_by_name);
-//                        System.out.println("Debug: " + R.id.sort_by_date);
 					}
 
 					@Override
 					public void onNothingSelected(AdapterView<?> arg0) {
-//                        System.out.println("Debug: 2: " + arg0.getClass());
-					}
-
-					private void setid() {
-//                sp.setSelection(sp_position);
-//                t.setText(spinner_item);
 					}
 				});
 			}
@@ -335,10 +297,10 @@ public class FragmentAppView extends Fragment {
 	public void onStart() {
 		super.onStart();
 
-		Intent intent = new Intent(getActivity(), UploadServiceV3.class);
+		Intent intent = new Intent(getActivity(), UploadService.class);
 
 		getActivity().startService(intent);
-		intent = new Intent(getActivity(), UploadServiceV3.class);
+		intent = new Intent(getActivity(), UploadService.class);
 		getActivity().bindService(intent, mConnection, Context.BIND_AUTO_CREATE);
 	}
 
@@ -432,12 +394,6 @@ public class FragmentAppView extends Fragment {
 
 		inflater.inflate(R.menu.app_grid_menu, menu);
 
-//        menu.findItem(R.id.sort_by_name).setOnMenuItemClickListener(sortByNameListener());
-//        menu.findItem(R.id.sort_by_date).setOnMenuItemClickListener(sortByFirstInstallListener());
-
-//        if (checked != 0)
-//            menu.findItem(checked).setChecked(true);
-
 		menu.findItem(R.id.logout_button).setOnMenuItemClickListener(logoutListener());
 	}
 
@@ -449,8 +405,6 @@ public class FragmentAppView extends Fragment {
 	private void prepareSpinner(int viewId, int arrayId) {
 		Spinner spinner = (Spinner) rootView.findViewById(viewId);
 		// Create an ArrayAdapter using the string array and a default spinner layout
-//        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(),
-//                arrayId, android.R.layout.simple_spinner_item);
 		ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), arrayId, R.layout.spinner_item);
 
 		String[] stringArray = getResources().getStringArray(arrayId);
@@ -476,14 +430,6 @@ public class FragmentAppView extends Fragment {
 		adapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 			public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
 				((MultiChoiceAdapter) parent.getAdapter()).setItemChecked(id, true);
-
-//                if(((MultiChoiceAdapter) parent.getAdapter()).isChecked(position))
-//                    v.setBackground(null);
-//
-//                System.out.println("Debug: Position: " + position);
-//                System.out.println("Debug: IsChecked: " + ((MultiChoiceAdapter) parent.getAdapter()).isChecked(position));
-//                System.out.println("Debug: V: " + v);
-//                System.out.println("Debug: View: " + view);
 			}
 		});
 	}
@@ -493,20 +439,10 @@ public class FragmentAppView extends Fragment {
 			@Override
 			public void onClick(View v) {
 
-//                Fragment submitAppFragment = new SubmitAppFragment();
-//                Bundle bundle = new Bundle();
-//                bundle.putSerializable("userCredentialsJson", userCredentialsJson);
-
 				ArrayList<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>(adapter.getCheckedItemCount());
 				for (Long aLong : adapter.getCheckedItems()) {
 					selectablePackageInfos.add(adapter.getItem(aLong.intValue()));
 				}
-
-//                bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
-//                submitAppFragment.setArguments(bundle);
-//                adapter.ffinishActionMode();
-//
-//                getFragmentManager().beginTransaction().addToBackStack(null).replace(R.id.container, submitAppFragment).commit();
 
 				for (SelectablePackageInfo selectablePackageInfo : selectablePackageInfos) {
 					mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);

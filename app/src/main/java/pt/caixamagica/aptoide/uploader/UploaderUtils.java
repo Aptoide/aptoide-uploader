@@ -97,8 +97,6 @@ public class UploaderUtils {
 
 	public static String computeHmacSha1(String value, String keyString) throws InvalidKeyException, IllegalStateException, UnsupportedEncodingException,
 			NoSuchAlgorithmException {
-//        System.out.println("computeHmacSha1 value: " + value);
-//        System.out.println("computeHmacSha1 keyString: " + keyString);
 		SecretKeySpec key = new SecretKeySpec((keyString).getBytes("UTF-8"), "HmacSHA1");
 		Mac mac = Mac.getInstance("HmacSHA1");
 		mac.init(key);
@@ -108,25 +106,17 @@ public class UploaderUtils {
 		return convToHex(bytes);
 	}
 
-	public static <T extends FragmentActivity & LoadingFragment.LoadingCallback> void pushLoadingFragment(T context, int container, String str) {
+	public static <T extends FragmentActivity> void pushLoadingFragment(T context, int container, String str) {
 		LoadingFragment loadingFragment = new LoadingFragment();
 		loadingFragment.setText(str);
 		if (!context.isFinishing()) context.getSupportFragmentManager().beginTransaction().addToBackStack("").replace(container, loadingFragment).commit();
 	}
 
 	public static void popLoadingFragment(FragmentActivity context) {
-//        System.out.println("Debug: popLoadingFragment: " + context.getSupportFragmentManager().getBackStackEntryCount());
 		if (context.getSupportFragmentManager().getBackStackEntryCount() > 0) context.getSupportFragmentManager().popBackStack();
 	}
 
 	public static void checkSpiceManagerPendingContent(final SpiceManager spiceManager, final String cacheKey, PendingRequestListener pendingRequestListener, Class clazz) {
-
-//        try {
-//            System.out.println("Debug: Pending: " + spiceManager.getPendingRequestCount());
-//            System.out.println("Debug: Cache: " + spiceManager.isDataInCache(clazz, cacheKey, DurationInMillis.ONE_SECOND * 5).isDone());
-//        } catch (CacheCreationException e) {
-//            e.printStackTrace();
-//        }
 
 		spiceManager.addListenerIfPending(clazz, cacheKey, pendingRequestListener);
 

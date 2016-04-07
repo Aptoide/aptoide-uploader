@@ -49,7 +49,6 @@ public class OAuth {
 	@Override
 	public String toString() {
 
-//        String separator = System.getProperty("line.separator");
 		String separator = " ";
 
 		StringBuilder builder = new StringBuilder();
