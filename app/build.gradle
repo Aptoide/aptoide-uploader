@@ -52,7 +52,7 @@ android {
     defaultConfig {
         applicationId "pt.caixamagica.aptoide.uploader"
         minSdkVersion 9
-        targetSdkVersion 23
+        targetSdkVersion 22
         versionCode 22
         versionName "2.1"
 
