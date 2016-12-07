@@ -37,6 +37,8 @@ public class ConfirmationDialog extends DialogFragment {
 
 		int textViewId = alertDialog.getContext().getResources().getIdentifier("android:id/alertTitle", null, null);
 		TextView tv = (TextView) alertDialog.findViewById(textViewId);
+		alertDialog.getButton(DialogInterface.BUTTON_POSITIVE).setTextColor(getResources().getColor(R.color.wallet_holo_blue_light));
+		alertDialog.getButton(DialogInterface.BUTTON_NEGATIVE).setTextColor(getResources().getColor(R.color.wallet_holo_blue_light));
 		tv.setTextColor(Color.BLACK);
 
 		return alertDialog;
