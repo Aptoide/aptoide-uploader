@@ -14,6 +14,9 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
+import java.util.concurrent.Executors;
+import java.util.concurrent.TimeUnit;
+
 import pt.caixamagica.aptoide.uploader.R;
 
 /**
@@ -59,6 +62,23 @@ public class SplashDialogFragment extends DialogFragment {
 		view.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View view) {
+				dismissSplashScreen();
+			}
+		});
+
+		Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
+			@Override
+			public void run() {
+						dismissSplashScreen();
+			}
+		}, 3, TimeUnit.SECONDS);
+
+	}
+
+	private void dismissSplashScreen() {
+		getActivity().runOnUiThread(new Runnable() {
+			@Override
+			public void run() {
 				mCallback.checkStoredCredentialsCallback();
 				dismiss();
 			}
