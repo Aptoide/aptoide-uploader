@@ -38,6 +38,7 @@ import android.widget.Toast;
 import com.manuelpeinado.multichoiceadapter.MultiChoiceAdapter;
 import com.octo.android.robospice.SpiceManager;
 
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -154,6 +155,23 @@ public class FragmentAppView extends Fragment {
 		}).start();
 	}
 
+	private void sortByLastInstall() {
+		Toast.makeText(getActivity(), "Sorting by Date", Toast.LENGTH_SHORT).show();
+
+		new Thread(new Runnable() {
+			@Override
+			public void run() {
+				Collections.sort(adapter.mDataset, newLastInstallComparator());
+				getActivity().runOnUiThread(new Runnable() {
+					@Override
+					public void run() {
+						adapter.notifyDataSetChanged();
+					}
+				});
+			}
+		}).start();
+	}
+
 	private MenuItem.OnMenuItemClickListener sortByNameListener() {
 		return new MenuItem.OnMenuItemClickListener() {
 			@Override
@@ -228,6 +246,21 @@ public class FragmentAppView extends Fragment {
 		};
 	}
 
+	public Comparator<SelectablePackageInfo> newLastInstallComparator() {
+		return new Comparator<SelectablePackageInfo>() {
+			@Override
+			public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
+				return (int) (getLastInstallDate(rhs) / 1000 - getLastInstallDate(lhs) / 1000);
+			}
+		};
+	}
+
+	private long getLastInstallDate(PackageInfo packageInfo) {
+		PackageManager pm = getContext().getPackageManager();
+		String appFile = packageInfo.applicationInfo.sourceDir;
+		return new File(appFile).lastModified(); //Epoch Time
+	}
+
 	@Override
 	public void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
@@ -257,7 +290,7 @@ public class FragmentAppView extends Fragment {
 					public void onItemSelected(AdapterView<?> arg0, View arg1, int arg2, long arg3) {
 
 						if (arg2 == 0) {
-							sortByFirstInstall();
+							sortByLastInstall();
 						}
 
 						if (arg2 == 1) {
@@ -487,23 +520,9 @@ public class FragmentAppView extends Fragment {
 			selectablePackageInfos.add(new SelectablePackageInfo(p, getActivity().getPackageManager()));
 		}
 
-		if (ordered) Collections.sort(selectablePackageInfos, getComparatorInstallDate());
+		if (ordered) Collections.sort(selectablePackageInfos, newLastInstallComparator());
 
 		return selectablePackageInfos;
-	}
-
-	/**
-	 * Comparator para ordenar por data de instalação (descendente).
-	 *
-	 * @return Comparator para ordenar por data de instalação (descendente).
-	 */
-	private Comparator<SelectablePackageInfo> getComparatorInstallDate() {
-		return new Comparator<SelectablePackageInfo>() {
-			@Override
-			public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
-				return (rhs.firstInstallTime > lhs.firstInstallTime ? 1 : -1);
-			}
-		};
 	}
 
 	private boolean isSystemPackage(PackageInfo packageInfo) {
