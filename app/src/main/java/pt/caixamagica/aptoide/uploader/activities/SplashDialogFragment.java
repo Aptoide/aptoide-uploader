@@ -25,6 +25,7 @@ import pt.caixamagica.aptoide.uploader.R;
 public class SplashDialogFragment extends DialogFragment {
 
 	OnHeadlineSelectedListener mCallback;
+	private boolean resumed;
 
 	@Override
 	public void onAttach(Activity activity) {
@@ -76,13 +77,25 @@ public class SplashDialogFragment extends DialogFragment {
 	}
 
 	private void dismissSplashScreen() {
-		getActivity().runOnUiThread(new Runnable() {
-			@Override
-			public void run() {
-				mCallback.checkStoredCredentialsCallback();
-				dismiss();
-			}
-		});
+		if (resumed) {
+			getActivity().runOnUiThread(new Runnable() {
+				@Override
+				public void run() {
+					mCallback.checkStoredCredentialsCallback();
+					dismiss();
+				}
+			});
+		}
+	}
+
+	@Override public void onResume() {
+		super.onResume();
+		resumed = true;
+	}
+
+	@Override public void onPause() {
+		resumed = false;
+		super.onPause();
 	}
 
 	@Override
