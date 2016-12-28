@@ -53,8 +53,8 @@ android {
         applicationId "pt.caixamagica.aptoide.uploader"
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 23
-        versionName "2.2"
+        versionCode 24
+        versionName "2.3"
 
         buildConfigField BOOLEAN, GMS_CONFIGURED, (gmsServerId != null).toString()
         buildConfigField STRING, GMS_SERVER_ID, "\"" + gmsServerId.toString() + "\""
