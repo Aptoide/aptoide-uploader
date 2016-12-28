@@ -116,7 +116,7 @@ dependencies {
     compile 'com.squareup.picasso:picasso:2.4.0'
     compile 'com.android.support:recyclerview-v7:23.2.1'
     compile 'com.github.manuelpeinado.multichoiceadapter:multichoiceadapter:3.1.0'
-    compile 'com.facebook.android:facebook-android-sdk:3.23.0'
+    compile 'com.facebook.android:facebook-android-sdk:3.23.1'
     compile 'com.google.android.gms:play-services:6.5.87'
     provided 'org.projectlombok:lombok:1.16.0'
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {

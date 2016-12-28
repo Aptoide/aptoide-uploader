@@ -26,4 +26,6 @@
     <string name="create_repo">"Create"</string>
     <string name="cancel">Cancel</string>
 
+    <string name="facebook_error">You should provide your email in order to login.</string>
+
 </resources>

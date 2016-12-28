@@ -15,6 +15,7 @@ import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
+import android.text.TextUtils;
 import android.text.method.PasswordTransformationMethod;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
@@ -27,7 +28,6 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
-
 import com.facebook.FacebookException;
 import com.facebook.Request;
 import com.facebook.Response;
@@ -36,9 +36,7 @@ import com.facebook.SessionState;
 import com.facebook.UiLifecycleHelper;
 import com.facebook.model.GraphUser;
 import com.facebook.widget.LoginButton;
-
 import java.util.Arrays;
-
 import pt.caixamagica.aptoide.uploader.activities.LoginActivity;
 import pt.caixamagica.aptoide.uploader.components.callbacks.login.LoginActivityCallback;
 import pt.caixamagica.aptoide.uploader.model.UserInfo;
@@ -71,10 +69,23 @@ public class LoginFragment extends Fragment {
 
 			if (state.isOpened()) {
 				Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+
 					@Override
 					public void onCompleted(final GraphUser user, Response response) {
+
+						String username = user.getProperty("email") == null ? "" : user.getProperty("email").toString();
+
+						if (TextUtils.isEmpty(username)) {
+							session.close();
+
+							getActivity().runOnUiThread(new Runnable() {
+								public void run() {
+									Toast.makeText(getActivity(), R.string.facebook_error, Toast.LENGTH_LONG).show();
+								}
+							});
+						}
+
 						if (session == Session.getActiveSession() && user != null) {
-							String username = user.getProperty("email").toString();
 							String authToken = session.getAccessToken();
 							OAuth2AuthenticationRequest.Mode mode = OAuth2AuthenticationRequest.Mode.facebook;
 
@@ -109,7 +120,7 @@ public class LoginFragment extends Fragment {
 				if (error.getMessage().equals("Log in attempt aborted.")) return;
 
 				error.printStackTrace();
-				Toast.makeText(getActivity(), R.string.loginFail, Toast.LENGTH_LONG).show();
+				Toast.makeText(getActivity(), "yup sou eu lol", Toast.LENGTH_LONG).show();
 			}
 		});
 	}
