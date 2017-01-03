@@ -296,7 +296,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 			@Override
 			public void run() {
 
-				final String serverId = BuildConfig.GMS_SERVER_ID;
+					final String serverId = BuildConfig.GMS_SERVER_ID;
 
 				String accountName = Plus.AccountApi.getAccountName(mGoogleApiClient);
 				try {
