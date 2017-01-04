@@ -16,15 +16,12 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
-
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
-
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
@@ -157,6 +154,16 @@ public class UploadService extends Service {
 				}
 			}
 
+			private boolean hasErrorCodes(List<Error> errors, String... errCodes) {
+				for (String errCode : errCodes) {
+					if (hasErrorCode(errors, errCode)) {
+						return true;
+					}
+				}
+
+				return false;
+			}
+
 			private boolean hasErrorCode(List<Error> errors, String errCode) {
 				for (Error e : errors) {
 					if (e.getCode().equals(errCode)) return true;
@@ -182,7 +189,7 @@ public class UploadService extends Service {
 			}
 
 			private boolean isDummyUploadError(List<Error> errors) {
-				return hasErrorCode(errors, "MARG-100");
+				return hasErrorCodes(errors, "MARG-100", "MARG-101", "MARG-102" ,"MARG-103");
 			}
 
 			private boolean setErrorFlag(Error error) {
