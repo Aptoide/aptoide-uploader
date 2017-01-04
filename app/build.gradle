@@ -31,6 +31,10 @@ repositories {
 
 
 android {
+    lintOptions {
+        disable 'MissingTranslation'
+        abortOnError false
+    }
     signingConfigs {
         release {
             storeFile = file(project.STORE_FILE_BACKUP)
