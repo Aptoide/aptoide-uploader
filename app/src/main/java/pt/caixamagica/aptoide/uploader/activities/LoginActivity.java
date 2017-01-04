@@ -125,7 +125,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 	protected void onResume() {
 		super.onResume();
 
-		if (dismissSplash && splashDialogFragment != null) {
+		if (dismissSplash && splashDialogFragment != null && splashDialogFragment.isAdded()) {
 			dismissSplash = false;
 			checkStoredCredentialsCallback();
 			splashDialogFragment.dismiss();
