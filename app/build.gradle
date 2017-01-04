@@ -47,7 +47,8 @@ android {
         applicationId "pt.caixamagica.aptoide.uploader"
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 24
+        Integer value = project.APTOIDE_UPLOADER_VERSION_CODE.toInteger();
+        versionCode value
         versionName "2.3"
 
         manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
