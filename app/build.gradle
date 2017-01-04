@@ -1,3 +1,5 @@
+apply plugin: 'com.android.application'
+
 buildscript {
     repositories {
         maven { url 'https://maven.fabric.io/public' }
@@ -7,15 +9,8 @@ buildscript {
         classpath 'io.fabric.tools:gradle:1.+'
     }
 }
-apply plugin: 'com.android.application'
-apply plugin: 'io.fabric'
 
-// Should be moved to application module when possible
-Properties localProperties = new Properties()
-localProperties.load(new FileInputStream("local.properties"))
-
-def gmsServerId = localProperties.GMS_SERVER_ID
-def fabricApiKey = localProperties.FABRIC_API_KEY
+def fabricApiKey = project.FABRIC_API_KEY
 def fabricConfigured = fabricApiKey != null
 if (fabricConfigured) {
     task fabricGenerateProperties {
@@ -36,42 +31,38 @@ repositories {
 
 
 android {
+    signingConfigs {
+        release {
+            storeFile = file(project.STORE_FILE_BACKUP)
+            storePassword = project.STORE_PASSWORD_BACKUP
+            keyAlias = project.KEY_ALIAS_UPLOADER
+            keyPassword = project.KEY_PASSWORD_UPLOADER
+//            v2SigningEnabled = false
+        }
+    }
+
     compileSdkVersion 23
     buildToolsVersion "23.0.3"
-
-    signingConfigs { release }
-
-    def BOOLEAN = "boolean"
-    def STRING = "String"
-
-    def GMS_CONFIGURED = "GMS_CONFIGURED"
-    def GMS_SERVER_ID = "GMS_SERVER_ID"
-    def FACEBOOK_CONFIGURED = "FACEBOOK_CONFIGURED"
-    def FABRIC_CONFIGURED = "FABRIC_CONFIGURED"
 
     defaultConfig {
         applicationId "pt.caixamagica.aptoide.uploader"
         minSdkVersion 9
         targetSdkVersion 22
-        versionCode 24
+        Integer value = project.APTOIDE_UPLOADER_VERSION_CODE.toInteger();
+        versionCode value
         versionName "2.3"
 
-        buildConfigField BOOLEAN, GMS_CONFIGURED, (gmsServerId != null).toString()
-        buildConfigField STRING, GMS_SERVER_ID, "\"" + gmsServerId.toString() + "\""
+        manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
 
-        buildConfigField BOOLEAN, FABRIC_CONFIGURED, (fabricApiKey != null).toString()
+        buildConfigField "String", "GMS_SERVER_ID", "\"" + project.GMS_SERVER_ID + "\""
 
-        def facebookAppId = localProperties.FACEBOOK_APP_ID
-        def facebookAppIdExists = facebookAppId != null
-        buildConfigField BOOLEAN, FACEBOOK_CONFIGURED, facebookAppIdExists.toString()
-        facebookAppId = facebookAppIdExists ? facebookAppId.toString() : "0"
-        resValue "string", "facebook_app_id", "\"" + facebookAppId + "\""
+        resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID + "\""
     }
+
     buildTypes {
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-
             signingConfig signingConfigs.release
 
             applicationVariants.all { variant ->
@@ -87,6 +78,7 @@ android {
         }
 
         debug {
+            applicationIdSuffix ".debug"
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
         }
@@ -122,26 +114,4 @@ dependencies {
     compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
         transitive = true;
     }
-}
-
-def File propFile = new File('signing.properties')
-if (propFile.canRead()) {
-    def Properties props = new Properties()
-    props.load(new FileInputStream(propFile))
-
-    if (props != null && props.containsKey('STORE_FILE') && props.containsKey('STORE_PASSWORD') &&
-            props.containsKey('KEY_ALIAS') && props.containsKey('KEY_PASSWORD')) {
-
-        android.signingConfigs.release.storeFile = file(props['STORE_FILE'])
-        android.signingConfigs.release.storePassword = props['STORE_PASSWORD']
-        android.signingConfigs.release.keyAlias = props['KEY_ALIAS']
-        android.signingConfigs.release.keyPassword = props['KEY_PASSWORD']
-        println 'all good to go'
-    } else {
-        android.buildTypes.release.signingConfig = null
-        println 'signing.properties found but some entries are missing'
-    }
-} else {
-    println 'signing.properties not found'
-    android.buildTypes.release.signingConfig = null
 }
