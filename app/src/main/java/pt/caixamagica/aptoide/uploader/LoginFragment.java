@@ -120,7 +120,6 @@ public class LoginFragment extends Fragment {
 				if (error.getMessage().equals("Log in attempt aborted.")) return;
 
 				error.printStackTrace();
-				Toast.makeText(getActivity(), "yup sou eu lol", Toast.LENGTH_LONG).show();
 			}
 		});
 	}
