@@ -54,7 +54,7 @@ android {
         targetSdkVersion 22
         Integer value = project.APTOIDE_UPLOADER_VERSION_CODE.toInteger();
         versionCode value
-        versionName "2.3"
+        versionName "2.4"
 
         manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
 
