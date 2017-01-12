@@ -9,6 +9,8 @@ import java.io.Serializable;
 import java.util.List;
 
 import lombok.Data;
+import lombok.Getter;
+import lombok.Setter;
 import lombok.ToString;
 
 /**
@@ -20,6 +22,8 @@ public class UserCredentialsJson implements Serializable {
 
 	public String status;
 
+	@Setter @Getter
+	public String refreshToken;
 	public String token;
 	public String avatar;
 	public String username;

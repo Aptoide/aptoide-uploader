@@ -23,6 +23,7 @@ import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.Setter;
 import pt.caixamagica.aptoide.uploader.UploaderUtils;
+import pt.caixamagica.aptoide.uploader.retrofit.OAuth2Request;
 import pt.caixamagica.aptoide.uploader.uploadService.RequestProgressListener;
 import pt.caixamagica.aptoide.uploader.webservices.json.UploadAppToRepoJson;
 import retrofit.http.Multipart;
@@ -127,7 +128,7 @@ public class UploadAppToRepoRequest extends RetrofitSpiceRequest<UploadAppToRepo
 
 			checkObbExistence();
 
-			parameters.put("token", token);
+			parameters.put("access_token", token);
 			parameters.put("repo", repo);
 			parameters.put("apkname", apkName);
 			parameters.put("description", description);
@@ -142,7 +143,7 @@ public class UploadAppToRepoRequest extends RetrofitSpiceRequest<UploadAppToRepo
 			parameters.put("upload_from", uploadFrom);
 			parameters.put("obb_main_filename", fileName(obbMainPath));
 			parameters.put("obb_patch_filename", fileName(obbPatchPath));
-			parameters.put("mode", "json");
+			parameters.put("mode", "response");
 
 			if (FLAG_APK) {
 				parameters.put("apk", newTweakedTypedFile("apk", apkPath));
@@ -162,7 +163,14 @@ public class UploadAppToRepoRequest extends RetrofitSpiceRequest<UploadAppToRepo
 				} else parameters.put("obb_patch_md5sum", UploaderUtils.md5Calc(new File(obbPatchPath)));
 			}
 
-			return getService().uploadAppToRepo(parameters);
+			UploadAppToRepoJson response = getService().uploadAppToRepo(parameters);
+			if (response.getErrors().get(0).getCode().equals("AUTH-2")) {
+				OAuth2Request oAuth2Request = new OAuth2Request();
+				token = oAuth2Request.builder();
+				parameters.put("access_token", token);
+				response = getService().uploadAppToRepo(parameters);
+			}
+			return response;
 		} catch (Exception e) {
 			// Trick para forçar a chamada do onRequestFailure pois aparentemente nem sempre isso acontece
 			throw new SpiceException("");
@@ -251,7 +259,7 @@ public class UploadAppToRepoRequest extends RetrofitSpiceRequest<UploadAppToRepo
 	public interface Webservice {
 
 		@Multipart
-		@POST("/2/uploadAppToRepo")
+		@POST("/3/uploadAppToRepo")
 		UploadAppToRepoJson uploadAppToRepo(@PartMap Map<String, Object> params);
 	}
 }

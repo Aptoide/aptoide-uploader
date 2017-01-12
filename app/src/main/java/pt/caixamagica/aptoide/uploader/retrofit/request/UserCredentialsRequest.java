@@ -9,6 +9,7 @@ import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
 import java.util.HashMap;
 
+import pt.caixamagica.aptoide.uploader.retrofit.OAuth2Request;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
@@ -33,7 +34,14 @@ public class UserCredentialsRequest extends RetrofitSpiceRequest<UserCredentials
 		parameters.put("access_token", token);
 		parameters.put("mode", "json");
 
-		return getService().getUserInfo(parameters);
+		UserCredentialsJson response = getService().getUserInfo(parameters);
+		if (response.getErrors().get(0).getCode().equals("AUTH-2")) {
+			OAuth2Request oAuth2Request = new OAuth2Request();
+			token = oAuth2Request.builder();
+			parameters.put("access_token", token);
+			response = getService().getUserInfo(parameters);
+		}
+		return response;
 	}
 
 	public String getToken() {

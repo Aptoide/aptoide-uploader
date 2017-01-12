@@ -16,6 +16,9 @@ import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.IBinder;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+import android.widget.Toast;
+
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -26,8 +29,10 @@ import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploadService;
+import pt.caixamagica.aptoide.uploader.retrofit.request.OAuth2AuthenticationRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UploadAppToRepoRequest;
 import pt.caixamagica.aptoide.uploader.webservices.json.Error;
+import pt.caixamagica.aptoide.uploader.webservices.json.OAuth;
 import pt.caixamagica.aptoide.uploader.webservices.json.UploadAppToRepoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -125,6 +130,24 @@ public class UploadService extends Service {
 			@Override
 			public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
 				if (uploadAppToRepoJson.getErrors() != null) {
+
+//					if (uploadAppToRepoJson.getErrors().get(0).getCode().equals("AUTH-2")) {
+//						OAuth2AuthenticationRequest oAuth2AuthenticationRequest = new OAuth2AuthenticationRequest();
+//						oAuth2AuthenticationRequest.bean.setGrant_type("refresh_token");
+//						oAuth2AuthenticationRequest.bean.setRefresh_token(userCredentialsJson.getRefreshToken());
+//						spiceManager.execute(oAuth2AuthenticationRequest, new RequestListener<OAuth>() {
+//							@Override
+//							public void onRequestFailure(SpiceException spiceException) {
+//
+//							}
+//
+//							@Override
+//							public void onRequestSuccess(OAuth oAuth) {
+//								userCredentialsJson.setToken(oAuth.getAccess_token());
+//								Toast.makeText(getApplicationContext(), "Please try again", Toast.LENGTH_LONG).show();
+//							}
+//						});
+//					}
 
 					// Don't show notification if the problem is lack of info
 					if (isDummyUploadError(uploadAppToRepoJson.getErrors())) {

@@ -41,6 +41,7 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.PendingRequestListener;
+import com.octo.android.robospice.request.listener.RequestListener;
 
 import java.io.IOException;
 import java.util.LinkedList;
@@ -90,6 +91,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 	private ConnectionResult mConnectionResult;
 	private Fragment mContent;
 	private UserInfo userInfo;
+	private UserCredentialsJson userCredentials;
 
 	@Override
 	protected void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -229,10 +231,12 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 			try {
 				String token = aesObfuscator.unobfuscate(sharedpreferences.getString("token", ""), "token");
+				String refreshToken = aesObfuscator.unobfuscate(sharedpreferences.getString("refreshToken", ""), "refreshToken");
 				String repo = aesObfuscator.unobfuscate(sharedpreferences.getString("repo", ""), "repo");
 
 				UserCredentialsJson userCredentialsJson = new UserCredentialsJson();
 				userCredentialsJson.setToken(token);
+				userCredentialsJson.setRefreshToken(refreshToken);
 				userCredentialsJson.setRepo(repo);
 				return userCredentialsJson;
 			} catch (ValidationException e) {
@@ -246,20 +250,27 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 			try {
 				String URL = "content://cm.aptoide.pt.StubProvider";
 				Uri token_uri = Uri.parse(URL + "/token");
+				Uri refresh_token_uri = Uri.parse(URL + "/refreshToken");
 				Uri repo_uri = Uri.parse(URL + "/repo");
 
 				Cursor c1 = getContentResolver().query(token_uri, null, null, null, null);
-				Cursor c2 = getContentResolver().query(repo_uri, null, null, null, null);
+				Cursor c2 = getContentResolver().query(refresh_token_uri, null, null, null, null);
+				Cursor c3 = getContentResolver().query(repo_uri, null, null, null, null);
 
 				c1.moveToFirst();
 				c2.moveToFirst();
+				c3.moveToFirst();
 
 				UserCredentialsJson userCredentialsJson = new UserCredentialsJson();
 				userCredentialsJson.setToken(c1.getString(c1.getColumnIndex("userToken")));
-				userCredentialsJson.setRepo(c2.getString(c2.getColumnIndex("userRepo")));
+				userCredentialsJson.setRefreshToken(c2.getString(c2.getColumnIndex("userRefreshToken")));
+				userCredentialsJson.setRepo(c3.getString(c3.getColumnIndex("userRepo")));
+
+				storeToken(userCredentialsJson);
 
 				c1.close();
 				c2.close();
+				c3.close();
 
 				return userCredentialsJson;
 			} catch (Exception e) {
@@ -438,7 +449,22 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 			// Isto não devia ser bem assim, mas enfim..
 			if (!"FAIL".equals(oAuth.getStatus())) {
 				getUserInfo(oAuth);
-			}
+			}/* else if (oAuth.getError().get(0).getCode().equals("AUTH-2")) {
+				OAuth2AuthenticationRequest oAuth2AuthenticationRequest = new OAuth2AuthenticationRequest();
+				oAuth2AuthenticationRequest.bean.setGrant_type("refresh_token");
+				oAuth2AuthenticationRequest.bean.setRefresh_token(userCredentials.getRefreshToken());
+				spiceManager.execute(oAuth2AuthenticationRequest, new RequestListener<OAuth>() {
+					@Override
+					public void onRequestFailure(SpiceException spiceException) {
+
+					}
+
+					@Override
+					public void onRequestSuccess(OAuth oAuth) {
+						userCredentials.setToken(oAuth.getAccess_token());
+					}
+				});
+			}*/
 			// Caso o login seja enviado em branco, cai aqui.
 			else {
 				UploaderUtils.popLoadingFragment(LoginActivity.this);
@@ -449,23 +475,25 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 		}
 	}
 
+	private void storeToken(UserCredentialsJson userCredentialsJson) {
+
+		// Try to use more dgradleata here. ANDROID_ID is a single point of attack.
+		String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+		AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), deviceId);
+
+		SharedPreferences sharedpreferences = getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+		SharedPreferences.Editor editor = sharedpreferences.edit();
+
+		editor.putString("token", aesObfuscator.obfuscate(userCredentialsJson.getToken(), "token"));
+		editor.putString("refreshToken", aesObfuscator.obfuscate(userCredentialsJson.getRefreshToken(), "refreshToken"));
+		editor.putString("repo", aesObfuscator.obfuscate(userCredentialsJson.getRepo(), "repo"));
+
+		editor.commit();
+	}
+
 	public class UserCredentialsPendingRequestListener implements PendingRequestListener<UserCredentialsJson> {
 
-		private void storeToken(UserCredentialsJson userCredentialsJson) {
-
-			// Try to use more dgradleata here. ANDROID_ID is a single point of attack.
-			String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-
-			AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), deviceId);
-
-			SharedPreferences sharedpreferences = getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
-			SharedPreferences.Editor editor = sharedpreferences.edit();
-
-			editor.putString("token", aesObfuscator.obfuscate(userCredentialsJson.getToken(), "token"));
-			editor.putString("repo", aesObfuscator.obfuscate(userCredentialsJson.getRepo(), "repo"));
-
-			editor.commit();
-		}
 
 		@Override
 		public void onRequestFailure(SpiceException spiceException) {

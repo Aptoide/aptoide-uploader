@@ -45,7 +45,7 @@ public class OAuth2AuthenticationRequest extends RetrofitSpiceRequest<OAuth, OAu
 		s = objectMapper.writeValueAsString(hashMap);
 
 		HashMap<String, String> parameters = new HashMap<String, String>();
-		parameters.put("grant_type", "password");
+		parameters.put("grant_type", bean.getGrant_type());
 		parameters.put("client_id", "Aptoide");
 		parameters.put("mode", "json");
 
@@ -111,7 +111,7 @@ public class OAuth2AuthenticationRequest extends RetrofitSpiceRequest<OAuth, OAu
 	public class Bean {
 
 		@JsonProperty("mode") public final String tmp = "json";
-		public final String grant_type = "password";
+		@Getter @Setter private String grant_type = "password";
 		public final String client_id = "Aptoide";
 		@Getter @Setter private String username;
 		@Getter @Setter private String password;
@@ -125,5 +125,6 @@ public class OAuth2AuthenticationRequest extends RetrofitSpiceRequest<OAuth, OAu
 		@Getter @Setter private String privacy_pass;
 		@Getter @Setter private Mode authMode;
 		@Getter @Setter private String nameForGoogle;
+		@Getter @Setter private String refresh_token;
 	}
 }
