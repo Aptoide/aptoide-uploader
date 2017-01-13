@@ -17,6 +17,8 @@ public class UploadAppToRepoJson {
 
 	private String status;
 	private Info info;
+	private String error;
+	private String error_description;
 	private List<Error> errors;
 
 	@Data

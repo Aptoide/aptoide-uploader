@@ -32,6 +32,8 @@ public class UserCredentialsJson implements Serializable {
 	public List<Error> errors;
 	public Settings settings;
 	String repo;
+	@Getter private String error;
+	@Getter private String error_description;
 
 	public Settings getSettings() {
 		return settings;
