@@ -222,27 +222,7 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 
 	private UserCredentialsJson getStoredUserCredentials() {
 
-		SharedPreferences sharedpreferences = this.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-		if (sharedpreferences != null && sharedpreferences.getAll().size() > 0) {
-			String deviceId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-
-			AESObfuscator aesObfuscator = new AESObfuscator(SALT, this.getPackageName(), deviceId);
-
-			try {
-				String token = aesObfuscator.unobfuscate(sharedpreferences.getString("token", ""), "token");
-				String refreshToken = aesObfuscator.unobfuscate(sharedpreferences.getString("refreshToken", ""), "refreshToken");
-				String repo = aesObfuscator.unobfuscate(sharedpreferences.getString("repo", ""), "repo");
-
-				UserCredentialsJson userCredentialsJson = new UserCredentialsJson();
-				userCredentialsJson.setToken(token);
-				userCredentialsJson.setRefreshToken(refreshToken);
-				userCredentialsJson.setRepo(repo);
-				return userCredentialsJson;
-			} catch (ValidationException e) {
-				e.printStackTrace();
-			}
-		}
 
 		AccountManager accountManager = AccountManager.get(this);
 		if (!AptoideUploaderApplication.isForcedLogout() && accountManager.getAccountsByType("cm.aptoide.pt").length != 0) {
@@ -275,6 +255,30 @@ public class LoginActivity extends AppCompatActivity implements GoogleApiClient.
 				return userCredentialsJson;
 			} catch (Exception e) {
 				e.printStackTrace();
+			}
+		} else {
+			SharedPreferences sharedpreferences = this.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+
+			if (sharedpreferences != null && sharedpreferences.getAll().size() > 0) {
+				String deviceId = Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+
+				AESObfuscator aesObfuscator = new AESObfuscator(SALT, this.getPackageName(), deviceId);
+
+				try {
+					String token = aesObfuscator.unobfuscate(sharedpreferences.getString("token", ""), "token");
+					String refreshToken = aesObfuscator.unobfuscate(sharedpreferences.getString("refreshToken", ""), "refreshToken");
+					String repo = aesObfuscator.unobfuscate(sharedpreferences.getString("repo", ""), "repo");
+
+					UserCredentialsJson userCredentialsJson = new UserCredentialsJson();
+					userCredentialsJson.setToken(token);
+					userCredentialsJson.setRefreshToken(refreshToken);
+					userCredentialsJson.setRepo(repo);
+					return userCredentialsJson;
+				} catch (ValidationException e) {
+					e.printStackTrace();
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
 			}
 		}
 
