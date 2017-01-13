@@ -35,11 +35,14 @@ public class UserCredentialsRequest extends RetrofitSpiceRequest<UserCredentials
 		parameters.put("mode", "json");
 
 		UserCredentialsJson response = getService().getUserInfo(parameters);
-		if (response.getErrors().get(0).getCode().equals("AUTH-2")) {
-			OAuth2Request oAuth2Request = new OAuth2Request();
-			token = oAuth2Request.builder();
-			parameters.put("access_token", token);
-			response = getService().getUserInfo(parameters);
+		if (!(response == null)) {
+			if ((("The access token provided is invalid").equals(response.getError_description())
+					|| ("The access token provided has expired").equals(response.getError_description()))) {
+				OAuth2Request oAuth2Request = new OAuth2Request();
+				token = oAuth2Request.builder();
+				parameters.put("access_token", token);
+				response = getService().getUserInfo(parameters);
+			}
 		}
 		return response;
 	}

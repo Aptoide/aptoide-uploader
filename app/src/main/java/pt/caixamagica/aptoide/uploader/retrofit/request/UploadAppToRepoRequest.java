@@ -38,228 +38,237 @@ import retrofit.mime.TypedFile;
 @EqualsAndHashCode(callSuper = false)
 public class UploadAppToRepoRequest extends RetrofitSpiceRequest<UploadAppToRepoJson, UploadAppToRepoRequest.Webservice> {
 
-	// Flags de controlo de existencia no server.
-	@Setter private boolean FLAG_APK = false;
+    // Flags de controlo de existencia no server.
+    @Setter
+    private boolean FLAG_APK = false;
 
-	@Setter private boolean FLAG_MAIN_OBB = false;
+    @Setter
+    private boolean FLAG_MAIN_OBB = false;
 
-	@Setter private boolean FLAG_PATCH_OBB = false;
+    @Setter
+    private boolean FLAG_PATCH_OBB = false;
 
-	private RequestProgressListener requestProgressListenerObject;
+    private RequestProgressListener requestProgressListenerObject;
 
-	private String token;
+    private String token;
 
-	private String repo;
+    private String repo;
 
-	private String apkName;
+    private String apkName;
 
-	private String apkPath;
+    private String apkPath;
 
-	private String packageName;
+    private String packageName;
 
-	private String description;
+    private String description;
 
-	private Integer category;
+    private Integer category;
 
-	private Integer rating;
+    private Integer rating;
 
-	private String apkPhone;
+    private String apkPhone;
 
-	private String apkEmail;
+    private String apkEmail;
 
-	private String apkWebsite;
+    private String apkWebsite;
 
-	private List<String> screenshotsUri;
+    private List<String> screenshotsUri;
 
-	private boolean onlyUserRepo = false;
+    private boolean onlyUserRepo = false;
 
-	private String apkMd5sum;
+    private String apkMd5sum;
 
-	private int uploadType = 2;
+    private int uploadType = 2;
 
-	private String hmac;
+    private String hmac;
 
-	private String uploadFrom;
+    private String uploadFrom;
 
-	private String obbMainPath;
+    private String obbMainPath;
 
-	private String obbPatchPath;
+    private String obbPatchPath;
 
-	private String obbMainMd5sum;
+    private String obbMainMd5sum;
 
-	private String obbPatchMd5sum;
+    private String obbPatchMd5sum;
 
-	/**
-	 * Label cachada por questões de performance.
-	 */
-	private String label;
+    /**
+     * Label cachada por questões de performance.
+     */
+    private String label;
 
-	private boolean checked = false;
+    private boolean checked = false;
 
-	public UploadAppToRepoRequest() {
-		super(UploadAppToRepoJson.class, UploadAppToRepoRequest.Webservice.class);
-	}
+    public UploadAppToRepoRequest() {
+        super(UploadAppToRepoJson.class, UploadAppToRepoRequest.Webservice.class);
+    }
 
-	public UploadAppToRepoRequest(UploadAppToRepoRequest uploadAppToRepoRequest) {
-		this(uploadAppToRepoRequest.getRequestProgressListenerObject());
+    public UploadAppToRepoRequest(UploadAppToRepoRequest uploadAppToRepoRequest) {
+        this(uploadAppToRepoRequest.getRequestProgressListenerObject());
 
-		token = uploadAppToRepoRequest.token;
-		repo = uploadAppToRepoRequest.repo;
-		packageName = uploadAppToRepoRequest.packageName;
-		apkPath = uploadAppToRepoRequest.apkPath;
-		uploadType = uploadAppToRepoRequest.uploadType;
-		hmac = uploadAppToRepoRequest.hmac;
+        token = uploadAppToRepoRequest.token;
+        repo = uploadAppToRepoRequest.repo;
+        packageName = uploadAppToRepoRequest.packageName;
+        apkPath = uploadAppToRepoRequest.apkPath;
+        uploadType = uploadAppToRepoRequest.uploadType;
+        hmac = uploadAppToRepoRequest.hmac;
 
-		label = uploadAppToRepoRequest.label;
-	}
+        label = uploadAppToRepoRequest.label;
+    }
 
-	public UploadAppToRepoRequest(RequestProgressListener requestProgressListenerObject) {
-		this();
-		this.requestProgressListenerObject = requestProgressListenerObject;
-	}
+    public UploadAppToRepoRequest(RequestProgressListener requestProgressListenerObject) {
+        this();
+        this.requestProgressListenerObject = requestProgressListenerObject;
+    }
 
-	@Override
-	public UploadAppToRepoJson loadDataFromNetwork() throws SpiceException {
+    @Override
+    public UploadAppToRepoJson loadDataFromNetwork() throws SpiceException {
 
-		try {
-			setRequestProgressListener(requestProgressListenerObject);
+        try {
+            setRequestProgressListener(requestProgressListenerObject);
 
-			final HashMap<String, Object> parameters = new HashMap<>();
+            final HashMap<String, Object> parameters = new HashMap<>();
 
-			checkObbExistence();
+            checkObbExistence();
 
-			parameters.put("access_token", token);
-			parameters.put("repo", repo);
-			parameters.put("apkname", apkName);
-			parameters.put("description", description);
-			parameters.put("category", category);
-			parameters.put("rating", rating);
-			parameters.put("apk_phone", apkPhone);
-			parameters.put("apk_email", apkEmail);
-			parameters.put("apk_website", apkWebsite);
-			parameters.put("only_user_repo", onlyUserRepo);
-			parameters.put("uploadType", uploadType);
-			parameters.put("hmac", hmac);
-			parameters.put("upload_from", uploadFrom);
-			parameters.put("obb_main_filename", fileName(obbMainPath));
-			parameters.put("obb_patch_filename", fileName(obbPatchPath));
-			parameters.put("mode", "response");
+            parameters.put("access_token", token);
+            parameters.put("repo", repo);
+            parameters.put("apkname", apkName);
+            parameters.put("description", description);
+            parameters.put("category", category);
+            parameters.put("rating", rating);
+            parameters.put("apk_phone", apkPhone);
+            parameters.put("apk_email", apkEmail);
+            parameters.put("apk_website", apkWebsite);
+            parameters.put("only_user_repo", onlyUserRepo);
+            parameters.put("uploadType", uploadType);
+            parameters.put("hmac", hmac);
+            parameters.put("upload_from", uploadFrom);
+            parameters.put("obb_main_filename", fileName(obbMainPath));
+            parameters.put("obb_patch_filename", fileName(obbPatchPath));
+            parameters.put("mode", "json");
+            parameters.put("only_user_repo", true);
 
-			if (FLAG_APK) {
-				parameters.put("apk", newTweakedTypedFile("apk", apkPath));
-			} else {
-				parameters.put("apk_md5sum", UploaderUtils.md5Calc(new File(apkPath)));
-			}
+            if (FLAG_APK) {
+                parameters.put("apk", newTweakedTypedFile("apk", apkPath));
+            } else {
+                parameters.put("apk_md5sum", UploaderUtils.md5Calc(new File(apkPath)));
+            }
 
-			if (obbMainPath != null) {
-				if (FLAG_MAIN_OBB) {
-					parameters.put("obb_main", newTweakedTypedFile("obb", obbMainPath));
-				} else parameters.put("obb_main_md5sum", UploaderUtils.md5Calc(new File(obbMainPath)));
-			}
+            if (obbMainPath != null) {
+                if (FLAG_MAIN_OBB) {
+                    parameters.put("obb_main", newTweakedTypedFile("obb", obbMainPath));
+                } else
+                    parameters.put("obb_main_md5sum", UploaderUtils.md5Calc(new File(obbMainPath)));
+            }
 
-			if (obbPatchPath != null) {
-				if (FLAG_PATCH_OBB) {
-					parameters.put("obb_patch", newTweakedTypedFile("obb", obbPatchPath));
-				} else parameters.put("obb_patch_md5sum", UploaderUtils.md5Calc(new File(obbPatchPath)));
-			}
+            if (obbPatchPath != null) {
+                if (FLAG_PATCH_OBB) {
+                    parameters.put("obb_patch", newTweakedTypedFile("obb", obbPatchPath));
+                } else
+                    parameters.put("obb_patch_md5sum", UploaderUtils.md5Calc(new File(obbPatchPath)));
+            }
 
-			UploadAppToRepoJson response = getService().uploadAppToRepo(parameters);
-			if (response.getErrors().get(0).getCode().equals("AUTH-2")) {
-				OAuth2Request oAuth2Request = new OAuth2Request();
-				token = oAuth2Request.builder();
-				parameters.put("access_token", token);
-				response = getService().uploadAppToRepo(parameters);
-			}
-			return response;
-		} catch (Exception e) {
-			// Trick para forçar a chamada do onRequestFailure pois aparentemente nem sempre isso acontece
-			throw new SpiceException("");
-		} finally {
+            UploadAppToRepoJson response = getService().uploadAppToRepo(parameters);
+            if (!(response == null)) {
+                if ((("The access token provided is invalid").equals(response.getError_description())
+                        || ("The access token provided has expired").equals(response.getError_description()))) {
+                    OAuth2Request oAuth2Request = new OAuth2Request();
+                    token = oAuth2Request.builder();
+                    parameters.put("access_token", token);
+                    response = getService().uploadAppToRepo(parameters);
+                }
+            }
+            return response;
+        } catch (Exception e) {
+            // Trick para forçar a chamada do onRequestFailure pois aparentemente nem sempre isso acontece
+            throw new SpiceException("");
+        } finally {
 //            if (!isCancelled())
 //                publishProgress(100);
-		}
-	}
+        }
+    }
 
-	@Override
-	protected void publishProgress(float progress) {
-		super.publishProgress(progress);
-	}
+    @Override
+    protected void publishProgress(float progress) {
+        super.publishProgress(progress);
+    }
 
-	private String fileName(String apkPath) {
+    private String fileName(String apkPath) {
 
-		if (apkPath == null) return null;
+        if (apkPath == null) return null;
 
-		return apkPath.substring(apkPath.lastIndexOf("/") + 1);
-	}
+        return apkPath.substring(apkPath.lastIndexOf("/") + 1);
+    }
 
-	private void checkObbExistence() {
-		if (!checked) {
-			String sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
-			File obbDir = new File(sdcard + "/Android/obb/" + getPackageName() + "/");
-			if (obbDir.isDirectory()) {
+    private void checkObbExistence() {
+        if (!checked) {
+            String sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
+            File obbDir = new File(sdcard + "/Android/obb/" + getPackageName() + "/");
+            if (obbDir.isDirectory()) {
 
-				File[] files = obbDir.listFiles();
+                File[] files = obbDir.listFiles();
 
-				if (files != null) {
-					for (File file : files) {
+                if (files != null) {
+                    for (File file : files) {
 
-						if (file.getName().contains("main") && !file.getName().contains("--downloading")) {
-							obbMainPath = file.getAbsolutePath();
-						} else if (file.getName().contains("patch") && !file.getName().contains("--downloading")) {
-							obbPatchPath = file.getAbsolutePath();
-						}
-					}
-				}
-			}
-			checked = true;
-		}
-	}
+                        if (file.getName().contains("main") && !file.getName().contains("--downloading")) {
+                            obbMainPath = file.getAbsolutePath();
+                        } else if (file.getName().contains("patch") && !file.getName().contains("--downloading")) {
+                            obbPatchPath = file.getAbsolutePath();
+                        }
+                    }
+                }
+            }
+            checked = true;
+        }
+    }
 
-	private TypedFile newTweakedTypedFile(String extension, String apkPath) {
+    private TypedFile newTweakedTypedFile(String extension, String apkPath) {
 
-		String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+        String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
 
-		if (mimeType == null) mimeType = "application/octet-stream";
+        if (mimeType == null) mimeType = "application/octet-stream";
 
-		final File file = new File(apkPath);
-		return new TypedFile(mimeType, file) {
+        final File file = new File(apkPath);
+        return new TypedFile(mimeType, file) {
 
-			@Override
-			public void writeTo(OutputStream out) throws IOException {
-				byte[] buffer = new byte[4096];
-				FileInputStream in = new FileInputStream(file);
+            @Override
+            public void writeTo(OutputStream out) throws IOException {
+                byte[] buffer = new byte[4096];
+                FileInputStream in = new FileInputStream(file);
 
-				long fileSize = file.length();
+                long fileSize = file.length();
 
-				long percentageTicks = fileSize / 4096 / 100;
+                long percentageTicks = fileSize / 4096 / 100;
 
-				int parts = 0;
-				float progress = 0;
+                int parts = 0;
+                float progress = 0;
 
-				try {
-					int read;
-					while ((read = in.read(buffer)) != -1 && !isCancelled()) {
-						out.write(buffer, 0, read);
-						parts++;
-						if (percentageTicks > 0 && parts % percentageTicks == 0) {
-							progress = (float) parts * buffer.length / fileSize * 100;
-							publishProgress(progress);
-						}
-					}
-					if (read == -1) {
-						publishProgress(100);
-					}
-				} finally {
-					in.close();
-				}
-			}
-		};
-	}
+                try {
+                    int read;
+                    while ((read = in.read(buffer)) != -1 && !isCancelled()) {
+                        out.write(buffer, 0, read);
+                        parts++;
+                        if (percentageTicks > 0 && parts % percentageTicks == 0) {
+                            progress = (float) parts * buffer.length / fileSize * 100;
+                            publishProgress(progress);
+                        }
+                    }
+                    if (read == -1) {
+                        publishProgress(100);
+                    }
+                } finally {
+                    in.close();
+                }
+            }
+        };
+    }
 
-	public interface Webservice {
+    public interface Webservice {
 
-		@Multipart
-		@POST("/3/uploadAppToRepo")
-		UploadAppToRepoJson uploadAppToRepo(@PartMap Map<String, Object> params);
-	}
+        @Multipart
+        @POST("/3/uploadAppToRepo")
+        UploadAppToRepoJson uploadAppToRepo(@PartMap Map<String, Object> params);
+    }
 }
