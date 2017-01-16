@@ -10,15 +10,19 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.IBinder;
+import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.google.android.vending.licensing.AESObfuscator;
+import com.google.android.vending.licensing.ValidationException;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -35,6 +39,9 @@ import pt.caixamagica.aptoide.uploader.webservices.json.Error;
 import pt.caixamagica.aptoide.uploader.webservices.json.OAuth;
 import pt.caixamagica.aptoide.uploader.webservices.json.UploadAppToRepoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
+
+import static pt.caixamagica.aptoide.uploader.activities.LoginActivity.SALT;
+import static pt.caixamagica.aptoide.uploader.activities.LoginActivity.SHARED_PREFERENCES_FILE;
 
 /**
  * Created by neuro on 07-03-2015.
@@ -81,7 +88,7 @@ public class UploadService extends Service {
 		}
 	}
 
-	public void prepareUploadAndSend(UserCredentialsJson userCredentialsJson, SelectablePackageInfo packageInfo) {
+	public void prepareUploadAndSend(UserCredentialsJson userCredentialsJson, SelectablePackageInfo packageInfo) throws ValidationException {
 
 		if (this.userCredentialsJson == null) this.userCredentialsJson = userCredentialsJson;
 
@@ -94,11 +101,15 @@ public class UploadService extends Service {
 		NotificationCompat.Builder builder = setPreparingUploadNotification(packageInfo.packageName, packageInfo.getLabel());
 
 		RequestProgressListener requestProgressListener = new RequestProgressListener(getApplication(), intent, builder);
+		SharedPreferences sharedpreferences =
+				getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+
+		AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
 
 		UploadAppToRepoRequest uploadAppToRepoRequest = new UploadAppToRepoRequest(requestProgressListener);
 		uploadAppToRepoRequest.setPackageName(packageInfo.packageName);
 		uploadAppToRepoRequest.setApkName(packageInfo.getName());
-		uploadAppToRepoRequest.setToken(userCredentialsJson.token);
+		uploadAppToRepoRequest.setToken(aesObfuscator.unobfuscate(sharedpreferences.getString("token", ""), "token"));
 		uploadAppToRepoRequest.setApkPath(packageInfo.applicationInfo.sourceDir);
 		uploadAppToRepoRequest.setRepo(userCredentialsJson.getRepo());
 

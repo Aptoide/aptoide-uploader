@@ -66,7 +66,7 @@ public class LoginActivity extends AppCompatActivity
 
   public static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
 
-  private static final byte[] SALT = new byte[] {
+  public static final byte[] SALT = new byte[] {
       -46, 65, 30, -128, -103, -57, 74, -64, 51, 88, -95, -21, 77, -117, -36, -113, -11, 32, -64, 89
   };
 
@@ -393,6 +393,7 @@ public class LoginActivity extends AppCompatActivity
   private void getUserInfo(OAuth oAuth) {
     UserCredentialsRequest request = new UserCredentialsRequest();
     request.setToken(oAuth.getAccess_token());
+    storeToken(oAuth);
 
     spiceManager.execute(request, "getUserInfo", DEFAULT_CACHE_TIME,
         new UserCredentialsPendingRequestListener());
@@ -498,6 +499,40 @@ public class LoginActivity extends AppCompatActivity
     editor.commit();
   }
 
+  private void storeToken(OAuth oAuth) {
+
+    // Try to use more dgradleata here. ANDROID_ID is a single point of attack.
+    String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+    AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), deviceId);
+
+    SharedPreferences sharedpreferences =
+        getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = sharedpreferences.edit();
+
+    editor.putString("token", aesObfuscator.obfuscate(oAuth.getAccess_token(), "token"));
+    editor.putString("refreshToken",
+        aesObfuscator.obfuscate(oAuth.getRefreshToken(), "refreshToken"));
+
+    editor.commit();
+  }
+
+  private void storeRepo(UserCredentialsJson userCredentialsJson) {
+
+    // Try to use more dgradleata here. ANDROID_ID is a single point of attack.
+    String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+    AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), deviceId);
+
+    SharedPreferences sharedpreferences =
+        getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = sharedpreferences.edit();
+
+    editor.putString("repo", aesObfuscator.obfuscate(userCredentialsJson.getRepo(), "repo"));
+
+    editor.commit();
+  }
+
   public class UserCredentialsPendingRequestListener
       implements PendingRequestListener<UserCredentialsJson> {
 
@@ -520,8 +555,8 @@ public class LoginActivity extends AppCompatActivity
         UploaderUtils.popLoadingFragment(LoginActivity.this);
         return;
       }
-
-      storeToken(userCredentialsJson);
+      //storeToken(userCredentialsJson);
+      storeRepo(userCredentialsJson);
       switchToAppViewFragment(userCredentialsJson);
 
       spiceManager.removeAllDataFromCache();

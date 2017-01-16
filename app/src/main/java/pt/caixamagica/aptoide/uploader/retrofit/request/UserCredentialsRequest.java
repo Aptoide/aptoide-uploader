@@ -5,12 +5,15 @@
 
 package pt.caixamagica.aptoide.uploader.retrofit.request;
 
+import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 
 import java.util.HashMap;
 
 import pt.caixamagica.aptoide.uploader.retrofit.OAuth2Request;
+import pt.caixamagica.aptoide.uploader.webservices.json.UploadAppToRepoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
+import retrofit.RetrofitError;
 import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.POST;
@@ -31,20 +34,22 @@ public class UserCredentialsRequest extends RetrofitSpiceRequest<UserCredentials
 
 		HashMap<String, String> parameters = new HashMap<String, String>();
 
-		parameters.put("access_token", token);
-		parameters.put("mode", "json");
+		try {
+			parameters.put("access_token", token);
+			parameters.put("mode", "json");
 
-		UserCredentialsJson response = getService().getUserInfo(parameters);
-		if (!(response == null)) {
-			if ((("The access token provided is invalid").equals(response.getError_description())
-					|| ("The access token provided has expired").equals(response.getError_description()))) {
+			UserCredentialsJson response = getService().getUserInfo(parameters);
+			return response;
+		} catch (RetrofitError e) {
+			if ((("The access token provided is invalid").equals(((UserCredentialsJson)e.getBody()).getError_description())
+					|| ("The access token provided has expired").equals(((UserCredentialsJson)e.getBody()).getError_description()))) {
 				OAuth2Request oAuth2Request = new OAuth2Request();
 				token = oAuth2Request.builder();
 				parameters.put("access_token", token);
-				response = getService().getUserInfo(parameters);
+				return getService().getUserInfo(parameters);
 			}
+			throw new SpiceException("");
 		}
-		return response;
 	}
 
 	public String getToken() {

@@ -26,6 +26,7 @@ import pt.caixamagica.aptoide.uploader.UploaderUtils;
 import pt.caixamagica.aptoide.uploader.retrofit.OAuth2Request;
 import pt.caixamagica.aptoide.uploader.uploadService.RequestProgressListener;
 import pt.caixamagica.aptoide.uploader.webservices.json.UploadAppToRepoJson;
+import retrofit.RetrofitError;
 import retrofit.http.Multipart;
 import retrofit.http.POST;
 import retrofit.http.PartMap;
@@ -124,10 +125,11 @@ public class UploadAppToRepoRequest extends RetrofitSpiceRequest<UploadAppToRepo
     @Override
     public UploadAppToRepoJson loadDataFromNetwork() throws SpiceException {
 
+        final HashMap<String, Object> parameters = new HashMap<>();
+
         try {
             setRequestProgressListener(requestProgressListenerObject);
 
-            final HashMap<String, Object> parameters = new HashMap<>();
 
             checkObbExistence();
 
@@ -170,22 +172,18 @@ public class UploadAppToRepoRequest extends RetrofitSpiceRequest<UploadAppToRepo
             }
 
             UploadAppToRepoJson response = getService().uploadAppToRepo(parameters);
-            if (!(response == null)) {
-                if ((("The access token provided is invalid").equals(response.getError_description())
-                        || ("The access token provided has expired").equals(response.getError_description()))) {
-                    OAuth2Request oAuth2Request = new OAuth2Request();
-                    token = oAuth2Request.builder();
-                    parameters.put("access_token", token);
-                    response = getService().uploadAppToRepo(parameters);
-                }
-            }
+
             return response;
-        } catch (Exception e) {
+        } catch (RetrofitError e) {
             // Trick para forçar a chamada do onRequestFailure pois aparentemente nem sempre isso acontece
+            if ((("The access token provided is invalid").equals(((UploadAppToRepoJson)e.getBody()).getError_description())
+                    || ("The access token provided has expired").equals(((UploadAppToRepoJson)e.getBody()).getError_description()))) {
+                OAuth2Request oAuth2Request = new OAuth2Request();
+                token = oAuth2Request.builder();
+                parameters.put("access_token", token);
+                return getService().uploadAppToRepo(parameters);
+            }
             throw new SpiceException("");
-        } finally {
-//            if (!isCancelled())
-//                publishProgress(100);
         }
     }
 

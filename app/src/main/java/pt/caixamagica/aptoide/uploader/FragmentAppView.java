@@ -37,6 +37,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.vending.licensing.ValidationException;
 import com.manuelpeinado.multichoiceadapter.MultiChoiceAdapter;
 import com.octo.android.robospice.SpiceManager;
 
@@ -512,7 +513,11 @@ public class FragmentAppView extends Fragment {
                 }
 
                 for (SelectablePackageInfo selectablePackageInfo : selectablePackageInfos) {
-                    mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);
+                    try {
+                        mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);
+                    } catch (ValidationException e) {
+                        e.printStackTrace();
+                    }
                 }
 
                 adapter.uncheckAll();

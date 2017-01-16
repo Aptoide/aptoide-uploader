@@ -24,6 +24,7 @@ import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
 
+import com.google.android.vending.licensing.ValidationException;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
@@ -202,7 +203,7 @@ public class SubmitAppFragment extends Fragment {
 		userCredentialsJson = (UserCredentialsJson) getArguments().getSerializable("userCredentialsJson");
 	}
 
-	private void submitApp() {
+	private void submitApp() throws ValidationException {
 
 		if (validadeFields()) {
 
@@ -232,7 +233,7 @@ public class SubmitAppFragment extends Fragment {
 		}
 	}
 
-	private void uploadApp() {
+	private void uploadApp() throws ValidationException {
 
 		mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfos.get(0));
 
@@ -271,7 +272,11 @@ public class SubmitAppFragment extends Fragment {
 		button.setOnClickListener(new View.OnClickListener() {
 			@Override
 			public void onClick(View v) {
-				submitApp();
+				try {
+					submitApp();
+				} catch (ValidationException e) {
+					e.printStackTrace();
+				}
 			}
 		});
 
