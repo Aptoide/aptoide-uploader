@@ -149,8 +149,6 @@ public class LoginActivity extends AppCompatActivity
       case MY_PERMISSIONS_REQUEST: {
 
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-
-          checkStoredCredentialsCallback();
         }
       }
       default:
@@ -167,13 +165,7 @@ public class LoginActivity extends AppCompatActivity
 
         requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
             MY_PERMISSIONS_REQUEST);
-      } else {
-
-        checkStoredCredentialsCallback();
       }
-    } else {
-
-      checkStoredCredentialsCallback();
     }
   }
 
