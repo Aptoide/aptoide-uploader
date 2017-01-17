@@ -149,7 +149,6 @@ public class UploadAppToRepoRequest extends RetrofitSpiceRequest<UploadAppToRepo
             parameters.put("obb_main_filename", fileName(obbMainPath));
             parameters.put("obb_patch_filename", fileName(obbPatchPath));
             parameters.put("mode", "json");
-            parameters.put("only_user_repo", true);
 
             if (FLAG_APK) {
                 parameters.put("apk", newTweakedTypedFile("apk", apkPath));
