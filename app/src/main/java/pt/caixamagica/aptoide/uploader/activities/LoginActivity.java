@@ -41,6 +41,8 @@ import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.PendingRequestListener;
 import java.io.IOException;
+import java.util.ArrayList;
+import java.util.List;
 import lombok.Getter;
 import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
 import pt.caixamagica.aptoide.uploader.BuildConfig;
@@ -149,23 +151,35 @@ public class LoginActivity extends AppCompatActivity
       case MY_PERMISSIONS_REQUEST: {
 
         if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+          dismissSplash = true;
         }
       }
       default:
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
-    dismissSplash = true;
   }
 
   public void checkPermissions() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
+      List<String> requests = new ArrayList<String>();
+
       if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
           != PackageManager.PERMISSION_GRANTED) {
-
-        requestPermissions(new String[] { Manifest.permission.READ_EXTERNAL_STORAGE },
-            MY_PERMISSIONS_REQUEST);
+        requests.add(Manifest.permission.READ_EXTERNAL_STORAGE);
       }
+      if (checkSelfPermission(Manifest.permission.GET_ACCOUNTS)
+          != PackageManager.PERMISSION_GRANTED) {
+        requests.add(Manifest.permission.GET_ACCOUNTS);
+      }
+
+      if (!requests.isEmpty()) {
+        requestPermissions(requests.toArray(new String[requests.size()]), MY_PERMISSIONS_REQUEST);
+      } else {
+        dismissSplash = true;
+      }
+    } else {
+      dismissSplash = true;
     }
   }
 
