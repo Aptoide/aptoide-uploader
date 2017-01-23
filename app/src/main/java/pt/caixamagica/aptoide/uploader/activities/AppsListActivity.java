@@ -66,6 +66,9 @@ public class AppsListActivity extends ActionBarActivity implements ConfirmationD
 				Session.getActiveSession().closeAndClearTokenInformation();
 				Session.getActiveSession().close();
 			}
+		} else if (Session.getActiveSession() != null) {
+			Session.getActiveSession().closeAndClearTokenInformation();
+			Session.getActiveSession().close();
 		}
 		Session.setActiveSession(null);
 	}
