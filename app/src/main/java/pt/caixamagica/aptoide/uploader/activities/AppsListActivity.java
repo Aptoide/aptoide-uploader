@@ -14,6 +14,7 @@ import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 
 import com.facebook.Session;
+import com.facebook.SessionState;
 
 import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
 import pt.caixamagica.aptoide.uploader.FragmentAppView;
@@ -60,12 +61,18 @@ public class AppsListActivity extends ActionBarActivity implements ConfirmationD
 	private void clearSessionInformation() {
 		//Stop the activity
 		AptoideUploaderApplication.setForcedLogout(true);
-		if (Session.getActiveSession() != null) Session.getActiveSession().closeAndClearTokenInformation();
+		if (Session.getActiveSession() == null) {
+			if (Session.openActiveSessionFromCache(getApplicationContext()) != null) {
+				Session.getActiveSession().closeAndClearTokenInformation();
+				Session.getActiveSession().close();
+			}
+		}
+		Session.setActiveSession(null);
 	}
 
 	public void removeUserCredentials() {
 		SharedPreferences preferences = getSharedPreferences(LoginFragment.SHARED_PREFERENCES_FILE, 0);
-		preferences.edit().remove("token").remove("repo").remove("username").commit();
+		preferences.edit().remove("token").remove("refreshToken").remove("repo").remove("username").commit();
 	}
 
 	public void switchToLoginFragment() {

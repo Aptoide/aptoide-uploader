@@ -10,7 +10,9 @@ package pt.caixamagica.aptoide.uploader;
  */
 
 import android.app.Activity;
+import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -62,11 +64,11 @@ public class LoginFragment extends Fragment {
 
 	private RelativeLayout contentLayout;
 
+
 	//    private UiLifecycleHelper uiLifecycleHelper = ((MainActivity)getActivity()).uiLifecycleHelper;
 	private Session.StatusCallback statusCallback = new Session.StatusCallback() {
 		@Override
 		public void call(final Session session, SessionState state, Exception exception) {
-
 			if (state.isOpened()) {
 				Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
 
