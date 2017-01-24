@@ -15,6 +15,6 @@
 -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/uploader_spinner_theme_list_activated_holo" android:state_activated="true"/>
-    <item android:drawable="@android:color/transparent"/>
+  <item android:drawable="@drawable/uploader_spinner_theme_list_activated_holo" android:state_activated="true"/>
+  <item android:drawable="@android:color/transparent"/>
 </selector>

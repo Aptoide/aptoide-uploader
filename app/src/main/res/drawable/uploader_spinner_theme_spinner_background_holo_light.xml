@@ -15,11 +15,11 @@
 -->
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/uploader_spinner_theme_spinner_disabled_holo_light"
-          android:state_enabled="false"/>
-    <item android:drawable="@drawable/uploader_spinner_theme_spinner_pressed_holo_light"
-          android:state_pressed="true"/>
-    <item android:drawable="@drawable/uploader_spinner_theme_spinner_focused_holo_light" android:state_focused="true"
-          android:state_pressed="false"/>
-    <item android:drawable="@drawable/uploader_spinner_theme_spinner_default_holo_light"/>
+  <item android:drawable="@drawable/uploader_spinner_theme_spinner_disabled_holo_light"
+      android:state_enabled="false"/>
+  <item android:drawable="@drawable/uploader_spinner_theme_spinner_pressed_holo_light"
+      android:state_pressed="true"/>
+  <item android:drawable="@drawable/uploader_spinner_theme_spinner_focused_holo_light" android:state_focused="true"
+      android:state_pressed="false"/>
+  <item android:drawable="@drawable/uploader_spinner_theme_spinner_default_holo_light"/>
 </selector>

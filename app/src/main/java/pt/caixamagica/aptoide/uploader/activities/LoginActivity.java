@@ -64,14 +64,11 @@ public class LoginActivity extends AppCompatActivity
     implements GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener,
     View.OnClickListener, LoginActivityCallback, SplashDialogFragment.OnHeadlineSelectedListener {
 
-  private static final int MY_PERMISSIONS_REQUEST = 1;
-
   public static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
-
   public static final byte[] SALT = new byte[] {
       -46, 65, 30, -128, -103, -57, 74, -64, 51, 88, -95, -21, 77, -117, -36, -113, -11, 32, -64, 89
   };
-
+  private static final int MY_PERMISSIONS_REQUEST = 1;
   private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
 
   final long DEFAULT_CACHE_TIME = DurationInMillis.ONE_SECOND * 5;
@@ -236,20 +233,19 @@ public class LoginActivity extends AppCompatActivity
     AccountManager accountManager = AccountManager.get(this);
 
     SharedPreferences sharedpreferences =
-            this.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+        this.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
     if (sharedpreferences != null && sharedpreferences.getAll().size() > 0) {
       String deviceId =
-              Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
+          Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
       AESObfuscator aesObfuscator = new AESObfuscator(SALT, this.getPackageName(), deviceId);
 
       try {
-        String token =
-                aesObfuscator.unobfuscate(sharedpreferences.getString("token", ""), "token");
+        String token = aesObfuscator.unobfuscate(sharedpreferences.getString("token", ""), "token");
         String refreshToken =
-                aesObfuscator.unobfuscate(sharedpreferences.getString("refreshToken", ""),
-                        "refreshToken");
+            aesObfuscator.unobfuscate(sharedpreferences.getString("refreshToken", ""),
+                "refreshToken");
         String repo = aesObfuscator.unobfuscate(sharedpreferences.getString("repo", ""), "repo");
 
         UserCredentialsJson userCredentialsJson = new UserCredentialsJson();
@@ -446,53 +442,6 @@ public class LoginActivity extends AppCompatActivity
     return AptoideUploaderApplication.firstLaunchApagar;
   }
 
-  public class OAuthPendingRequestListener implements PendingRequestListener<OAuth> {
-
-    @Override public void onRequestFailure(SpiceException spiceException) {
-      if (spiceException.getCause() instanceof LoginErrorException) {
-        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
-      }
-      UploaderUtils.popLoadingFragment(LoginActivity.this);
-    }
-
-    @Override public void onRequestNotFound() {
-    }
-
-    @Override public void onRequestSuccess(final OAuth oAuth) {
-      if (oAuth == null) {
-        return;
-      }
-
-      // Caso o login seja efectuado com sucesso.
-      // Isto não devia ser bem assim, mas enfim..
-      if (!"FAIL".equals(oAuth.getStatus())) {
-        getUserInfo(oAuth);
-      }/* else if (oAuth.getError().get(0).getCode().equals("AUTH-2")) {
-        OAuth2AuthenticationRequest oAuth2AuthenticationRequest = new OAuth2AuthenticationRequest();
-				oAuth2AuthenticationRequest.bean.setGrant_type("refresh_token");
-				oAuth2AuthenticationRequest.bean.setRefresh_token(userCredentials.getRefreshToken());
-				spiceManager.execute(oAuth2AuthenticationRequest, new RequestListener<OAuth>() {
-					@Override
-					public void onRequestFailure(SpiceException spiceException) {
-
-					}
-
-					@Override
-					public void onRequestSuccess(OAuth oAuth) {
-						userCredentials.setToken(oAuth.getAccess_token());
-					}
-				});
-			}*/
-      // Caso o login seja enviado em branco, cai aqui.
-      else {
-        UploaderUtils.popLoadingFragment(LoginActivity.this);
-        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
-      }
-
-      spiceManager.removeAllDataFromCache();
-    }
-  }
-
   private void storeToken(UserCredentialsJson userCredentialsJson) {
 
     // Try to use more dgradleata here. ANDROID_ID is a single point of attack.
@@ -544,6 +493,53 @@ public class LoginActivity extends AppCompatActivity
     editor.putString("repo", aesObfuscator.obfuscate(userCredentialsJson.getRepo(), "repo"));
 
     editor.commit();
+  }
+
+  public class OAuthPendingRequestListener implements PendingRequestListener<OAuth> {
+
+    @Override public void onRequestFailure(SpiceException spiceException) {
+      if (spiceException.getCause() instanceof LoginErrorException) {
+        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
+      }
+      UploaderUtils.popLoadingFragment(LoginActivity.this);
+    }
+
+    @Override public void onRequestNotFound() {
+    }
+
+    @Override public void onRequestSuccess(final OAuth oAuth) {
+      if (oAuth == null) {
+        return;
+      }
+
+      // Caso o login seja efectuado com sucesso.
+      // Isto não devia ser bem assim, mas enfim..
+      if (!"FAIL".equals(oAuth.getStatus())) {
+        getUserInfo(oAuth);
+      }/* else if (oAuth.getError().get(0).getCode().equals("AUTH-2")) {
+        OAuth2AuthenticationRequest oAuth2AuthenticationRequest = new OAuth2AuthenticationRequest();
+				oAuth2AuthenticationRequest.bean.setGrant_type("refresh_token");
+				oAuth2AuthenticationRequest.bean.setRefresh_token(userCredentials.getRefreshToken());
+				spiceManager.execute(oAuth2AuthenticationRequest, new RequestListener<OAuth>() {
+					@Override
+					public void onRequestFailure(SpiceException spiceException) {
+
+					}
+
+					@Override
+					public void onRequestSuccess(OAuth oAuth) {
+						userCredentials.setToken(oAuth.getAccess_token());
+					}
+				});
+			}*/
+      // Caso o login seja enviado em branco, cai aqui.
+      else {
+        UploaderUtils.popLoadingFragment(LoginActivity.this);
+        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
+      }
+
+      spiceManager.removeAllDataFromCache();
+    }
   }
 
   public class UserCredentialsPendingRequestListener

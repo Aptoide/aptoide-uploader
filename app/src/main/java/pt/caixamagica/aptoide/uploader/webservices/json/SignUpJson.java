@@ -6,15 +6,13 @@
 package pt.caixamagica.aptoide.uploader.webservices.json;
 
 import java.util.List;
-
 import lombok.Data;
 
 /**
  * Created by neuro on 14-04-2015.
  */
-@Data
-public class SignUpJson {
+@Data public class SignUpJson {
 
-	private String status;
-	private List<Error> errors;
+  private String status;
+  private List<Error> errors;
 }

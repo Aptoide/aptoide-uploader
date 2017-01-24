@@ -4,38 +4,40 @@
     android:layout_height="130dp"
 
     android:foreground="@drawable/mca__list_item_selector2"
-    android:scaleType="centerCrop">
+    android:scaleType="centerCrop"
+    >
 
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
+  <RelativeLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
 
-        android:background="#FFFFFF"
-        >
+      android:background="#FFFFFF"
+      >
 
-        <ImageView
-            android:id="@+id/appIcon"
-            android:layout_width="75dp"
-            android:layout_height="75dp"
-            android:layout_centerHorizontal="true"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="5dp"
-            />
+    <ImageView
+        android:id="@+id/appIcon"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:layout_centerHorizontal="true"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="5dp"
+        />
 
-        <TextView
+    <TextView
 
-            android:id="@+id/appName"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/appIcon"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="3dp"
-            android:ellipsize="end"
-            android:gravity="center_horizontal"
-            android:maxLines="2"
-            android:text="Jogos"
-            android:textColor="@android:color/black"/>
+        android:id="@+id/appName"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/appIcon"
+        android:layout_centerHorizontal="true"
+        android:layout_marginTop="3dp"
+        android:ellipsize="end"
+        android:gravity="center_horizontal"
+        android:maxLines="2"
+        android:text="Jogos"
+        android:textColor="@android:color/black"
+        />
 
-    </RelativeLayout>
+  </RelativeLayout>
 
 </com.manuelpeinado.multichoiceadapter.CheckableFrameLayout>

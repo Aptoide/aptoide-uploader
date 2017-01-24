@@ -12,13 +12,13 @@ import android.os.Binder;
  */
 public class MyBinder extends Binder {
 
-	UploadService uploadService;
+  UploadService uploadService;
 
-	public MyBinder(UploadService uploadService) {
-		this.uploadService = uploadService;
-	}
+  public MyBinder(UploadService uploadService) {
+    this.uploadService = uploadService;
+  }
 
-	public UploadService getService() {
-		return uploadService;
-	}
+  public UploadService getService() {
+    return uploadService;
+  }
 }

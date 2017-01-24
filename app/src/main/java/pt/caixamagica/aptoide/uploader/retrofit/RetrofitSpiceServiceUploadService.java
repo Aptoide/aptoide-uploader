@@ -10,8 +10,7 @@ package pt.caixamagica.aptoide.uploader.retrofit;
  */
 public class RetrofitSpiceServiceUploadService extends RetrofitSpiceServiceUploader {
 
-	@Override
-	public int getThreadCount() {
-		return 1;
-	}
+  @Override public int getThreadCount() {
+    return 1;
+  }
 }

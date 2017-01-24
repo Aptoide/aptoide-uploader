@@ -6,7 +6,6 @@
 package pt.caixamagica.aptoide.uploader.webservices.json;
 
 import java.util.List;
-
 import lombok.Getter;
 import lombok.Setter;
 
@@ -15,40 +14,39 @@ import lombok.Setter;
  */
 public class CategoriesJson {
 
-	@Getter @Setter public String status;
-	@Getter @Setter public Categories categories;
-	@Getter @Setter List<Error> errors;
+  @Getter @Setter public String status;
+  @Getter @Setter public Categories categories;
+  @Getter @Setter List<Error> errors;
 
-	public static class Categories {
+  public static class Categories {
 
-		@Getter @Setter public List<Category> standard;
-		@Getter @Setter public List<Category> custom;
-	}
+    @Getter @Setter public List<Category> standard;
+    @Getter @Setter public List<Category> custom;
+  }
 
-	public static class Category {
+  public static class Category {
 
-		@Getter @Setter public Number id;
-		@Getter @Setter public Number parent;
-		@Getter @Setter public String name;
+    @Getter @Setter public Number id;
+    @Getter @Setter public Number parent;
+    @Getter @Setter public String name;
 
-		public Category() {
-		}
+    public Category() {
+    }
 
-		public Category(int i) {
-			id = i;
-		}
+    public Category(int i) {
+      id = i;
+    }
 
-		@Override
-		public boolean equals(Object o) {
-			if (o == this) {
-				return true;
-			}
+    @Override public boolean equals(Object o) {
+      if (o == this) {
+        return true;
+      }
 
-			if (o instanceof Category) {
-				return ((Category) o).getId().equals(id);
-			}
+      if (o instanceof Category) {
+        return ((Category) o).getId().equals(id);
+      }
 
-			return super.equals(o);
-		}
-	}
+      return super.equals(o);
+    }
+  }
 }

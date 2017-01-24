@@ -1,144 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
 <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-            android:layout_width="match_parent"
-            android:layout_height="match_parent"
-            android:theme="@style/SignUpTheme"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:theme="@style/SignUpTheme"
     >
 
-    <LinearLayout
+  <LinearLayout
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:animateLayoutChanges="true"
+      android:orientation="vertical"
+      >
+
+    <EditText
+        android:id="@+id/email"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:animateLayoutChanges="true"
-        android:orientation="vertical">
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:hint="Email"
+        android:inputType="textEmailAddress"
+        />
 
-        <EditText
-            android:id="@+id/email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:hint="Email"
-            android:inputType="textEmailAddress"/>
+    <EditText
+        android:id="@+id/password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:hint="Password"
+        android:inputType="textPassword"
+        />
 
-        <EditText
-            android:id="@+id/password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="10dp"
-            android:hint="Password"
-            android:inputType="textPassword"/>
+    <EditText
+        android:id="@+id/store"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:hint="Store"
+        />
 
-        <EditText
-            android:id="@+id/store"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="10dp"
-            android:hint="Store"/>
+    <EditText
+        android:id="@+id/store_username"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="20dp"
+        android:hint="Store Username"
+        android:visibility="gone"
+        />
 
-        <EditText
-            android:id="@+id/store_username"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="20dp"
-            android:hint="Store Username"
-            android:visibility="gone"/>
+    <EditText
+        android:id="@+id/store_password"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="20dp"
+        android:layout_marginRight="20dp"
+        android:layout_marginTop="10dp"
+        android:hint="Store Password"
+        android:visibility="gone"
+        />
 
-        <EditText
-            android:id="@+id/store_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="20dp"
-            android:layout_marginRight="20dp"
-            android:layout_marginTop="10dp"
-            android:hint="Store Password"
-            android:visibility="gone"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_marginTop="15dp"
+        android:text="Store Privacy"
+        android:textSize="@dimen/textSize"
+        />
 
-        <TextView
+    <LinearLayout
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:orientation="horizontal"
+        >
+
+      <RadioGroup
+          android:id="@+id/store_visibility"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="horizontal"
+          >
+
+        <RadioButton
+            android:id="@+id/store_public"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:layout_marginTop="15dp"
-            android:text="Store Privacy"
-            android:textSize="@dimen/textSize"/>
+            android:checked="true"
+            android:text="Public"
+            android:textColor="@android:color/white"
+            />
 
-        <LinearLayout
+        <RadioButton
+            android:id="@+id/store_private"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:orientation="horizontal">
-
-            <RadioGroup
-                android:id="@+id/store_visibility"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:orientation="horizontal">
-
-                <RadioButton
-                    android:id="@+id/store_public"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:checked="true"
-                    android:text="Public"
-                    android:textColor="@android:color/white"/>
-
-                <RadioButton
-                    android:id="@+id/store_private"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginLeft="10dp"
-                    android:text="Private"
-                    android:textColor="@android:color/white"/>
-
-            </RadioGroup>
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/create_Account"
-            style="@style/Buttonuploader_button_theme"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="30dp"
-            android:layout_marginRight="30dp"
-            android:layout_marginTop="20dp"
-            android:text="New Account"/>
-
-        <TextView
-            android:id="@+id/already_have_an_account"
-            style="@style/text_view_clickable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="30dp"
-            android:text="Already have an account? Sign in"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:id="@+id/forgot_password"
-            style="@style/text_view_clickable"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:layout_marginTop="0dp"
-            android:background="@drawable/text_view_selectable"
-            android:text="Forgotten your password?"
-            android:textStyle="bold"/>
-
-        <TextView
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginBottom="20dp"
             android:layout_marginLeft="10dp"
-            android:layout_marginRight="10dp"
-            android:layout_marginTop="20dp"
-            android:text="By signing up you are agreeing to the Aptoide Terms of Service and Aptoide Content Policy for Developers"/>
+            android:text="Private"
+            android:textColor="@android:color/white"
+            />
+
+      </RadioGroup>
 
     </LinearLayout>
+
+    <Button
+        android:id="@+id/create_Account"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:layout_marginTop="20dp"
+        android:text="New Account"
+        style="@style/Buttonuploader_button_theme"
+        />
+
+    <TextView
+        android:id="@+id/already_have_an_account"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="30dp"
+        android:text="Already have an account? Sign in"
+        android:textStyle="bold"
+        style="@style/text_view_clickable"
+        />
+
+    <TextView
+        android:id="@+id/forgot_password"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:layout_marginTop="0dp"
+        android:background="@drawable/text_view_selectable"
+        android:text="Forgotten your password?"
+        android:textStyle="bold"
+        style="@style/text_view_clickable"
+        />
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginTop="20dp"
+        android:text="By signing up you are agreeing to the Aptoide Terms of Service and Aptoide Content Policy for Developers"
+        />
+
+  </LinearLayout>
 
 </ScrollView>

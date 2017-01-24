@@ -10,9 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-
 import java.util.ArrayList;
-
 import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 import pt.caixamagica.aptoide.uploader.SubmitAppFragment;
@@ -23,35 +21,40 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
  */
 public class SubmitActivity extends ActionBarActivity {
 
-	public static final String FILL_MISSING_INFO = "fillMissingInfo";
+  public static final String FILL_MISSING_INFO = "fillMissingInfo";
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+  @Override protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-		setContentView(R.layout.activity_main);
+    setContentView(R.layout.activity_main);
 
-		setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
+    setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
 
-		Bundle extras = getIntent().getExtras();
+    Bundle extras = getIntent().getExtras();
 
-		UserCredentialsJson userCredentialsJson = (UserCredentialsJson) extras.getSerializable("userCredentialsJson");
-		SelectablePackageInfo selectablePackageInfo = new SelectablePackageInfo(((PackageInfo) extras.getParcelable("selectablePackageInfo")), getPackageManager());
+    UserCredentialsJson userCredentialsJson =
+        (UserCredentialsJson) extras.getSerializable("userCredentialsJson");
+    SelectablePackageInfo selectablePackageInfo =
+        new SelectablePackageInfo(((PackageInfo) extras.getParcelable("selectablePackageInfo")),
+            getPackageManager());
 
-		switchtoSubmitAppFragment(userCredentialsJson, selectablePackageInfo);
-	}
+    switchtoSubmitAppFragment(userCredentialsJson, selectablePackageInfo);
+  }
 
-	private void switchtoSubmitAppFragment(UserCredentialsJson userCredentialsJson, SelectablePackageInfo selectablePackageInfo) {
-		Fragment submitAppFragment = new SubmitAppFragment();
-		Bundle bundle = new Bundle();
-		bundle.putSerializable("userCredentialsJson", userCredentialsJson);
+  private void switchtoSubmitAppFragment(UserCredentialsJson userCredentialsJson,
+      SelectablePackageInfo selectablePackageInfo) {
+    Fragment submitAppFragment = new SubmitAppFragment();
+    Bundle bundle = new Bundle();
+    bundle.putSerializable("userCredentialsJson", userCredentialsJson);
 
-		ArrayList<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>(1);
-		selectablePackageInfos.add(selectablePackageInfo);
+    ArrayList<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>(1);
+    selectablePackageInfos.add(selectablePackageInfo);
 
-		bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
-		submitAppFragment.setArguments(bundle);
+    bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
+    submitAppFragment.setArguments(bundle);
 
-		getSupportFragmentManager().beginTransaction().replace(R.id.container, submitAppFragment).commit();
-	}
+    getSupportFragmentManager().beginTransaction()
+        .replace(R.id.container, submitAppFragment)
+        .commit();
+  }
 }

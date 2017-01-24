@@ -13,7 +13,6 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.TextView;
-
 import lombok.Setter;
 import pt.caixamagica.aptoide.uploader.R;
 
@@ -22,27 +21,25 @@ import pt.caixamagica.aptoide.uploader.R;
  */
 public class LoadingFragment extends Fragment {
 
-	@Setter String text;
+  @Setter String text;
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-	}
+  @Override public void onAttach(Activity activity) {
+    super.onAttach(activity);
+  }
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
+  @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
 
-		if (savedInstanceState != null) text = savedInstanceState.getString("text");
+    if (savedInstanceState != null) text = savedInstanceState.getString("text");
 
-		View inflate = inflater.inflate(R.layout.loading_fragment, container, false);
-		((TextView) inflate.findViewById(R.id.loadingText)).setText(text);
+    View inflate = inflater.inflate(R.layout.loading_fragment, container, false);
+    ((TextView) inflate.findViewById(R.id.loadingText)).setText(text);
 
-		return inflate;
-	}
+    return inflate;
+  }
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		outState.putString("text", text);
-		super.onSaveInstanceState(outState);
-	}
+  @Override public void onSaveInstanceState(Bundle outState) {
+    outState.putString("text", text);
+    super.onSaveInstanceState(outState);
+  }
 }

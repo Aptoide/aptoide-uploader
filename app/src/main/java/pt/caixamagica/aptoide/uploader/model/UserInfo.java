@@ -6,7 +6,6 @@
 package pt.caixamagica.aptoide.uploader.model;
 
 import java.io.Serializable;
-
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import pt.caixamagica.aptoide.uploader.retrofit.request.OAuth2AuthenticationRequest;
@@ -14,17 +13,16 @@ import pt.caixamagica.aptoide.uploader.retrofit.request.OAuth2AuthenticationRequ
 /**
  * Created by neuro on 18-09-2015.
  */
-@Data
-@AllArgsConstructor(suppressConstructorProperties = true)
-public class UserInfo implements Serializable {
+@Data @AllArgsConstructor(suppressConstructorProperties = true) public class UserInfo
+    implements Serializable {
 
-	private String username;
-	private String password;
-	private String oauthToken;
-	private OAuth2AuthenticationRequest.Mode mode;
-	private String nameForGoogle;
-	private String repo;
-	private String privacyUsername;
-	private String privacyPassword;
-	private int createRepo = 0;
+  private String username;
+  private String password;
+  private String oauthToken;
+  private OAuth2AuthenticationRequest.Mode mode;
+  private String nameForGoogle;
+  private String repo;
+  private String privacyUsername;
+  private String privacyPassword;
+  private int createRepo = 0;
 }

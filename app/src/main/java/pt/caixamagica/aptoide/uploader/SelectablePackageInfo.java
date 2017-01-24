@@ -7,75 +7,72 @@ package pt.caixamagica.aptoide.uploader;
 
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-
 import lombok.Getter;
 import lombok.Setter;
 
 /**
  * Created by neuro on 05-02-2015.
  */
-@Getter
-@Setter
-public class SelectablePackageInfo extends PackageInfo {
+@Getter @Setter public class SelectablePackageInfo extends PackageInfo {
 
-	private final PackageInfo info;
+  private final PackageInfo info;
 
-	public boolean selected;
+  public boolean selected;
 
-	private PackageManager pm;
+  private PackageManager pm;
 
-	private String label;
+  private String label;
 
-	// Descrições e etcs..
-	private String name;
+  // Descrições e etcs..
+  private String name;
 
-	private int ageRating;
+  private int ageRating;
 
-	private int category;
+  private int category;
 
-	private String description;
+  private String description;
 
-	private String phoneNumber;
+  private String phoneNumber;
 
-	private String email;
+  private String email;
 
-	private String website;
+  private String website;
 
-	public SelectablePackageInfo(PackageInfo info, PackageManager pm) {
-		super();
-		this.pm = pm;
+  public SelectablePackageInfo(PackageInfo info, PackageManager pm) {
+    super();
+    this.pm = pm;
 
-		this.packageName = info.packageName;
-		this.info = info;
-		this.applicationInfo = info.applicationInfo;
-		this.firstInstallTime = info.firstInstallTime;
+    this.packageName = info.packageName;
+    this.info = info;
+    this.applicationInfo = info.applicationInfo;
+    this.firstInstallTime = info.firstInstallTime;
 
-		this.versionCode = info.versionCode;
-		this.versionName = info.versionName;
-	}
+    this.versionCode = info.versionCode;
+    this.versionName = info.versionName;
+  }
 
-	public boolean isSelected() {
-		return selected;
-	}
+  public boolean isSelected() {
+    return selected;
+  }
 
-	public void toggleSelected() {
-		selected = !selected;
-	}
+  public void toggleSelected() {
+    selected = !selected;
+  }
 
-	private void loadLabel() {
-		label = (String) applicationInfo.loadLabel(pm);
-	}
+  private void loadLabel() {
+    label = (String) applicationInfo.loadLabel(pm);
+  }
 
-	public String getLabel() {
-		if (label == null) loadLabel();
-		return label;
-	}
+  public String getLabel() {
+    if (label == null) loadLabel();
+    return label;
+  }
 
-	public String getApkPath() {
-		return info.applicationInfo.sourceDir;
-	}
+  public String getApkPath() {
+    return info.applicationInfo.sourceDir;
+  }
 
-	public int tes() {
-		return applicationInfo.labelRes;
-	}
+  public int tes() {
+    return applicationInfo.labelRes;
+  }
 }

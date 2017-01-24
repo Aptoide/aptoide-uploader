@@ -9,5 +9,5 @@ import pt.caixamagica.aptoide.uploader.model.UserInfo;
 
 public interface LoginActivityCallback {
 
-	void submitAuthentication(UserInfo userInfo);
+  void submitAuthentication(UserInfo userInfo);
 }

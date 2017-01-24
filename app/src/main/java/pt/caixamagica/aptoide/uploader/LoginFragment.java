@@ -10,9 +10,7 @@ package pt.caixamagica.aptoide.uploader;
  */
 
 import android.app.Activity;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
@@ -49,247 +47,250 @@ import pt.caixamagica.aptoide.uploader.retrofit.request.OAuth2AuthenticationRequ
  */
 public class LoginFragment extends Fragment {
 
-	// Nome do ficheiro Shared Preferences, para controlo de versão
-	public static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
+  // Nome do ficheiro Shared Preferences, para controlo de versão
+  public static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
 
-	protected View rootView;
+  protected View rootView;
 
-	protected Button button;
+  protected Button button;
 
-	LoginActivityCallback mCallback;
+  LoginActivityCallback mCallback;
 
-	RelativeLayout progressLayout;
+  RelativeLayout progressLayout;
 
-	boolean showPassword = false;
+  boolean showPassword = false;
 
-	private RelativeLayout contentLayout;
+  private RelativeLayout contentLayout;
 
+  //    private UiLifecycleHelper uiLifecycleHelper = ((MainActivity)getActivity()).uiLifecycleHelper;
+  private Session.StatusCallback statusCallback = new Session.StatusCallback() {
+    @Override public void call(final Session session, SessionState state, Exception exception) {
+      if (state.isOpened()) {
+        Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
 
-	//    private UiLifecycleHelper uiLifecycleHelper = ((MainActivity)getActivity()).uiLifecycleHelper;
-	private Session.StatusCallback statusCallback = new Session.StatusCallback() {
-		@Override
-		public void call(final Session session, SessionState state, Exception exception) {
-			if (state.isOpened()) {
-				Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
+          @Override public void onCompleted(final GraphUser user, Response response) {
 
-					@Override
-					public void onCompleted(final GraphUser user, Response response) {
+            String username =
+                user.getProperty("email") == null ? "" : user.getProperty("email").toString();
 
-						String username = user.getProperty("email") == null ? "" : user.getProperty("email").toString();
+            if (TextUtils.isEmpty(username)) {
+              session.close();
 
-						if (TextUtils.isEmpty(username)) {
-							session.close();
+              getActivity().runOnUiThread(new Runnable() {
+                public void run() {
+                  Toast.makeText(getActivity(), R.string.facebook_error, Toast.LENGTH_LONG).show();
+                }
+              });
+            }
 
-							getActivity().runOnUiThread(new Runnable() {
-								public void run() {
-									Toast.makeText(getActivity(), R.string.facebook_error, Toast.LENGTH_LONG).show();
-								}
-							});
-						}
+            if (session == Session.getActiveSession() && user != null) {
+              String authToken = session.getAccessToken();
+              OAuth2AuthenticationRequest.Mode mode = OAuth2AuthenticationRequest.Mode.facebook;
 
-						if (session == Session.getActiveSession() && user != null) {
-							String authToken = session.getAccessToken();
-							OAuth2AuthenticationRequest.Mode mode = OAuth2AuthenticationRequest.Mode.facebook;
+              //                            mCallback.submitAuthentication(username, authToken, mode, null, null, null, null);
+              mCallback.submitAuthentication(
+                  new UserInfo(username, null, authToken, mode, null, null, null, null, 0));
+            }
+          }
+        });
+        request.executeAsync();
+      }
+    }
+  };
 
-//                            mCallback.submitAuthentication(username, authToken, mode, null, null, null, null);
-							mCallback.submitAuthentication(new UserInfo(username, null, authToken, mode, null, null, null, null, 0));
-						}
-					}
-				});
-				request.executeAsync();
-			}
-		}
-	};
+  /**
+   * Prepara e envia o pedido de autenticação.
+   *
+   * @param username username
+   * @param password password
+   */
+  private OAuth2AuthenticationRequest oAuth2AuthenticationRequest;
 
-	/**
-	 * Prepara e envia o pedido de autenticação.
-	 *
-	 * @param username username
-	 * @param password password
-	 */
-	private OAuth2AuthenticationRequest oAuth2AuthenticationRequest;
+  private void setUpFacebookButton() {
+    LoginButton fbButton = (LoginButton) rootView.findViewById(R.id.fb_login_button);
+    fbButton.setFragment(this);
 
-	private void setUpFacebookButton() {
-		LoginButton fbButton = (LoginButton) rootView.findViewById(R.id.fb_login_button);
-		fbButton.setFragment(this);
+    fbButton.setReadPermissions(Arrays.asList("email", "user_friends"));
 
-		fbButton.setReadPermissions(Arrays.asList("email", "user_friends"));
+    fbButton.setOnErrorListener(new LoginButton.OnErrorListener() {
+      @Override public void onError(FacebookException error) {
 
-		fbButton.setOnErrorListener(new LoginButton.OnErrorListener() {
-			@Override
-			public void onError(FacebookException error) {
+        if (error.getMessage().equals("Log in attempt aborted.")) return;
 
-				if (error.getMessage().equals("Log in attempt aborted.")) return;
+        error.printStackTrace();
+      }
+    });
+  }
 
-				error.printStackTrace();
-			}
-		});
-	}
+  private void setUpSignUpButton() {
+    View view = rootView.findViewById(R.id.sign_up_link);
+    view.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        switchtoSignUpFragment();
+      }
+    });
+  }
 
-	private void setUpSignUpButton() {
-		View view = rootView.findViewById(R.id.sign_up_link);
-		view.setOnClickListener(new View.OnClickListener() {
-			@Override
-			public void onClick(View v) {
-				switchtoSignUpFragment();
-			}
-		});
-	}
+  private void setUpGooglePlusButton() {
+    rootView.findViewById(R.id.sign_in_button).setOnClickListener((LoginActivity) getActivity());
+  }
 
-	private void setUpGooglePlusButton() {
-		rootView.findViewById(R.id.sign_in_button).setOnClickListener((LoginActivity) getActivity());
-	}
+  @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
+    super.onActivityResult(requestCode, resultCode, data);
+    ((LoginActivity) getActivity()).uiLifecycleHelper.onActivityResult(requestCode, resultCode,
+        data);
+  }
 
-	@Override
-	public void onActivityResult(int requestCode, int resultCode, Intent data) {
-		super.onActivityResult(requestCode, resultCode, data);
-		((LoginActivity) getActivity()).uiLifecycleHelper.onActivityResult(requestCode, resultCode, data);
-	}
+  @Override public void onAttach(Activity activity) {
+    super.onAttach(activity);
+    try {
+      mCallback = (LoginActivityCallback) activity;
+    } catch (ClassCastException e) {
+      throw new ClassCastException(activity.toString() + " must implement MainActivityCallback");
+    }
+  }
 
-	@Override
-	public void onAttach(Activity activity) {
-		super.onAttach(activity);
-		try {
-			mCallback = (LoginActivityCallback) activity;
-		} catch (ClassCastException e) {
-			throw new ClassCastException(activity.toString() + " must implement MainActivityCallback");
-		}
-	}
+  @Override public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
 
-	@Override
-	public void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
+    setHasOptionsMenu(true);
 
-		setHasOptionsMenu(true);
+    ((LoginActivity) getActivity()).uiLifecycleHelper =
+        new UiLifecycleHelper(getActivity(), statusCallback);
+    ((LoginActivity) getActivity()).uiLifecycleHelper.onCreate(savedInstanceState);
+  }
 
-		((LoginActivity) getActivity()).uiLifecycleHelper = new UiLifecycleHelper(getActivity(), statusCallback);
-		((LoginActivity) getActivity()).uiLifecycleHelper.onCreate(savedInstanceState);
-	}
+  @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
+      Bundle savedInstanceState) {
+    rootView = inflater.inflate(R.layout.login_fragment, container, false);
 
-	@Override
-	public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-		rootView = inflater.inflate(R.layout.login_fragment, container, false);
+    inputStuff();
 
-		inputStuff();
+    contentLayout = (RelativeLayout) rootView.findViewById(R.id.content);
+    progressLayout = (RelativeLayout) rootView.findViewById(R.id.progressBar);
 
-		contentLayout = (RelativeLayout) rootView.findViewById(R.id.content);
-		progressLayout = (RelativeLayout) rootView.findViewById(R.id.progressBar);
+    setUpFacebookButton();
+    setUpGooglePlusButton();
+    setUpSignUpButton();
 
-		setUpFacebookButton();
-		setUpGooglePlusButton();
-		setUpSignUpButton();
+    return rootView;
+  }
 
-		return rootView;
-	}
+  @Override public void onResume() {
+    super.onResume();
+    ((LoginActivity) getActivity()).uiLifecycleHelper.onResume();
+  }
 
-	@Override
-	public void onResume() {
-		super.onResume();
-		((LoginActivity) getActivity()).uiLifecycleHelper.onResume();
-	}
+  @Override public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    ((LoginActivity) getActivity()).uiLifecycleHelper.onSaveInstanceState(outState);
+  }
 
-	@Override
-	public void onSaveInstanceState(Bundle outState) {
-		super.onSaveInstanceState(outState);
-		((LoginActivity) getActivity()).uiLifecycleHelper.onSaveInstanceState(outState);
-	}
+  @Override public void onPause() {
+    super.onPause();
+    ((LoginActivity) getActivity()).uiLifecycleHelper.onPause();
+  }
 
-	@Override
-	public void onPause() {
-		super.onPause();
-		((LoginActivity) getActivity()).uiLifecycleHelper.onPause();
-	}
+  @Override public void onDestroy() {
+    super.onDestroy();
+    ((LoginActivity) getActivity()).uiLifecycleHelper.onDestroy();
+  }
 
-	@Override
-	public void onDestroy() {
-		super.onDestroy();
-		((LoginActivity) getActivity()).uiLifecycleHelper.onDestroy();
-	}
+  /**
+   * Define a acção do botão, e adiciona um listener ao passwordText para fazer autoClick quando o
+   * utilizador termina o input da password.
+   */
+  private void inputStuff() {
+    buttonAction();
 
-	/**
-	 * Define a acção do botão, e adiciona um listener ao passwordText para fazer autoClick quando o utilizador termina o input da password.
-	 */
-	private void inputStuff() {
-		buttonAction();
+    EditText editText = (EditText) rootView.findViewById(R.id.passwordText);
+    editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
+      @Override public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
+        if (actionId == EditorInfo.IME_ACTION_DONE) {
+          button.performClick();
+        }
+        return true;
+      }
+    });
 
-		EditText editText = (EditText) rootView.findViewById(R.id.passwordText);
-		editText.setOnEditorActionListener(new TextView.OnEditorActionListener() {
-			@Override
-			public boolean onEditorAction(TextView v, int actionId, KeyEvent event) {
-				if (actionId == EditorInfo.IME_ACTION_DONE) {
-					button.performClick();
-				}
-				return true;
-			}
-		});
+    setShowPasswordEye();
+  }
 
-		setShowPasswordEye();
-	}
+  private void setShowPasswordEye() {
+    final EditText password_box = (EditText) rootView.findViewById(R.id.passwordText);
+    password_box.setTransformationMethod(new PasswordTransformationMethod());
 
-	private void setShowPasswordEye() {
-		final EditText password_box = (EditText) rootView.findViewById(R.id.passwordText);
-		password_box.setTransformationMethod(new PasswordTransformationMethod());
+    final Drawable hidePasswordRes = getResources().getDrawable(R.drawable.ic_show_password);
+    final Drawable showPasswordRes = getResources().getDrawable(R.drawable.ic_hide_password);
 
-		final Drawable hidePasswordRes = getResources().getDrawable(R.drawable.ic_show_password);
-		final Drawable showPasswordRes = getResources().getDrawable(R.drawable.ic_hide_password);
+    password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
+    password_box.setOnTouchListener(new View.OnTouchListener() {
+      @Override public boolean onTouch(View v, MotionEvent event) {
+        if (password_box.getCompoundDrawables()[2] == null) {
+          return false;
+        }
+        if (event.getAction() != MotionEvent.ACTION_DOWN) {
+          return false;
+        }
+        if (event.getX()
+            > password_box.getWidth()
+            - password_box.getPaddingRight()
+            - hidePasswordRes.getIntrinsicWidth()) {
+          if (showPassword) {
+            showPassword = false;
+            password_box.setTransformationMethod(null);
+            password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, showPasswordRes, null);
+          } else {
+            showPassword = true;
+            password_box.setTransformationMethod(new PasswordTransformationMethod());
+            password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
+          }
+        }
 
-		password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
-		password_box.setOnTouchListener(new View.OnTouchListener() {
-			@Override
-			public boolean onTouch(View v, MotionEvent event) {
-				if (password_box.getCompoundDrawables()[2] == null) {
-					return false;
-				}
-				if (event.getAction() != MotionEvent.ACTION_DOWN) {
-					return false;
-				}
-				if (event.getX() > password_box.getWidth() - password_box.getPaddingRight() - hidePasswordRes.getIntrinsicWidth()) {
-					if (showPassword) {
-						showPassword = false;
-						password_box.setTransformationMethod(null);
-						password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, showPasswordRes, null);
-					} else {
-						showPassword = true;
-						password_box.setTransformationMethod(new PasswordTransformationMethod());
-						password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
-					}
-				}
+        return false;
+      }
+    });
+  }
 
-				return false;
-			}
-		});
-	}
+  /**
+   * Define a acção do botão (efectuar login) <br> Lança a cosmética do loading.
+   */
+  private void buttonAction() {
 
-	/**
-	 * Define a acção do botão (efectuar login) <br> Lança a cosmética do loading.
-	 */
-	private void buttonAction() {
+    button = (Button) rootView.findViewById(R.id.loginButton);
+    button.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
 
-		button = (Button) rootView.findViewById(R.id.loginButton);
-		button.setOnClickListener(new View.OnClickListener() {
-			public void onClick(View v) {
+        String username, password;
+        TextView textView;
 
-				String username, password;
-				TextView textView;
+        textView = (TextView) rootView.findViewById(R.id.usernameText);
+        username = textView.getText().toString();
+        textView = (TextView) rootView.findViewById(R.id.passwordText);
+        password = textView.getText().toString();
 
-				textView = (TextView) rootView.findViewById(R.id.usernameText);
-				username = textView.getText().toString();
-				textView = (TextView) rootView.findViewById(R.id.passwordText);
-				password = textView.getText().toString();
+        if (!username.equals("") && !password.equals("")) {
+          mCallback.submitAuthentication(
+              new UserInfo(username, password, null, null, null, null, null, null, 0));
 
-				if (!username.equals("") && !password.equals("")) {
-					mCallback.submitAuthentication(new UserInfo(username, password, null, null, null, null, null, null, 0));
+          ((TextView) rootView.findViewById(R.id.signing_in_text)).setText(
+              "Signing in as\n" + username);
 
-					((TextView) rootView.findViewById(R.id.signing_in_text)).setText("Signing in as\n" + username);
+          UploaderUtils.hideKeyboard(getActivity(), getView());
+        } else {
+          Toast.makeText(getActivity(), "Please fill username and password", Toast.LENGTH_SHORT)
+              .show();
+        }
+      }
+    });
+  }
 
-					UploaderUtils.hideKeyboard(getActivity(), getView());
-				} else Toast.makeText(getActivity(), "Please fill username and password", Toast.LENGTH_SHORT).show();
-			}
-		});
-	}
-
-	private void switchtoSignUpFragment() {
-		Fragment signUpFragment = new SignUpFragment();
-		getFragmentManager().beginTransaction().replace(R.id.container, signUpFragment).setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN).addToBackStack("signUp").commit();
-	}
+  private void switchtoSignUpFragment() {
+    Fragment signUpFragment = new SignUpFragment();
+    getFragmentManager().beginTransaction()
+        .replace(R.id.container, signUpFragment)
+        .setTransition(FragmentTransaction.TRANSIT_FRAGMENT_OPEN)
+        .addToBackStack("signUp")
+        .commit();
+  }
 }

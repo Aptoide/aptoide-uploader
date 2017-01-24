@@ -3,14 +3,14 @@
 <!-- Generated with http://android-holo-colors.com -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="uploader_button_theme" parent="@style/_uploader_button_theme"/>
+  <style name="uploader_button_theme" parent="@style/_uploader_button_theme"/>
 
-    <style name="_uploader_button_theme" parent="Theme.AppCompat.Light">
+  <style name="_uploader_button_theme" parent="Theme.AppCompat.Light">
 
-        <item name="android:buttonStyle">@style/Buttonuploader_button_theme</item>
+    <item name="android:buttonStyle">@style/Buttonuploader_button_theme</item>
 
-        <item name="android:imageButtonStyle">@style/ImageButtonuploader_button_theme</item>
+    <item name="android:imageButtonStyle">@style/ImageButtonuploader_button_theme</item>
 
-    </style>
+  </style>
 
 </resources>

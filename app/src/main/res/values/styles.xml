@@ -1,129 +1,129 @@
 <resources xmlns:android="http://schemas.android.com/apk/res/android" xmlns:tools="http://schemas.android.com/tools">
 
-    <!-- Base application theme. -->
-    <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-        <!-- Customize your theme here. -->
+  <!-- Base application theme. -->
+  <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
+    <!-- Customize your theme here. -->
 
-        <item name="actionModeBackground">@drawable/gradient_drawable</item>
-        <item name="colorPrimary">#0078ab</item>
-        <item name="colorAccent">#0078ab</item>
-        <item name="android:textColor">@android:color/white</item>
-        <!--<item name="colorAccent">#0078ab</item>-->
-        <item name="windowActionBar">false</item>
-        <item name="windowActionModeOverlay">true</item>
-        <item name="colorControlNormal">#fff</item>
-        <item name="editTextStyle">@style/EditText</item>
+    <item name="actionModeBackground">@drawable/gradient_drawable</item>
+    <item name="colorPrimary">#0078ab</item>
+    <item name="colorAccent">#0078ab</item>
+    <item name="android:textColor">@android:color/white</item>
+    <!--<item name="colorAccent">#0078ab</item>-->
+    <item name="windowActionBar">false</item>
+    <item name="windowActionModeOverlay">true</item>
+    <item name="colorControlNormal">#fff</item>
+    <item name="editTextStyle">@style/EditText</item>
 
-        <!--<item name="android:spinnerStyle">@style/Spinner</item>-->
-        <!--<item name="android:spinnerStyle">@style/uploader_spinner_theme</item>-->
+    <!--<item name="android:spinnerStyle">@style/Spinner</item>-->
+    <!--<item name="android:spinnerStyle">@style/uploader_spinner_theme</item>-->
 
-        <item name="android:textColorHint">#C6B8B8</item>
-
-
-        <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
-        <item name="android:spinnerDropDownItemStyle">@style/Spinner.Dropdown</item>
+    <item name="android:textColorHint">#C6B8B8</item>
 
 
-        <!--<item name="android:navigationBarColor">#FF0078ab</item>-->
-        <item name="colorPrimaryDark">#006294</item>
-
-        <item name="android:windowBackground">@drawable/gradient_drawable</item>
-        <item name="actionButtonStyle">@style/Widget.Aptoide.AppCompat.ActionButton</item>
-        <!--<item name="android:background">@drawable/gradient_drawable</item>-->
-
-    </style>
-
-    <style name="SpinnerItem" parent="Widget.AppCompat.TextView.SpinnerItem">
-        <item name="android:textColor">#fff</item>
-    </style>
-
-    <style name="Spinner.Dropdown" parent="Widget.AppCompat.DropDownItem.Spinner">
-        <item name="android:textColor">@android:color/black</item>
-    </style>
+    <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
+    <item name="android:spinnerDropDownItemStyle">@style/Spinner.Dropdown</item>
 
 
-    <style name="Widget.Aptoide.AppCompat.ActionButton" parent="Widget.AppCompat.ActionButton">
-        <item name="textAllCaps">false</item>
-    </style>
+    <!--<item name="android:navigationBarColor">#FF0078ab</item>-->
+    <item name="colorPrimaryDark">#006294</item>
 
-    <style name="menu_style" parent="ThemeOverlay.AppCompat.Light">
-        <item name="colorAccent">@android:color/black</item>
-        <item name="android:textColor">@android:color/black</item>
-    </style>
+    <item name="android:windowBackground">@drawable/gradient_drawable</item>
+    <item name="actionButtonStyle">@style/Widget.Aptoide.AppCompat.ActionButton</item>
+    <!--<item name="android:background">@drawable/gradient_drawable</item>-->
 
-    <style name="text_view_clickable">
-        <item name="android:background">@drawable/text_view_selectable</item>
-        <item name="android:padding">10dp</item>
-    </style>
-    <!--<style name="EditText" parent="Base.Widget.AppCompat.EditText">-->
+  </style>
+
+  <style name="SpinnerItem" parent="Widget.AppCompat.TextView.SpinnerItem">
+    <item name="android:textColor">#fff</item>
+  </style>
+
+  <style name="Spinner.Dropdown" parent="Widget.AppCompat.DropDownItem.Spinner">
+    <item name="android:textColor">@android:color/black</item>
+  </style>
+
+
+  <style name="Widget.Aptoide.AppCompat.ActionButton" parent="Widget.AppCompat.ActionButton">
+    <item name="textAllCaps">false</item>
+  </style>
+
+  <style name="menu_style" parent="ThemeOverlay.AppCompat.Light">
+    <item name="colorAccent">@android:color/black</item>
+    <item name="android:textColor">@android:color/black</item>
+  </style>
+
+  <style name="text_view_clickable">
+    <item name="android:background">@drawable/text_view_selectable</item>
+    <item name="android:padding">10dp</item>
+  </style>
+  <!--<style name="EditText" parent="Base.Widget.AppCompat.EditText">-->
+  <!--<item name="android:color">@android:color/white</item>-->
+  <!--<item name="android:background">@drawable/edittextbackground<s/item>-->
+  <!--<item name="android:padding">5dp</item>-->
+  <!--<item name="android:textColor">?attr/colorPrimary</item>-->
+  <!--</style>-->
+  <style name="EditText" parent="Base.Widget.AppCompat.EditText">
     <!--<item name="android:color">@android:color/white</item>-->
-    <!--<item name="android:background">@drawable/edittextbackground<s/item>-->
-    <!--<item name="android:padding">5dp</item>-->
-    <!--<item name="android:textColor">?attr/colorPrimary</item>-->
-    <!--</style>-->
-    <style name="EditText" parent="Base.Widget.AppCompat.EditText">
-        <!--<item name="android:color">@android:color/white</item>-->
-        <!--<item name="android:background">@drawable/btn_toggle_on_normal_holo_light</item>-->
-        <!--<item name="android:padding">24dp</item>-->
+    <!--<item name="android:background">@drawable/btn_toggle_on_normal_holo_light</item>-->
+    <!--<item name="android:padding">24dp</item>-->
 
-        <item name="android:textColor">?attr/colorPrimary</item>
-        <item name="android:background">@drawable/btn_toggle_on_normal_holo_light</item>
-        <item name="android:textSize">16dp</item>
-    </style>
+    <item name="android:textColor">?attr/colorPrimary</item>
+    <item name="android:background">@drawable/btn_toggle_on_normal_holo_light</item>
+    <item name="android:textSize">16dp</item>
+  </style>
 
 
-    <style name="Widget.ActionButton.Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow" tools:targetApi="11">
-        <item name="android:src">@android:drawable/ic_menu_sort_by_size</item>
-    </style>
+  <style name="Widget.ActionButton.Overflow" parent="@android:style/Widget.Holo.ActionButton.Overflow" tools:targetApi="11">
+    <item name="android:src">@android:drawable/ic_menu_sort_by_size</item>
+  </style>
 
-    <style name="teste" parent="Theme.AppCompat">
-        <item name="colorPrimaryDark">#FF0</item>
-        <item name="android:textColorSecondary">#FF0</item>
-        <item name="colorAccent">#F0F</item>
-        <item name="android:textColor">#00F</item>
-    </style>
+  <style name="teste" parent="Theme.AppCompat">
+    <item name="colorPrimaryDark">#FF0</item>
+    <item name="android:textColorSecondary">#FF0</item>
+    <item name="colorAccent">#F0F</item>
+    <item name="android:textColor">#00F</item>
+  </style>
 
-    <style name="TextViewCustom">
-        <item name="android:layout_marginTop">30dp</item>
-        <item name="android:layout_marginLeft">@dimen/sideMarginTitle</item>
-        <!--<item name="android:layout_marginRight">@dimen/sideMargin</item>-->
-        <item name="android:textSize">@dimen/abc_text_size_small_material</item>
-        <item name="android:textColor">?attr/colorPrimary</item>
-    </style>
+  <style name="TextViewCustom">
+    <item name="android:layout_marginTop">30dp</item>
+    <item name="android:layout_marginLeft">@dimen/sideMarginTitle</item>
+    <!--<item name="android:layout_marginRight">@dimen/sideMargin</item>-->
+    <item name="android:textSize">@dimen/abc_text_size_small_material</item>
+    <item name="android:textColor">?attr/colorPrimary</item>
+  </style>
 
-    <style name="SignUpTheme" parent="AppTheme">
+  <style name="SignUpTheme" parent="AppTheme">
 
-        <item name="colorAccent">#FFFFFF</item>
-    </style>
+    <item name="colorAccent">#FFFFFF</item>
+  </style>
 
-    <style name="RepoDialog" parent="Theme.AppCompat.Light.Dialog">
-        <item name="android:textColor">#009cb8</item>
-        <item name="editTextStyle">@style/EditTextDialog</item>
-        <!--<item name="android:editTextStyle">@style/EditTextDialog</item>-->
-        <!--<item name="android:textViewStyle">@style/TextViewDialog</item>-->
-        <item name="colorAccent">#009cb8</item>
-    </style>
+  <style name="RepoDialog" parent="Theme.AppCompat.Light.Dialog">
+    <item name="android:textColor">#009cb8</item>
+    <item name="editTextStyle">@style/EditTextDialog</item>
+    <!--<item name="android:editTextStyle">@style/EditTextDialog</item>-->
+    <!--<item name="android:textViewStyle">@style/TextViewDialog</item>-->
+    <item name="colorAccent">#009cb8</item>
+  </style>
 
-    <style name="EditTextDialog" parent="Base.Widget.AppCompat.EditText">
+  <style name="EditTextDialog" parent="Base.Widget.AppCompat.EditText">
 
-        <item name="android:textColor">@android:color/black</item>
-        <!--<item name="android:background">#FF0000</item>-->
-        <!--<item name="android:textColor">#000000</item>-->
-        <!--<item name="android:background">?attr/editTextBackground</item>-->
-        <!--<item name="colorAccent">#FFFFFF</item>-->
-        <!--<item name="colorPrimary">#FFFFFF</item>-->
-        <!--<item name="colorPrimaryDark">#FFFFFF</item>-->
-        <item name="colorAccent">#FF9cb8</item>
-        <item name="colorPrimary">#009cb8</item>
-        <item name="android:paddingLeft">10dp</item>
-    </style>
+    <item name="android:textColor">@android:color/black</item>
+    <!--<item name="android:background">#FF0000</item>-->
+    <!--<item name="android:textColor">#000000</item>-->
+    <!--<item name="android:background">?attr/editTextBackground</item>-->
+    <!--<item name="colorAccent">#FFFFFF</item>-->
+    <!--<item name="colorPrimary">#FFFFFF</item>-->
+    <!--<item name="colorPrimaryDark">#FFFFFF</item>-->
+    <item name="colorAccent">#FF9cb8</item>
+    <item name="colorPrimary">#009cb8</item>
+    <item name="android:paddingLeft">10dp</item>
+  </style>
 
-    <style name="TextViewDialog">
-        <item name="android:textColor">#FF0000</item>
-    </style>
+  <style name="TextViewDialog">
+    <item name="android:textColor">#FF0000</item>
+  </style>
 
-    <string name="store_username_undefined">You should define an username for your private store</string>
-    <string name="store_password_undefined">You should define a password for your private store</string>
+  <string name="store_username_undefined">You should define an username for your private store</string>
+  <string name="store_password_undefined">You should define a password for your private store</string>
 
 
 </resources>

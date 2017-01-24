@@ -3,11 +3,11 @@
 <!-- Generated with http://android-holo-colors.com -->
 <resources>
 
-    <style name="uploader_spinner_theme" parent="@style/_uploader_spinner_theme"/>
+  <style name="uploader_spinner_theme" parent="@style/_uploader_spinner_theme"/>
 
-    <style name="_uploader_spinner_theme" parent="Theme.AppCompat.Light">
+  <style name="_uploader_spinner_theme" parent="Theme.AppCompat.Light">
 
 
-    </style>
+  </style>
 
 </resources>

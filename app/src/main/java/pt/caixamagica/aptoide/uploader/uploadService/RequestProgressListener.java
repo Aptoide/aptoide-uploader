@@ -10,65 +10,65 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
-
 import com.octo.android.robospice.request.listener.RequestProgress;
-
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 
 /**
  * Created by neuro on 04-03-2015.
  */
-public class RequestProgressListener implements com.octo.android.robospice.request.listener.RequestProgressListener {
+public class RequestProgressListener
+    implements com.octo.android.robospice.request.listener.RequestProgressListener {
 
-	private int mId;
+  private int mId;
 
-	private NotificationCompat.Builder mBuilder;
+  private NotificationCompat.Builder mBuilder;
 
-	private NotificationManager mNotificationManager;
+  private NotificationManager mNotificationManager;
 
-	private Context context;
+  private Context context;
 
-	private SelectablePackageInfo packageInfo;
+  private SelectablePackageInfo packageInfo;
 
-	public RequestProgressListener(Context context, Intent intent, NotificationCompat.Builder mBuilder) {
-		this.context = context;
-		this.mBuilder = mBuilder;
-		mNotificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+  public RequestProgressListener(Context context, Intent intent,
+      NotificationCompat.Builder mBuilder) {
+    this.context = context;
+    this.mBuilder = mBuilder;
+    mNotificationManager =
+        (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		processIntent(intent);
+    processIntent(intent);
 
-		// Depende do package name deb!!
-		mId = packageInfo.packageName.hashCode();
-		mBuilder.setContentText("Uploading " + packageInfo.getLabel() + " (Tap to cancel upload)");
-	}
+    // Depende do package name deb!!
+    mId = packageInfo.packageName.hashCode();
+    mBuilder.setContentText("Uploading " + packageInfo.getLabel() + " (Tap to cancel upload)");
+  }
 
-	private PendingIntent newCancelationIntentV3() {
+  private PendingIntent newCancelationIntentV3() {
 
-		// Gera um ID único para prevenir reutilização de PendingIntent.
-		int reqCode = (int) System.currentTimeMillis() / 1000;
+    // Gera um ID único para prevenir reutilização de PendingIntent.
+    int reqCode = (int) System.currentTimeMillis() / 1000;
 
-		Intent intent = new Intent(context, UploadService.class);
+    Intent intent = new Intent(context, UploadService.class);
 
-		intent.setAction(UploadService.UPLOADER_CANCEL);
+    intent.setAction(UploadService.UPLOADER_CANCEL);
 
-		intent.putExtra("packageName", packageInfo.packageName);
+    intent.putExtra("packageName", packageInfo.packageName);
 
-		return PendingIntent.getService(context, reqCode, intent, 0);
-	}
+    return PendingIntent.getService(context, reqCode, intent, 0);
+  }
 
-	private void processIntent(Intent intent) {
-		packageInfo = (SelectablePackageInfo) intent.getExtras().get("packageInfo");
-	}
+  private void processIntent(Intent intent) {
+    packageInfo = (SelectablePackageInfo) intent.getExtras().get("packageInfo");
+  }
 
-	@Override
-	public void onRequestProgressUpdate(RequestProgress progress) {
+  @Override public void onRequestProgressUpdate(RequestProgress progress) {
 
-		mBuilder.setProgress(100, (int) progress.getProgress(), false);
+    mBuilder.setProgress(100, (int) progress.getProgress(), false);
 
-		mNotificationManager.notify(mId, mBuilder.build());
+    mNotificationManager.notify(mId, mBuilder.build());
 
-		if (progress.getProgress() >= 100) {
-			mNotificationManager.notify(mId, mBuilder.build());
-		}
-	}
+    if (progress.getProgress() >= 100) {
+      mNotificationManager.notify(mId, mBuilder.build());
+    }
+  }
 }

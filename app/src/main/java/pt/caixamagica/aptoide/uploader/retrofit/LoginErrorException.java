@@ -12,7 +12,7 @@ import com.octo.android.robospice.exception.NetworkException;
  */
 public class LoginErrorException extends NetworkException {
 
-	public LoginErrorException() {
-		super("This login was unsuccessful");
-	}
+  public LoginErrorException() {
+    super("This login was unsuccessful");
+  }
 }

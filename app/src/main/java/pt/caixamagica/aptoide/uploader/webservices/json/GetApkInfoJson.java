@@ -6,882 +6,879 @@
 package pt.caixamagica.aptoide.uploader.webservices.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-
 import java.util.List;
-
 import lombok.Data;
 import pt.caixamagica.aptoide.uploader.model.Comment;
 import pt.caixamagica.aptoide.uploader.model.Obb;
 
-@Data
-public class GetApkInfoJson {
+@Data public class GetApkInfoJson {
 
-	public Apk apk;
+  public Apk apk;
 
-	public String latest;
+  public String latest;
 
-	public Malware malware;
+  public Malware malware;
 
-	public Media media;
+  public Media media;
 
-	public Meta meta;
+  public Meta meta;
 
-	public Payment payment;
+  public Payment payment;
 
-	public Signature signature;
+  public Signature signature;
 
-	public String status;
+  public String status;
 
-	public ObbObject obb;
+  public ObbObject obb;
 
-	List<Error> errors;
+  List<Error> errors;
 
-	public Apk getApk() {
-		return apk;
-	}
+  public Apk getApk() {
+    return apk;
+  }
 
-	public String getLatest() {
-		return latest;
-	}
+  public String getLatest() {
+    return latest;
+  }
 
-	public Malware getMalware() {
-		return malware;
-	}
+  public Malware getMalware() {
+    return malware;
+  }
 
-	public Media getMedia() {
-		return media;
-	}
+  public Media getMedia() {
+    return media;
+  }
 
-	public Meta getMeta() {
-		return meta;
-	}
+  public Meta getMeta() {
+    return meta;
+  }
 
-	public Payment getPayment() {
-		return payment;
-	}
+  public Payment getPayment() {
+    return payment;
+  }
 
-	public Signature getSignature() {
-		return signature;
-	}
+  public Signature getSignature() {
+    return signature;
+  }
 
-	public String getStatus() {
-		return status;
-	}
+  public String getStatus() {
+    return status;
+  }
 
-	public List<Error> getErrors() {
-		return errors;
-	}
+  public List<Error> getErrors() {
+    return errors;
+  }
 
-	public ObbObject getObb() {
-		return obb;
-	}
+  public ObbObject getObb() {
+    return obb;
+  }
 
-	public static class Media {
+  public static class Media {
 
-		public List<String> sshots;
-		public List<Screenshots> sshots_hd;
-		public List<Videos> videos;
+    public List<String> sshots;
+    public List<Screenshots> sshots_hd;
+    public List<Videos> videos;
 
-		public List<String> getSshots() {
+    public List<String> getSshots() {
 
-			return this.sshots;
-		}
+      return this.sshots;
+    }
 
-		public void setSshots(List<String> sshots) {
-			this.sshots = sshots;
-		}
+    public void setSshots(List<String> sshots) {
+      this.sshots = sshots;
+    }
 
-		public List<Screenshots> getSshots_hd() {
-			return this.sshots_hd;
-		}
+    public List<Screenshots> getSshots_hd() {
+      return this.sshots_hd;
+    }
 
-		public List<Videos> getVideos() {
-			return videos;
-		}
+    public List<Videos> getVideos() {
+      return videos;
+    }
 
-		public void setVideos(List<Videos> videos) {
-			this.videos = videos;
-		}
+    public void setVideos(List<Videos> videos) {
+      this.videos = videos;
+    }
 
-		public static class Videos {
+    public static class Videos {
 
-			public String thumb;
-			public String type;
-			public String url;
+      public String thumb;
+      public String type;
+      public String url;
 
-			public String getThumb() {
-				return this.thumb;
-			}
+      public String getThumb() {
+        return this.thumb;
+      }
 
-			public void setThumb(String thumb) {
-				this.thumb = thumb;
-			}
+      public void setThumb(String thumb) {
+        this.thumb = thumb;
+      }
 
-			public String getType() {
-				return this.type;
-			}
+      public String getType() {
+        return this.type;
+      }
 
-			public void setType(String type) {
-				this.type = type;
-			}
+      public void setType(String type) {
+        this.type = type;
+      }
 
-			public String getUrl() {
-				return this.url;
-			}
+      public String getUrl() {
+        return this.url;
+      }
 
-			public void setUrl(String url) {
-				this.url = url;
-			}
-		}
+      public void setUrl(String url) {
+        this.url = url;
+      }
+    }
 
-		public static class Screenshots {
-
-			public String path;
-			public String orient;
-
-			public String getOrient() {
-				return orient;
-			}
-
-			public String getPath() {
-				return path;
-			}
-		}
-	}
+    public static class Screenshots {
+
+      public String path;
+      public String orient;
 
-	public static class Payment {
-
-		public Number amount;
+      public String getOrient() {
+        return orient;
+      }
 
-		@JsonProperty("currency_symbol") public String symbol;
-
-		public String apkpath;
-		public Metadata metadata;
-		public List<PaymentServices> payment_services;
-		public String status;
-
-		public Number getAmount() {
-			return this.amount;
-		}
-
-		public void setAmount(Number amount) {
-			this.amount = amount;
-		}
-
-		public String getapkpath() {
-			return this.apkpath;
-		}
-
-		public void setapkpath(String apkpath) {
-			this.apkpath = apkpath;
-		}
-
-		public String getStatus() {
-			return this.status;
-		}
-
-		public void setStatus(String status) {
-			this.status = status;
-		}
-
-		public List<PaymentServices> getPayment_services() {
-			return this.payment_services;
-		}
-
-		public void setPayment_seCategrvices(List<PaymentServices> payment_services) {
-			this.payment_services = payment_services;
-		}
-
-		public String getSymbol() {
-			return symbol;
-		}
-
-		public void setSymbol(String symbol) {
-			this.symbol = symbol;
-		}
+      public String getPath() {
+        return path;
+      }
+    }
+  }
 
-		public Metadata getMetadata() {
-			return metadata;
-		}
+  public static class Payment {
 
-		public static class Metadata {
+    public Number amount;
 
-			public int id;
+    @JsonProperty("currency_symbol") public String symbol;
 
-			public int getId() {
-				return id;
-			}
-		}
-	}
+    public String apkpath;
+    public Metadata metadata;
+    public List<PaymentServices> payment_services;
+    public String status;
+
+    public Number getAmount() {
+      return this.amount;
+    }
+
+    public void setAmount(Number amount) {
+      this.amount = amount;
+    }
+
+    public String getapkpath() {
+      return this.apkpath;
+    }
+
+    public void setapkpath(String apkpath) {
+      this.apkpath = apkpath;
+    }
+
+    public String getStatus() {
+      return this.status;
+    }
+
+    public void setStatus(String status) {
+      this.status = status;
+    }
+
+    public List<PaymentServices> getPayment_services() {
+      return this.payment_services;
+    }
+
+    public void setPayment_seCategrvices(List<PaymentServices> payment_services) {
+      this.payment_services = payment_services;
+    }
+
+    public String getSymbol() {
+      return symbol;
+    }
+
+    public void setSymbol(String symbol) {
+      this.symbol = symbol;
+    }
 
-	public static class Meta {
+    public Metadata getMetadata() {
+      return metadata;
+    }
 
-		public List<Comment> comments;
-		public String description;
-		public Developer developer;
-		public Likevotes likevotes;
-		public String news;
-		public String title;
-		public String wurl;
-		public Number min_age;
-		public Flags flags;
-		public int downloads;
-		public Categories categories;
+    public static class Metadata {
 
-		public int getDownloads() {
-			return this.downloads;
-		}
+      public int id;
 
-		public void setDownloads(int downloads) {
-			this.downloads = downloads;
-		}
-
-		public List<Comment> getComments() {
-			return this.comments;
-		}
+      public int getId() {
+        return id;
+      }
+    }
+  }
 
-		public void setComments(List<Comment> comments) {
-			this.comments = comments;
-		}
+  public static class Meta {
 
-		public String getDescription() {
-			return this.description;
-		}
+    public List<Comment> comments;
+    public String description;
+    public Developer developer;
+    public Likevotes likevotes;
+    public String news;
+    public String title;
+    public String wurl;
+    public Number min_age;
+    public Flags flags;
+    public int downloads;
+    public Categories categories;
 
-		public void setDescription(String description) {
-			this.description = description;
-		}
+    public int getDownloads() {
+      return this.downloads;
+    }
 
-		public Developer getDeveloper() {
-			return this.developer;
-		}
+    public void setDownloads(int downloads) {
+      this.downloads = downloads;
+    }
+
+    public List<Comment> getComments() {
+      return this.comments;
+    }
 
-		public void setDeveloper(Developer developer) {
-			this.developer = developer;
-		}
+    public void setComments(List<Comment> comments) {
+      this.comments = comments;
+    }
 
-		public Likevotes getLikevotes() {
-			return this.likevotes;
-		}
+    public String getDescription() {
+      return this.description;
+    }
 
-		public void setLikevotes(Likevotes likevotes) {
-			this.likevotes = likevotes;
-		}
+    public void setDescription(String description) {
+      this.description = description;
+    }
 
-		public String getNews() {
-			return this.news;
-		}
+    public Developer getDeveloper() {
+      return this.developer;
+    }
 
-		public void setNews(String news) {
-			this.news = news;
-		}
+    public void setDeveloper(Developer developer) {
+      this.developer = developer;
+    }
 
-		public String getTitle() {
-			return this.title;
-		}
+    public Likevotes getLikevotes() {
+      return this.likevotes;
+    }
 
-		public void setTitle(String title) {
-			this.title = title;
-		}
+    public void setLikevotes(Likevotes likevotes) {
+      this.likevotes = likevotes;
+    }
 
-		public String getWUrl() {
-			return wurl;
-		}
+    public String getNews() {
+      return this.news;
+    }
 
-		public Flags getFlags() {
-			return flags;
-		}
+    public void setNews(String news) {
+      this.news = news;
+    }
 
-		public void setFlags(Flags flags) {
-			this.flags = flags;
-		}
+    public String getTitle() {
+      return this.title;
+    }
 
-		public static class Likevotes {
+    public void setTitle(String title) {
+      this.title = title;
+    }
 
-			public Number dislikes;
-			public Number likes;
-			public Number rating;
-			public String uservote;
+    public String getWUrl() {
+      return wurl;
+    }
 
-			public String getUservote() {
-				return uservote;
-			}
+    public Flags getFlags() {
+      return flags;
+    }
 
-			public void setUservote(String uservote) {
-				this.uservote = uservote;
-			}
+    public void setFlags(Flags flags) {
+      this.flags = flags;
+    }
 
-			public Number getDislikes() {
-				return this.dislikes;
-			}
+    public static class Likevotes {
 
-			public void setDislikes(Number dislikes) {
-				this.dislikes = dislikes;
-			}
+      public Number dislikes;
+      public Number likes;
+      public Number rating;
+      public String uservote;
 
-			public Number getLikes() {
-				return this.likes;
-			}
+      public String getUservote() {
+        return uservote;
+      }
 
-			public void setLikes(Number likes) {
-				this.likes = likes;
-			}
+      public void setUservote(String uservote) {
+        this.uservote = uservote;
+      }
 
-			public Number getRating() {
-				return this.rating;
-			}
+      public Number getDislikes() {
+        return this.dislikes;
+      }
 
-			public void setRating(Number rating) {
-				this.rating = rating;
-			}
-		}
+      public void setDislikes(Number dislikes) {
+        this.dislikes = dislikes;
+      }
 
-		public static class Flags {
+      public Number getLikes() {
+        return this.likes;
+      }
 
-			public Votes votes;
-			public String uservote;
-			public Veredict veredict;
+      public void setLikes(Number likes) {
+        this.likes = likes;
+      }
 
-			public String getUservote() {
-				return uservote;
-			}
+      public Number getRating() {
+        return this.rating;
+      }
 
-			public Votes getVotes() {
-				return this.votes;
-			}
+      public void setRating(Number rating) {
+        this.rating = rating;
+      }
+    }
 
-			public void setVotes(Votes votes) {
-				this.votes = votes;
-			}
+    public static class Flags {
 
-			public Veredict getVeredict() {
-				return this.veredict;
-			}
+      public Votes votes;
+      public String uservote;
+      public Veredict veredict;
 
-			public void setVeredict(Veredict veredict) {
-				this.veredict = veredict;
-			}
-		}
+      public String getUservote() {
+        return uservote;
+      }
 
-		public static class Categories {
+      public Votes getVotes() {
+        return this.votes;
+      }
 
-			public List<Category> standard;
-			public List<Category> custom;
+      public void setVotes(Votes votes) {
+        this.votes = votes;
+      }
 
-			public static class Category {
+      public Veredict getVeredict() {
+        return this.veredict;
+      }
 
-				public Number id;
-				public Number parent;
-				public String name;
-			}
-		}
+      public void setVeredict(Veredict veredict) {
+        this.veredict = veredict;
+      }
+    }
 
-		public static class Veredict {
+    public static class Categories {
 
-			public String flag;
-			public String review;
+      public List<Category> standard;
+      public List<Category> custom;
 
-			public String getFlag() {
-				return this.flag;
-			}
+      public static class Category {
 
-			public void setFlag(String flag) {
-				this.flag = flag;
-			}
+        public Number id;
+        public Number parent;
+        public String name;
+      }
+    }
 
-			public String getReview() {
-				return this.review;
-			}
+    public static class Veredict {
 
-			public void setReview(String review) {
-				this.review = review;
-			}
-		}
+      public String flag;
+      public String review;
 
-		public static class Votes {
+      public String getFlag() {
+        return this.flag;
+      }
 
-			public Number fake;
-			public Number freeze;
-			public Number good;
-			public Number license;
-			public Number virus;
+      public void setFlag(String flag) {
+        this.flag = flag;
+      }
 
-			public Number getFake() {
-				return this.fake;
-			}
+      public String getReview() {
+        return this.review;
+      }
 
-			public void setFake(Number fake) {
-				this.fake = fake;
-			}
+      public void setReview(String review) {
+        this.review = review;
+      }
+    }
 
-			public Number getFreeze() {
-				return this.freeze;
-			}
+    public static class Votes {
 
-			public void setFreeze(Number freeze) {
-				this.freeze = freeze;
-			}
+      public Number fake;
+      public Number freeze;
+      public Number good;
+      public Number license;
+      public Number virus;
 
-			public Number getGood() {
-				return this.good;
-			}
+      public Number getFake() {
+        return this.fake;
+      }
 
-			public void setGood(Number good) {
-				this.good = good;
-			}
+      public void setFake(Number fake) {
+        this.fake = fake;
+      }
 
-			public Number getLicense() {
-				return this.license;
-			}
+      public Number getFreeze() {
+        return this.freeze;
+      }
 
-			public void setLicense(Number license) {
-				this.license = license;
-			}
+      public void setFreeze(Number freeze) {
+        this.freeze = freeze;
+      }
 
-			public Number getVirus() {
-				return this.virus;
-			}
+      public Number getGood() {
+        return this.good;
+      }
 
-			public void setVirus(Number virus) {
-				this.virus = virus;
-			}
-		}
+      public void setGood(Number good) {
+        this.good = good;
+      }
 
-		public static class Developer {
+      public Number getLicense() {
+        return this.license;
+      }
 
-			public Info info;
-			public List<String> packages;
+      public void setLicense(Number license) {
+        this.license = license;
+      }
 
-			public Info getInfo() {
-				return this.info;
-			}
+      public Number getVirus() {
+        return this.virus;
+      }
 
-			public void setInfo(Info info) {
-				this.info = info;
-			}
+      public void setVirus(Number virus) {
+        this.virus = virus;
+      }
+    }
 
-			public List<String> getPackages() {
-				return this.packages;
-			}
+    public static class Developer {
 
-			public void setPackages(List<String> packages) {
-				this.packages = packages;
-			}
+      public Info info;
+      public List<String> packages;
 
-			public static class Info {
+      public Info getInfo() {
+        return this.info;
+      }
 
-				public String email;
-				public String name;
-				public String privacy_policy;
-				public String website;
+      public void setInfo(Info info) {
+        this.info = info;
+      }
 
-				public String getEmail() {
-					return this.email;
-				}
+      public List<String> getPackages() {
+        return this.packages;
+      }
 
-				public void setEmail(String email) {
-					this.email = email;
-				}
+      public void setPackages(List<String> packages) {
+        this.packages = packages;
+      }
 
-				public String getName() {
-					return this.name;
-				}
+      public static class Info {
 
-				public void setName(String name) {
-					this.name = name;
-				}
+        public String email;
+        public String name;
+        public String privacy_policy;
+        public String website;
 
-				public String getPrivacy_policy() {
-					return this.privacy_policy;
-				}
+        public String getEmail() {
+          return this.email;
+        }
 
-				public void setPrivacy_policy(String privacy_policy) {
-					this.privacy_policy = privacy_policy;
-				}
+        public void setEmail(String email) {
+          this.email = email;
+        }
 
-				public String getWebsite() {
-					return this.website;
-				}
+        public String getName() {
+          return this.name;
+        }
 
-				public void setWebsite(String website) {
-					this.website = website;
-				}
-			}
-		}
-	}
+        public void setName(String name) {
+          this.name = name;
+        }
 
-	public static class Malware {
+        public String getPrivacy_policy() {
+          return this.privacy_policy;
+        }
 
-		public Reason reason;
-		public String status;
+        public void setPrivacy_policy(String privacy_policy) {
+          this.privacy_policy = privacy_policy;
+        }
 
-		public Reason getReason() {
-			return this.reason;
-		}
+        public String getWebsite() {
+          return this.website;
+        }
 
-		public void setReason(Reason reason) {
-			this.reason = reason;
-		}
+        public void setWebsite(String website) {
+          this.website = website;
+        }
+      }
+    }
+  }
 
-		public String getStatus() {
-			return this.status;
-		}
+  public static class Malware {
 
-		public void setStatus(String status) {
-			this.status = status;
-		}
+    public Reason reason;
+    public String status;
 
-		public static class Scanned {
+    public Reason getReason() {
+      return this.reason;
+    }
 
-			public List<Av_info> av_info;
-			public String date;
-			public String status;
+    public void setReason(Reason reason) {
+      this.reason = reason;
+    }
 
-			public List<Av_info> getAv_info() {
-				return this.av_info;
-			}
+    public String getStatus() {
+      return this.status;
+    }
 
-			public void setAv_info(List<Av_info> av_info) {
-				this.av_info = av_info;
-			}
+    public void setStatus(String status) {
+      this.status = status;
+    }
 
-			public String getDate() {
-				return this.date;
-			}
+    public static class Scanned {
 
-			public void setDate(String date) {
-				this.date = date;
-			}
+      public List<Av_info> av_info;
+      public String date;
+      public String status;
 
-			public String getStatus() {
-				return this.status;
-			}
+      public List<Av_info> getAv_info() {
+        return this.av_info;
+      }
 
-			public void setStatus(String status) {
-				this.status = status;
-			}
-		}
+      public void setAv_info(List<Av_info> av_info) {
+        this.av_info = av_info;
+      }
 
-		public static class Reason {
+      public String getDate() {
+        return this.date;
+      }
 
-			public Scanned scanned;
-			public Signature_validated signature_validated;
-			public Thirdparty_validated thirdparty_validated;
-			public Manual_qa manual_qa;
+      public void setDate(String date) {
+        this.date = date;
+      }
 
-			public Scanned getScanned() {
-				return this.scanned;
-			}
+      public String getStatus() {
+        return this.status;
+      }
 
-			public void setScanned(Scanned scanned) {
-				this.scanned = scanned;
-			}
+      public void setStatus(String status) {
+        this.status = status;
+      }
+    }
 
-			public Signature_validated getSignature_validated() {
-				return this.signature_validated;
-			}
+    public static class Reason {
 
-			public void setSignature_validated(Signature_validated signature_validated) {
-				this.signature_validated = signature_validated;
-			}
+      public Scanned scanned;
+      public Signature_validated signature_validated;
+      public Thirdparty_validated thirdparty_validated;
+      public Manual_qa manual_qa;
 
-			public Thirdparty_validated getThirdparty_validated() {
-				return this.thirdparty_validated;
-			}
+      public Scanned getScanned() {
+        return this.scanned;
+      }
 
-			public void setThirdparty_validated(Thirdparty_validated thirdparty_validated) {
-				this.thirdparty_validated = thirdparty_validated;
-			}
+      public void setScanned(Scanned scanned) {
+        this.scanned = scanned;
+      }
 
-			public Manual_qa getManual_qa() {
-				return manual_qa;
-			}
+      public Signature_validated getSignature_validated() {
+        return this.signature_validated;
+      }
 
-			public void setManual_qa(Manual_qa manual_qa) {
-				this.manual_qa = manual_qa;
-			}
+      public void setSignature_validated(Signature_validated signature_validated) {
+        this.signature_validated = signature_validated;
+      }
 
-			public static class Signature_validated {
+      public Thirdparty_validated getThirdparty_validated() {
+        return this.thirdparty_validated;
+      }
 
-				public String date;
-				public String signature_from;
-				public String status;
+      public void setThirdparty_validated(Thirdparty_validated thirdparty_validated) {
+        this.thirdparty_validated = thirdparty_validated;
+      }
 
-				public String getDate() {
-					return this.date;
-				}
+      public Manual_qa getManual_qa() {
+        return manual_qa;
+      }
 
-				public void setDate(String date) {
-					this.date = date;
-				}
+      public void setManual_qa(Manual_qa manual_qa) {
+        this.manual_qa = manual_qa;
+      }
 
-				public String getSignature_from() {
-					return this.signature_from;
-				}
+      public static class Signature_validated {
 
-				public void setSignature_from(String signature_from) {
-					this.signature_from = signature_from;
-				}
+        public String date;
+        public String signature_from;
+        public String status;
 
-				public String getStatus() {
-					return this.status;
-				}
+        public String getDate() {
+          return this.date;
+        }
 
-				public void setStatus(String status) {
-					this.status = status;
-				}
-			}
+        public void setDate(String date) {
+          this.date = date;
+        }
 
-			public static class Thirdparty_validated {
+        public String getSignature_from() {
+          return this.signature_from;
+        }
 
-				public String date;
-				public String store;
+        public void setSignature_from(String signature_from) {
+          this.signature_from = signature_from;
+        }
 
-				public String getDate() {
-					return this.date;
-				}
+        public String getStatus() {
+          return this.status;
+        }
 
-				public void setDate(String date) {
-					this.date = date;
-				}
+        public void setStatus(String status) {
+          this.status = status;
+        }
+      }
 
-				public String getStore() {
-					return this.store;
-				}
+      public static class Thirdparty_validated {
 
-				public void setStore(String store) {
-					this.store = store;
-				}
-			}
+        public String date;
+        public String store;
 
-			public static class Manual_qa {
+        public String getDate() {
+          return this.date;
+        }
 
-				public String date;
-				public String tester;
-				public String status;
+        public void setDate(String date) {
+          this.date = date;
+        }
 
-				public String getDate() {
-					return this.date;
-				}
+        public String getStore() {
+          return this.store;
+        }
 
-				public void setDate(String date) {
-					this.date = date;
-				}
+        public void setStore(String store) {
+          this.store = store;
+        }
+      }
 
-				public String getTester() {
-					return tester;
-				}
+      public static class Manual_qa {
 
-				public void setTester(String tester) {
-					this.tester = tester;
-				}
+        public String date;
+        public String tester;
+        public String status;
 
-				public String getStatus() {
-					return status;
-				}
+        public String getDate() {
+          return this.date;
+        }
 
-				public void setStatus(String status) {
-					this.status = status;
-				}
-			}
-		}
-	}
+        public void setDate(String date) {
+          this.date = date;
+        }
 
-	public static class Av_info {
+        public String getTester() {
+          return tester;
+        }
 
-		public List<Infection> infections;
-		public String name;
+        public void setTester(String tester) {
+          this.tester = tester;
+        }
 
-		public List getInfections() {
-			return this.infections;
-		}
+        public String getStatus() {
+          return status;
+        }
 
-		public void setInfections(List<Infection> infections) {
-			this.infections = infections;
-		}
+        public void setStatus(String status) {
+          this.status = status;
+        }
+      }
+    }
+  }
 
-		public String getName() {
-			return this.name;
-		}
+  public static class Av_info {
 
-		public void setName(String name) {
-			this.name = name;
-		}
-	}
+    public List<Infection> infections;
+    public String name;
 
-	public static class Infection {
+    public List getInfections() {
+      return this.infections;
+    }
 
-		public String description;
-		public String name;
+    public void setInfections(List<Infection> infections) {
+      this.infections = infections;
+    }
 
-		public String getDescription() {
-			return description;
-		}
+    public String getName() {
+      return this.name;
+    }
 
-		public void setDescription(String description) {
-			this.description = description;
-		}
+    public void setName(String name) {
+      this.name = name;
+    }
+  }
 
-		public String getName() {
-			return name;
-		}
+  public static class Infection {
 
-		public void setName(String name) {
-			this.name = name;
-		}
-	}
+    public String description;
+    public String name;
 
-	public static class Signature {
+    public String getDescription() {
+      return description;
+    }
 
-		@JsonProperty("SHA1") public String SHA1;
+    public void setDescription(String description) {
+      this.description = description;
+    }
 
-		public String getSHA1() {
-			return this.SHA1;
-		}
+    public String getName() {
+      return name;
+    }
 
-		public void setSHA1(String sHA1) {
-			this.SHA1 = sHA1;
-		}
-	}
+    public void setName(String name) {
+      this.name = name;
+    }
+  }
 
-	public static class Apk {
+  public static class Signature {
 
-		public String icon;
+    @JsonProperty("SHA1") public String SHA1;
 
-		public Number id;
+    public String getSHA1() {
+      return this.SHA1;
+    }
 
-		public String md5sum;
+    public void setSHA1(String sHA1) {
+      this.SHA1 = sHA1;
+    }
+  }
 
-		public Number minSdk;
+  public static class Apk {
 
-		public String minScreen;
+    public String icon;
 
-		public String packageName;
+    public Number id;
 
-		public String path;
+    public String md5sum;
 
-		public String altpath;
+    public Number minSdk;
 
-		public List<String> permissions;
+    public String minScreen;
 
-		public String repo;
+    public String packageName;
 
-		public Number size;
+    public String path;
 
-		public Number vercode;
+    public String altpath;
 
-		public String vername;
+    public List<String> permissions;
 
-		public String icon_hd;
+    public String repo;
 
-		public String getIcon() {
-			return this.icon;
-		}
+    public Number size;
 
-		public void setIcon(String icon) {
-			this.icon = icon;
-		}
+    public Number vercode;
 
-		public Number getId() {
-			return this.id;
-		}
+    public String vername;
 
-		public void setId(Number id) {
-			this.id = id;
-		}
+    public String icon_hd;
 
-		public String getMd5sum() {
-			return this.md5sum;
-		}
+    public String getIcon() {
+      return this.icon;
+    }
 
-		public void setMd5sum(String md5sum) {
-			this.md5sum = md5sum;
-		}
+    public void setIcon(String icon) {
+      this.icon = icon;
+    }
 
-		public String getPackage() {
-			return this.packageName;
-		}
+    public Number getId() {
+      return this.id;
+    }
 
-		public void setPackage(String packageName) {
-			this.packageName = packageName;
-		}
+    public void setId(Number id) {
+      this.id = id;
+    }
 
-		public String getPath() {
-			return this.path;
-		}
+    public String getMd5sum() {
+      return this.md5sum;
+    }
 
-		public void setPath(String path) {
-			this.path = path;
-		}
+    public void setMd5sum(String md5sum) {
+      this.md5sum = md5sum;
+    }
 
-		public List<String> getPermissions() {
-			return this.permissions;
-		}
+    public String getPackage() {
+      return this.packageName;
+    }
 
-		public void setPermissions(List<String> permissions) {
-			this.permissions = permissions;
-		}
+    public void setPackage(String packageName) {
+      this.packageName = packageName;
+    }
 
-		public String getRepo() {
-			return this.repo;
-		}
+    public String getPath() {
+      return this.path;
+    }
 
-		public void setRepo(String repo) {
-			this.repo = repo;
-		}
+    public void setPath(String path) {
+      this.path = path;
+    }
 
-		public Number getSize() {
-			return this.size;
-		}
+    public List<String> getPermissions() {
+      return this.permissions;
+    }
 
-		public void setSize(Number size) {
-			this.size = size;
-		}
+    public void setPermissions(List<String> permissions) {
+      this.permissions = permissions;
+    }
 
-		public Number getVercode() {
-			return this.vercode;
-		}
+    public String getRepo() {
+      return this.repo;
+    }
 
-		public void setVercode(Number vercode) {
-			this.vercode = vercode;
-		}
+    public void setRepo(String repo) {
+      this.repo = repo;
+    }
 
-		public String getVername() {
-			return this.vername;
-		}
+    public Number getSize() {
+      return this.size;
+    }
 
-		public void setVername(String vername) {
-			this.vername = vername;
-		}
+    public void setSize(Number size) {
+      this.size = size;
+    }
 
-		public String getIconHd() {
-			return icon_hd;
-		}
+    public Number getVercode() {
+      return this.vercode;
+    }
 
-		public Number getMinSdk() {
-			return minSdk;
-		}
+    public void setVercode(Number vercode) {
+      this.vercode = vercode;
+    }
 
-		public String getMinScreen() {
-			return minScreen;
-		}
+    public String getVername() {
+      return this.vername;
+    }
 
-		public String getAltPath() {
-			return altpath;
-		}
-	}
+    public void setVername(String vername) {
+      this.vername = vername;
+    }
 
-	public static class ObbObject {
+    public String getIconHd() {
+      return icon_hd;
+    }
 
-		public Obb main;
-		public Obb patch;
+    public Number getMinSdk() {
+      return minSdk;
+    }
 
-		public Obb getMain() {
-			return main;
-		}
+    public String getMinScreen() {
+      return minScreen;
+    }
 
-		public Obb getPatch() {
-			return patch;
-		}
-	}
+    public String getAltPath() {
+      return altpath;
+    }
+  }
+
+  public static class ObbObject {
+
+    public Obb main;
+    public Obb patch;
+
+    public Obb getMain() {
+      return main;
+    }
+
+    public Obb getPatch() {
+      return patch;
+    }
+  }
 }

@@ -3,15 +3,15 @@
 <!-- Generated with http://android-holo-colors.com -->
 <resources xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <style name="Buttonuploader_button_theme" parent="android:Widget.Button">
-        <item name="android:background">@drawable/uploader_button_theme_btn_default_holo_light</item>
-        <item name="android:minHeight">48dip</item>
-        <item name="android:minWidth">64dip</item>
-        <item name="android:textColor">#FFFFFF</item>
-    </style>
+  <style name="Buttonuploader_button_theme" parent="android:Widget.Button">
+    <item name="android:background">@drawable/uploader_button_theme_btn_default_holo_light</item>
+    <item name="android:minHeight">48dip</item>
+    <item name="android:minWidth">64dip</item>
+    <item name="android:textColor">#FFFFFF</item>
+  </style>
 
-    <style name="ImageButtonuploader_button_theme" parent="android:Widget.ImageButton">
-        <item name="android:background">@drawable/uploader_button_theme_btn_default_holo_light</item>
-    </style>
+  <style name="ImageButtonuploader_button_theme" parent="android:Widget.ImageButton">
+    <item name="android:background">@drawable/uploader_button_theme_btn_default_holo_light</item>
+  </style>
 
 </resources>

@@ -1,39 +1,42 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-                xmlns:app="http://schemas.android.com/apk/res-auto"
-                xmlns:tools="http://schemas.android.com/tools"
-                android:layout_width="match_parent"
-                android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
 
 
-                android:orientation="vertical"
-                tools:context=".MainActivity"
-                tools:ignore="MergeRootFrame">
+    android:orientation="vertical"
+    tools:context=".MainActivity"
+    tools:ignore="MergeRootFrame"
+    >
 
-    <!--<ImageView-->
-    <!--android:layout_width="match_parent"-->
-    <!--android:layout_height="match_parent" android:scaleType="centerCrop" android:src="@drawable/background"/>-->
+  <!--<ImageView-->
+  <!--android:layout_width="match_parent"-->
+  <!--android:layout_height="match_parent" android:scaleType="centerCrop" android:src="@drawable/background"/>-->
 
-    <android.support.v7.widget.Toolbar
-        android:id="@+id/my_awesome_toolbar"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:minHeight="?attr/actionBarSize"
-        app:popupTheme="@style/menu_style"
+  <android.support.v7.widget.Toolbar
+      android:id="@+id/my_awesome_toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:minHeight="?attr/actionBarSize"
+      app:popupTheme="@style/menu_style"
 
-        app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"/>
-
-
-    <FrameLayout
-        android:id="@+id/container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_below="@id/my_awesome_toolbar"/>
+      app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar"
+      />
 
 
-    <!--<TextView-->
-    <!--android:layout_width="fill_parent"-->
-    <!--android:layout_height="wrap_content"-->
-    <!--android:text="Hello World, splash"/>-->
+  <FrameLayout
+      android:id="@+id/container"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_below="@id/my_awesome_toolbar"
+      />
+
+
+  <!--<TextView-->
+  <!--android:layout_width="fill_parent"-->
+  <!--android:layout_height="wrap_content"-->
+  <!--android:text="Hello World, splash"/>-->
 
 
 </RelativeLayout>

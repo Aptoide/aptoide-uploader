@@ -10,5 +10,5 @@ package pt.caixamagica.aptoide.uploader;
  */
 public abstract class PriorityRunnable implements Runnable {
 
-	public long priority = System.currentTimeMillis();
+  public long priority = System.currentTimeMillis();
 }

@@ -16,13 +16,13 @@
 
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
 
-    <item android:drawable="@android:color/transparent" android:state_window_focused="false"/>
+  <item android:drawable="@android:color/transparent" android:state_window_focused="false"/>
 
-    <!-- Even though these two point to the same resource, have two states so the drawable will invalidate itself when coming out of pressed state. -->
-    <item android:drawable="@drawable/uploader_spinner_theme_list_selector_disabled_holo_light" android:state_enabled="false" android:state_focused="true" android:state_pressed="true"/>
-    <item android:drawable="@drawable/uploader_spinner_theme_list_selector_disabled_holo_light" android:state_enabled="false" android:state_focused="true"/>
-    <item android:drawable="@drawable/uploader_spinner_theme_list_selector_background_transition_holo_light" android:state_focused="true" android:state_pressed="true"/>
-    <item android:drawable="@drawable/uploader_spinner_theme_list_selector_background_transition_holo_light" android:state_focused="false" android:state_pressed="true"/>
-    <item android:drawable="@drawable/uploader_spinner_theme_list_focused_holo" android:state_focused="true"/>
+  <!-- Even though these two point to the same resource, have two states so the drawable will invalidate itself when coming out of pressed state. -->
+  <item android:drawable="@drawable/uploader_spinner_theme_list_selector_disabled_holo_light" android:state_enabled="false" android:state_focused="true" android:state_pressed="true"/>
+  <item android:drawable="@drawable/uploader_spinner_theme_list_selector_disabled_holo_light" android:state_enabled="false" android:state_focused="true"/>
+  <item android:drawable="@drawable/uploader_spinner_theme_list_selector_background_transition_holo_light" android:state_focused="true" android:state_pressed="true"/>
+  <item android:drawable="@drawable/uploader_spinner_theme_list_selector_background_transition_holo_light" android:state_focused="false" android:state_pressed="true"/>
+  <item android:drawable="@drawable/uploader_spinner_theme_list_focused_holo" android:state_focused="true"/>
 
 </selector>
