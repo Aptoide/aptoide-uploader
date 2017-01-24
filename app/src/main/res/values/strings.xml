@@ -28,4 +28,53 @@
 
     <string name="facebook_error">You should provide your email in order to login.</string>
 
+    <string name="age_rating_1">All</string>
+    <string name="age_rating_2">Pre-Teen (minimal age: 10)</string>
+    <string name="age_rating_3">Teen (minimal age: 16)</string>
+    <string name="age_rating_4">Mature (minimal age: 18)</string>
+
+    <string name="app_category_1">App Category</string>
+    <string name="app_category_2">Comics</string>
+    <string name="app_category_3">Communication</string>
+    <string name="app_category_4">Entertainment</string>
+    <string name="app_category_5">Finance</string>
+    <string name="app_category_6">Health</string>
+    <string name="app_category_7">Lifestyle</string>
+    <string name="app_category_8">Multimedia</string>
+    <string name="app_category_9">News &amp; Weather</string>
+    <string name="app_category_10">Productivity</string>
+    <string name="app_category_11">Reference</string>
+    <string name="app_category_12">Shopping</string>
+    <string name="app_category_13">Social</string>
+    <string name="app_category_14">Sports</string>
+    <string name="app_category_15">Themes</string>
+    <string name="app_category_16">Tools</string>
+    <string name="app_category_17">Travel</string>
+    <string name="app_category_18">Demo</string>
+    <string name="app_category_19">Software Libraries</string>
+    <string name="app_category_20">Arcade &amp; Action (Games)</string>
+    <string name="app_category_21">Brain &amp; Puzzle (Games)</string>
+    <string name="app_category_22">Cards &amp; Casino (Games)</string>
+    <string name="app_category_23">Casual (Games)</string>
+    <string name="app_category_24">News &amp; Magazines</string>
+    <string name="app_category_25">Music &amp; Audio</string>
+    <string name="app_category_26">Photography</string>
+    <string name="app_category_27">Personalization</string>
+    <string name="app_category_28">Racing (Games)</string>
+    <string name="app_category_29">Books &amp; Reference</string>
+    <string name="app_category_30">Health &amp; Fitness</string>
+    <string name="app_category_31">Media &amp; Video</string>
+    <string name="app_category_32">Education</string>
+    <string name="app_category_33">Business</string>
+    <string name="app_category_34">Sports Games</string>
+    <string name="app_category_35">Weather</string>
+    <string name="app_category_36">Travel &amp; Local</string>
+    <string name="app_category_37">Transportation</string>
+    <string name="app_category_38">Medical</string>
+    <string name="app_category_39">Libraries &amp; Demo</string>
+    <string name="app_category_40">Transport</string>
+
+    <string name="sort_spinner_values_1">By Date</string>
+    <string name="sort_spinner_values_2">By Name</string>
+
 </resources>

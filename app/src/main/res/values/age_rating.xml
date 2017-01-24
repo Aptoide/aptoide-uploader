@@ -1,9 +1,0 @@
-<?xml version="1.0" encoding="utf-8"?>
-<resources>
-    <string-array name="age_rating_array">
-        <item>All</item>
-        <item>Pre-Teen (minimal age: 10)</item>
-        <item>Teen (minimal age: 16)</item>
-        <item>Mature (minimal age: 18)</item>
-    </string-array>
-</resources>

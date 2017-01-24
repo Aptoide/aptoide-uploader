@@ -1,0 +1,59 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+  <string-array name="sort_spinner_array">
+    <item>@string/sort_spinner_values_1</item>
+    <item>@string/sort_spinner_values_2</item>
+  </string-array>
+
+  <string-array name="app_category_array">
+    <item>@string/app_category_1</item>
+    <item>@string/app_category_2</item>
+    <item>@string/app_category_3</item>
+    <item>@string/app_category_4</item>
+    <item>@string/app_category_5</item>
+    <item>@string/app_category_6</item>
+    <item>@string/app_category_7</item>
+    <item>@string/app_category_8</item>
+    <item>@string/app_category_9</item>
+    <item>@string/app_category_10</item>
+    <item>@string/app_category_11</item>
+    <item>@string/app_category_12</item>
+    <item>@string/app_category_13</item>
+    <item>@string/app_category_14</item>
+    <item>@string/app_category_15</item>
+    <item>@string/app_category_16</item>
+    <item>@string/app_category_17</item>
+    <item>@string/app_category_18</item>
+    <item>@string/app_category_19</item>
+    <item>@string/app_category_20</item>
+    <item>@string/app_category_21</item>
+    <item>@string/app_category_22</item>
+    <item>@string/app_category_23</item>
+    <item>@string/app_category_24</item>
+    <item>@string/app_category_25</item>
+    <item>@string/app_category_26</item>
+    <item>@string/app_category_27</item>
+    <item>@string/app_category_28</item>
+    <item>@string/app_category_29</item>
+    <item>@string/app_category_30</item>
+    <item>@string/app_category_31</item>
+    <item>@string/app_category_32</item>
+    <item>@string/app_category_33</item>
+    <item>@string/app_category_34</item>
+    <item>@string/app_category_35</item>
+    <item>@string/app_category_36</item>
+    <item>@string/app_category_37</item>
+    <item>@string/app_category_38</item>
+    <item>@string/app_category_39</item>
+    <item>@string/app_category_40</item>
+
+  </string-array>
+
+  <string-array name="age_rating_array">
+    <item>@string/age_rating_1</item>
+    <item>@string/age_rating_2</item>
+    <item>@string/age_rating_3</item>
+    <item>@string/age_rating_4</item>
+  </string-array>
+
+</resources>
