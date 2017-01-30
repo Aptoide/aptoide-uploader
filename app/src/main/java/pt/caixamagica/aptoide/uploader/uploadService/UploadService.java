@@ -30,6 +30,7 @@ import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploadService;
+import pt.caixamagica.aptoide.uploader.retrofit.request.StoreTokenInterface;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UploadAppToRepoRequest;
 import pt.caixamagica.aptoide.uploader.webservices.json.Error;
 import pt.caixamagica.aptoide.uploader.webservices.json.UploadAppToRepoJson;
@@ -93,7 +94,7 @@ public class UploadService extends Service {
     }
   }
 
-  public void prepareUploadAndSend(UserCredentialsJson userCredentialsJson,
+  public void prepareUploadAndSend(final UserCredentialsJson userCredentialsJson,
       SelectablePackageInfo packageInfo) throws ValidationException {
 
     if (this.userCredentialsJson == null) this.userCredentialsJson = userCredentialsJson;
@@ -109,14 +110,18 @@ public class UploadService extends Service {
 
     RequestProgressListener requestProgressListener =
         new RequestProgressListener(getApplication(), intent, builder);
-    SharedPreferences sharedpreferences =
+    final SharedPreferences sharedpreferences =
         getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-    AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(),
+    final AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(),
         Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
 
     UploadAppToRepoRequest uploadAppToRepoRequest =
-        new UploadAppToRepoRequest(requestProgressListener);
+        new UploadAppToRepoRequest(requestProgressListener, new StoreTokenInterface() {
+          @Override public void setToken(String token) {
+            sharedpreferences.edit().putString("token", aesObfuscator.obfuscate(token, "token")).apply();
+          }
+        });
     uploadAppToRepoRequest.setPackageName(packageInfo.packageName);
     uploadAppToRepoRequest.setApkName(packageInfo.getName());
     uploadAppToRepoRequest.setToken(
@@ -325,7 +330,16 @@ public class UploadService extends Service {
             sendingAppsUploadRequests.get(intent.getStringExtra("packageName"));
         setPreparingUploadNotification(req.getPackageName(), req.getLabel());
 
-        uploadApp(new UploadAppToRepoRequest(req), null);
+        uploadApp(new UploadAppToRepoRequest(req, new StoreTokenInterface() {
+          @Override public void setToken(String token) {
+            final SharedPreferences sharedpreferences =
+                getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+
+            final AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(),
+                Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+            sharedpreferences.edit().putString("token", aesObfuscator.obfuscate(token, "token")).apply();
+          }
+        }), null);
       }
     }
 

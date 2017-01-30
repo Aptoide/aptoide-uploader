@@ -92,13 +92,18 @@ import retrofit.mime.TypedFile;
   private String label;
 
   private boolean checked = false;
+  private StoreTokenInterface storeTokenInterface;
 
-  public UploadAppToRepoRequest() {
+  public UploadAppToRepoRequest(StoreTokenInterface storeTokenInterface) {
     super(UploadAppToRepoJson.class, UploadAppToRepoRequest.Webservice.class);
+    this.storeTokenInterface = storeTokenInterface;
   }
 
-  public UploadAppToRepoRequest(UploadAppToRepoRequest uploadAppToRepoRequest) {
-    this(uploadAppToRepoRequest.getRequestProgressListenerObject());
+  public UploadAppToRepoRequest(UploadAppToRepoRequest uploadAppToRepoRequest,
+      StoreTokenInterface storeTokenInterface) {
+    this(uploadAppToRepoRequest.getRequestProgressListenerObject(), storeTokenInterface);
+
+    this.storeTokenInterface = storeTokenInterface;
 
     token = uploadAppToRepoRequest.token;
     repo = uploadAppToRepoRequest.repo;
@@ -110,8 +115,9 @@ import retrofit.mime.TypedFile;
     label = uploadAppToRepoRequest.label;
   }
 
-  public UploadAppToRepoRequest(RequestProgressListener requestProgressListenerObject) {
-    this();
+  public UploadAppToRepoRequest(RequestProgressListener requestProgressListenerObject,
+      StoreTokenInterface storeTokenInterface) {
+    this(storeTokenInterface);
     this.requestProgressListenerObject = requestProgressListenerObject;
   }
 
@@ -175,6 +181,9 @@ import retrofit.mime.TypedFile;
         OAuth2Request oAuth2Request = new OAuth2Request();
         token = oAuth2Request.builder();
         parameters.put("access_token", token);
+
+        storeTokenInterface.setToken(token);
+
         return getService().uploadAppToRepo(parameters);
       }
       throw new SpiceException("");
