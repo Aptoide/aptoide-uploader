@@ -68,8 +68,10 @@ public class LoginActivity extends AppCompatActivity
   public static final byte[] SALT = new byte[] {
       -46, 65, 30, -128, -103, -57, 74, -64, 51, 88, -95, -21, 77, -117, -36, -113, -11, 32, -64, 89
   };
+
   private static final int MY_PERMISSIONS_REQUEST = 1;
   private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
+  public static final int USER_RECOVERY_AUTH_REQUEST_CODE = 9001;
 
   final long DEFAULT_CACHE_TIME = DurationInMillis.ONE_SECOND * 5;
   public UiLifecycleHelper uiLifecycleHelper;
@@ -100,9 +102,14 @@ public class LoginActivity extends AppCompatActivity
       mConnectionResult = null;
       mGoogleApiClient.connect();
     } else {
-      if (requestCode == 9001 && resultCode == RESULT_OK
+      if (requestCode == USER_RECOVERY_AUTH_REQUEST_CODE && resultCode == RESULT_OK
           || requestCode == 90 && resultCode == RESULT_OK) {
-        mGoogleApiClient.connect();
+
+        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+          getGoogleToken();
+        } else {
+          mGoogleApiClient.connect();
+        }
       }
     }
   }
@@ -273,22 +280,25 @@ public class LoginActivity extends AppCompatActivity
         Cursor c2 = getContentResolver().query(refresh_token_uri, null, null, null, null);
         Cursor c3 = getContentResolver().query(repo_uri, null, null, null, null);
 
-        c1.moveToFirst();
-        c2.moveToFirst();
-        c3.moveToFirst();
+        if (c1 != null && c2 != null && c3 != null) {
 
-        UserCredentialsJson userCredentialsJson = new UserCredentialsJson();
-        userCredentialsJson.setToken(c1.getString(c1.getColumnIndex("userToken")));
-        userCredentialsJson.setRefreshToken(c2.getString(c2.getColumnIndex("userRefreshToken")));
-        userCredentialsJson.setRepo(c3.getString(c3.getColumnIndex("userRepo")));
+          c1.moveToFirst();
+          c2.moveToFirst();
+          c3.moveToFirst();
 
-        storeToken(userCredentialsJson);
+          UserCredentialsJson userCredentialsJson = new UserCredentialsJson();
+          userCredentialsJson.setToken(c1.getString(c1.getColumnIndex("userToken")));
+          userCredentialsJson.setRefreshToken(c2.getString(c2.getColumnIndex("userRefreshToken")));
+          userCredentialsJson.setRepo(c3.getString(c3.getColumnIndex("userRepo")));
 
-        c1.close();
-        c2.close();
-        c3.close();
+          storeToken(userCredentialsJson);
 
-        return userCredentialsJson;
+          c1.close();
+          c2.close();
+          c3.close();
+
+          return userCredentialsJson;
+        }
       } catch (Exception e) {
         e.printStackTrace();
       }
@@ -313,6 +323,11 @@ public class LoginActivity extends AppCompatActivity
 
   @Override public void onConnected(final Bundle bundle) {
 
+    getGoogleToken();
+  }
+
+  private void getGoogleToken() {
+
     HandlerThread thread = new HandlerThread("name");
     thread.start();
     Handler handler = new Handler(thread.getLooper());
@@ -332,7 +347,7 @@ public class LoginActivity extends AppCompatActivity
         } catch (IOException e) {
           e.printStackTrace();
         } catch (UserRecoverableAuthException e) {
-          startActivityForResult(e.getIntent(), 9001);
+          startActivityForResult(e.getIntent(), USER_RECOVERY_AUTH_REQUEST_CODE);
         } catch (GoogleAuthException e) {
           e.printStackTrace();
         }
