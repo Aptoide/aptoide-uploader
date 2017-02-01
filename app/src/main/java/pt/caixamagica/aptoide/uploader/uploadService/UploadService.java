@@ -18,9 +18,11 @@ import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
+import android.util.Log;
 import com.google.android.vending.licensing.AESObfuscator;
 import com.google.android.vending.licensing.ValidationException;
 import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.exception.NetworkException;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import java.util.HashMap;
@@ -44,10 +46,11 @@ import static pt.caixamagica.aptoide.uploader.activities.LoginActivity.SHARED_PR
  */
 public class UploadService extends Service {
 
-  public static final String UPLOADER_CANCEL = "cancel";
+  private static final String TAG = UploadService.class.getSimpleName();
 
+  public static final String UPLOADER_CANCEL = "cancel";
   public static final String UPLOADER_RETRY = "retry";
-  static int i = 1;
+
   private final MyBinder myBinder = new MyBinder(this);
 
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploadService.class);
@@ -59,7 +62,7 @@ public class UploadService extends Service {
 
   private NotificationCompat.Builder setPreparingUploadNotification(String packageName,
       String label) {
-    return setNotification(packageName, "Preparing to upload " + label,
+    return setNotification(packageName, getString(R.string.upload_prepare, label),
         newCancelIntent(packageName));
   }
 
@@ -119,7 +122,9 @@ public class UploadService extends Service {
     UploadAppToRepoRequest uploadAppToRepoRequest =
         new UploadAppToRepoRequest(requestProgressListener, new StoreTokenInterface() {
           @Override public void setToken(String token) {
-            sharedpreferences.edit().putString("token", aesObfuscator.obfuscate(token, "token")).apply();
+            sharedpreferences.edit()
+                .putString("token", aesObfuscator.obfuscate(token, "token"))
+                .apply();
           }
         });
     uploadAppToRepoRequest.setPackageName(packageInfo.packageName);
@@ -151,12 +156,21 @@ public class UploadService extends Service {
 
     spiceManager.execute(uploadAppToRepoRequest, new RequestListener<UploadAppToRepoJson>() {
       @Override public void onRequestFailure(SpiceException spiceException) {
-        setRetryNotification(uploadAppToRepoRequest.getPackageName(),
-            uploadAppToRepoRequest.getLabel());
+
+        Log.e(TAG, "onRequestFailure: ", spiceException);
+
+        if (spiceException instanceof NetworkException) {
+          setNotification(uploadAppToRepoRequest.getPackageName(),
+              getString(R.string.upload_done_network_error), null);
+        } else {
+          setRetryNotification(uploadAppToRepoRequest.getPackageName(),
+              uploadAppToRepoRequest.getLabel());
+        }
       }
 
       // Investigar powerlock
       @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
+        Log.v(TAG, "onRequestSuccess: ");
         if (uploadAppToRepoJson.getErrors() != null) {
 
           //					if (uploadAppToRepoJson.getErrors().get(0).getCode().equals("AUTH-2")) {
@@ -337,7 +351,9 @@ public class UploadService extends Service {
 
             final AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(),
                 Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
-            sharedpreferences.edit().putString("token", aesObfuscator.obfuscate(token, "token")).apply();
+            sharedpreferences.edit()
+                .putString("token", aesObfuscator.obfuscate(token, "token"))
+                .apply();
           }
         }), null);
       }
