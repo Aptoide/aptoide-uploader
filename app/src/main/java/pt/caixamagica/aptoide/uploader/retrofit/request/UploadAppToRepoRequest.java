@@ -6,6 +6,7 @@
 package pt.caixamagica.aptoide.uploader.retrofit.request;
 
 import android.os.Environment;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
@@ -34,6 +35,8 @@ import retrofit.mime.TypedFile;
  */
 @Data @EqualsAndHashCode(callSuper = false) public class UploadAppToRepoRequest
     extends RetrofitSpiceRequest<UploadAppToRepoJson, UploadAppToRepoRequest.Webservice> {
+
+  private static final String TAG = UploadAppToRepoRequest.class.getSimpleName();
 
   // Flags de controlo de existencia no server.
   @Setter private boolean FLAG_APK = false;
@@ -173,11 +176,14 @@ import retrofit.mime.TypedFile;
 
       return response;
     } catch (RetrofitError e) {
+      Log.e(TAG, "RetrofitError: ", e);
+
       // Trick para forçar a chamada do onRequestFailure pois aparentemente nem sempre isso acontece
-      if ((("The access token provided is invalid").equals(
+      if (e != null && e.getBody() != null && (("The access token provided is invalid").equals(
           ((UploadAppToRepoJson) e.getBody()).getError_description())
           || ("The access token provided has expired").equals(
           ((UploadAppToRepoJson) e.getBody()).getError_description()))) {
+
         OAuth2Request oAuth2Request = new OAuth2Request();
         token = oAuth2Request.builder();
         parameters.put("access_token", token);
@@ -185,8 +191,9 @@ import retrofit.mime.TypedFile;
         storeTokenInterface.setToken(token);
 
         return getService().uploadAppToRepo(parameters);
+      } else {
+        throw new SpiceException(e);
       }
-      throw new SpiceException("");
     }
   }
 

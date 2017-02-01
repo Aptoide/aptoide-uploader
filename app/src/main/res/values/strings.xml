@@ -28,6 +28,9 @@
 
   <string name="facebook_error">You should provide your email in order to login.</string>
 
+  <string name="upload_done_network_error">Upload done!!! Check your store.</string>
+  <string name="upload_prepare">Preparing to upload %s</string>
+
   <string name="age_rating_1">All</string>
   <string name="age_rating_2">Pre-Teen (minimal age: 10)</string>
   <string name="age_rating_3">Teen (minimal age: 16)</string>
@@ -76,5 +79,4 @@
 
   <string name="sort_spinner_values_1">By Date</string>
   <string name="sort_spinner_values_2">By Name</string>
-
 </resources>
