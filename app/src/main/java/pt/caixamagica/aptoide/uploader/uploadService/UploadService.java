@@ -46,11 +46,9 @@ import static pt.caixamagica.aptoide.uploader.activities.LoginActivity.SHARED_PR
  */
 public class UploadService extends Service {
 
-  private static final String TAG = UploadService.class.getSimpleName();
-
   public static final String UPLOADER_CANCEL = "cancel";
   public static final String UPLOADER_RETRY = "retry";
-
+  private static final String TAG = UploadService.class.getSimpleName();
   private final MyBinder myBinder = new MyBinder(this);
 
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploadService.class);
@@ -221,22 +219,8 @@ public class UploadService extends Service {
         }
       }
 
-      private boolean hasErrorCodes(List<Error> errors, String... errCodes) {
-        for (String errCode : errCodes) {
-          if (hasErrorCode(errors, errCode)) {
-            return true;
-          }
-        }
-
-        return false;
-      }
-
-      private boolean hasErrorCode(List<Error> errors, String errCode) {
-        for (Error e : errors) {
-          if (e.getCode().equals(errCode)) return true;
-        }
-
-        return false;
+      private boolean isDummyUploadError(List<Error> errors) {
+        return hasErrorCodes(errors, "MARG-100", "MARG-101", "MARG-102", "MARG-103");
       }
 
       private boolean systemError(List<Error> errors) {
@@ -259,8 +243,22 @@ public class UploadService extends Service {
         return missingBinaryFound;
       }
 
-      private boolean isDummyUploadError(List<Error> errors) {
-        return hasErrorCodes(errors, "MARG-100", "MARG-101", "MARG-102", "MARG-103");
+      private boolean hasErrorCodes(List<Error> errors, String... errCodes) {
+        for (String errCode : errCodes) {
+          if (hasErrorCode(errors, errCode)) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      private boolean hasErrorCode(List<Error> errors, String errCode) {
+        for (Error e : errors) {
+          if (e.getCode().equals(errCode)) return true;
+        }
+
+        return false;
       }
 
       private boolean setErrorFlag(Error error) {

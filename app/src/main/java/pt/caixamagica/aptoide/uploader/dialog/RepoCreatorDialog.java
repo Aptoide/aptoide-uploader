@@ -219,15 +219,6 @@ public class RepoCreatorDialog extends DialogFragment {
     }
   }
 
-  private void fillNewUserInfo() {
-    userInfo.setRepo(repository.getText().toString());
-
-    if (privateButton.isChecked()) {
-      userInfo.setPrivacyUsername(repoUsername.getText().toString());
-      userInfo.setPrivacyPassword(repoPassword.getText().toString());
-    }
-  }
-
   private boolean validateNotEmptyFields() {
 
     if (repository.getText().toString().isEmpty()) {
@@ -242,5 +233,14 @@ public class RepoCreatorDialog extends DialogFragment {
     }
 
     return true;
+  }
+
+  private void fillNewUserInfo() {
+    userInfo.setRepo(repository.getText().toString());
+
+    if (privateButton.isChecked()) {
+      userInfo.setPrivacyUsername(repoUsername.getText().toString());
+      userInfo.setPrivacyPassword(repoPassword.getText().toString());
+    }
   }
 }

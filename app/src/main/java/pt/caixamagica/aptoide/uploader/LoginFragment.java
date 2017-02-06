@@ -106,35 +106,6 @@ public class LoginFragment extends Fragment {
    */
   private OAuth2AuthenticationRequest oAuth2AuthenticationRequest;
 
-  private void setUpFacebookButton() {
-    LoginButton fbButton = (LoginButton) rootView.findViewById(R.id.fb_login_button);
-    fbButton.setFragment(this);
-
-    fbButton.setReadPermissions(Arrays.asList("email", "user_friends"));
-
-    fbButton.setOnErrorListener(new LoginButton.OnErrorListener() {
-      @Override public void onError(FacebookException error) {
-
-        if (error.getMessage().equals("Log in attempt aborted.")) return;
-
-        error.printStackTrace();
-      }
-    });
-  }
-
-  private void setUpSignUpButton() {
-    View view = rootView.findViewById(R.id.sign_up_link);
-    view.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        switchtoSignUpFragment();
-      }
-    });
-  }
-
-  private void setUpGooglePlusButton() {
-    rootView.findViewById(R.id.sign_in_button).setOnClickListener((LoginActivity) getActivity());
-  }
-
   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
     ((LoginActivity) getActivity()).uiLifecycleHelper.onActivityResult(requestCode, resultCode,
@@ -216,38 +187,31 @@ public class LoginFragment extends Fragment {
     setShowPasswordEye();
   }
 
-  private void setShowPasswordEye() {
-    final EditText password_box = (EditText) rootView.findViewById(R.id.passwordText);
-    password_box.setTransformationMethod(new PasswordTransformationMethod());
+  private void setUpFacebookButton() {
+    LoginButton fbButton = (LoginButton) rootView.findViewById(R.id.fb_login_button);
+    fbButton.setFragment(this);
 
-    final Drawable hidePasswordRes = getResources().getDrawable(R.drawable.ic_show_password);
-    final Drawable showPasswordRes = getResources().getDrawable(R.drawable.ic_hide_password);
+    fbButton.setReadPermissions(Arrays.asList("email", "user_friends"));
 
-    password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
-    password_box.setOnTouchListener(new View.OnTouchListener() {
-      @Override public boolean onTouch(View v, MotionEvent event) {
-        if (password_box.getCompoundDrawables()[2] == null) {
-          return false;
-        }
-        if (event.getAction() != MotionEvent.ACTION_DOWN) {
-          return false;
-        }
-        if (event.getX()
-            > password_box.getWidth()
-            - password_box.getPaddingRight()
-            - hidePasswordRes.getIntrinsicWidth()) {
-          if (showPassword) {
-            showPassword = false;
-            password_box.setTransformationMethod(null);
-            password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, showPasswordRes, null);
-          } else {
-            showPassword = true;
-            password_box.setTransformationMethod(new PasswordTransformationMethod());
-            password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
-          }
-        }
+    fbButton.setOnErrorListener(new LoginButton.OnErrorListener() {
+      @Override public void onError(FacebookException error) {
 
-        return false;
+        if (error.getMessage().equals("Log in attempt aborted.")) return;
+
+        error.printStackTrace();
+      }
+    });
+  }
+
+  private void setUpGooglePlusButton() {
+    rootView.findViewById(R.id.sign_in_button).setOnClickListener((LoginActivity) getActivity());
+  }
+
+  private void setUpSignUpButton() {
+    View view = rootView.findViewById(R.id.sign_up_link);
+    view.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        switchtoSignUpFragment();
       }
     });
   }
@@ -281,6 +245,42 @@ public class LoginFragment extends Fragment {
           Toast.makeText(getActivity(), "Please fill username and password", Toast.LENGTH_SHORT)
               .show();
         }
+      }
+    });
+  }
+
+  private void setShowPasswordEye() {
+    final EditText password_box = (EditText) rootView.findViewById(R.id.passwordText);
+    password_box.setTransformationMethod(new PasswordTransformationMethod());
+
+    final Drawable hidePasswordRes = getResources().getDrawable(R.drawable.ic_show_password);
+    final Drawable showPasswordRes = getResources().getDrawable(R.drawable.ic_hide_password);
+
+    password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
+    password_box.setOnTouchListener(new View.OnTouchListener() {
+      @Override public boolean onTouch(View v, MotionEvent event) {
+        if (password_box.getCompoundDrawables()[2] == null) {
+          return false;
+        }
+        if (event.getAction() != MotionEvent.ACTION_DOWN) {
+          return false;
+        }
+        if (event.getX()
+            > password_box.getWidth()
+            - password_box.getPaddingRight()
+            - hidePasswordRes.getIntrinsicWidth()) {
+          if (showPassword) {
+            showPassword = false;
+            password_box.setTransformationMethod(null);
+            password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, showPasswordRes, null);
+          } else {
+            showPassword = true;
+            password_box.setTransformationMethod(new PasswordTransformationMethod());
+            password_box.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
+          }
+        }
+
+        return false;
       }
     });
   }

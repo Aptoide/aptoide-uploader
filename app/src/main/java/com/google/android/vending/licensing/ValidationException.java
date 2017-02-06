@@ -17,17 +17,18 @@
 package com.google.android.vending.licensing;
 
 /**
- * Indicates that an error occurred while validating the integrity of data managed by an {@link Obfuscator}.}
+ * Indicates that an error occurred while validating the integrity of data managed by an {@link
+ * Obfuscator}.}
  */
 public class ValidationException extends Exception {
 
-	private static final long serialVersionUID = 1L;
+  private static final long serialVersionUID = 1L;
 
-	public ValidationException() {
-		super();
-	}
+  public ValidationException() {
+    super();
+  }
 
-	public ValidationException(String s) {
-		super(s);
-	}
+  public ValidationException(String s) {
+    super(s);
+  }
 }

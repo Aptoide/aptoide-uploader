@@ -110,6 +110,48 @@ public class SignUpFragment extends Fragment {
     createAccountButton = (Button) rootView.findViewById(R.id.create_Account);
   }
 
+  private void setDefaultStoreVisibility() {
+    ((RadioButton) rootView.findViewById(R.id.store_public)).setChecked(true);
+  }
+
+  private void setupBackLink() {
+    View view = rootView.findViewById(R.id.already_have_an_account);
+    view.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        getFragmentManager().popBackStack();
+      }
+    });
+  }
+
+  private void setupRecoverPasswordLink() {
+    View view = rootView.findViewById(R.id.forgot_password);
+    view.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        String download_link = "https://www.aptoide.com/account/password-recovery";
+        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(download_link));
+        startActivity(myIntent);
+        getFragmentManager().popBackStack();
+      }
+    });
+  }
+
+  private void setupStoreVisibilityListeners() {
+    storeVisibilityRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+      @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
+        int selected = checkedId;
+        if (selected == R.id.store_private) {
+          publicStore = false;
+          storeUsernameEditText.setVisibility(View.VISIBLE);
+          storePasswordEditText.setVisibility(View.VISIBLE);
+        } else {
+          publicStore = true;
+          storeUsernameEditText.setVisibility(View.GONE);
+          storePasswordEditText.setVisibility(View.GONE);
+        }
+      }
+    });
+  }
+
   private void setupSubmitButton() {
     createAccountButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
@@ -126,6 +168,16 @@ public class SignUpFragment extends Fragment {
         }
       }
     });
+  }
+
+  private boolean validateFields(EditText... editTexts) {
+
+    for (EditText editText : editTexts) {
+      if (TextUtils.isEmpty(editText.getText())) {
+        return false;
+      }
+    }
+    return true;
   }
 
   private void createAccount() {
@@ -168,58 +220,6 @@ public class SignUpFragment extends Fragment {
           String message = StringUtils.join(errors.toArray(), ", ");
           Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
         }
-      }
-    });
-  }
-
-  private boolean validateFields(EditText... editTexts) {
-
-    for (EditText editText : editTexts) {
-      if (TextUtils.isEmpty(editText.getText())) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private void setupStoreVisibilityListeners() {
-    storeVisibilityRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-      @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
-        int selected = checkedId;
-        if (selected == R.id.store_private) {
-          publicStore = false;
-          storeUsernameEditText.setVisibility(View.VISIBLE);
-          storePasswordEditText.setVisibility(View.VISIBLE);
-        } else {
-          publicStore = true;
-          storeUsernameEditText.setVisibility(View.GONE);
-          storePasswordEditText.setVisibility(View.GONE);
-        }
-      }
-    });
-  }
-
-  private void setDefaultStoreVisibility() {
-    ((RadioButton) rootView.findViewById(R.id.store_public)).setChecked(true);
-  }
-
-  private void setupBackLink() {
-    View view = rootView.findViewById(R.id.already_have_an_account);
-    view.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        getFragmentManager().popBackStack();
-      }
-    });
-  }
-
-  private void setupRecoverPasswordLink() {
-    View view = rootView.findViewById(R.id.forgot_password);
-    view.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        String download_link = "https://www.aptoide.com/account/password-recovery";
-        Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(download_link));
-        startActivity(myIntent);
-        getFragmentManager().popBackStack();
       }
     });
   }

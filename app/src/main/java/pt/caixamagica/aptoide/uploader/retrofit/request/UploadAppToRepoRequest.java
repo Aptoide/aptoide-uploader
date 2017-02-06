@@ -97,11 +97,6 @@ import retrofit.mime.TypedFile;
   private boolean checked = false;
   private StoreTokenInterface storeTokenInterface;
 
-  public UploadAppToRepoRequest(StoreTokenInterface storeTokenInterface) {
-    super(UploadAppToRepoJson.class, UploadAppToRepoRequest.Webservice.class);
-    this.storeTokenInterface = storeTokenInterface;
-  }
-
   public UploadAppToRepoRequest(UploadAppToRepoRequest uploadAppToRepoRequest,
       StoreTokenInterface storeTokenInterface) {
     this(uploadAppToRepoRequest.getRequestProgressListenerObject(), storeTokenInterface);
@@ -122,6 +117,11 @@ import retrofit.mime.TypedFile;
       StoreTokenInterface storeTokenInterface) {
     this(storeTokenInterface);
     this.requestProgressListenerObject = requestProgressListenerObject;
+  }
+
+  public UploadAppToRepoRequest(StoreTokenInterface storeTokenInterface) {
+    super(UploadAppToRepoJson.class, UploadAppToRepoRequest.Webservice.class);
+    this.storeTokenInterface = storeTokenInterface;
   }
 
   @Override public UploadAppToRepoJson loadDataFromNetwork() throws SpiceException {
@@ -201,13 +201,6 @@ import retrofit.mime.TypedFile;
     super.publishProgress(progress);
   }
 
-  private String fileName(String apkPath) {
-
-    if (apkPath == null) return null;
-
-    return apkPath.substring(apkPath.lastIndexOf("/") + 1);
-  }
-
   private void checkObbExistence() {
     if (!checked) {
       String sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -230,6 +223,13 @@ import retrofit.mime.TypedFile;
       }
       checked = true;
     }
+  }
+
+  private String fileName(String apkPath) {
+
+    if (apkPath == null) return null;
+
+    return apkPath.substring(apkPath.lastIndexOf("/") + 1);
   }
 
   private TypedFile newTweakedTypedFile(String extension, String apkPath) {

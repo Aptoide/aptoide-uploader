@@ -68,11 +68,9 @@ public class LoginActivity extends AppCompatActivity
   public static final byte[] SALT = new byte[] {
       -46, 65, 30, -128, -103, -57, 74, -64, 51, 88, -95, -21, 77, -117, -36, -113, -11, 32, -64, 89
   };
-
+  public static final int USER_RECOVERY_AUTH_REQUEST_CODE = 9001;
   private static final int MY_PERMISSIONS_REQUEST = 1;
   private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
-  public static final int USER_RECOVERY_AUTH_REQUEST_CODE = 9001;
-
   final long DEFAULT_CACHE_TIME = DurationInMillis.ONE_SECOND * 5;
   public UiLifecycleHelper uiLifecycleHelper;
   SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
@@ -163,76 +161,23 @@ public class LoginActivity extends AppCompatActivity
     }
   }
 
-  public void checkPermissions() {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+  @Override public void checkStoredCredentialsCallback() {
 
-      List<String> requests = new ArrayList<String>();
-
-      if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
-          != PackageManager.PERMISSION_GRANTED) {
-        requests.add(Manifest.permission.READ_EXTERNAL_STORAGE);
-      }
-      if (checkSelfPermission(Manifest.permission.GET_ACCOUNTS)
-          != PackageManager.PERMISSION_GRANTED) {
-        requests.add(Manifest.permission.GET_ACCOUNTS);
-      }
-
-      if (!requests.isEmpty()) {
-        requestPermissions(requests.toArray(new String[requests.size()]), MY_PERMISSIONS_REQUEST);
-      } else {
-        dismissSplash = true;
-      }
+    UserCredentialsJson userCredentialsJson = getStoredUserCredentials();
+    if (userCredentialsJson != null) {
+      switchToAppViewFragment(userCredentialsJson);
     } else {
-      dismissSplash = true;
-    }
-  }
+      setContentView(R.layout.activity_main);
+      setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
 
-  @Override protected void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
+      mContent = new LoginFragment();
 
-    checkPermissions();
-
-    if (savedInstanceState != null) {
-      userInfo = (UserInfo) savedInstanceState.getSerializable("userInfo");
+      getSupportFragmentManager().beginTransaction()
+          .replace(R.id.container, mContent, "loginFragment")
+          .commit();
     }
 
-    if (isSplashShowState()) {
-      if (savedInstanceState == null) {
-        splashDialogFragment.show(getSupportFragmentManager(), "splashDialog");
-      }
-    } else {
-      if (savedInstanceState == null) {
-        checkStoredCredentialsCallback();
-      } else {
-        setContentView(R.layout.activity_main);
-        setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
-      }
-    }
-
-    // Google
-    mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
-        .addOnConnectionFailedListener(this)
-        .addApi(Plus.API)
-        .addScope(Plus.SCOPE_PLUS_LOGIN)
-        .build();
-  }
-
-  @Override protected void onStop() {
-    spiceManager.shouldStop();
-    super.onStop();
-
-    if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-      mGoogleApiClient.disconnect();
-    }
-  }
-
-  @Override protected void onDestroy() {
-    super.onDestroy();
-  }
-
-  @Override protected void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    outState.putSerializable("userInfo", userInfo);
+    AptoideUploaderApplication.firstLaunchApagar = false;
   }
 
   private UserCredentialsJson getStoredUserCredentials() {
@@ -307,23 +252,34 @@ public class LoginActivity extends AppCompatActivity
     return null;
   }
 
-  @Override public boolean onOptionsItemSelected(MenuItem item) {
-    // Handle action bar item clicks here. The action bar will
-    // automatically handle clicks on the Home/Up button, so long
-    // as you specify a parent activity in AndroidManifest.xml.
-    int id = item.getItemId();
+  private void switchToAppViewFragment(UserCredentialsJson userCredentialsJson) {
+    finish();
 
-    //noinspection SimplifiableIfStatement
-    if (id == R.id.action_settings) {
-      return true;
-    }
+    Bundle bundle = new Bundle();
+    bundle.putSerializable("userCredentialsJson", userCredentialsJson);
 
-    return super.onOptionsItemSelected(item);
+    Intent intent = new Intent(this, AppsListActivity.class);
+    intent.putExtras(bundle);
+    startActivity(intent);
   }
 
-  @Override public void onConnected(final Bundle bundle) {
+  private void storeToken(UserCredentialsJson userCredentialsJson) {
 
-    getGoogleToken();
+    // Try to use more dgradleata here. ANDROID_ID is a single point of attack.
+    String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
+
+    AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), deviceId);
+
+    SharedPreferences sharedpreferences =
+        getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+    SharedPreferences.Editor editor = sharedpreferences.edit();
+
+    editor.putString("token", aesObfuscator.obfuscate(userCredentialsJson.getToken(), "token"));
+    editor.putString("refreshToken",
+        aesObfuscator.obfuscate(userCredentialsJson.getRefreshToken(), "refreshToken"));
+    editor.putString("repo", aesObfuscator.obfuscate(userCredentialsJson.getRepo(), "repo"));
+
+    editor.commit();
   }
 
   private void getGoogleToken() {
@@ -353,6 +309,125 @@ public class LoginActivity extends AppCompatActivity
         }
       }
     });
+  }
+
+  @Override public void submitAuthentication(UserInfo userInfo) {
+    this.userInfo = userInfo;
+
+    checkUserCredentialsRequest = new OAuth2AuthenticationRequest();
+
+    checkUserCredentialsRequest.bean.setUsername(userInfo.getUsername());
+    checkUserCredentialsRequest.bean.setPassword(userInfo.getPassword());
+    checkUserCredentialsRequest.bean.setOauthToken(userInfo.getOauthToken());
+    // Martelada
+    checkUserCredentialsRequest.bean.setAuthMode(userInfo.getMode());
+    checkUserCredentialsRequest.bean.setOauthUserName(userInfo.getNameForGoogle());
+
+    checkUserCredentialsRequest.bean.setOauthCreateRepo(Integer.toString(userInfo.getCreateRepo()));
+    checkUserCredentialsRequest.bean.setRepo(userInfo.getRepo());
+    checkUserCredentialsRequest.bean.setPrivacy_user(userInfo.getPrivacyUsername());
+    checkUserCredentialsRequest.bean.setPrivacy_pass(userInfo.getPrivacyPassword());
+
+    spiceManager.execute(checkUserCredentialsRequest, "loginActivity", DEFAULT_CACHE_TIME,
+        new OAuthPendingRequestListener());
+
+    UploaderUtils.pushLoadingFragment(this, R.id.container,
+        "Logging in as " + userInfo.getUsername());
+  }
+
+  @Override protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+
+    checkPermissions();
+
+    if (savedInstanceState != null) {
+      userInfo = (UserInfo) savedInstanceState.getSerializable("userInfo");
+    }
+
+    if (isSplashShowState()) {
+      if (savedInstanceState == null) {
+        splashDialogFragment.show(getSupportFragmentManager(), "splashDialog");
+      }
+    } else {
+      if (savedInstanceState == null) {
+        checkStoredCredentialsCallback();
+      } else {
+        setContentView(R.layout.activity_main);
+        setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
+      }
+    }
+
+    // Google
+    mGoogleApiClient = new GoogleApiClient.Builder(this).addConnectionCallbacks(this)
+        .addOnConnectionFailedListener(this)
+        .addApi(Plus.API)
+        .addScope(Plus.SCOPE_PLUS_LOGIN)
+        .build();
+  }
+
+  public void checkPermissions() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+
+      List<String> requests = new ArrayList<String>();
+
+      if (checkSelfPermission(Manifest.permission.READ_EXTERNAL_STORAGE)
+          != PackageManager.PERMISSION_GRANTED) {
+        requests.add(Manifest.permission.READ_EXTERNAL_STORAGE);
+      }
+      if (checkSelfPermission(Manifest.permission.GET_ACCOUNTS)
+          != PackageManager.PERMISSION_GRANTED) {
+        requests.add(Manifest.permission.GET_ACCOUNTS);
+      }
+
+      if (!requests.isEmpty()) {
+        requestPermissions(requests.toArray(new String[requests.size()]), MY_PERMISSIONS_REQUEST);
+      } else {
+        dismissSplash = true;
+      }
+    } else {
+      dismissSplash = true;
+    }
+  }
+
+  public boolean isSplashShowState() {
+    return AptoideUploaderApplication.firstLaunchApagar;
+  }
+
+  @Override protected void onStop() {
+    spiceManager.shouldStop();
+    super.onStop();
+
+    if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+      mGoogleApiClient.disconnect();
+    }
+  }
+
+  @Override protected void onDestroy() {
+    super.onDestroy();
+  }
+
+  @Override protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putSerializable("userInfo", userInfo);
+  }
+
+  @Override public boolean onOptionsItemSelected(MenuItem item) {
+    // Handle action bar item clicks here. The action bar will
+    // automatically handle clicks on the Home/Up button, so long
+    // as you specify a parent activity in AndroidManifest.xml.
+    int id = item.getItemId();
+
+    //noinspection SimplifiableIfStatement
+    if (id == R.id.action_settings) {
+      return true;
+    }
+
+    return super.onOptionsItemSelected(item);
+  }
+
+  @Override public void onConnected(final Bundle bundle) {
+
+    getGoogleToken();
   }
 
   @Override public void onConnectionSuspended(int i) {
@@ -390,30 +465,6 @@ public class LoginActivity extends AppCompatActivity
     }
   }
 
-  @Override public void submitAuthentication(UserInfo userInfo) {
-    this.userInfo = userInfo;
-
-    checkUserCredentialsRequest = new OAuth2AuthenticationRequest();
-
-    checkUserCredentialsRequest.bean.setUsername(userInfo.getUsername());
-    checkUserCredentialsRequest.bean.setPassword(userInfo.getPassword());
-    checkUserCredentialsRequest.bean.setOauthToken(userInfo.getOauthToken());
-    // Martelada
-    checkUserCredentialsRequest.bean.setAuthMode(userInfo.getMode());
-    checkUserCredentialsRequest.bean.setOauthUserName(userInfo.getNameForGoogle());
-
-    checkUserCredentialsRequest.bean.setOauthCreateRepo(Integer.toString(userInfo.getCreateRepo()));
-    checkUserCredentialsRequest.bean.setRepo(userInfo.getRepo());
-    checkUserCredentialsRequest.bean.setPrivacy_user(userInfo.getPrivacyUsername());
-    checkUserCredentialsRequest.bean.setPrivacy_pass(userInfo.getPrivacyPassword());
-
-    spiceManager.execute(checkUserCredentialsRequest, "loginActivity", DEFAULT_CACHE_TIME,
-        new OAuthPendingRequestListener());
-
-    UploaderUtils.pushLoadingFragment(this, R.id.container,
-        "Logging in as " + userInfo.getUsername());
-  }
-
   private void getUserInfo(OAuth oAuth) {
     UserCredentialsRequest request = new UserCredentialsRequest();
     request.setToken(oAuth.getAccess_token());
@@ -421,59 +472,6 @@ public class LoginActivity extends AppCompatActivity
 
     spiceManager.execute(request, "getUserInfo", DEFAULT_CACHE_TIME,
         new UserCredentialsPendingRequestListener());
-  }
-
-  private void switchToAppViewFragment(UserCredentialsJson userCredentialsJson) {
-    finish();
-
-    Bundle bundle = new Bundle();
-    bundle.putSerializable("userCredentialsJson", userCredentialsJson);
-
-    Intent intent = new Intent(this, AppsListActivity.class);
-    intent.putExtras(bundle);
-    startActivity(intent);
-  }
-
-  @Override public void checkStoredCredentialsCallback() {
-
-    UserCredentialsJson userCredentialsJson = getStoredUserCredentials();
-    if (userCredentialsJson != null) {
-      switchToAppViewFragment(userCredentialsJson);
-    } else {
-      setContentView(R.layout.activity_main);
-      setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
-
-      mContent = new LoginFragment();
-
-      getSupportFragmentManager().beginTransaction()
-          .replace(R.id.container, mContent, "loginFragment")
-          .commit();
-    }
-
-    AptoideUploaderApplication.firstLaunchApagar = false;
-  }
-
-  public boolean isSplashShowState() {
-    return AptoideUploaderApplication.firstLaunchApagar;
-  }
-
-  private void storeToken(UserCredentialsJson userCredentialsJson) {
-
-    // Try to use more dgradleata here. ANDROID_ID is a single point of attack.
-    String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-
-    AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), deviceId);
-
-    SharedPreferences sharedpreferences =
-        getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedpreferences.edit();
-
-    editor.putString("token", aesObfuscator.obfuscate(userCredentialsJson.getToken(), "token"));
-    editor.putString("refreshToken",
-        aesObfuscator.obfuscate(userCredentialsJson.getRefreshToken(), "refreshToken"));
-    editor.putString("repo", aesObfuscator.obfuscate(userCredentialsJson.getRepo(), "repo"));
-
-    editor.commit();
   }
 
   private void storeToken(OAuth oAuth) {

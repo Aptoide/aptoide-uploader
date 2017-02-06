@@ -59,13 +59,13 @@ import lombok.Setter;
     selected = !selected;
   }
 
-  private void loadLabel() {
-    label = (String) applicationInfo.loadLabel(pm);
-  }
-
   public String getLabel() {
     if (label == null) loadLabel();
     return label;
+  }
+
+  private void loadLabel() {
+    label = (String) applicationInfo.loadLabel(pm);
   }
 
   public String getApkPath() {

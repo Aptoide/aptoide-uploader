@@ -92,20 +92,6 @@ public class FragmentAppView extends Fragment {
     }
   };
 
-  private MenuItem.OnMenuItemClickListener logoutListener() {
-
-    return new MenuItem.OnMenuItemClickListener() {
-      @Override public boolean onMenuItemClick(MenuItem item) {
-
-        ConfirmationDialog confirmationDialog = new ConfirmationDialog();
-        confirmationDialog.setTargetFragment(FragmentAppView.this, 0);
-        confirmationDialog.show(getFragmentManager(), "confirmDialog");
-
-        return false;
-      }
-    };
-  }
-
   private MenuItem.OnMenuItemClickListener sortByFirstInstallListener() {
     return new MenuItem.OnMenuItemClickListener() {
       @Override public boolean onMenuItemClick(final MenuItem item) {
@@ -132,27 +118,20 @@ public class FragmentAppView extends Fragment {
     };
   }
 
+  public Comparator<SelectablePackageInfo> newFirstInstallComparator() {
+    return new Comparator<SelectablePackageInfo>() {
+      @Override public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
+        return (int) (rhs.firstInstallTime / 1000 - lhs.firstInstallTime / 1000);
+      }
+    };
+  }
+
   private void sortByFirstInstall() {
     Toast.makeText(getActivity(), "Sorting by Date", Toast.LENGTH_SHORT).show();
 
     new Thread(new Runnable() {
       @Override public void run() {
         Collections.sort(adapter.mDataset, newFirstInstallComparator());
-        getActivity().runOnUiThread(new Runnable() {
-          @Override public void run() {
-            adapter.notifyDataSetChanged();
-          }
-        });
-      }
-    }).start();
-  }
-
-  private void sortByLastInstall() {
-    Toast.makeText(getActivity(), "Sorting by Date", Toast.LENGTH_SHORT).show();
-
-    new Thread(new Runnable() {
-      @Override public void run() {
-        Collections.sort(adapter.mDataset, newLastInstallComparator());
         getActivity().runOnUiThread(new Runnable() {
           @Override public void run() {
             adapter.notifyDataSetChanged();
@@ -193,54 +172,12 @@ public class FragmentAppView extends Fragment {
     };
   }
 
-  private void sortByName() {
-    Toast.makeText(getActivity(), "Sorting by Name", Toast.LENGTH_SHORT).show();
-
-    new Thread(new Runnable() {
-      @Override public void run() {
-        // Carrega as labels necessárias
-        PackageManager packageManager = getActivity().getPackageManager();
-        for (SelectablePackageInfo selectablePackageInfo : adapter.mDataset)
-          selectablePackageInfo.getLabel();
-
-        Collections.sort(adapter.mDataset, newNameComparator());
-        getActivity().runOnUiThread(new Runnable() {
-          @Override public void run() {
-            adapter.notifyDataSetChanged();
-          }
-        });
-      }
-    }).start();
-  }
-
   public Comparator<SelectablePackageInfo> newNameComparator() {
     return new Comparator<SelectablePackageInfo>() {
       @Override public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
         return lhs.getLabel().compareTo(rhs.getLabel());
       }
     };
-  }
-
-  public Comparator<SelectablePackageInfo> newFirstInstallComparator() {
-    return new Comparator<SelectablePackageInfo>() {
-      @Override public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
-        return (int) (rhs.firstInstallTime / 1000 - lhs.firstInstallTime / 1000);
-      }
-    };
-  }
-
-  public Comparator<SelectablePackageInfo> newLastInstallComparator() {
-    return new Comparator<SelectablePackageInfo>() {
-      @Override public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
-        return (int) (getLastInstallDate(rhs) / 1000 - getLastInstallDate(lhs) / 1000);
-      }
-    };
-  }
-
-  private long getLastInstallDate(PackageInfo packageInfo) {
-    PackageManager pm = getContext().getPackageManager();
-    String appFile = packageInfo.applicationInfo.sourceDir;
-    return new File(appFile).lastModified(); //Epoch Time
   }
 
   @Override public void onCreate(Bundle savedInstanceState) {
@@ -436,42 +373,22 @@ public class FragmentAppView extends Fragment {
     menu.findItem(R.id.logout_button).setOnMenuItemClickListener(logoutListener());
   }
 
+  private MenuItem.OnMenuItemClickListener logoutListener() {
+
+    return new MenuItem.OnMenuItemClickListener() {
+      @Override public boolean onMenuItemClick(MenuItem item) {
+
+        ConfirmationDialog confirmationDialog = new ConfirmationDialog();
+        confirmationDialog.setTargetFragment(FragmentAppView.this, 0);
+        confirmationDialog.show(getFragmentManager(), "confirmDialog");
+
+        return false;
+      }
+    };
+  }
+
   @Override public void onPrepareOptionsMenu(Menu menu) {
     super.onPrepareOptionsMenu(menu);
-  }
-
-  private void prepareSpinner(int viewId, int arrayId) {
-    Spinner spinner = (Spinner) rootView.findViewById(viewId);
-    // Create an ArrayAdapter using the string array and a default spinner layout
-    ArrayAdapter<CharSequence> adapter =
-        ArrayAdapter.createFromResource(getActivity(), arrayId, R.layout.spinner_item);
-
-    String[] stringArray = getResources().getStringArray(arrayId);
-
-    ArrayAdapter<CharSequence> a =
-        new ArrayAdapter<CharSequence>(getActivity(), R.layout.spinner_item, stringArray) {
-          @Override public int getCount() {
-            int count = super.getCount();
-            return count > 0 ? count - 1 : count;
-          }
-        };
-
-    // Specify the layout to use when the list of choices appears
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    // Apply the adapter to the spinner
-    spinner.setAdapter(adapter);
-  }
-
-  private void setAdapter(Bundle savedInstanceState, final View view) {
-
-    adapter = new ManelAdapter(savedInstanceState, view, this, nonSystemPackages(true),
-        userCredentialsJson);
-
-    adapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
-      public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
-        ((MultiChoiceAdapter) parent.getAdapter()).setItemChecked(id, true);
-      }
-    });
   }
 
   private void setUploadButtonListener() {
@@ -498,23 +415,73 @@ public class FragmentAppView extends Fragment {
     });
   }
 
-  private void changeToSubmitAppFragment(UserCredentialsJson userCredentialsJson,
-      SelectablePackageInfo selectablePackageInfo) {
-    Fragment submitAppFragment = new SubmitAppFragment();
-    Bundle bundle = new Bundle();
-    bundle.putSerializable("userCredentialsJson", userCredentialsJson);
+  private void prepareSpinner(int viewId, int arrayId) {
+    Spinner spinner = (Spinner) rootView.findViewById(viewId);
+    // Create an ArrayAdapter using the string array and a default spinner layout
+    ArrayAdapter<CharSequence> adapter =
+        ArrayAdapter.createFromResource(getActivity(), arrayId, R.layout.spinner_item);
 
-    ArrayList<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>(1);
-    selectablePackageInfos.add(selectablePackageInfo);
+    String[] stringArray = getResources().getStringArray(arrayId);
 
-    bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
-    submitAppFragment.setArguments(bundle);
-    adapter.ffinishActionMode();
+    ArrayAdapter<CharSequence> a =
+        new ArrayAdapter<CharSequence>(getActivity(), R.layout.spinner_item, stringArray) {
+          @Override public int getCount() {
+            int count = super.getCount();
+            return count > 0 ? count - 1 : count;
+          }
+        };
 
-    getFragmentManager().beginTransaction()
-        .addToBackStack(null)
-        .replace(R.id.container, submitAppFragment)
-        .commit();
+    // Specify the layout to use when the list of choices appears
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    // Apply the adapter to the spinner
+    spinner.setAdapter(adapter);
+  }
+
+  private void sortByLastInstall() {
+    Toast.makeText(getActivity(), "Sorting by Date", Toast.LENGTH_SHORT).show();
+
+    new Thread(new Runnable() {
+      @Override public void run() {
+        Collections.sort(adapter.mDataset, newLastInstallComparator());
+        getActivity().runOnUiThread(new Runnable() {
+          @Override public void run() {
+            adapter.notifyDataSetChanged();
+          }
+        });
+      }
+    }).start();
+  }
+
+  private void sortByName() {
+    Toast.makeText(getActivity(), "Sorting by Name", Toast.LENGTH_SHORT).show();
+
+    new Thread(new Runnable() {
+      @Override public void run() {
+        // Carrega as labels necessárias
+        PackageManager packageManager = getActivity().getPackageManager();
+        for (SelectablePackageInfo selectablePackageInfo : adapter.mDataset)
+          selectablePackageInfo.getLabel();
+
+        Collections.sort(adapter.mDataset, newNameComparator());
+        getActivity().runOnUiThread(new Runnable() {
+          @Override public void run() {
+            adapter.notifyDataSetChanged();
+          }
+        });
+      }
+    }).start();
+  }
+
+  private void setAdapter(Bundle savedInstanceState, final View view) {
+
+    adapter = new ManelAdapter(savedInstanceState, view, this, nonSystemPackages(true),
+        userCredentialsJson);
+
+    adapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+      public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
+        ((MultiChoiceAdapter) parent.getAdapter()).setItemChecked(id, true);
+      }
+    });
   }
 
   private List<SelectablePackageInfo> nonSystemPackages(boolean ordered) {
@@ -540,12 +507,45 @@ public class FragmentAppView extends Fragment {
     return selectablePackageInfos;
   }
 
+  private boolean isSystemUpdatedPackage(PackageInfo packageInfo) {
+    int maskUpdade = ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
+    return (packageInfo.applicationInfo.flags & maskUpdade) != 0;
+  }
+
   private boolean isSystemPackage(PackageInfo packageInfo) {
     return ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
   }
 
-  private boolean isSystemUpdatedPackage(PackageInfo packageInfo) {
-    int maskUpdade = ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
-    return (packageInfo.applicationInfo.flags & maskUpdade) != 0;
+  public Comparator<SelectablePackageInfo> newLastInstallComparator() {
+    return new Comparator<SelectablePackageInfo>() {
+      @Override public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
+        return (int) (getLastInstallDate(rhs) / 1000 - getLastInstallDate(lhs) / 1000);
+      }
+    };
+  }
+
+  private long getLastInstallDate(PackageInfo packageInfo) {
+    PackageManager pm = getContext().getPackageManager();
+    String appFile = packageInfo.applicationInfo.sourceDir;
+    return new File(appFile).lastModified(); //Epoch Time
+  }
+
+  private void changeToSubmitAppFragment(UserCredentialsJson userCredentialsJson,
+      SelectablePackageInfo selectablePackageInfo) {
+    Fragment submitAppFragment = new SubmitAppFragment();
+    Bundle bundle = new Bundle();
+    bundle.putSerializable("userCredentialsJson", userCredentialsJson);
+
+    ArrayList<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>(1);
+    selectablePackageInfos.add(selectablePackageInfo);
+
+    bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
+    submitAppFragment.setArguments(bundle);
+    adapter.ffinishActionMode();
+
+    getFragmentManager().beginTransaction()
+        .addToBackStack(null)
+        .replace(R.id.container, submitAppFragment)
+        .commit();
   }
 }

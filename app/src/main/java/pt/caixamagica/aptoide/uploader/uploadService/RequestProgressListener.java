@@ -43,6 +43,10 @@ public class RequestProgressListener
     mBuilder.setContentText("Uploading " + packageInfo.getLabel() + " (Tap to cancel upload)");
   }
 
+  private void processIntent(Intent intent) {
+    packageInfo = (SelectablePackageInfo) intent.getExtras().get("packageInfo");
+  }
+
   private PendingIntent newCancelationIntentV3() {
 
     // Gera um ID único para prevenir reutilização de PendingIntent.
@@ -55,10 +59,6 @@ public class RequestProgressListener
     intent.putExtra("packageName", packageInfo.packageName);
 
     return PendingIntent.getService(context, reqCode, intent, 0);
-  }
-
-  private void processIntent(Intent intent) {
-    packageInfo = (SelectablePackageInfo) intent.getExtras().get("packageInfo");
   }
 
   @Override public void onRequestProgressUpdate(RequestProgress progress) {
