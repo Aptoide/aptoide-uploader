@@ -41,14 +41,16 @@ import lombok.Setter;
   public SelectablePackageInfo(PackageInfo info, PackageManager pm) {
     super();
     this.pm = pm;
-
-    this.packageName = info.packageName;
     this.info = info;
-    this.applicationInfo = info.applicationInfo;
-    this.firstInstallTime = info.firstInstallTime;
 
-    this.versionCode = info.versionCode;
-    this.versionName = info.versionName;
+    if (info != null) {
+      this.packageName = info.packageName;
+      this.applicationInfo = info.applicationInfo;
+      this.firstInstallTime = info.firstInstallTime;
+
+      this.versionCode = info.versionCode;
+      this.versionName = info.versionName;
+    }
   }
 
   public boolean isSelected() {
@@ -69,7 +71,11 @@ import lombok.Setter;
   }
 
   public String getApkPath() {
-    return info.applicationInfo.sourceDir;
+    if (info != null && info.applicationInfo != null) {
+      return info.applicationInfo.sourceDir;
+    } else {
+      return null;
+    }
   }
 
   public int tes() {
