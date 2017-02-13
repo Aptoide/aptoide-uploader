@@ -80,11 +80,14 @@ public class LoginFragment extends Fragment {
             if (TextUtils.isEmpty(username)) {
               session.close();
 
-              getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                  Toast.makeText(getActivity(), R.string.facebook_error, Toast.LENGTH_LONG).show();
-                }
-              });
+              if (getActivity() != null && !getActivity().isFinishing()) {
+                getActivity().runOnUiThread(new Runnable() {
+                  public void run() {
+                    Toast.makeText(getActivity(), R.string.facebook_error, Toast.LENGTH_LONG)
+                        .show();
+                  }
+                });
+              }
             }
 
             if (session == Session.getActiveSession() && user != null) {
