@@ -12,6 +12,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
 import android.graphics.drawable.BitmapDrawable;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
@@ -67,13 +68,15 @@ public class UploadService extends Service {
   private NotificationCompat.Builder setNotification(String packageName, String text,
       PendingIntent pendingIntent) {
 
-    NotificationCompat.Builder mBuilder =
-        new NotificationCompat.Builder(getApplication()).setLargeIcon(loadIcon(packageName))
-            .setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle(getApplication().getString(R.string.app_name))
-            .setContentIntent(buildRetryIntent(packageName))
-            .setOngoing(false)
-            .setContentText(text);
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplication());
+    Bitmap b = loadIcon(packageName);
+    if (b != null) mBuilder.setLargeIcon(b);
+    b = null;
+    mBuilder.setSmallIcon(R.drawable.notification_icon)
+        .setContentTitle(getApplication().getString(R.string.app_name))
+        .setContentIntent(buildRetryIntent(packageName))
+        .setOngoing(false)
+        .setContentText(text);
 
     if (pendingIntent != null) mBuilder.setContentIntent(pendingIntent);
 
@@ -290,9 +293,11 @@ public class UploadService extends Service {
     String label = uploadAppToRepoJson.getLabel();
 
     NotificationCompat.Builder mBuilder = new NotificationCompat.
-        Builder(getApplication()).
-        setLargeIcon(loadIcon(packageName)).
-        setSmallIcon(R.drawable.notification_icon).
+        Builder(getApplication());
+    Bitmap b = loadIcon(packageName);
+    if (b != null) mBuilder.setLargeIcon(b);
+    b = null;
+    mBuilder.setSmallIcon(R.drawable.notification_icon).
         setContentTitle(getApplication().getString(R.string.app_name)).
         setContentIntent(buildFillMissingInfoIntent(selectablePackageInfo)).
         setOngoing(false).
@@ -309,13 +314,14 @@ public class UploadService extends Service {
   }
 
   private void setFinishedNotification(String packageName, String label) {
-    NotificationCompat.Builder mBuilder =
-        new NotificationCompat.Builder(getApplication()).setLargeIcon(loadIcon(packageName))
-            .setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle(getApplication().getString(R.string.app_name))
-            .setOngoing(false)
-            .setSubText("App successfully uploaded")
-            .setContentText(label);
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplication());
+    Bitmap b = loadIcon(packageName);
+    if (b != null) mBuilder.setLargeIcon(b);
+    b = null;
+    mBuilder.setSmallIcon(R.drawable.notification_icon)
+        .setOngoing(false)
+        .setSubText("App successfully uploaded")
+        .setContentText(label);
 
     NotificationManager mNotificationManager =
         (NotificationManager) getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -378,17 +384,19 @@ public class UploadService extends Service {
 
   private void setRetryNotification(String packageName, String label) {
 
-    NotificationCompat.Builder mBuilder =
-        new NotificationCompat.Builder(getApplication()).setLargeIcon(loadIcon(packageName))
-            .setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle(getApplication().getString(R.string.app_name))
-            .setContentIntent(buildRetryIntent(packageName))
-            .setOngoing(false)
-            .setSubText("Tap to retry, " +
-                "slide" +
-                " " +
-                "" + "to dismiss")
-            .setContentText(label);
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplication());
+    Bitmap b = loadIcon(packageName);
+    if (b != null) mBuilder.setLargeIcon(b);
+    b = null;
+    mBuilder.setSmallIcon(R.drawable.notification_icon)
+        .setContentTitle(getApplication().getString(R.string.app_name))
+        .setContentIntent(buildRetryIntent(packageName))
+        .setOngoing(false)
+        .setSubText("Tap to retry, " +
+            "slide" +
+            " " +
+            "" + "to dismiss")
+        .setContentText(label);
 
     NotificationManager mNotificationManager =
         (NotificationManager) getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -397,12 +405,14 @@ public class UploadService extends Service {
 
   private void setErrorsNotification(String packageName, String label, List<Error> errors) {
 
-    NotificationCompat.Builder mBuilder =
-        new NotificationCompat.Builder(getApplication()).setLargeIcon(loadIcon(packageName))
-            .setSmallIcon(R.drawable.notification_icon)
-            .setContentTitle(getApplication().getString(R.string.app_name))
-            .setOngoing(false)
-            .setContentText(label);
+    NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplication());
+    Bitmap b = loadIcon(packageName);
+    if (b != null) mBuilder.setLargeIcon(b);
+    b = null;
+    mBuilder.setSmallIcon(R.drawable.notification_icon)
+        .setContentTitle(getApplication().getString(R.string.app_name))
+        .setOngoing(false)
+        .setContentText(label);
 
     if (Build.VERSION.SDK_INT >= 16) {
       mBuilder.setSubText("Error Uploading (Expand for details)");
@@ -440,7 +450,7 @@ public class UploadService extends Service {
       e.printStackTrace();
     }
 
-    return ((BitmapDrawable) drawable).getBitmap();
+    return drawable == null ? null : ((BitmapDrawable) drawable).getBitmap();
   }
 
   private PendingIntent buildFillMissingInfoIntent(SelectablePackageInfo selectablePackageInfo) {
