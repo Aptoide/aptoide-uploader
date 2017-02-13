@@ -73,7 +73,9 @@ public class LoginActivity extends AppCompatActivity
   private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
   final long DEFAULT_CACHE_TIME = DurationInMillis.ONE_SECOND * 5;
   public UiLifecycleHelper uiLifecycleHelper;
+
   SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
+
   boolean dismissSplash = false;
   //    OAuth2AuthenticationRequest oAuth2AuthenticationRequest;
   OAuth2AuthenticationRequest checkUserCredentialsRequest;
@@ -152,9 +154,7 @@ public class LoginActivity extends AppCompatActivity
     switch (requestCode) {
       case MY_PERMISSIONS_REQUEST: {
 
-        if (grantResults.length > 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-          dismissSplash = true;
-        }
+        dismissSplash = true;
       }
       default:
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);

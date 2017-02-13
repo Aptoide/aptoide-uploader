@@ -9,10 +9,14 @@ package pt.caixamagica.aptoide.uploader;
  * Created by neuro on 02-02-2015.
  */
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
@@ -105,6 +109,7 @@ public class LoginFragment extends Fragment {
    * @param password password
    */
   private OAuth2AuthenticationRequest oAuth2AuthenticationRequest;
+  private View btnGoogle;
 
   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
@@ -139,12 +144,25 @@ public class LoginFragment extends Fragment {
 
     contentLayout = (RelativeLayout) rootView.findViewById(R.id.content);
     progressLayout = (RelativeLayout) rootView.findViewById(R.id.progressBar);
+    btnGoogle = rootView.findViewById(R.id.sign_in_button);
 
     setUpFacebookButton();
     setUpGooglePlusButton();
     setUpSignUpButton();
 
     return rootView;
+  }
+
+  @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+
+    if (btnGoogle.getId() == R.id.sign_in_button
+        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+        && getActivity().checkSelfPermission(Manifest.permission.GET_ACCOUNTS)
+        != PackageManager.PERMISSION_GRANTED) {
+
+      btnGoogle.setEnabled(false);
+    }
   }
 
   @Override public void onResume() {
