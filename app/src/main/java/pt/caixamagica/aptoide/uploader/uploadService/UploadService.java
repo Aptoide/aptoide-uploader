@@ -340,20 +340,24 @@ public class UploadService extends Service {
       if (UPLOADER_RETRY.equals(intent.getAction())) {
         UploadAppToRepoRequest req =
             sendingAppsUploadRequests.get(intent.getStringExtra("packageName"));
-        setPreparingUploadNotification(req.getPackageName(), req.getLabel());
 
-        uploadApp(new UploadAppToRepoRequest(req, new StoreTokenInterface() {
-          @Override public void setToken(String token) {
-            final SharedPreferences sharedpreferences =
-                getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+        if (req != null) {
 
-            final AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(),
-                Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
-            sharedpreferences.edit()
-                .putString("token", aesObfuscator.obfuscate(token, "token"))
-                .apply();
-          }
-        }), null);
+          setPreparingUploadNotification(req.getPackageName(), req.getLabel());
+
+          uploadApp(new UploadAppToRepoRequest(req, new StoreTokenInterface() {
+            @Override public void setToken(String token) {
+              final SharedPreferences sharedpreferences =
+                  getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+
+              final AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(),
+                  Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID));
+              sharedpreferences.edit()
+                  .putString("token", aesObfuscator.obfuscate(token, "token"))
+                  .apply();
+            }
+          }), null);
+        }
       }
     }
 
