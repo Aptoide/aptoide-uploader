@@ -150,7 +150,7 @@ public class RepoCreatorDialog extends DialogFragment {
 
     //        repoUsername.setText(login.getUsername().split("@")[0]);
     //        repoUsername.setText("Teste");
-    repoUsername.setText(userInfo.getUsername());
+    repoUsername.setText(userInfo == null ? "" : userInfo.getUsername());
 
     privateButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
