@@ -10,8 +10,8 @@
   <string name="OK">OK</string>
 
   <!-- Mensagens de erro -->
-  <string name="loginFail">Login Falhou. Username ou Password errados.</string>
-  <string name="duplicated_apk">O Apk já existe no repositório, nada a fazer.</string>
+  <string name="loginFail">Login failed. Wrong username or password.</string>
+  <string name="duplicated_apk">The apk already exists in the repository. Nothing to be done.</string>
 
   <string name="store">Store</string>
   <string name="store_privacy">Store privacy</string>
