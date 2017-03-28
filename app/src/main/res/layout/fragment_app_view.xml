@@ -22,8 +22,7 @@
         android:layout_height="wrap_content"
         android:background="#0078ab"
         android:padding="10dp"
-        android:text="Store"
-
+        android:text="@string/store"
         android:textSize="18dp"
         />
 
@@ -37,7 +36,7 @@
           android:layout_height="wrap_content"
           android:layout_centerVertical="true"
           android:layout_marginLeft="10dp"
-          android:text="Select apps to upload to your store"
+          android:text="@string/select_apps_to_upload_to_your_store"
           android:textColor="@android:color/darker_gray"
           />
 
@@ -97,7 +96,7 @@
       android:layout_height="wrap_content"
       android:layout_alignParentBottom="true"
       android:background="#0078ab"
-      android:text="Submit Apps"
+      android:text="@string/submit_apps"
       android:visibility="gone"
       />
 

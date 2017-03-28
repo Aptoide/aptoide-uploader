@@ -33,7 +33,7 @@
         android:layout_below="@id/progressBarBar"
         android:layout_centerHorizontal="true"
         android:padding="25dp"
-        android:text="Loading content..."
+        android:text="@string/loading_content"
         android:textColor="?attr/colorPrimary"
         />
 
@@ -81,7 +81,7 @@
       android:layout_centerHorizontal="true"
       android:layout_marginLeft="@dimen/sideMargin"
       android:layout_marginRight="@dimen/sideMargin"
-      android:text="Submit"
+      android:text="@string/submit"
       android:textColor="#FFFFFF"
       style="@style/Buttonuploader_button_theme"
       />
@@ -103,7 +103,7 @@
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="App Name"
+          android:text="@string/app_name_form"
           style="@style/TextViewCustom"
           />
 
@@ -127,7 +127,7 @@
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="Age Rating"
+          android:text="@string/age_rating"
           style="@style/TextViewCustom"
           />
 
@@ -159,7 +159,7 @@
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="App Category"
+          android:text="@string/app_category"
           style="@style/TextViewCustom"
           />
 
@@ -192,7 +192,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="App Description"
+            android:text="@string/app_description"
             style="@style/TextViewCustom"
             />
 
@@ -200,7 +200,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
-            android:text=" (optional)"
+            android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
             />
@@ -241,7 +241,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phone Number"
+            android:text="@string/phone_number"
             style="@style/TextViewCustom"
             />
 
@@ -249,7 +249,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
-            android:text=" (optional)"
+            android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
             />
@@ -273,7 +273,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="E-Mail"
+            android:text="@string/e_mail"
             style="@style/TextViewCustom"
             />
 
@@ -281,7 +281,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
-            android:text=" (optional)"
+            android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
             />
@@ -303,7 +303,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Website"
+            android:text="@string/website"
             style="@style/TextViewCustom"
             />
 
@@ -311,7 +311,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
-            android:text=" (optional)"
+            android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
             />

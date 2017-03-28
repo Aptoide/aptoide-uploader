@@ -34,7 +34,7 @@
         android:ellipsize="end"
         android:gravity="center_horizontal"
         android:maxLines="2"
-        android:text="Jogos"
+        android:text="@string/jogos"
         android:textColor="@android:color/black"
         />
 

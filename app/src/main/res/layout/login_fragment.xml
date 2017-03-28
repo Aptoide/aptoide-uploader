@@ -103,7 +103,7 @@
           android:clickable="true"
           android:gravity="center"
           android:padding="10dp"
-          android:text="New to Aptoide? Create a free account"
+          android:text="@string/new_to_aptoide_create_a_free_account"
           android:textColor="@android:color/white"
           />
 
@@ -133,7 +133,7 @@
             android:layout_centerInParent="true"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:text="OR"
+            android:text="@string/or"
             />
 
         <View
@@ -178,7 +178,7 @@
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:padding="25dp"
-        android:text="Signing in..."
+        android:text="@string/signing_in"
         android:textAlignment="center"
         />
 
