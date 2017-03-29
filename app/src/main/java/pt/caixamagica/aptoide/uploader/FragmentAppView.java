@@ -33,6 +33,7 @@ import android.view.animation.TranslateAnimation;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.GridView;
+import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -223,10 +224,10 @@ public class FragmentAppView extends Fragment {
         });
       }
     });
-
-    TextView tv = (TextView) rootView.findViewById(R.id.select_apps_hint);
-    tv.setText("Store   " + userCredentialsJson.getRepo());
-    tv.setOnLongClickListener(new View.OnLongClickListener() {
+    LinearLayout linearLayout = (LinearLayout) rootView.findViewById(R.id.store_info);
+    TextView textView = (TextView) rootView.findViewById(R.id.store_name);
+    textView.setText(" " + userCredentialsJson.getRepo());
+    linearLayout.setOnLongClickListener(new View.OnLongClickListener() {
 
       @Override public boolean onLongClick(View v) {
         PackageInfo pInfo = null;
@@ -299,7 +300,7 @@ public class FragmentAppView extends Fragment {
 
       @Override public void show() {
         TranslateAnimation anim = new TranslateAnimation(0, 0, 0,
-            rootView.findViewById(R.id.select_apps_hint).getHeight());
+            rootView.findViewById(R.id.store_icon).getHeight());
         anim.setDuration(timeMillis);
         anim.setFillAfter(true);
 
@@ -323,7 +324,7 @@ public class FragmentAppView extends Fragment {
       @Override public void hide() {
 
         TranslateAnimation anim = new TranslateAnimation(0, 0, 0,
-            -rootView.findViewById(R.id.select_apps_hint).getHeight());
+            -rootView.findViewById(R.id.store_icon).getHeight());
         anim.setDuration(timeMillis);
         anim.setFillAfter(true);
 
@@ -337,7 +338,7 @@ public class FragmentAppView extends Fragment {
 
           @Override public void onAnimationEnd(Animation animation) {
             ViewCompat.setTranslationY(rootView.findViewById(R.id.grid_view_and_hint),
-                -rootView.findViewById(R.id.select_apps_hint).getHeight());
+                -rootView.findViewById(R.id.store_icon).getHeight());
             rootView.findViewById(R.id.grid_view_and_hint).clearAnimation();
           }
         });
