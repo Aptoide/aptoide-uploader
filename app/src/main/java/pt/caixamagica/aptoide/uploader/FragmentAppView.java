@@ -299,8 +299,8 @@ public class FragmentAppView extends Fragment {
       final int timeMillis = 100;
 
       @Override public void show() {
-        TranslateAnimation anim = new TranslateAnimation(0, 0, 0,
-            rootView.findViewById(R.id.store_icon).getHeight());
+        TranslateAnimation anim =
+            new TranslateAnimation(0, 0, 0, rootView.findViewById(R.id.store_icon).getHeight());
         anim.setDuration(timeMillis);
         anim.setFillAfter(true);
 
@@ -323,8 +323,8 @@ public class FragmentAppView extends Fragment {
 
       @Override public void hide() {
 
-        TranslateAnimation anim = new TranslateAnimation(0, 0, 0,
-            -rootView.findViewById(R.id.store_icon).getHeight());
+        TranslateAnimation anim =
+            new TranslateAnimation(0, 0, 0, -rootView.findViewById(R.id.store_icon).getHeight());
         anim.setDuration(timeMillis);
         anim.setFillAfter(true);
 
