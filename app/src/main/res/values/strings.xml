@@ -99,4 +99,5 @@
   <string name="phone_number">Phone Number</string>
   <string name="e_mail">E-Mail</string>
   <string name="website">Website</string>
+  <string name="signout">Sign Out</string>
 </resources>
