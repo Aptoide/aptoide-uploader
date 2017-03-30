@@ -19,6 +19,7 @@ import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.view.ViewCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.widget.RecyclerView;
 import android.util.DisplayMetrics;
 import android.util.TypedValue;
@@ -266,9 +267,8 @@ public class FragmentAppView extends Fragment {
     return rootView;
   }
 
-  @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
+  @Override public void onViewCreated(final View view, @Nullable final Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-
     DisplayMetrics metrics = getResources().getDisplayMetrics();
     float px = TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 120,
         getResources().getDisplayMetrics());
@@ -276,7 +276,17 @@ public class FragmentAppView extends Fragment {
     gridview = (GridView) rootView.findViewById(R.id.grid_view);
     gridview.setNumColumns(i);
     adapter.setAdapterView(gridview);
-
+    final SwipeRefreshLayout swipeRefreshLayout =
+        (SwipeRefreshLayout) rootView.findViewById(R.id.swipe);
+    swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+      @Override public void onRefresh() {
+        //call method(s) responsible for creating the list.
+        //notifyDataSetChanged on adapter
+        adapter.mDataset = nonSystemPackages(true);
+        adapter.notifyDataSetChanged();
+        swipeRefreshLayout.setRefreshing(false);
+      }
+    });
     setUploadButtonListener();
   }
 

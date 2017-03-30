@@ -80,19 +80,27 @@
 
     </RelativeLayout>
 
-    <GridView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/grid_view"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/store_icon"
-        android:layout_marginLeft="7dp"
-        android:layout_marginRight="7dp"
-        android:horizontalSpacing="5dp"
-        android:numColumns="3"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="5dp"
-        />
+        >
+
+      <GridView
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:id="@+id/grid_view"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_below="@id/store_icon"
+          android:layout_marginLeft="7dp"
+          android:layout_marginRight="7dp"
+          android:horizontalSpacing="5dp"
+          android:numColumns="3"
+          android:stretchMode="columnWidth"
+          android:verticalSpacing="5dp"
+          />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
   </LinearLayout>
 
