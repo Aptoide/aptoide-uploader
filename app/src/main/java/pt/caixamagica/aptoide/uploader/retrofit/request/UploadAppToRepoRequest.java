@@ -153,6 +153,7 @@ import retrofit.mime.TypedFile;
       if (FLAG_APK) {
         parameters.put("apk", newTweakedTypedFile("apk", apkPath));
       } else {
+        //Used in first request to check if apk already exists
         parameters.put("apk_md5sum", UploaderUtils.md5Calc(new File(apkPath)));
       }
 

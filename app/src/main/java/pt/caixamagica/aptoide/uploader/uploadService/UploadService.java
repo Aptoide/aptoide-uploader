@@ -26,11 +26,13 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.exception.NetworkException;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
+import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
+import pt.caixamagica.aptoide.uploader.UploaderUtils;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploadService;
 import pt.caixamagica.aptoide.uploader.retrofit.request.StoreTokenInterface;
@@ -161,8 +163,10 @@ public class UploadService extends Service {
         Log.e(TAG, "onRequestFailure: ", spiceException);
 
         if (spiceException instanceof NetworkException) {
-          setNotification(uploadAppToRepoRequest.getPackageName(),
-              getString(R.string.upload_done_network_error), null);
+          checkUploadSuccess(uploadAppToRepoRequest);
+
+          //setNotification(uploadAppToRepoRequest.getPackageName(),
+          //    getString(R.string.upload_done_network_error), null);
         } else {
           setRetryNotification(uploadAppToRepoRequest.getPackageName(),
               uploadAppToRepoRequest.getLabel());
@@ -328,6 +332,24 @@ public class UploadService extends Service {
     mNotificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
+  private void simpleNotification(String packageName, String label, String message) {
+    NotificationCompat.Builder notificationBuilder =
+        new NotificationCompat.Builder(getApplication());
+    Bitmap icon = loadIcon(packageName);
+    if (icon != null) {
+      notificationBuilder.setLargeIcon(icon);
+    }
+    icon = null;
+    notificationBuilder.setSmallIcon(R.drawable.notification_icon)
+        .setOngoing(false)
+        .setSubText(message)
+        .setContentText(label);
+
+    NotificationManager notificationManager =
+        (NotificationManager) getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
+    notificationManager.notify(packageName.hashCode(), notificationBuilder.build());
+  }
+
   @Override public void onCreate() {
     spiceManager.start(this);
   }
@@ -391,11 +413,7 @@ public class UploadService extends Service {
     mBuilder.setSmallIcon(R.drawable.notification_icon)
         .setContentTitle(getApplication().getString(R.string.app_name))
         .setContentIntent(buildRetryIntent(packageName))
-        .setOngoing(false)
-        .setSubText("Tap to retry, " +
-            "slide" +
-            " " +
-            "" + "to dismiss")
+        .setOngoing(false).setSubText("Tap to retry, " + "slide" + " " + "" + "to dismiss")
         .setContentText(label);
 
     NotificationManager mNotificationManager =
@@ -489,5 +507,53 @@ public class UploadService extends Service {
     intent.putExtra("packageName", packageName);
 
     return PendingIntent.getService(this, reqCode, intent, 0);
+  }
+
+  private void checkUploadSuccess(final UploadAppToRepoRequest originalRequest) {
+    final SharedPreferences sharedpreferences =
+        getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
+
+    final AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(),
+        Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID));
+
+    final UploadAppToRepoRequest uploadAppToRepoRequest =
+        new UploadAppToRepoRequest(originalRequest, new StoreTokenInterface() {
+          @Override public void setToken(String token) {
+            sharedpreferences.edit()
+                .putString("token", aesObfuscator.obfuscate(originalRequest.getToken(), "token"))
+                .apply();
+          }
+        });
+    uploadAppToRepoRequest.setApkMd5sum(
+        UploaderUtils.md5Calc(new File(originalRequest.getApkPath())));
+    spiceManager.execute(uploadAppToRepoRequest, new RequestListener<UploadAppToRepoJson>() {
+      @Override public void onRequestFailure(SpiceException spiceException) {
+        simpleNotification(uploadAppToRepoRequest.getPackageName(),
+            uploadAppToRepoRequest.getLabel(), getString(R.string.upload_failed));
+      }
+
+      @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
+        if (uploadAppToRepoJson.getErrors() != null) {
+          String errorCode = uploadAppToRepoJson.getErrors().get(0).getCode();
+          if (errorCode.equals("APK-5")) {
+            setErrorsNotification(uploadAppToRepoRequest.getPackageName(),
+                uploadAppToRepoRequest.getLabel(), uploadAppToRepoJson.getErrors());
+          } else if (errorCode.equals("APK-103")) {
+            setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
+                uploadAppToRepoRequest.getLabel());
+            sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
+            sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
+          } else {
+            simpleNotification(uploadAppToRepoRequest.getPackageName(),
+                uploadAppToRepoRequest.getLabel(), getString(R.string.upload_failed));
+          }
+        } else {
+          setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
+              uploadAppToRepoRequest.getLabel());
+          sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
+          sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
+        }
+      }
+    });
   }
 }
