@@ -28,7 +28,6 @@
 
   <string name="facebook_error">You should provide your email in order to login.</string>
 
-  <string name="upload_done_network_error">Upload done!!! Check your store.</string>
   <string name="upload_prepare">Preparing to upload %s</string>
 
   <string name="age_rating_1">All</string>
@@ -100,4 +99,5 @@
   <string name="e_mail">E-Mail</string>
   <string name="website">Website</string>
   <string name="signout">Sign Out</string>
+  <string name="upload_failed">This upload failed, please try again later</string>
 </resources>
