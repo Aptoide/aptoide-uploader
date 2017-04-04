@@ -49,8 +49,6 @@ import static pt.caixamagica.aptoide.uploader.activities.LoginActivity.SHARED_PR
  */
 public class UploadService extends Service {
 
-  public static final String UPLOADER_CANCEL = "cancel";
-  public static final String UPLOADER_RETRY = "retry";
   private static final String TAG = UploadService.class.getSimpleName();
   private final MyBinder myBinder = new MyBinder(this);
 
@@ -173,8 +171,29 @@ public class UploadService extends Service {
         }
       }
 
-      // Investigar powerlock
-      @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
+      private boolean isDummyUploadError(List<Error> errors) {
+        return hasErrorCodes(errors, "MARG-100", "MARG-101", "MARG-102", "MARG-103");
+      }      // Investigar powerlock
+
+      private boolean systemError(List<Error> errors) {
+        return hasErrorCode(errors, "SYS-1");
+      }
+
+      private boolean processErrors(
+          List<pt.caixamagica.aptoide.uploader.webservices.json.Error> errorList) {
+
+        boolean missingBinaryFound = false;
+
+        for (Error error : errorList) {
+          if (!missingBinaryFound) {
+            missingBinaryFound = setErrorFlag(error);
+          } else {
+            setErrorFlag(error);
+          }
+        }
+
+        return missingBinaryFound;
+      }      @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
         Log.v(TAG, "onRequestSuccess: ");
         if (uploadAppToRepoJson.getErrors() != null) {
 
@@ -226,30 +245,6 @@ public class UploadService extends Service {
         }
       }
 
-      private boolean isDummyUploadError(List<Error> errors) {
-        return hasErrorCodes(errors, "MARG-100", "MARG-101", "MARG-102", "MARG-103");
-      }
-
-      private boolean systemError(List<Error> errors) {
-        return hasErrorCode(errors, "SYS-1");
-      }
-
-      private boolean processErrors(
-          List<pt.caixamagica.aptoide.uploader.webservices.json.Error> errorList) {
-
-        boolean missingBinaryFound = false;
-
-        for (Error error : errorList) {
-          if (!missingBinaryFound) {
-            missingBinaryFound = setErrorFlag(error);
-          } else {
-            setErrorFlag(error);
-          }
-        }
-
-        return missingBinaryFound;
-      }
-
       private boolean hasErrorCodes(List<Error> errors, String... errCodes) {
         for (String errCode : errCodes) {
           if (hasErrorCode(errors, errCode)) {
@@ -287,6 +282,8 @@ public class UploadService extends Service {
 
         return true;
       }
+
+
     });
   }
 
@@ -362,10 +359,10 @@ public class UploadService extends Service {
     }
 
     if (intent != null) {
-      if (UPLOADER_CANCEL.equals(intent.getAction())) {
+      if (getString(R.string.cancel).equals(intent.getAction())) {
         cancelUpload(intent.getExtras().getString("packageName"));
       }
-      if (UPLOADER_RETRY.equals(intent.getAction())) {
+      if (getString(R.string.retry).equals(intent.getAction())) {
         UploadAppToRepoRequest req =
             sendingAppsUploadRequests.get(intent.getStringExtra("packageName"));
 
@@ -413,7 +410,8 @@ public class UploadService extends Service {
     mBuilder.setSmallIcon(R.drawable.notification_icon)
         .setContentTitle(getApplication().getString(R.string.app_name))
         .setContentIntent(buildRetryIntent(packageName))
-        .setOngoing(false).setSubText("Tap to retry, " + "slide" + " " + "" + "to dismiss")
+        .setOngoing(false)
+        .setSubText("Tap to retry, " + "slide" + " " + "" + "to dismiss")
         .setContentText(label);
 
     NotificationManager mNotificationManager =
@@ -485,7 +483,7 @@ public class UploadService extends Service {
   private PendingIntent buildRetryIntent(String apkName) {
     Intent intent = new Intent(getApplicationContext(), UploadService.class);
 
-    intent.setAction(UploadService.UPLOADER_RETRY);
+    intent.setAction(getString(R.string.retry));
 
     intent.putExtra("packageName", apkName);
 
@@ -503,7 +501,7 @@ public class UploadService extends Service {
 
     Intent intent = new Intent(this, UploadService.class);
 
-    intent.setAction(UploadService.UPLOADER_CANCEL);
+    intent.setAction(getString(R.string.cancel));
     intent.putExtra("packageName", packageName);
 
     return PendingIntent.getService(this, reqCode, intent, 0);

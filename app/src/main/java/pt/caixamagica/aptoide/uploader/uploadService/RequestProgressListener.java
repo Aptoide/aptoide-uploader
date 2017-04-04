@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import com.octo.android.robospice.request.listener.RequestProgress;
+import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 
 /**
@@ -54,7 +55,7 @@ public class RequestProgressListener
 
     Intent intent = new Intent(context, UploadService.class);
 
-    intent.setAction(UploadService.UPLOADER_CANCEL);
+    intent.setAction(context.getString(R.string.cancel));
 
     intent.putExtra("packageName", packageInfo.packageName);
 
