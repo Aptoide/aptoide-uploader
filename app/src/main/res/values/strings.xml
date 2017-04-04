@@ -12,7 +12,8 @@
 
   <!-- Mensagens de erro -->
   <string name="loginFail">Login failed. Wrong username or password.</string>
-  <string name="duplicated_apk">The apk already exists in the repository. Nothing to be done.</string>
+  <string name="duplicated_apk">The apk already exists in the repository. You don\'t need to do
+    anything.</string>
 
   <string name="store">Store</string>
   <string name="store_privacy">Store privacy</string>
@@ -79,14 +80,15 @@
   <string name="sort_spinner_values_2">By Name</string>
   <string name="select_apps_to_upload_to_your_store">Select apps to upload to your store</string>
   <string name="submit_apps">Submit Apps</string>
-  <string name="new_to_aptoide_create_a_free_account">New to Aptoide? Create a free account</string>
+  <string name="new_to_aptoide_create_a_free_account">New to Aptoide? Create a free account.</string>
   <string name="or">OR</string>
   <string name="signing_in">Signing in...</string>
   <string name="jogos">Games</string>
   <string name="new_account">New Account</string>
   <string name="already_have_an_account_sign_in">Already have an account? Sign in</string>
   <string name="forgotten_your_password">Forgotten your password?</string>
-  <string name="by_signing_up_you_are_agreeing_to_the_aptoide_terms_of_service_and_aptoide_content_policy_for_developers">By signing up you are agreeing to the Aptoide Terms of Service and Aptoide Content Policy for Developers</string>
+  <string
+      name="by_signing_up_you_are_agreeing_to_the_aptoide_terms_of_service_and_aptoide_content_policy_for_developers">By signing up you are agreeing to the Aptoide\'s Terms of Service and Aptoide Content Policy for Developers.</string>
   <string name="loading_content">Loading content...</string>
   <string name="submit">Submit</string>
   <string name="age_rating">Age Rating</string>
@@ -98,5 +100,5 @@
   <string name="e_mail">E-Mail</string>
   <string name="website">Website</string>
   <string name="signout">Sign Out</string>
-  <string name="upload_failed">This upload failed, please try again later</string>
+  <string name="upload_failed">This upload failed, please try again later.</string>
 </resources>
