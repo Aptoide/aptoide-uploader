@@ -118,12 +118,5 @@
     <item name="android:paddingLeft">10dp</item>
   </style>
 
-  <style name="TextViewDialog">
-    <item name="android:textColor">#FF0000</item>
-  </style>
-
-  <string name="store_username_undefined">You should define an username for your private store</string>
-  <string name="store_password_undefined">You should define a password for your private store</string>
-
 
 </resources>
