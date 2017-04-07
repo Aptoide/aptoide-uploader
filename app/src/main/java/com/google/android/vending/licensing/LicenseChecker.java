@@ -81,6 +81,7 @@ public class LicenseChecker implements ServiceConnection {
    * @param context a Context
    * @param policy implementation of Policy
    * @param encodedPublicKey Base64-encoded RSA public key
+   *
    * @throws IllegalArgumentException if encodedPublicKey is invalid
    */
   public LicenseChecker(Context context, Policy policy, String encodedPublicKey) {
@@ -98,6 +99,7 @@ public class LicenseChecker implements ServiceConnection {
    * Generates a PublicKey instance from a string containing the Base64-encoded public key.
    *
    * @param encodedPublicKey Base64-encoded public key
+   *
    * @throws IllegalArgumentException if encodedPublicKey is invalid
    */
   private static PublicKey generatePublicKey(String encodedPublicKey) {
@@ -122,6 +124,7 @@ public class LicenseChecker implements ServiceConnection {
    * Get version code for the application package name.
    *
    * @param packageName application package name
+   *
    * @return the version code or empty string if package not found
    */
   private static String getVersionCode(Context context, String packageName) {

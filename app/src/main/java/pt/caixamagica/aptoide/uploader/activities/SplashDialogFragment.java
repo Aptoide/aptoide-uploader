@@ -69,17 +69,6 @@ public class SplashDialogFragment extends DialogFragment {
     }, 3, TimeUnit.SECONDS);
   }
 
-  private void dismissSplashScreen() {
-    if (resumed) {
-      getActivity().runOnUiThread(new Runnable() {
-        @Override public void run() {
-          mCallback.checkStoredCredentialsCallback();
-          dismiss();
-        }
-      });
-    }
-  }
-
   @Override public void onResume() {
     super.onResume();
     resumed = true;
@@ -92,6 +81,17 @@ public class SplashDialogFragment extends DialogFragment {
 
   @Override public void onDestroy() {
     super.onDestroy();
+  }
+
+  private void dismissSplashScreen() {
+    if (resumed) {
+      getActivity().runOnUiThread(new Runnable() {
+        @Override public void run() {
+          mCallback.checkStoredCredentialsCallback();
+          dismiss();
+        }
+      });
+    }
   }
 
   // Container Activity must implement this interface

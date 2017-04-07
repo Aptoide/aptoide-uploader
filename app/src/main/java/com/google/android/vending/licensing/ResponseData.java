@@ -39,7 +39,9 @@ public class ResponseData {
    * Parses response string into ResponseData.
    *
    * @param responseData response data string
+   *
    * @return ResponseData object
+   *
    * @throws IllegalArgumentException upon parsing error
    */
   public static ResponseData parse(String responseData) {

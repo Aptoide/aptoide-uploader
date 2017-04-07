@@ -373,6 +373,7 @@ public class SubmitAppFragment extends Fragment {
    * Retorna o id da categoria cujo nome é <code>name</code>, -1 para default (não encontrado).
    *
    * @param name nome da categoria
+   *
    * @return o id da categoria cujo nome é <code>name</code>.
    */
   public int getCategoryId(String name) {
@@ -392,6 +393,7 @@ public class SubmitAppFragment extends Fragment {
    * desconhecido.
    *
    * @param id id da categoria
+   *
    * @return o indice no spinner da categoria com o <code>id</code> fornecido.
    */
   public int getCategorySpinnerIndex(Number id) {
@@ -410,6 +412,7 @@ public class SubmitAppFragment extends Fragment {
    * Retorna o índice no spinner do age rating fornecido.
    *
    * @param number age rating fornecido.
+   *
    * @return o índice no spinner do age rating fornecido.
    */
   public int getAgeRatingSpinnerIndex(Number number) {

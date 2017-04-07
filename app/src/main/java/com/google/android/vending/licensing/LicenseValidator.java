@@ -86,8 +86,9 @@ class LicenseValidator {
     String userId = null;
     // Skip signature check for unsuccessful requests
     ResponseData data = null;
-    if (responseCode == LICENSED || responseCode == NOT_LICENSED ||
-        responseCode == LICENSED_OLD_KEY) {
+    if (responseCode == LICENSED
+        || responseCode == NOT_LICENSED
+        || responseCode == LICENSED_OLD_KEY) {
       // Verify signature.
       try {
         Signature sig = Signature.getInstance(SIGNATURE_ALGORITHM);

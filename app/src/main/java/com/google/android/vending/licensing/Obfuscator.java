@@ -32,6 +32,7 @@ public interface Obfuscator {
    *
    * @param original The data that is to be obfuscated.
    * @param key The key for the data that is to be obfuscated.
+   *
    * @return A transformed version of the original data.
    */
   String obfuscate(String original, String key);
@@ -41,7 +42,9 @@ public interface Obfuscator {
    *
    * @param original The data that is to be obfuscated.
    * @param key The key for the data that is to be obfuscated.
+   *
    * @return A transformed version of the original data.
+   *
    * @throws ValidationException Optionally thrown if a data integrity check fails.
    */
   String unobfuscate(String obfuscated, String key) throws ValidationException;

@@ -124,7 +124,9 @@ public class PaymentServices implements Parcelable {
     @Override public int describeContents() {
       return 0;
     }
-  }  public void writeToParcel(Parcel out, int flags) {
+  }
+
+  public void writeToParcel(Parcel out, int flags) {
     out.writeInt(id);
     out.writeString(short_name);
     out.writeString(name);
@@ -134,6 +136,4 @@ public class PaymentServices implements Parcelable {
     out.writeDouble(taxRate);
     out.writeString(sign);
   }
-
-
 }

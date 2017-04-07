@@ -91,8 +91,7 @@ public class AESObfuscator implements Obfuscator {
       // where the block size is correct during decryption.
       int headerIndex = result.indexOf(header + key);
       if (headerIndex != 0) {
-        throw new ValidationException("Header not found (invalid data or key)" + ":" +
-            obfuscated);
+        throw new ValidationException("Header not found (invalid data or key)" + ":" + obfuscated);
       }
       return result.substring(header.length() + key.length(), result.length());
     } catch (Base64DecoderException e) {

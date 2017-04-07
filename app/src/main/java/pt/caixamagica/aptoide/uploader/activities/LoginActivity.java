@@ -365,6 +365,24 @@ public class LoginActivity extends AppCompatActivity
         .build();
   }
 
+  @Override protected void onStop() {
+    spiceManager.shouldStop();
+    super.onStop();
+
+    if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+      mGoogleApiClient.disconnect();
+    }
+  }
+
+  @Override protected void onDestroy() {
+    super.onDestroy();
+  }
+
+  @Override protected void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putSerializable("userInfo", userInfo);
+  }
+
   public void checkPermissions() {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
 
@@ -391,24 +409,6 @@ public class LoginActivity extends AppCompatActivity
 
   public boolean isSplashShowState() {
     return AptoideUploaderApplication.firstLaunchApagar;
-  }
-
-  @Override protected void onStop() {
-    spiceManager.shouldStop();
-    super.onStop();
-
-    if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-      mGoogleApiClient.disconnect();
-    }
-  }
-
-  @Override protected void onDestroy() {
-    super.onDestroy();
-  }
-
-  @Override protected void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    outState.putSerializable("userInfo", userInfo);
   }
 
   @Override public boolean onOptionsItemSelected(MenuItem item) {

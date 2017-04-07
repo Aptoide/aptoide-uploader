@@ -195,6 +195,24 @@ public class UploadService extends Service {
         return missingBinaryFound;
       }
 
+      private boolean hasErrorCodes(List<Error> errors, String... errCodes) {
+        for (String errCode : errCodes) {
+          if (hasErrorCode(errors, errCode)) {
+            return true;
+          }
+        }
+
+        return false;
+      }
+
+      private boolean hasErrorCode(List<Error> errors, String errCode) {
+        for (Error e : errors) {
+          if (e.getCode().equals(errCode)) return true;
+        }
+
+        return false;
+      }
+
       @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
         Log.v(TAG, "onRequestSuccess: ");
         if (uploadAppToRepoJson.getErrors() != null) {
@@ -245,24 +263,6 @@ public class UploadService extends Service {
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
         }
-      }
-
-      private boolean hasErrorCodes(List<Error> errors, String... errCodes) {
-        for (String errCode : errCodes) {
-          if (hasErrorCode(errors, errCode)) {
-            return true;
-          }
-        }
-
-        return false;
-      }
-
-      private boolean hasErrorCode(List<Error> errors, String errCode) {
-        for (Error e : errors) {
-          if (e.getCode().equals(errCode)) return true;
-        }
-
-        return false;
       }
 
       private boolean setErrorFlag(Error error) {

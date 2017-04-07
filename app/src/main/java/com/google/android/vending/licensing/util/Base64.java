@@ -116,7 +116,7 @@ public class Base64 {
       39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, // Letters 'n' through 'z'
       -9, -9, -9, -9, -9 // Decimal 123 - 127
     /*  ,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,     // Decimal 128 - 139
-		-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,     // Decimal 140 - 152
+    -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,     // Decimal 140 - 152
         -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,     // Decimal 153 - 165
         -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,     // Decimal 166 - 178
         -9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,-9,     // Decimal 179 - 191
@@ -183,6 +183,7 @@ public class Base64 {
    * source.length)}
    *
    * @param source The data to convert
+   *
    * @since 1.4
    */
   public static String encode(byte[] source) {
@@ -198,6 +199,7 @@ public class Base64 {
    * @param alphabet is the encoding alphabet
    * @param doPadding is {@code true} to pad result with '=' chars if it does not fall on 3 byte
    * boundaries
+   *
    * @since 1.4
    */
   public static String encode(byte[] source, int off, int len, byte[] alphabet, boolean doPadding) {
@@ -224,6 +226,7 @@ public class Base64 {
    * @param len Length of data to convert
    * @param alphabet is the encoding alphabet
    * @param maxLineLength maximum length of one line.
+   *
    * @return the BASE64-encoded byte array
    */
   public static byte[] encode(byte[] source, int off, int len, byte[] alphabet, int maxLineLength) {
@@ -290,7 +293,9 @@ public class Base64 {
    * @param destination the array to hold the conversion
    * @param destOffset the index where output will be put
    * @param alphabet is the encoding alphabet
+   *
    * @return the <var>destination</var> array
+   *
    * @since 1.3
    */
   private static byte[] encode3to4(byte[] source, int srcOffset, int numSigBytes,
@@ -354,7 +359,9 @@ public class Base64 {
    * Decodes data from Base64 notation.
    *
    * @param s the string to decode (decoded in default encoding)
+   *
    * @return the decoded data
+   *
    * @since 1.4
    */
   public static byte[] decode(String s) throws Base64DecoderException {
@@ -368,7 +375,9 @@ public class Base64 {
    * @param source The Base64 encoded data
    * @param off The offset of where to begin decoding
    * @param len The length of characters to decode
+   *
    * @return decoded data
+   *
    * @throws Base64DecoderException
    * @since 1.3
    */
@@ -383,6 +392,7 @@ public class Base64 {
    * @param off The offset of where to begin decoding
    * @param len The length of characters to decode
    * @param decodabet the decodabet for decoding Base64 content
+   *
    * @return decoded data
    */
   public static byte[] decode(byte[] source, int off, int len, byte[] decodabet)
@@ -465,7 +475,9 @@ public class Base64 {
    * @param destination the array to hold the conversion
    * @param destOffset the index where output will be put
    * @param decodabet the decodabet for decoding Base64 content
+   *
    * @return the number of decoded bytes converted
+   *
    * @since 1.3
    */
   private static int decode4to3(byte[] source, int srcOffset, byte[] destination, int destOffset,
@@ -507,6 +519,7 @@ public class Base64 {
    * instead of '/'
    *
    * @param s the string to decode (decoded in default encoding)
+   *
    * @return the decoded data
    */
   public static byte[] decodeWebSafe(String s) throws Base64DecoderException {
@@ -521,6 +534,7 @@ public class Base64 {
    * @param source The Base64 encoded data
    * @param off The offset of where to begin decoding
    * @param len The length of characters to decode
+   *
    * @return decoded data
    */
   public static byte[] decodeWebSafe(byte[] source, int off, int len)
@@ -532,7 +546,9 @@ public class Base64 {
    * Decodes Base64 content in byte array format and returns the decoded byte array.
    *
    * @param source The Base64 encoded data
+   *
    * @return decoded data
+   *
    * @throws Base64DecoderException
    * @since 1.3
    */
@@ -545,6 +561,7 @@ public class Base64 {
    * encoding uses '-' instead of '+', '_' instead of '/'
    *
    * @param source the string to decode (decoded in default encoding)
+   *
    * @return the decoded data
    */
   public static byte[] decodeWebSafe(byte[] source) throws Base64DecoderException {

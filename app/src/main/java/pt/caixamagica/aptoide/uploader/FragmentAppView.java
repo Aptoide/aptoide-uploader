@@ -391,6 +391,10 @@ public class FragmentAppView extends Fragment {
     menu.findItem(R.id.logout_button).setOnMenuItemClickListener(logoutListener());
   }
 
+  @Override public void onPrepareOptionsMenu(Menu menu) {
+    super.onPrepareOptionsMenu(menu);
+  }
+
   private MenuItem.OnMenuItemClickListener logoutListener() {
 
     return new MenuItem.OnMenuItemClickListener() {
@@ -403,10 +407,6 @@ public class FragmentAppView extends Fragment {
         return false;
       }
     };
-  }
-
-  @Override public void onPrepareOptionsMenu(Menu menu) {
-    super.onPrepareOptionsMenu(menu);
   }
 
   private void setUploadButtonListener() {
