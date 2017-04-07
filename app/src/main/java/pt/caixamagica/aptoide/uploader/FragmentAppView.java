@@ -425,7 +425,12 @@ public class FragmentAppView extends Fragment {
           spiceManagerSecondary.execute(getProposedRequest,
               new RequestListener<GetProposedResponse>() {
                 @Override public void onRequestFailure(SpiceException spiceException) {
-                  //TODO: what to do?
+                  //If it fails, follow the same case than when it returns an empty list
+                  try {
+                    mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);
+                  } catch (ValidationException e) {
+                    e.printStackTrace();
+                  }
                 }
 
                 @Override public void onRequestSuccess(GetProposedResponse getProposedResponse) {
