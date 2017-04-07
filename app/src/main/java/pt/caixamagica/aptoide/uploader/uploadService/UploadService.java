@@ -193,7 +193,9 @@ public class UploadService extends Service {
         }
 
         return missingBinaryFound;
-      }      @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
+      }
+
+      @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
         Log.v(TAG, "onRequestSuccess: ");
         if (uploadAppToRepoJson.getErrors() != null) {
 
@@ -282,8 +284,6 @@ public class UploadService extends Service {
 
         return true;
       }
-
-
     });
   }
 

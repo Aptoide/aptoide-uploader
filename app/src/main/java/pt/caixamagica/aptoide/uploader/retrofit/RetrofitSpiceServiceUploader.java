@@ -25,7 +25,9 @@ public class RetrofitSpiceServiceUploader extends RetrofitJackson2SpiceService {
 
   @Override public int getThreadCount() {
     return 2;
-  }  @Override protected String getServerUrl() {
+  }
+
+  @Override protected String getServerUrl() {
     return WebserviceOptions.WebServicesLink;
   }
 
@@ -37,6 +39,4 @@ public class RetrofitSpiceServiceUploader extends RetrofitJackson2SpiceService {
 
     return builder;
   }
-
-
 }

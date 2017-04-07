@@ -11,4 +11,6 @@ package pt.caixamagica.aptoide.uploader.webservices;
 public class WebserviceOptions {
 
   public final static String WebServicesLink = "http://upload.webservices.aptoide.com/webservices/";
+  public final static String BASE_HOST_SECONDARY = "https://ws75-secondary.aptoide.com/api/7/";
+
 }
