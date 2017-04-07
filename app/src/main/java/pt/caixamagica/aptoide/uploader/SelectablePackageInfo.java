@@ -13,6 +13,10 @@ import lombok.Setter;
 /**
  * Created by neuro on 05-02-2015.
  */
+
+/**
+ * This class contains content from the submitappfragment to be sent with the apk on upload
+ */
 @Getter @Setter public class SelectablePackageInfo extends PackageInfo {
 
   private final PackageInfo info;

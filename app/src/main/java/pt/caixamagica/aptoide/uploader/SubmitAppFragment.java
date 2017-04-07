@@ -96,8 +96,21 @@ public class SubmitAppFragment extends Fragment {
   private ArrayList<SelectablePackageInfo> selectablePackageInfos;
   private boolean dataLoaded;
 
+  private String proposedTitle;
+  private String proposedDescription;
+  private boolean fromAppView = false;
+
+  public static SubmitAppFragment newInstance() {
+    SubmitAppFragment submitAppFragment = new SubmitAppFragment();
+    return submitAppFragment;
+  }
+
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    if (!getArguments().isEmpty()) {
+      proposedTitle = getArguments().getString("title");
+      proposedDescription = getArguments().getString("description");
+    }
   }
 
   @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -130,13 +143,20 @@ public class SubmitAppFragment extends Fragment {
     applicationNameEditText = (EditText) view.findViewById(R.id.appName);
     ageRatingSpinner = (Spinner) view.findViewById(R.id.age_rating_spinner);
     appCategorySpinner = (Spinner) view.findViewById(R.id.app_category_spinner);
-    appDescriptionEditText = (EditText) view.findViewById(R.id.appName);
-    phoneNumberEditText = (EditText) view.findViewById(R.id.appName);
-    emailEditText = (EditText) view.findViewById(R.id.appName);
-    websiteEditText = (EditText) view.findViewById(R.id.appName);
+    appDescriptionEditText = (EditText) view.findViewById(R.id.app_description);
+    phoneNumberEditText = (EditText) view.findViewById(R.id.phone_number);
+    emailEditText = (EditText) view.findViewById(R.id.email);
+    websiteEditText = (EditText) view.findViewById(R.id.website);
 
-    if (applicationNameEditText.getText().toString().equals("")) {
+    if (applicationNameEditText.getText().toString().equals("") && selectablePackageInfos != null) {
       applicationNameEditText.setText(selectablePackageInfos.get(0).getLabel());
+    }
+
+    if (proposedTitle != null && !proposedTitle.isEmpty()) {
+      applicationNameEditText.setText(proposedTitle);
+    }
+    if (proposedDescription != null && !proposedDescription.isEmpty()) {
+      appDescriptionEditText.setText(proposedDescription);
     }
   }
 
@@ -196,6 +216,9 @@ public class SubmitAppFragment extends Fragment {
     selectablePackageInfos = getArguments().getParcelableArrayList("selectableAppNames");
     userCredentialsJson =
         (UserCredentialsJson) getArguments().getSerializable("userCredentialsJson");
+    proposedTitle = getArguments().getString("title");
+    proposedDescription = getArguments().getString("description");
+    fromAppView = getArguments().getBoolean("from_appview");
   }
 
   private void submitApp() throws ValidationException {
@@ -254,12 +277,12 @@ public class SubmitAppFragment extends Fragment {
   private void prepareInfo() {
     dataLoaded = false;
 
-    if (selectablePackageInfos.size() > 0) {
+    if (selectablePackageInfos != null && selectablePackageInfos.size() > 0) {
 
-      loadingCosmetics(true, "Checking repository");
-
-      getAppInfo(selectablePackageInfos.get(0));
-
+      if (!fromAppView) {
+        loadingCosmetics(true, "Checking repository");
+        getAppInfo(selectablePackageInfos.get(0));
+      }
       getActivity().setTitle(selectablePackageInfos.get(0).getLabel());
     }
   }

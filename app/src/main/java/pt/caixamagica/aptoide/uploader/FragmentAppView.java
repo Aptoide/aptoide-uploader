@@ -41,6 +41,8 @@ import android.widget.Toast;
 import com.google.android.vending.licensing.ValidationException;
 import com.manuelpeinado.multichoiceadapter.MultiChoiceAdapter;
 import com.octo.android.robospice.SpiceManager;
+import com.octo.android.robospice.persistence.exception.SpiceException;
+import com.octo.android.robospice.request.listener.RequestListener;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,8 +51,12 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import pt.caixamagica.aptoide.uploader.dialog.ConfirmationDialog;
+import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
+import pt.caixamagica.aptoide.uploader.retrofit.request.GetProposedRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
+import pt.caixamagica.aptoide.uploader.util.Utils;
+import pt.caixamagica.aptoide.uploader.webservices.json.GetProposedResponse;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
 /**
@@ -63,17 +69,13 @@ public class FragmentAppView extends Fragment {
   protected View rootView;
 
   protected UserCredentialsJson userCredentialsJson;
-
+  protected SpiceManager spiceManagerSecondary =
+      new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
   int checked = 0;
-
   GridView gridview;
-
   private RecyclerView mRecyclerView;
-
   private RecyclerView.Adapter mAdapter;
-
   private RecyclerView.LayoutManager mLayoutManager;
-
   private ManelAdapter adapter;
   private boolean mBound = false;
   private UploadService mService;
@@ -187,7 +189,7 @@ public class FragmentAppView extends Fragment {
     if (savedInstanceState != null) {
       checked = savedInstanceState.getInt("sortCheckable");
     }
-
+    spiceManagerSecondary.start(getContext());
     setHasOptionsMenu(true);
 
     userCredentialsJson = (UserCredentialsJson) getArguments().get("userCredentialsJson");
@@ -376,6 +378,11 @@ public class FragmentAppView extends Fragment {
     }
   }
 
+  @Override public void onDestroy() {
+    super.onDestroy();
+    spiceManagerSecondary.shouldStop();
+  }
+
   @Override public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
     super.onCreateOptionsMenu(menu, inflater);
 
@@ -412,14 +419,49 @@ public class FragmentAppView extends Fragment {
           selectablePackageInfos.add(adapter.getItem(aLong.intValue()));
         }
 
-        for (SelectablePackageInfo selectablePackageInfo : selectablePackageInfos) {
-          try {
-            mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);
-          } catch (ValidationException e) {
-            e.printStackTrace();
-          }
-        }
+        for (final SelectablePackageInfo selectablePackageInfo : selectablePackageInfos) {
+          GetProposedRequest getProposedRequest =
+              new GetProposedRequest(Utils.getLanguage(), selectablePackageInfo.packageName);
+          spiceManagerSecondary.execute(getProposedRequest,
+              new RequestListener<GetProposedResponse>() {
+                @Override public void onRequestFailure(SpiceException spiceException) {
+                  //TODO: what to do?
+                }
 
+                @Override public void onRequestSuccess(GetProposedResponse getProposedResponse) {
+                  //Show submitappfragment with form with content that came from getProposed
+                  String language = Utils.getLanguage();
+                  List<GetProposedResponse.Data> dataList = getProposedResponse.data;
+
+                  if (!dataList.isEmpty()) {
+                    //check if present language exists, if not, check default (en) in response
+                    //compare local language with languages received from webservice and send correct strings???
+                    Fragment fragment = SubmitAppFragment.newInstance();
+                    Bundle bundle = new Bundle();
+                    bundle.putSerializable("userCredentialsJson", userCredentialsJson);
+
+                    ArrayList<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>(1);
+                    selectablePackageInfos.add(selectablePackageInfo);
+                    bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
+                    bundle.putString("title", dataList.get(0).getTitle());
+                    bundle.putString("description", dataList.get(0).getDescription());
+                    bundle.putBoolean("from_appview", true);
+                    fragment.setArguments(bundle);
+                    getChildFragmentManager().beginTransaction()
+                        .addToBackStack(null)
+                        .replace(R.id.app_view_fragment, fragment)
+                        .commit();
+                  } else {
+                    //No proposed translations available call upload
+                    try {
+                      mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);
+                    } catch (ValidationException e) {
+                      e.printStackTrace();
+                    }
+                  }
+                }
+              });
+        }
         adapter.uncheckAll();
         Toast.makeText(getActivity(), "Sending app in the background", Toast.LENGTH_SHORT).show();
       }
@@ -539,24 +581,5 @@ public class FragmentAppView extends Fragment {
     PackageManager pm = getContext().getPackageManager();
     String appFile = packageInfo.applicationInfo.sourceDir;
     return new File(appFile).lastModified(); //Epoch Time
-  }
-
-  private void changeToSubmitAppFragment(UserCredentialsJson userCredentialsJson,
-      SelectablePackageInfo selectablePackageInfo) {
-    Fragment submitAppFragment = new SubmitAppFragment();
-    Bundle bundle = new Bundle();
-    bundle.putSerializable("userCredentialsJson", userCredentialsJson);
-
-    ArrayList<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>(1);
-    selectablePackageInfos.add(selectablePackageInfo);
-
-    bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
-    submitAppFragment.setArguments(bundle);
-    adapter.ffinishActionMode();
-
-    getFragmentManager().beginTransaction()
-        .addToBackStack(null)
-        .replace(R.id.container, submitAppFragment)
-        .commit();
   }
 }

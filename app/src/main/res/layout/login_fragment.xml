@@ -78,7 +78,7 @@
           android:id="@+id/fb_login_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_below="@+id/apagar"
+          android:layout_below="@+id/app_view_fragment"
           android:layout_margin="4dp"
           app:confirm_logout="false"
           app:fetch_user_info="true"
@@ -108,7 +108,7 @@
           />
 
       <RelativeLayout
-          android:id="@+id/apagar"
+          android:id="@+id/app_view_fragment"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_below="@id/loginButton"
