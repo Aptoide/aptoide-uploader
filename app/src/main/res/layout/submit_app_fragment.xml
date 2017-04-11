@@ -7,8 +7,6 @@
     android:orientation="vertical"
     >
 
-  <!--android:background="#EEEEEE"-->
-
   <RelativeLayout
       android:id="@+id/progressBar"
       android:layout_width="match_parent"
@@ -115,15 +113,6 @@
           android:layout_marginRight="@dimen/sideMargin"
           />
 
-      <!--<TextView-->
-      <!--android:layout_width="match_parent"-->
-      <!--android:layout_height="wrap_content"-->
-      <!--android:layout_marginTop="30dp"-->
-      <!--android:textSize="20dp"-->
-      <!--android:gravity="center"-->
-      <!--android:textColor="?attr/colorPrimary"-->
-      <!--android:text="Age Rating"/>-->
-
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
@@ -131,7 +120,6 @@
           style="@style/TextViewCustom"
           />
 
-      <!--style="@style/Spinneruploader_spinner_theme"-->
       <Spinner
           android:id="@+id/age_rating_spinner"
 
@@ -147,14 +135,6 @@
           >
       </Spinner>
 
-      <!--<TextView-->
-      <!--android:layout_width="match_parent"-->
-      <!--android:layout_height="wrap_content"-->
-      <!--android:layout_marginTop="30dp"-->
-      <!--android:textSize="20dp"-->
-      <!--android:gravity="center"-->
-      <!--android:textColor="?attr/colorPrimary"-->
-      <!--android:text="App Category"/>-->
 
       <TextView
           android:layout_width="wrap_content"
@@ -175,13 +155,6 @@
           >
       </Spinner>
 
-      <!--<TextView-->
-      <!--android:layout_width="match_parent"-->
-      <!--android:layout_height="wrap_content"-->
-      <!--android:layout_marginTop="30dp"-->
-      <!--android:textSize="20dp"-->
-      <!--android:gravity="center"-->
-      <!--android:text="App Description (Optional)"/>-->
 
       <LinearLayout
           android:layout_width="wrap_content"
@@ -193,15 +166,6 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="@string/app_description"
-            style="@style/TextViewCustom"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:text="@string/optional"
-            android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
             />
 

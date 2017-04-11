@@ -41,16 +41,22 @@
           />
       <!--android:text="Store"-->
     </LinearLayout>
-    <RelativeLayout
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="5dp"
         >
 
       <TextView
-          android:layout_width="wrap_content"
+          android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:layout_centerVertical="true"
-          android:layout_marginLeft="10dp"
+          android:layout_marginEnd="5dp"
+          android:layout_marginRight="5dp"
+          android:layout_weight="1"
+          android:ellipsize="start"
+          android:maxLines="2"
           android:text="@string/select_apps_to_upload_to_your_store"
           android:textColor="@android:color/darker_gray"
           />
@@ -58,10 +64,11 @@
       <FrameLayout
           android:layout_width="112dp"
           android:layout_height="wrap_content"
-          android:layout_alignParentRight="true"
           android:layout_marginBottom="3dp"
+          android:layout_marginEnd="6dp"
           android:layout_marginLeft="3dp"
           android:layout_marginRight="6dp"
+          android:layout_marginStart="3dp"
           android:layout_marginTop="3dp"
           android:background="@drawable/spinner_custom_background"
           android:padding="4dp"
@@ -71,14 +78,12 @@
             android:id="@+id/sort_spinner"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_marginLeft="3dp"
             >
-
         </Spinner>
 
       </FrameLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
     <android.support.v4.widget.SwipeRefreshLayout
         android:id="@+id/swipe"
