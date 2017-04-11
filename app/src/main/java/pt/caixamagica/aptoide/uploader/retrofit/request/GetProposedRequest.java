@@ -16,11 +16,13 @@ public class GetProposedRequest
 
   private String language_code;
   private String package_name;
+  private String filter;
 
-  public GetProposedRequest(String languageCode, String packageName) {
+  public GetProposedRequest(String languageCode, String packageName, String filter) {
     super(GetProposedResponse.class, GetProposedRequest.Webservice.class);
     language_code = languageCode;
     package_name = packageName;
+    this.filter = filter;
   }
 
   @Override public GetProposedResponse loadDataFromNetwork() throws Exception {
@@ -28,6 +30,7 @@ public class GetProposedRequest
 
     parameters.put("language_code", language_code);
     parameters.put("package_name", package_name);
+    parameters.put("filter", filter);
 
     return getService().getProposed(parameters);
   }

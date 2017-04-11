@@ -410,6 +410,8 @@ public class FragmentAppView extends Fragment {
   }
 
   private void setUploadButtonListener() {
+    final String filter =
+        "true"; //this value is used to cause getProposed not to send the same response twice.
     rootView.findViewById(R.id.submitAppsButton).setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
 
@@ -421,7 +423,8 @@ public class FragmentAppView extends Fragment {
 
         for (final SelectablePackageInfo selectablePackageInfo : selectablePackageInfos) {
           GetProposedRequest getProposedRequest =
-              new GetProposedRequest(Utils.getLanguage(), selectablePackageInfo.packageName);
+              new GetProposedRequest(Utils.getLanguage(), selectablePackageInfo.packageName,
+                  filter);
           spiceManagerSecondary.execute(getProposedRequest,
               new RequestListener<GetProposedResponse>() {
                 @Override public void onRequestFailure(SpiceException spiceException) {
