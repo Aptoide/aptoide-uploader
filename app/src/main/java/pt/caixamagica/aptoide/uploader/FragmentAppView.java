@@ -438,7 +438,6 @@ public class FragmentAppView extends Fragment {
 
                 @Override public void onRequestSuccess(GetProposedResponse getProposedResponse) {
                   //Show submitappfragment with form with content that came from getProposed
-                  String language = Utils.getLanguage();
                   List<GetProposedResponse.Data> dataList = getProposedResponse.data;
 
                   if (!dataList.isEmpty()) {
