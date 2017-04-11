@@ -213,6 +213,26 @@ public class UploadService extends Service {
         return false;
       }
 
+      private boolean setErrorFlag(Error error) {
+        String errorCode = error.getCode();
+
+        switch (errorCode) {
+          case "APK-5":
+            uploadAppToRepoRequest.setFLAG_APK(true);
+            break;
+          case "OBB-1":
+            uploadAppToRepoRequest.setFLAG_MAIN_OBB(true);
+            break;
+          case "OBB-2":
+            uploadAppToRepoRequest.setFLAG_PATCH_OBB(true);
+            break;
+          default:
+            return false;
+        }
+
+        return true;
+      }
+
       @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
         Log.v(TAG, "onRequestSuccess: ");
         if (uploadAppToRepoJson.getErrors() != null) {
@@ -265,25 +285,7 @@ public class UploadService extends Service {
         }
       }
 
-      private boolean setErrorFlag(Error error) {
-        String errorCode = error.getCode();
 
-        switch (errorCode) {
-          case "APK-5":
-            uploadAppToRepoRequest.setFLAG_APK(true);
-            break;
-          case "OBB-1":
-            uploadAppToRepoRequest.setFLAG_MAIN_OBB(true);
-            break;
-          case "OBB-2":
-            uploadAppToRepoRequest.setFLAG_PATCH_OBB(true);
-            break;
-          default:
-            return false;
-        }
-
-        return true;
-      }
     });
   }
 
@@ -304,9 +306,8 @@ public class UploadService extends Service {
         setOngoing(false).
         setAutoCancel(true).
         setStyle(new NotificationCompat.BigTextStyle().bigText(
-            "We need more info in order to upload your app, tap here in order to provide them.")).
-        setSubText(
-            "We need more info in order to upload your app, tap here in order to provide them.").
+            getString(R.string.upload_more_info))).
+        setSubText(getString(R.string.upload_more_info)).
         setContentText(label);
 
     NotificationManager mNotificationManager =

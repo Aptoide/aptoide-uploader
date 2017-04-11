@@ -99,4 +99,5 @@
   <string name="website">Website</string>
   <string name="signout">Sign Out</string>
   <string name="upload_failed">Upload failed. Please try again later.</string>
+  <string name="upload_more_info">We need more info in order to upload your app, tap here in order to provide it</string>
 </resources>
