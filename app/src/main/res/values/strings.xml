@@ -114,8 +114,8 @@
   <string name="quit_message">Are you sure you want to leave?</string>
   <string name="exit_confirmation">Really Quit</string>
   <string name="fill_empty_fields">Please fill empty fields!</string>
-  <string name="error_marg_100">MARG-100</string>
-  <string name="error_marg_101">MARG-101</string>
-  <string name="error_marg_102">MARG-102</string>
-  <string name="error_marg_103">MARG-103</string>
+  <string name="error_marg_100" translatable="false">MARG-100</string>
+  <string name="error_marg_101" translatable="false">MARG-101</string>
+  <string name="error_marg_102" translatable="false">MARG-102</string>
+  <string name="error_marg_103" translatable="false">MARG-103</string>
 </resources>
