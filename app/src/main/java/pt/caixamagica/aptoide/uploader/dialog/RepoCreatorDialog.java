@@ -101,7 +101,7 @@ public class RepoCreatorDialog extends DialogFragment {
 
               mCallback.submitAuthentication(userInfo);
             } else {
-              Toast.makeText(context, "Please fill empty fields!", Toast.LENGTH_SHORT).show();
+              Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT).show();
             }
 
             //                                if (repository.getText() != null) {
@@ -212,7 +212,7 @@ public class RepoCreatorDialog extends DialogFragment {
 
             dismiss();
           } else {
-            Toast.makeText(context, "Please fill empty fields!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT).show();
           }
         }
       });

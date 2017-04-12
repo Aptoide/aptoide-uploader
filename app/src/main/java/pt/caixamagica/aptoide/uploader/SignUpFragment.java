@@ -161,10 +161,10 @@ public class SignUpFragment extends Fragment {
             createAccount();
             UploaderUtils.hideKeyboard(getActivity(), getView());
           } else {
-            Toast.makeText(getActivity(), "Missing Fields", Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
           }
         } else {
-          Toast.makeText(getActivity(), "Missing Fields", Toast.LENGTH_SHORT).show();
+          Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
         }
       }
     });
@@ -199,7 +199,7 @@ public class SignUpFragment extends Fragment {
 
     spiceManager.execute(signUpRequest, new RequestListener<SignUpJson>() {
       @Override public void onRequestFailure(SpiceException spiceException) {
-        Toast.makeText(getActivity(), "Sorry, an error occurred", Toast.LENGTH_SHORT);
+        Toast.makeText(getActivity(), R.string.error_occurred, Toast.LENGTH_SHORT);
       }
 
       @Override public void onRequestSuccess(SignUpJson signUpJson) {

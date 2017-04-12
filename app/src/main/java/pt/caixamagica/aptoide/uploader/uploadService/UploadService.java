@@ -172,7 +172,9 @@ public class UploadService extends Service {
       }
 
       private boolean isDummyUploadError(List<Error> errors) {
-        return hasErrorCodes(errors, "MARG-100", "MARG-101", "MARG-102", "MARG-103");
+        return hasErrorCodes(errors, getString(R.string.error_marg_100),
+            getString(R.string.error_marg_101), getString(R.string.error_marg_102),
+            getString(R.string.error_marg_103));
       }      // Investigar powerlock
 
       private boolean systemError(List<Error> errors) {

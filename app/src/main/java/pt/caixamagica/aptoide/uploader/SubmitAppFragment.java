@@ -229,9 +229,9 @@ public class SubmitAppFragment extends Fragment {
 
       uploadApp();
 
-      Toast.makeText(getActivity(), "Sending app in the background", Toast.LENGTH_SHORT).show();
+      Toast.makeText(getActivity(), R.string.sending_background, Toast.LENGTH_SHORT).show();
     } else {
-      Toast.makeText(getActivity(), "Mandatory fields missing", Toast.LENGTH_LONG).show();
+      Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_LONG).show();
     }
   }
 

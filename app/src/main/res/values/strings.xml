@@ -100,4 +100,22 @@
   <string name="signout">Sign Out</string>
   <string name="upload_failed">Upload failed. Please try again later.</string>
   <string name="upload_more_info">We need more info in order to upload your app, tap here in order to provide it</string>
+  <string name="ok">OK</string>
+  <string name="sending_background">Sending app in the background</string>
+  <string name="sorting_by_date">Sorting by Date</string>
+  <string name="sorting">Sorting…</string>
+  <string name="sorting_by_name">Sorting by Name</string>
+  <string name="missing_username_password">Please fill username and password</string>
+  <string name="error_occurred">Sorry, an error occurred</string>
+  <string name="missing_fields">Missing mandatory fields</string>
+  <string name="no_store_error">The account doesn\'t have a store associated, please create one.</string>
+  <string name="yes">Yes</string>
+  <string name="no">No</string>
+  <string name="quit_message">Are you sure you want to leave?</string>
+  <string name="exit_confirmation">Really Quit</string>
+  <string name="fill_empty_fields">Please fill empty fields!</string>
+  <string name="error_marg_100">MARG-100</string>
+  <string name="error_marg_101">MARG-101</string>
+  <string name="error_marg_102">MARG-102</string>
+  <string name="error_marg_103">MARG-103</string>
 </resources>

@@ -263,7 +263,7 @@ public class LoginFragment extends Fragment {
 
           UploaderUtils.hideKeyboard(getActivity(), getView());
         } else {
-          Toast.makeText(getActivity(), "Please fill username and password", Toast.LENGTH_SHORT)
+          Toast.makeText(getActivity(), R.string.missing_username_password, Toast.LENGTH_SHORT)
               .show();
         }
       }

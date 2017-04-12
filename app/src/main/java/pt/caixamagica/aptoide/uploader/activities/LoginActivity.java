@@ -571,8 +571,7 @@ public class LoginActivity extends AppCompatActivity
 
       if (userCredentialsJson.getRepo() == null) {
         RepoCreatorDialog.showRepoCreatorDialog(LoginActivity.this, userInfo);
-        Toast.makeText(LoginActivity.this,
-            "The account doesn't have a store associated, please create one.", Toast.LENGTH_LONG)
+        Toast.makeText(LoginActivity.this, R.string.no_store_error, Toast.LENGTH_LONG)
             .show();
         UploaderUtils.popLoadingFragment(LoginActivity.this);
         return;

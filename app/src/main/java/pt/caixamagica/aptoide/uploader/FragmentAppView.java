@@ -100,7 +100,7 @@ public class FragmentAppView extends Fragment {
     return new MenuItem.OnMenuItemClickListener() {
       @Override public boolean onMenuItemClick(final MenuItem item) {
 
-        Toast.makeText(getActivity(), "Sorting...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.sorting, Toast.LENGTH_SHORT).show();
 
         new Thread(new Runnable() {
           @Override public void run() {
@@ -131,7 +131,7 @@ public class FragmentAppView extends Fragment {
   }
 
   private void sortByFirstInstall() {
-    Toast.makeText(getActivity(), "Sorting by Date", Toast.LENGTH_SHORT).show();
+    Toast.makeText(getActivity(), R.string.sorting_by_date, Toast.LENGTH_SHORT).show();
 
     new Thread(new Runnable() {
       @Override public void run() {
@@ -149,7 +149,7 @@ public class FragmentAppView extends Fragment {
     return new MenuItem.OnMenuItemClickListener() {
       @Override public boolean onMenuItemClick(final MenuItem item) {
 
-        Toast.makeText(getActivity(), "Sorting...", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.sorting, Toast.LENGTH_SHORT).show();
 
         new Thread(new Runnable() {
           @Override public void run() {
@@ -251,7 +251,7 @@ public class FragmentAppView extends Fragment {
               + "Version Code : "
               + versionCode);
 
-          builder.setPositiveButton("OK", new DialogInterface.OnClickListener() {
+          builder.setPositiveButton(R.string.ok, new DialogInterface.OnClickListener() {
             public void onClick(DialogInterface dialog, int id) {
               System.out.println("Pressed OK in the error of the app version");
             }
@@ -470,7 +470,7 @@ public class FragmentAppView extends Fragment {
               });
         }
         adapter.uncheckAll();
-        Toast.makeText(getActivity(), "Sending app in the background", Toast.LENGTH_SHORT).show();
+        Toast.makeText(getActivity(), R.string.sending_background, Toast.LENGTH_SHORT).show();
       }
     });
   }
@@ -498,7 +498,7 @@ public class FragmentAppView extends Fragment {
   }
 
   private void sortByLastInstall() {
-    Toast.makeText(getActivity(), "Sorting by Date", Toast.LENGTH_SHORT).show();
+    Toast.makeText(getActivity(), R.string.sorting_by_date, Toast.LENGTH_SHORT).show();
 
     new Thread(new Runnable() {
       @Override public void run() {
@@ -513,7 +513,7 @@ public class FragmentAppView extends Fragment {
   }
 
   private void sortByName() {
-    Toast.makeText(getActivity(), "Sorting by Name", Toast.LENGTH_SHORT).show();
+    Toast.makeText(getActivity(), R.string.sorting_by_name, Toast.LENGTH_SHORT).show();
 
     new Thread(new Runnable() {
       @Override public void run() {
