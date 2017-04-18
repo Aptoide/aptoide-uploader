@@ -323,6 +323,7 @@ public class UploadService extends Service {
     if (b != null) mBuilder.setLargeIcon(b);
     b = null;
     mBuilder.setSmallIcon(R.drawable.notification_icon)
+        .setContentTitle(getString(R.string.app_name))
         .setOngoing(false)
         .setSubText("App successfully uploaded")
         .setContentText(label);
@@ -341,6 +342,7 @@ public class UploadService extends Service {
     }
     icon = null;
     notificationBuilder.setSmallIcon(R.drawable.notification_icon)
+        .setContentTitle(getString(R.string.app_name))
         .setOngoing(false)
         .setSubText(message)
         .setContentText(label);
