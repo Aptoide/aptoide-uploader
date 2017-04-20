@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:hint="Email"
+        android:hint="@string/e_mail"
         android:inputType="textEmailAddress"
         />
 
@@ -29,7 +29,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:hint="Password"
+        android:hint="@string/passHint"
         android:inputType="textPassword"
         />
 
@@ -40,7 +40,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:hint="Store"
+        android:hint="@string/store"
         android:maxLength="63"
         />
 
@@ -51,7 +51,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
-        android:hint="Store Username"
+        android:hint="@string/store_username"
         android:visibility="gone"
         />
 
@@ -62,7 +62,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:hint="Store Password"
+        android:hint="@string/store_password"
         android:visibility="gone"
         />
 

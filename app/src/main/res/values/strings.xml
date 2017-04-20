@@ -75,6 +75,30 @@
   <string name="app_category_39">Libraries &amp; Demo</string>
   <string name="app_category_40">Transport</string>
 
+
+  <string name="language" translatable="false">Language</string>
+  <string name="language_1" translatable="false">العربية</string>
+  <string name="language_2" translatable="false">বাংলা</string>
+  <string name="language_3" translatable="false">ဗမာစာ</string>
+  <string name="language_4" translatable="false">Deutsch</string>
+  <string name="language_5">English</string>
+  <string name="language_6">Español</string>
+  <string name="language_7">فارسی</string>
+  <string name="language_8">Filipino</string>
+  <string name="language_9">Français</string>
+  <string name="language_10">हिंदी</string>
+  <string name="language_11">Bahasa Indonesia</string>
+  <string name="language_12">Italiano</string>
+  <string name="language_13">Bahasa Melayu</string>
+  <string name="language_14">Português</string>
+  <string name="language_15">Português (Brasil)</string>
+  <string name="language_16">Русский</string>
+  <string name="language_17">ภาษาไทย</string>
+  <string name="language_18">Türk</string>
+  <string name="language_19">Tiếng Việt</string>
+  <string name="language_20">中文</string>
+
+
   <string name="sort_spinner_values_1">By Date</string>
   <string name="sort_spinner_values_2">By Name</string>
   <string name="select_apps_to_upload_to_your_store">Select apps to upload to your store</string>
@@ -118,4 +142,5 @@
   <string name="error_marg_101" translatable="false">MARG-101</string>
   <string name="error_marg_102" translatable="false">MARG-102</string>
   <string name="error_marg_103" translatable="false">MARG-103</string>
+  <string name="logging_as">Logging in as</string>
 </resources>

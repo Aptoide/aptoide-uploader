@@ -332,7 +332,7 @@ public class LoginActivity extends AppCompatActivity
         new OAuthPendingRequestListener());
 
     UploaderUtils.pushLoadingFragment(this, R.id.container,
-        "Logging in as " + userInfo.getUsername());
+        getString(R.string.logging_as) + userInfo.getUsername());
   }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
