@@ -76,27 +76,27 @@
   <string name="app_category_40">Transport</string>
 
 
-  <string name="language" translatable="false">Language</string>
+  <string name="language">Language</string>
   <string name="language_1" translatable="false">العربية</string>
   <string name="language_2" translatable="false">বাংলা</string>
   <string name="language_3" translatable="false">ဗမာစာ</string>
   <string name="language_4" translatable="false">Deutsch</string>
-  <string name="language_5">English</string>
-  <string name="language_6">Español</string>
-  <string name="language_7">فارسی</string>
-  <string name="language_8">Filipino</string>
-  <string name="language_9">Français</string>
-  <string name="language_10">हिंदी</string>
-  <string name="language_11">Bahasa Indonesia</string>
-  <string name="language_12">Italiano</string>
-  <string name="language_13">Bahasa Melayu</string>
-  <string name="language_14">Português</string>
-  <string name="language_15">Português (Brasil)</string>
-  <string name="language_16">Русский</string>
-  <string name="language_17">ภาษาไทย</string>
-  <string name="language_18">Türk</string>
-  <string name="language_19">Tiếng Việt</string>
-  <string name="language_20">中文</string>
+  <string name="language_5" translatable="false">English</string>
+  <string name="language_6" translatable="false">Español</string>
+  <string name="language_7" translatable="false">فارسی</string>
+  <string name="language_8" translatable="false">Filipino</string>
+  <string name="language_9" translatable="false">Français</string>
+  <string name="language_10" translatable="false">हिंदी</string>
+  <string name="language_11" translatable="false">Bahasa Indonesia</string>
+  <string name="language_12" translatable="false">Italiano</string>
+  <string name="language_13" translatable="false">Bahasa Melayu</string>
+  <string name="language_14" translatable="false">Português</string>
+  <string name="language_15" translatable="false">Português (Brasil)</string>
+  <string name="language_16" translatable="false">Русский</string>
+  <string name="language_17" translatable="false">ภาษาไทย</string>
+  <string name="language_18" translatable="false">Türk</string>
+  <string name="language_19" translatable="false">Tiếng Việt</string>
+  <string name="language_20" translatable="false">中文</string>
 
 
   <string name="sort_spinner_values_1">By Date</string>
