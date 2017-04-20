@@ -42,6 +42,9 @@ import lombok.Setter;
 
   private String website;
 
+  private String inputTitle;
+      //For proposed translations only - when a title comes from getProposed webservice
+
   public SelectablePackageInfo(PackageInfo info, PackageManager pm) {
     super();
     this.pm = pm;

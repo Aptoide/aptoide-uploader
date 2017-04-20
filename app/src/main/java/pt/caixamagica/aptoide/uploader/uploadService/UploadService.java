@@ -51,6 +51,7 @@ public class UploadService extends Service {
 
   private static final String TAG = UploadService.class.getSimpleName();
   private final MyBinder myBinder = new MyBinder(this);
+  public String inputTitle = null;
 
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploadService.class);
 
@@ -145,6 +146,9 @@ public class UploadService extends Service {
     uploadAppToRepoRequest.setCategory(packageInfo.getCategory());
     uploadAppToRepoRequest.setRating(packageInfo.getAgeRating());
 
+    if (inputTitle != null) {
+      uploadAppToRepoRequest.setInputTitle(inputTitle);
+    }
     uploadApp(uploadAppToRepoRequest, packageInfo);
   }
 

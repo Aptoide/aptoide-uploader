@@ -89,6 +89,8 @@ import retrofit.mime.TypedFile;
 
   private String obbPatchMd5sum;
 
+  private String inputTitle = null;
+
   /**
    * Label cachada por questões de performance.
    */
@@ -149,6 +151,7 @@ import retrofit.mime.TypedFile;
       parameters.put("obb_main_filename", fileName(obbMainPath));
       parameters.put("obb_patch_filename", fileName(obbPatchPath));
       parameters.put("mode", "json");
+      parameters.put("inputTitle", inputTitle);
 
       if (FLAG_APK) {
         parameters.put("apk", newTweakedTypedFile("apk", apkPath));

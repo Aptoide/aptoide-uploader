@@ -255,6 +255,9 @@ public class SubmitAppFragment extends Fragment {
 
   private void uploadApp() throws ValidationException {
 
+    if (proposedTitle != null) { //In case this fragment is filled with content from getProposed
+      mService.inputTitle = proposedTitle;
+    }
     mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfos.get(0));
 
     nextApp();
