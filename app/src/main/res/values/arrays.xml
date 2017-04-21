@@ -57,13 +57,11 @@
   </string-array>
 
   <string-array name="language_array">
-    <item>@string/language_1</item>
     <item>@string/language_2</item>
     <item>@string/language_3</item>
     <item>@string/language_4</item>
     <item>@string/language_5</item>
     <item>@string/language_6</item>
-    <item>@string/language_7</item>
     <item>@string/language_8</item>
     <item>@string/language_9</item>
     <item>@string/language_10</item>
@@ -77,6 +75,9 @@
     <item>@string/language_18</item>
     <item>@string/language_19</item>
     <item>@string/language_20</item>
+    <item>@string/language_1</item>
+    //These two are in the end because they are rtl languages
+    <item>@string/language_7</item>
   </string-array>
 
 </resources>

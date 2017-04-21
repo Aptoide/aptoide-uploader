@@ -44,6 +44,7 @@ import lombok.Setter;
 
   private String inputTitle;
       //For proposed translations only - when a title comes from getProposed webservice
+      private String lang;
 
   public SelectablePackageInfo(PackageInfo info, PackageManager pm) {
     super();

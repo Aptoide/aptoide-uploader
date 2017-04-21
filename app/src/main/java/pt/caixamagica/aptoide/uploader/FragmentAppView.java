@@ -452,6 +452,7 @@ public class FragmentAppView extends Fragment {
                     bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
                     bundle.putString("title", dataList.get(0).getTitle());
                     bundle.putString("description", dataList.get(0).getDescription());
+                    bundle.putString("languageCode", dataList.get(0).getLanguage());
                     bundle.putBoolean("from_appview", true);
                     fragment.setArguments(bundle);
                     getChildFragmentManager().beginTransaction()

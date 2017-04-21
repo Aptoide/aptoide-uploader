@@ -95,6 +95,7 @@ import retrofit.mime.TypedFile;
    * Label cachada por questões de performance.
    */
   private String label;
+  private String lang;
 
   private boolean checked = false;
   private StoreTokenInterface storeTokenInterface;
@@ -152,6 +153,7 @@ import retrofit.mime.TypedFile;
       parameters.put("obb_patch_filename", fileName(obbPatchPath));
       parameters.put("mode", "json");
       parameters.put("inputTitle", inputTitle);
+      parameters.put("lang", lang);
 
       if (FLAG_APK) {
         parameters.put("apk", newTweakedTypedFile("apk", apkPath));

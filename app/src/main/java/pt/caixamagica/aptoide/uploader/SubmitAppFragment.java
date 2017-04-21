@@ -38,6 +38,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.request.GetApkInfoRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.ListCategoriesRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
+import pt.caixamagica.aptoide.uploader.util.LanguageCodesHelper;
 import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetApkInfoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
@@ -82,7 +83,7 @@ public class SubmitAppFragment extends Fragment {
   private Spinner ageRatingSpinner;
 
   private Spinner appCategorySpinner;
-
+  private Spinner appLanguageSpinner;
   private EditText appDescriptionEditText;
 
   private EditText phoneNumberEditText;
@@ -99,6 +100,8 @@ public class SubmitAppFragment extends Fragment {
   private String proposedTitle;
   private String proposedDescription;
   private boolean fromAppView = false;
+  private String languageCode;
+  private String language;
 
   public static SubmitAppFragment newInstance() {
     SubmitAppFragment submitAppFragment = new SubmitAppFragment();
@@ -143,6 +146,7 @@ public class SubmitAppFragment extends Fragment {
     applicationNameEditText = (EditText) view.findViewById(R.id.appName);
     ageRatingSpinner = (Spinner) view.findViewById(R.id.age_rating_spinner);
     appCategorySpinner = (Spinner) view.findViewById(R.id.app_category_spinner);
+    appLanguageSpinner = (Spinner) view.findViewById(R.id.app_language);
     appDescriptionEditText = (EditText) view.findViewById(R.id.app_description);
     phoneNumberEditText = (EditText) view.findViewById(R.id.phone_number);
     emailEditText = (EditText) view.findViewById(R.id.email);
@@ -157,6 +161,13 @@ public class SubmitAppFragment extends Fragment {
     }
     if (proposedDescription != null && !proposedDescription.isEmpty()) {
       appDescriptionEditText.setText(proposedDescription);
+    }
+    if (languageCode != null && !languageCode.isEmpty()) {
+      language = LanguageCodesHelper.translateToLanguageName(languageCode);
+      int languagePosition = findLanguageInArray(language);
+      if (languagePosition != -1) {
+        appLanguageSpinner.setSelection(languagePosition);
+      }
     }
   }
 
@@ -185,6 +196,20 @@ public class SubmitAppFragment extends Fragment {
       getActivity().unbindService(mConnection);
       mBound = false;
     }
+  }
+
+  private int findLanguageInArray(String language) {
+    int i = -1;
+    int index = 0;
+    String[] languages = getResources().getStringArray(R.array.language_array);
+    for (String s : languages) {
+      if (s.equals(language)) {
+        i = index;
+        break;
+      }
+      index++;
+    }
+    return i;
   }
 
   private void loadingCosmetics(boolean state) {
@@ -218,6 +243,7 @@ public class SubmitAppFragment extends Fragment {
         (UserCredentialsJson) getArguments().getSerializable("userCredentialsJson");
     proposedTitle = getArguments().getString("title");
     proposedDescription = getArguments().getString("description");
+    languageCode = getArguments().getString("languageCode");
     fromAppView = getArguments().getBoolean("from_appview");
   }
 
@@ -242,6 +268,8 @@ public class SubmitAppFragment extends Fragment {
     selectablePackageInfo.setCategory(getCategory());
     selectablePackageInfo.setAgeRating(getAgeRating());
     selectablePackageInfo.setDescription(getDescription());
+    String languageCode = LanguageCodesHelper.translateToLanguageCode(getLanguage());
+    selectablePackageInfo.setLang(languageCode);
   }
 
   private void nextApp() {
@@ -273,6 +301,7 @@ public class SubmitAppFragment extends Fragment {
     validation &= !applicationNameEditText.getText().toString().equals("");
     validation &= appCategorySpinner.getSelectedItemPosition() != 0;
     validation &= !appDescriptionEditText.getText().toString().equals("");
+    validation &= appLanguageSpinner.getSelectedItemPosition() != 0;
 
     return validation;
   }
@@ -312,6 +341,7 @@ public class SubmitAppFragment extends Fragment {
 
   private void prepareSpinners() {
     prepareSpinner(R.id.age_rating_spinner, R.array.age_rating_array);
+    prepareSpinner(R.id.app_language, R.array.language_array);
     retrieveCategorySpinnerArray();
   }
 
@@ -490,6 +520,12 @@ public class SubmitAppFragment extends Fragment {
 
   private String getDescription() {
     return ((EditText) rootView.findViewById(R.id.app_description)).getText().toString();
+  }
+
+  private String getLanguage() {
+    String selectedItem =
+        (String) ((Spinner) rootView.findViewById(R.id.app_language)).getSelectedItem();
+    return selectedItem;
   }
 
   private int idFromCategoryName(String name) {
