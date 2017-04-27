@@ -50,6 +50,7 @@ import java.util.Comparator;
 import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
+import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
 import pt.caixamagica.aptoide.uploader.dialog.ConfirmationDialog;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetProposedRequest;
@@ -95,6 +96,7 @@ public class FragmentAppView extends Fragment {
       mBound = false;
     }
   };
+  private int SUBMIT_APP_RESULT_CODE = 1111;
 
   private MenuItem.OnMenuItemClickListener sortByFirstInstallListener() {
     return new MenuItem.OnMenuItemClickListener() {
@@ -443,7 +445,7 @@ public class FragmentAppView extends Fragment {
                   if (!dataList.isEmpty()) {
                     //check if present language exists, if not, check default (en) in response
                     //compare local language with languages received from webservice and send correct strings???
-                    Fragment fragment = SubmitAppFragment.newInstance();
+                    /*Fragment fragment = SubmitAppFragment.newInstance();
                     Bundle bundle = new Bundle();
                     bundle.putSerializable("userCredentialsJson", userCredentialsJson);
 
@@ -458,7 +460,17 @@ public class FragmentAppView extends Fragment {
                     getChildFragmentManager().beginTransaction()
                         .addToBackStack(null)
                         .replace(R.id.app_view_fragment, fragment)
-                        .commit();
+                        .commit();*/
+                    Intent intent =
+                        new Intent(getContext().getApplicationContext(), SubmitActivity.class);
+                    intent.putExtra("userCredentialsJson", userCredentialsJson);
+                    intent.putExtra("selectablePackageInfo", selectablePackageInfo);
+                    intent.putExtra("title", dataList.get(0).getTitle());
+                    intent.putExtra("description", dataList.get(0).getDescription());
+                    intent.putExtra("languageCode", dataList.get(0).getLanguage());
+                    intent.putExtra("fromAppview", true);
+
+                    startActivityForResult(intent, SUBMIT_APP_RESULT_CODE);
                   } else {
                     //No proposed translations available call upload
                     try {
