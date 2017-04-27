@@ -152,7 +152,9 @@ public class SubmitAppFragment extends Fragment {
     emailEditText = (EditText) view.findViewById(R.id.email);
     websiteEditText = (EditText) view.findViewById(R.id.website);
 
-    if (applicationNameEditText.getText().toString().equals("") && selectablePackageInfos != null) {
+    if (applicationNameEditText.getText().toString().equals("")
+        && selectablePackageInfos != null
+        && proposedTitle.isEmpty()) {
       applicationNameEditText.setText(selectablePackageInfos.get(0).getLabel());
     }
 
@@ -244,7 +246,7 @@ public class SubmitAppFragment extends Fragment {
     proposedTitle = getArguments().getString("title");
     proposedDescription = getArguments().getString("description");
     languageCode = getArguments().getString("languageCode");
-    fromAppView = getArguments().getBoolean("from_appview");
+    fromAppView = getArguments().getBoolean("fromAppview");
   }
 
   private void submitApp() throws ValidationException {
@@ -284,7 +286,9 @@ public class SubmitAppFragment extends Fragment {
   private void uploadApp() throws ValidationException {
 
     if (proposedTitle != null) { //In case this fragment is filled with content from getProposed
-      mService.inputTitle = proposedTitle;
+      mService.inputTitle = applicationNameEditText.getText().toString();
+    } else {
+      mService.inputTitle = null;
     }
     mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfos.get(0));
 
@@ -315,7 +319,7 @@ public class SubmitAppFragment extends Fragment {
         loadingCosmetics(true, "Checking repository");
         getAppInfo(selectablePackageInfos.get(0));
       }
-      getActivity().setTitle(selectablePackageInfos.get(0).getLabel());
+      getActivity().setTitle(getString(R.string.submit_app));
     }
   }
 

@@ -148,7 +148,9 @@ public class UploadService extends Service {
     uploadAppToRepoRequest.setRating(packageInfo.getAgeRating());
 
     if (inputTitle != null) {
+      //These only apply when coming from a successfull getProposed request
       uploadAppToRepoRequest.setInputTitle(inputTitle);
+      uploadAppToRepoRequest.setApkName(inputTitle);
     }
     uploadAppToRepoRequest.setLang(packageInfo.getLang());
     uploadApp(uploadAppToRepoRequest, packageInfo);
