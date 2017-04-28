@@ -151,6 +151,8 @@ public class UploadService extends Service {
       //These only apply when coming from a successfull getProposed request
       uploadAppToRepoRequest.setInputTitle(inputTitle);
       uploadAppToRepoRequest.setApkName(inputTitle);
+    } else {
+      uploadAppToRepoRequest.setInputTitle(packageInfo.getName());
     }
     uploadAppToRepoRequest.setLang(packageInfo.getLang());
     uploadApp(uploadAppToRepoRequest, packageInfo);
