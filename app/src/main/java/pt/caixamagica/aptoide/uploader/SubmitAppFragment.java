@@ -153,8 +153,7 @@ public class SubmitAppFragment extends Fragment {
     websiteEditText = (EditText) view.findViewById(R.id.website);
 
     if (applicationNameEditText.getText().toString().equals("")
-        && selectablePackageInfos != null
-        && proposedTitle.isEmpty()) {
+        && selectablePackageInfos != null && proposedTitle == null) {
       applicationNameEditText.setText(selectablePackageInfos.get(0).getLabel());
     }
 
