@@ -154,6 +154,7 @@ public class UploadService extends Service {
     }
     uploadAppToRepoRequest.setLang(packageInfo.getLang());
     uploadApp(uploadAppToRepoRequest, packageInfo);
+    inputTitle = null;
   }
 
   private void uploadApp(final UploadAppToRepoRequest uploadAppToRepoRequest,
