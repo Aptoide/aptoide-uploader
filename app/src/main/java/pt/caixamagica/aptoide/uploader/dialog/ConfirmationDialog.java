@@ -31,10 +31,10 @@ public class ConfirmationDialog extends DialogFragment {
 
     AlertDialog alertDialog =
         new AlertDialog.Builder(getActivity()).setIcon(R.drawable.ic_dialog_alert_holo_light)
-            .setTitle("Are you sure you wanna leave?")
-            .setMessage("Really Quit")
-            .setPositiveButton("Yes", callback)
-            .setNegativeButton("No", null)
+            .setTitle(R.string.quit_message)
+            .setMessage(R.string.exit_confirmation)
+            .setPositiveButton(R.string.yes, callback)
+            .setNegativeButton(R.string.no, null)
             .show();
 
     int textViewId =

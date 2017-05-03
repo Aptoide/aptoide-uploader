@@ -37,12 +37,18 @@ public class SubmitActivity extends ActionBarActivity {
     SelectablePackageInfo selectablePackageInfo =
         new SelectablePackageInfo(((PackageInfo) extras.getParcelable("selectablePackageInfo")),
             getPackageManager());
+    String title = extras.getString("title");
+    String description = extras.getString("description");
+    String languageCode = extras.getString("languageCode");
+    boolean fromAppView = extras.getBoolean("fromAppview");
 
-    switchtoSubmitAppFragment(userCredentialsJson, selectablePackageInfo);
+    switchtoSubmitAppFragment(userCredentialsJson, selectablePackageInfo, title, description,
+        languageCode);
   }
 
   private void switchtoSubmitAppFragment(UserCredentialsJson userCredentialsJson,
-      SelectablePackageInfo selectablePackageInfo) {
+      SelectablePackageInfo selectablePackageInfo, String title, String description,
+      String languageCode) {
     Fragment submitAppFragment = new SubmitAppFragment();
     Bundle bundle = new Bundle();
     bundle.putSerializable("userCredentialsJson", userCredentialsJson);
@@ -51,6 +57,10 @@ public class SubmitActivity extends ActionBarActivity {
     selectablePackageInfos.add(selectablePackageInfo);
 
     bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
+    bundle.putString("title", title);
+    bundle.putString("description", description);
+    bundle.putString("languageCode", languageCode);
+    bundle.putBoolean("fromAppview", true);
     submitAppFragment.setArguments(bundle);
 
     getSupportFragmentManager().beginTransaction()

@@ -29,6 +29,22 @@ import pt.caixamagica.aptoide.uploader.util.LoadingFragment;
  */
 public class UploaderUtils {
 
+  public static String computeSHA1sum(String text) {
+    try {
+      MessageDigest md = MessageDigest.getInstance("SHA-1");
+      byte[] sha1hash = new byte[40];
+      md.update(text.getBytes("iso-8859-1"), 0, text.length());
+      sha1hash = md.digest();
+      return convToHex(sha1hash);
+    } catch (NoSuchAlgorithmException e) {
+      e.printStackTrace();
+    } catch (UnsupportedEncodingException e) {
+      e.printStackTrace();
+    }
+
+    return null;
+  }
+
   private static String convToHex(byte[] data) {
     StringBuilder buf = new StringBuilder();
     for (int i = 0; i < data.length; i++) {
@@ -44,22 +60,6 @@ public class UploaderUtils {
       } while (two_halfs++ < 1);
     }
     return buf.toString();
-  }
-
-  public static String computeSHA1sum(String text) {
-    try {
-      MessageDigest md = MessageDigest.getInstance("SHA-1");
-      byte[] sha1hash = new byte[40];
-      md.update(text.getBytes("iso-8859-1"), 0, text.length());
-      sha1hash = md.digest();
-      return convToHex(sha1hash);
-    } catch (NoSuchAlgorithmException e) {
-      e.printStackTrace();
-    } catch (UnsupportedEncodingException e) {
-      e.printStackTrace();
-    }
-
-    return null;
   }
 
   public static String md5Calc(File f) {

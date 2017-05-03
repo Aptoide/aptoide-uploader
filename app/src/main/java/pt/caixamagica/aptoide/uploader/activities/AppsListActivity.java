@@ -56,6 +56,16 @@ public class AppsListActivity extends ActionBarActivity
     switchToLoginFragment();
   }
 
+  public void removeUserCredentials() {
+    SharedPreferences preferences = getSharedPreferences(LoginFragment.SHARED_PREFERENCES_FILE, 0);
+    preferences.edit()
+        .remove("token")
+        .remove("refreshToken")
+        .remove("repo")
+        .remove("username")
+        .commit();
+  }
+
   private void clearSessionInformation() {
     //Stop the activity
     AptoideUploaderApplication.setForcedLogout(true);
@@ -69,16 +79,6 @@ public class AppsListActivity extends ActionBarActivity
       Session.getActiveSession().close();
     }
     Session.setActiveSession(null);
-  }
-
-  public void removeUserCredentials() {
-    SharedPreferences preferences = getSharedPreferences(LoginFragment.SHARED_PREFERENCES_FILE, 0);
-    preferences.edit()
-        .remove("token")
-        .remove("refreshToken")
-        .remove("repo")
-        .remove("username")
-        .commit();
   }
 
   public void switchToLoginFragment() {

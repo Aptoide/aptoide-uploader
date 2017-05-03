@@ -78,7 +78,7 @@
           android:id="@+id/fb_login_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_below="@+id/apagar"
+          android:layout_below="@+id/app_view_fragment"
           android:layout_margin="4dp"
           app:confirm_logout="false"
           app:fetch_user_info="true"
@@ -103,12 +103,12 @@
           android:clickable="true"
           android:gravity="center"
           android:padding="10dp"
-          android:text="New to Aptoide? Create a free account"
+          android:text="@string/new_to_aptoide_create_a_free_account"
           android:textColor="@android:color/white"
           />
 
       <RelativeLayout
-          android:id="@+id/apagar"
+          android:id="@+id/app_view_fragment"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
           android:layout_below="@id/loginButton"
@@ -133,7 +133,7 @@
             android:layout_centerInParent="true"
             android:paddingLeft="10dp"
             android:paddingRight="10dp"
-            android:text="OR"
+            android:text="@string/or"
             />
 
         <View
@@ -178,7 +178,7 @@
         android:layout_centerHorizontal="true"
         android:gravity="center_horizontal"
         android:padding="25dp"
-        android:text="Signing in..."
+        android:text="@string/signing_in"
         android:textAlignment="center"
         />
 

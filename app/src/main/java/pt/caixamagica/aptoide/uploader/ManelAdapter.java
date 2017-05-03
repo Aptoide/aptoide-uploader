@@ -35,12 +35,9 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
  */
 public class ManelAdapter extends MultiChoiceBaseAdapter {
 
-  public final List<SelectablePackageInfo> mDataset;
-
   private final FragmentActivity context;
-
   private final Fragment baseFragment;
-
+  public List<SelectablePackageInfo> mDataset;
   Comparator comparator = new Comparator<PriorityRunnable>() {
     @Override public int compare(PriorityRunnable lhs, PriorityRunnable rhs) {
       return (int) (lhs.priority - rhs.priority);

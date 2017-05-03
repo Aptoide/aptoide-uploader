@@ -85,17 +85,6 @@ public class PaymentServices implements Parcelable {
     return 0;
   }
 
-  public void writeToParcel(Parcel out, int flags) {
-    out.writeInt(id);
-    out.writeString(short_name);
-    out.writeString(name);
-    out.writeList(types);
-    out.writeDouble(price);
-    out.writeString(currency);
-    out.writeDouble(taxRate);
-    out.writeString(sign);
-  }
-
   public static class PaymentType implements Parcelable {
 
     public static final Creator<PaymentType> CREATOR = new Creator<PaymentType>() {
@@ -135,5 +124,16 @@ public class PaymentServices implements Parcelable {
     @Override public int describeContents() {
       return 0;
     }
+  }
+
+  public void writeToParcel(Parcel out, int flags) {
+    out.writeInt(id);
+    out.writeString(short_name);
+    out.writeString(name);
+    out.writeList(types);
+    out.writeDouble(price);
+    out.writeString(currency);
+    out.writeDouble(taxRate);
+    out.writeString(sign);
   }
 }

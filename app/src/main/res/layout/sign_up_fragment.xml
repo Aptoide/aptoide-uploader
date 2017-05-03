@@ -18,7 +18,7 @@
         android:layout_height="wrap_content"
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
-        android:hint="Email"
+        android:hint="@string/e_mail"
         android:inputType="textEmailAddress"
         />
 
@@ -29,7 +29,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:hint="Password"
+        android:hint="@string/passHint"
         android:inputType="textPassword"
         />
 
@@ -40,7 +40,8 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:hint="Store"
+        android:hint="@string/store"
+        android:maxLength="63"
         />
 
     <EditText
@@ -50,7 +51,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="20dp"
-        android:hint="Store Username"
+        android:hint="@string/store_username"
         android:visibility="gone"
         />
 
@@ -61,7 +62,7 @@
         android:layout_marginLeft="20dp"
         android:layout_marginRight="20dp"
         android:layout_marginTop="10dp"
-        android:hint="Store Password"
+        android:hint="@string/store_password"
         android:visibility="gone"
         />
 
@@ -70,7 +71,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="15dp"
-        android:text="Store Privacy"
+        android:text="@string/store_privacy"
         android:textSize="@dimen/textSize"
         />
 
@@ -93,7 +94,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:checked="true"
-            android:text="Public"
+            android:text="@string/public_key"
             android:textColor="@android:color/white"
             />
 
@@ -102,7 +103,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="10dp"
-            android:text="Private"
+            android:text="@string/private_key"
             android:textColor="@android:color/white"
             />
 
@@ -117,7 +118,7 @@
         android:layout_marginLeft="30dp"
         android:layout_marginRight="30dp"
         android:layout_marginTop="20dp"
-        android:text="New Account"
+        android:text="@string/new_account"
         style="@style/Buttonuploader_button_theme"
         />
 
@@ -127,7 +128,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_marginTop="30dp"
-        android:text="Already have an account? Sign in"
+        android:text="@string/already_have_an_account_sign_in"
         android:textStyle="bold"
         style="@style/text_view_clickable"
         />
@@ -139,7 +140,7 @@
         android:layout_gravity="center"
         android:layout_marginTop="0dp"
         android:background="@drawable/text_view_selectable"
-        android:text="Forgotten your password?"
+        android:text="@string/forgotten_your_password"
         android:textStyle="bold"
         style="@style/text_view_clickable"
         />
@@ -151,7 +152,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
         android:layout_marginTop="20dp"
-        android:text="By signing up you are agreeing to the Aptoide Terms of Service and Aptoide Content Policy for Developers"
+        android:text="@string/by_signing_up_you_are_agreeing_to_the_aptoide_terms_of_service_and_aptoide_content_policy_for_developers"
         />
 
   </LinearLayout>

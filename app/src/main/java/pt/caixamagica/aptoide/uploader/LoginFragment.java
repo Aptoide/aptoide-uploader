@@ -9,10 +9,14 @@ package pt.caixamagica.aptoide.uploader;
  * Created by neuro on 02-02-2015.
  */
 
+import android.Manifest;
 import android.app.Activity;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.graphics.drawable.Drawable;
+import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentTransaction;
 import android.text.TextUtils;
@@ -76,11 +80,14 @@ public class LoginFragment extends Fragment {
             if (TextUtils.isEmpty(username)) {
               session.close();
 
-              getActivity().runOnUiThread(new Runnable() {
-                public void run() {
-                  Toast.makeText(getActivity(), R.string.facebook_error, Toast.LENGTH_LONG).show();
-                }
-              });
+              if (getActivity() != null && !getActivity().isFinishing()) {
+                getActivity().runOnUiThread(new Runnable() {
+                  public void run() {
+                    Toast.makeText(getActivity(), R.string.facebook_error, Toast.LENGTH_LONG)
+                        .show();
+                  }
+                });
+              }
             }
 
             if (session == Session.getActiveSession() && user != null) {
@@ -105,35 +112,7 @@ public class LoginFragment extends Fragment {
    * @param password password
    */
   private OAuth2AuthenticationRequest oAuth2AuthenticationRequest;
-
-  private void setUpFacebookButton() {
-    LoginButton fbButton = (LoginButton) rootView.findViewById(R.id.fb_login_button);
-    fbButton.setFragment(this);
-
-    fbButton.setReadPermissions(Arrays.asList("email", "user_friends"));
-
-    fbButton.setOnErrorListener(new LoginButton.OnErrorListener() {
-      @Override public void onError(FacebookException error) {
-
-        if (error.getMessage().equals("Log in attempt aborted.")) return;
-
-        error.printStackTrace();
-      }
-    });
-  }
-
-  private void setUpSignUpButton() {
-    View view = rootView.findViewById(R.id.sign_up_link);
-    view.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        switchtoSignUpFragment();
-      }
-    });
-  }
-
-  private void setUpGooglePlusButton() {
-    rootView.findViewById(R.id.sign_in_button).setOnClickListener((LoginActivity) getActivity());
-  }
+  private View btnGoogle;
 
   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
@@ -168,12 +147,25 @@ public class LoginFragment extends Fragment {
 
     contentLayout = (RelativeLayout) rootView.findViewById(R.id.content);
     progressLayout = (RelativeLayout) rootView.findViewById(R.id.progressBar);
+    btnGoogle = rootView.findViewById(R.id.sign_in_button);
 
     setUpFacebookButton();
     setUpGooglePlusButton();
     setUpSignUpButton();
 
     return rootView;
+  }
+
+  @Override public void onActivityCreated(@Nullable Bundle savedInstanceState) {
+    super.onActivityCreated(savedInstanceState);
+
+    if (btnGoogle.getId() == R.id.sign_in_button
+        && Build.VERSION.SDK_INT >= Build.VERSION_CODES.M
+        && getActivity().checkSelfPermission(Manifest.permission.GET_ACCOUNTS)
+        != PackageManager.PERMISSION_GRANTED) {
+
+      btnGoogle.setEnabled(false);
+    }
   }
 
   @Override public void onResume() {
@@ -216,6 +208,68 @@ public class LoginFragment extends Fragment {
     setShowPasswordEye();
   }
 
+  private void setUpFacebookButton() {
+    LoginButton fbButton = (LoginButton) rootView.findViewById(R.id.fb_login_button);
+    fbButton.setFragment(this);
+
+    fbButton.setReadPermissions(Arrays.asList("email", "user_friends"));
+
+    fbButton.setOnErrorListener(new LoginButton.OnErrorListener() {
+      @Override public void onError(FacebookException error) {
+
+        if (error.getMessage().equals("Log in attempt aborted.")) return;
+
+        error.printStackTrace();
+      }
+    });
+  }
+
+  private void setUpGooglePlusButton() {
+    rootView.findViewById(R.id.sign_in_button).setOnClickListener((LoginActivity) getActivity());
+  }
+
+  private void setUpSignUpButton() {
+    View view = rootView.findViewById(R.id.sign_up_link);
+    view.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        switchtoSignUpFragment();
+      }
+    });
+  }
+
+  /**
+   * Define a acção do botão (efectuar login) <br> Lança a cosmética do loading.
+   */
+  private void buttonAction() {
+
+    button = (Button) rootView.findViewById(R.id.loginButton);
+    button.setOnClickListener(new View.OnClickListener() {
+      public void onClick(View v) {
+
+        String username, password;
+        TextView textView;
+
+        textView = (TextView) rootView.findViewById(R.id.usernameText);
+        username = textView.getText().toString();
+        textView = (TextView) rootView.findViewById(R.id.passwordText);
+        password = textView.getText().toString();
+
+        if (!username.equals("") && !password.equals("")) {
+          mCallback.submitAuthentication(
+              new UserInfo(username, password, null, null, null, null, null, null, 0));
+
+          ((TextView) rootView.findViewById(R.id.signing_in_text)).setText(
+              "Signing in as\n" + username);
+
+          UploaderUtils.hideKeyboard(getActivity(), getView());
+        } else {
+          Toast.makeText(getActivity(), R.string.missing_username_password, Toast.LENGTH_SHORT)
+              .show();
+        }
+      }
+    });
+  }
+
   private void setShowPasswordEye() {
     final EditText password_box = (EditText) rootView.findViewById(R.id.passwordText);
     password_box.setTransformationMethod(new PasswordTransformationMethod());
@@ -248,39 +302,6 @@ public class LoginFragment extends Fragment {
         }
 
         return false;
-      }
-    });
-  }
-
-  /**
-   * Define a acção do botão (efectuar login) <br> Lança a cosmética do loading.
-   */
-  private void buttonAction() {
-
-    button = (Button) rootView.findViewById(R.id.loginButton);
-    button.setOnClickListener(new View.OnClickListener() {
-      public void onClick(View v) {
-
-        String username, password;
-        TextView textView;
-
-        textView = (TextView) rootView.findViewById(R.id.usernameText);
-        username = textView.getText().toString();
-        textView = (TextView) rootView.findViewById(R.id.passwordText);
-        password = textView.getText().toString();
-
-        if (!username.equals("") && !password.equals("")) {
-          mCallback.submitAuthentication(
-              new UserInfo(username, password, null, null, null, null, null, null, 0));
-
-          ((TextView) rootView.findViewById(R.id.signing_in_text)).setText(
-              "Signing in as\n" + username);
-
-          UploaderUtils.hideKeyboard(getActivity(), getView());
-        } else {
-          Toast.makeText(getActivity(), "Please fill username and password", Toast.LENGTH_SHORT)
-              .show();
-        }
       }
     });
   }

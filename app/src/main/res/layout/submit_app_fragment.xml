@@ -7,8 +7,6 @@
     android:orientation="vertical"
     >
 
-  <!--android:background="#EEEEEE"-->
-
   <RelativeLayout
       android:id="@+id/progressBar"
       android:layout_width="match_parent"
@@ -33,7 +31,7 @@
         android:layout_below="@id/progressBarBar"
         android:layout_centerHorizontal="true"
         android:padding="25dp"
-        android:text="Loading content..."
+        android:text="@string/loading_content"
         android:textColor="?attr/colorPrimary"
         />
 
@@ -81,7 +79,7 @@
       android:layout_centerHorizontal="true"
       android:layout_marginLeft="@dimen/sideMargin"
       android:layout_marginRight="@dimen/sideMargin"
-      android:text="Submit"
+      android:text="@string/submit"
       android:textColor="#FFFFFF"
       style="@style/Buttonuploader_button_theme"
       />
@@ -103,7 +101,7 @@
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="App Name"
+          android:text="@string/app_name_form"
           style="@style/TextViewCustom"
           />
 
@@ -115,23 +113,13 @@
           android:layout_marginRight="@dimen/sideMargin"
           />
 
-      <!--<TextView-->
-      <!--android:layout_width="match_parent"-->
-      <!--android:layout_height="wrap_content"-->
-      <!--android:layout_marginTop="30dp"-->
-      <!--android:textSize="20dp"-->
-      <!--android:gravity="center"-->
-      <!--android:textColor="?attr/colorPrimary"-->
-      <!--android:text="Age Rating"/>-->
-
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="Age Rating"
+          android:text="@string/age_rating"
           style="@style/TextViewCustom"
           />
 
-      <!--style="@style/Spinneruploader_spinner_theme"-->
       <Spinner
           android:id="@+id/age_rating_spinner"
 
@@ -147,19 +135,11 @@
           >
       </Spinner>
 
-      <!--<TextView-->
-      <!--android:layout_width="match_parent"-->
-      <!--android:layout_height="wrap_content"-->
-      <!--android:layout_marginTop="30dp"-->
-      <!--android:textSize="20dp"-->
-      <!--android:gravity="center"-->
-      <!--android:textColor="?attr/colorPrimary"-->
-      <!--android:text="App Category"/>-->
 
       <TextView
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:text="App Category"
+          android:text="@string/app_category"
           style="@style/TextViewCustom"
           />
 
@@ -175,13 +155,24 @@
           >
       </Spinner>
 
-      <!--<TextView-->
-      <!--android:layout_width="match_parent"-->
-      <!--android:layout_height="wrap_content"-->
-      <!--android:layout_marginTop="30dp"-->
-      <!--android:textSize="20dp"-->
-      <!--android:gravity="center"-->
-      <!--android:text="App Description (Optional)"/>-->
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:text="@string/language"
+          style="@style/TextViewCustom"
+          />
+
+      <Spinner
+          android:id="@+id/app_language"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="@dimen/sideMargin"
+          android:layout_marginRight="@dimen/sideMargin"
+          android:layout_marginTop="10dp"
+          android:background="@drawable/spinner_toggle_on_normal_holo_light"
+          >
+      </Spinner>
+
 
       <LinearLayout
           android:layout_width="wrap_content"
@@ -192,16 +183,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="App Description"
-            style="@style/TextViewCustom"
-            />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
-            android:text=" (optional)"
-            android:textColor="@android:color/darker_gray"
+            android:text="@string/app_description"
             style="@style/TextViewCustom"
             />
 
@@ -241,7 +223,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Phone Number"
+            android:text="@string/phone_number"
             style="@style/TextViewCustom"
             />
 
@@ -249,7 +231,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
-            android:text=" (optional)"
+            android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
             />
@@ -273,7 +255,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="E-Mail"
+            android:text="@string/e_mail"
             style="@style/TextViewCustom"
             />
 
@@ -281,13 +263,14 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
-            android:text=" (optional)"
+            android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
             />
       </LinearLayout>
 
       <EditText
+          android:id="@+id/website"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginLeft="10dp"
@@ -303,7 +286,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Website"
+            android:text="@string/website"
             style="@style/TextViewCustom"
             />
 
@@ -311,7 +294,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginLeft="0dp"
-            android:text=" (optional)"
+            android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
             />

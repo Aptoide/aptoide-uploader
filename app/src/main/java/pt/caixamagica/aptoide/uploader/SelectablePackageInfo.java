@@ -13,6 +13,10 @@ import lombok.Setter;
 /**
  * Created by neuro on 05-02-2015.
  */
+
+/**
+ * This class contains content from the submitappfragment to be sent with the apk on upload
+ */
 @Getter @Setter public class SelectablePackageInfo extends PackageInfo {
 
   private final PackageInfo info;
@@ -38,17 +42,23 @@ import lombok.Setter;
 
   private String website;
 
+  private String inputTitle;
+      //For proposed translations only - when a title comes from getProposed webservice
+      private String lang;
+
   public SelectablePackageInfo(PackageInfo info, PackageManager pm) {
     super();
     this.pm = pm;
-
-    this.packageName = info.packageName;
     this.info = info;
-    this.applicationInfo = info.applicationInfo;
-    this.firstInstallTime = info.firstInstallTime;
 
-    this.versionCode = info.versionCode;
-    this.versionName = info.versionName;
+    if (info != null) {
+      this.packageName = info.packageName;
+      this.applicationInfo = info.applicationInfo;
+      this.firstInstallTime = info.firstInstallTime;
+
+      this.versionCode = info.versionCode;
+      this.versionName = info.versionName;
+    }
   }
 
   public boolean isSelected() {
@@ -59,17 +69,21 @@ import lombok.Setter;
     selected = !selected;
   }
 
-  private void loadLabel() {
-    label = (String) applicationInfo.loadLabel(pm);
-  }
-
   public String getLabel() {
     if (label == null) loadLabel();
     return label;
   }
 
+  private void loadLabel() {
+    label = (String) applicationInfo.loadLabel(pm);
+  }
+
   public String getApkPath() {
-    return info.applicationInfo.sourceDir;
+    if (info != null && info.applicationInfo != null) {
+      return info.applicationInfo.sourceDir;
+    } else {
+      return null;
+    }
   }
 
   public int tes() {

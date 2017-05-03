@@ -110,95 +110,6 @@ public class SignUpFragment extends Fragment {
     createAccountButton = (Button) rootView.findViewById(R.id.create_Account);
   }
 
-  private void setupSubmitButton() {
-    createAccountButton.setOnClickListener(new View.OnClickListener() {
-      @Override public void onClick(View v) {
-        if (validateFields(emailEditText, passwordEditText, storeEditText)) {
-          if (publicStore || (!publicStore && validateFields(storeUsernameEditText,
-              storePasswordEditText))) {
-            createAccount();
-            UploaderUtils.hideKeyboard(getActivity(), getView());
-          } else {
-            Toast.makeText(getActivity(), "Missing Fields", Toast.LENGTH_SHORT).show();
-          }
-        } else {
-          Toast.makeText(getActivity(), "Missing Fields", Toast.LENGTH_SHORT).show();
-        }
-      }
-    });
-  }
-
-  private void createAccount() {
-    final SignUpRequest signUpRequest = new SignUpRequest();
-
-    String passhash = UploaderUtils.computeSHA1sum(passwordEditText.getText().toString());
-
-    signUpRequest.setEmail(emailEditText.getText().toString())
-        .setPasshash(passhash)
-        .setRepo(storeEditText.getText().toString())
-        .setPrivacy(!publicStore);
-
-    if (!storeUsernameEditText.getText().toString().equals("") && !storePasswordEditText.getText()
-        .toString()
-        .equals("")) {
-      signUpRequest.setPrivacy_user(storeUsernameEditText.getText().toString())
-          .setPrivacy_pass(storePasswordEditText.getText().toString());
-    }
-
-    spiceManager.execute(signUpRequest, new RequestListener<SignUpJson>() {
-      @Override public void onRequestFailure(SpiceException spiceException) {
-        Toast.makeText(getActivity(), "Sorry, an error occurred", Toast.LENGTH_SHORT);
-      }
-
-      @Override public void onRequestSuccess(SignUpJson signUpJson) {
-        if (signUpJson.getErrors() == null) {
-          // Loja criada com sucesso, redirecciona para a AppsView
-          mCallback.submitAuthentication(
-              new UserInfo(signUpRequest.getEmail(), passwordEditText.getText().toString(), null,
-                  null, null, null, null, null, 0));
-        } else {
-          List<String> errors = new LinkedList<>();
-          for (Error error : signUpJson.getErrors()) {
-            if (error.getMsg() != null) {
-              errors.add(error.getMsg());
-            } else {
-              errors.add(error.getCode());
-            }
-          }
-          String message = StringUtils.join(errors.toArray(), ", ");
-          Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
-        }
-      }
-    });
-  }
-
-  private boolean validateFields(EditText... editTexts) {
-
-    for (EditText editText : editTexts) {
-      if (TextUtils.isEmpty(editText.getText())) {
-        return false;
-      }
-    }
-    return true;
-  }
-
-  private void setupStoreVisibilityListeners() {
-    storeVisibilityRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
-      @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
-        int selected = checkedId;
-        if (selected == R.id.store_private) {
-          publicStore = false;
-          storeUsernameEditText.setVisibility(View.VISIBLE);
-          storePasswordEditText.setVisibility(View.VISIBLE);
-        } else {
-          publicStore = true;
-          storeUsernameEditText.setVisibility(View.GONE);
-          storePasswordEditText.setVisibility(View.GONE);
-        }
-      }
-    });
-  }
-
   private void setDefaultStoreVisibility() {
     ((RadioButton) rootView.findViewById(R.id.store_public)).setChecked(true);
   }
@@ -220,6 +131,95 @@ public class SignUpFragment extends Fragment {
         Intent myIntent = new Intent(Intent.ACTION_VIEW, Uri.parse(download_link));
         startActivity(myIntent);
         getFragmentManager().popBackStack();
+      }
+    });
+  }
+
+  private void setupStoreVisibilityListeners() {
+    storeVisibilityRadioGroup.setOnCheckedChangeListener(new RadioGroup.OnCheckedChangeListener() {
+      @Override public void onCheckedChanged(RadioGroup group, int checkedId) {
+        int selected = checkedId;
+        if (selected == R.id.store_private) {
+          publicStore = false;
+          storeUsernameEditText.setVisibility(View.VISIBLE);
+          storePasswordEditText.setVisibility(View.VISIBLE);
+        } else {
+          publicStore = true;
+          storeUsernameEditText.setVisibility(View.GONE);
+          storePasswordEditText.setVisibility(View.GONE);
+        }
+      }
+    });
+  }
+
+  private void setupSubmitButton() {
+    createAccountButton.setOnClickListener(new View.OnClickListener() {
+      @Override public void onClick(View v) {
+        if (validateFields(emailEditText, passwordEditText, storeEditText)) {
+          if (publicStore || (!publicStore && validateFields(storeUsernameEditText,
+              storePasswordEditText))) {
+            createAccount();
+            UploaderUtils.hideKeyboard(getActivity(), getView());
+          } else {
+            Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
+          }
+        } else {
+          Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
+        }
+      }
+    });
+  }
+
+  private boolean validateFields(EditText... editTexts) {
+
+    for (EditText editText : editTexts) {
+      if (TextUtils.isEmpty(editText.getText())) {
+        return false;
+      }
+    }
+    return true;
+  }
+
+  private void createAccount() {
+    final SignUpRequest signUpRequest = new SignUpRequest();
+
+    String passhash = UploaderUtils.computeSHA1sum(passwordEditText.getText().toString());
+
+    signUpRequest.setEmail(emailEditText.getText().toString())
+        .setPasshash(passhash)
+        .setRepo(storeEditText.getText().toString())
+        .setPrivacy(!publicStore);
+
+    if (!storeUsernameEditText.getText().toString().equals("") && !storePasswordEditText.getText()
+        .toString()
+        .equals("")) {
+      signUpRequest.setPrivacy_user(storeUsernameEditText.getText().toString())
+          .setPrivacy_pass(storePasswordEditText.getText().toString());
+    }
+
+    spiceManager.execute(signUpRequest, new RequestListener<SignUpJson>() {
+      @Override public void onRequestFailure(SpiceException spiceException) {
+        Toast.makeText(getActivity(), R.string.error_occurred, Toast.LENGTH_SHORT);
+      }
+
+      @Override public void onRequestSuccess(SignUpJson signUpJson) {
+        if (signUpJson.getErrors() == null) {
+          // Loja criada com sucesso, redirecciona para a AppsView
+          mCallback.submitAuthentication(
+              new UserInfo(signUpRequest.getEmail(), passwordEditText.getText().toString(), null,
+                  null, null, null, null, null, 0));
+        } else {
+          List<String> errors = new LinkedList<>();
+          for (Error error : signUpJson.getErrors()) {
+            if (error.getMsg() != null) {
+              errors.add(error.getMsg());
+            } else {
+              errors.add(error.getCode());
+            }
+          }
+          String message = StringUtils.join(errors.toArray(), ", ");
+          Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+        }
       }
     });
   }

@@ -89,18 +89,16 @@ import retrofit.mime.TypedFile;
 
   private String obbPatchMd5sum;
 
+  private String inputTitle = null;
+
   /**
    * Label cachada por questões de performance.
    */
   private String label;
+  private String lang;
 
   private boolean checked = false;
   private StoreTokenInterface storeTokenInterface;
-
-  public UploadAppToRepoRequest(StoreTokenInterface storeTokenInterface) {
-    super(UploadAppToRepoJson.class, UploadAppToRepoRequest.Webservice.class);
-    this.storeTokenInterface = storeTokenInterface;
-  }
 
   public UploadAppToRepoRequest(UploadAppToRepoRequest uploadAppToRepoRequest,
       StoreTokenInterface storeTokenInterface) {
@@ -122,6 +120,11 @@ import retrofit.mime.TypedFile;
       StoreTokenInterface storeTokenInterface) {
     this(storeTokenInterface);
     this.requestProgressListenerObject = requestProgressListenerObject;
+  }
+
+  public UploadAppToRepoRequest(StoreTokenInterface storeTokenInterface) {
+    super(UploadAppToRepoJson.class, UploadAppToRepoRequest.Webservice.class);
+    this.storeTokenInterface = storeTokenInterface;
   }
 
   @Override public UploadAppToRepoJson loadDataFromNetwork() throws SpiceException {
@@ -149,10 +152,13 @@ import retrofit.mime.TypedFile;
       parameters.put("obb_main_filename", fileName(obbMainPath));
       parameters.put("obb_patch_filename", fileName(obbPatchPath));
       parameters.put("mode", "json");
+      parameters.put("inputTitle", inputTitle);
+      parameters.put("lang", lang);
 
       if (FLAG_APK) {
         parameters.put("apk", newTweakedTypedFile("apk", apkPath));
       } else {
+        //Used in first request to check if apk already exists
         parameters.put("apk_md5sum", UploaderUtils.md5Calc(new File(apkPath)));
       }
 
@@ -201,13 +207,6 @@ import retrofit.mime.TypedFile;
     super.publishProgress(progress);
   }
 
-  private String fileName(String apkPath) {
-
-    if (apkPath == null) return null;
-
-    return apkPath.substring(apkPath.lastIndexOf("/") + 1);
-  }
-
   private void checkObbExistence() {
     if (!checked) {
       String sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
@@ -230,6 +229,13 @@ import retrofit.mime.TypedFile;
       }
       checked = true;
     }
+  }
+
+  private String fileName(String apkPath) {
+
+    if (apkPath == null) return null;
+
+    return apkPath.substring(apkPath.lastIndexOf("/") + 1);
   }
 
   private TypedFile newTweakedTypedFile(String extension, String apkPath) {

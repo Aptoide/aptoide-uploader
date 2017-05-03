@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.support.v4.app.NotificationCompat;
 import com.octo.android.robospice.request.listener.RequestProgress;
+import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 
 /**
@@ -43,6 +44,10 @@ public class RequestProgressListener
     mBuilder.setContentText("Uploading " + packageInfo.getLabel() + " (Tap to cancel upload)");
   }
 
+  private void processIntent(Intent intent) {
+    packageInfo = (SelectablePackageInfo) intent.getExtras().get("packageInfo");
+  }
+
   private PendingIntent newCancelationIntentV3() {
 
     // Gera um ID único para prevenir reutilização de PendingIntent.
@@ -50,15 +55,11 @@ public class RequestProgressListener
 
     Intent intent = new Intent(context, UploadService.class);
 
-    intent.setAction(UploadService.UPLOADER_CANCEL);
+    intent.setAction(context.getString(R.string.cancel));
 
     intent.putExtra("packageName", packageInfo.packageName);
 
     return PendingIntent.getService(context, reqCode, intent, 0);
-  }
-
-  private void processIntent(Intent intent) {
-    packageInfo = (SelectablePackageInfo) intent.getExtras().get("packageInfo");
   }
 
   @Override public void onRequestProgressUpdate(RequestProgress progress) {

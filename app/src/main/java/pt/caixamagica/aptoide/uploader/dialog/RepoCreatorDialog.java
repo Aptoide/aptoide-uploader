@@ -101,7 +101,7 @@ public class RepoCreatorDialog extends DialogFragment {
 
               mCallback.submitAuthentication(userInfo);
             } else {
-              Toast.makeText(context, "Please fill empty fields!", Toast.LENGTH_SHORT).show();
+              Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT).show();
             }
 
             //                                if (repository.getText() != null) {
@@ -150,7 +150,7 @@ public class RepoCreatorDialog extends DialogFragment {
 
     //        repoUsername.setText(login.getUsername().split("@")[0]);
     //        repoUsername.setText("Teste");
-    repoUsername.setText(userInfo.getUsername());
+    repoUsername.setText(userInfo == null ? "" : userInfo.getUsername());
 
     privateButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
@@ -212,19 +212,10 @@ public class RepoCreatorDialog extends DialogFragment {
 
             dismiss();
           } else {
-            Toast.makeText(context, "Please fill empty fields!", Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT).show();
           }
         }
       });
-    }
-  }
-
-  private void fillNewUserInfo() {
-    userInfo.setRepo(repository.getText().toString());
-
-    if (privateButton.isChecked()) {
-      userInfo.setPrivacyUsername(repoUsername.getText().toString());
-      userInfo.setPrivacyPassword(repoPassword.getText().toString());
     }
   }
 
@@ -242,5 +233,14 @@ public class RepoCreatorDialog extends DialogFragment {
     }
 
     return true;
+  }
+
+  private void fillNewUserInfo() {
+    userInfo.setRepo(repository.getText().toString());
+
+    if (privateButton.isChecked()) {
+      userInfo.setPrivacyUsername(repoUsername.getText().toString());
+      userInfo.setPrivacyPassword(repoPassword.getText().toString());
+    }
   }
 }

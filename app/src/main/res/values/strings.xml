@@ -6,12 +6,13 @@
   <string name="passHint">Password</string>
   <string name="login">Sign In</string>
   <string name="action_settings">Settings</string>
-  <string name="remember_login">Remember Login</string>
   <string name="OK">OK</string>
+  <string name="retry">retry</string>
+  <string name="cancel">Cancel</string>
 
   <!-- Mensagens de erro -->
-  <string name="loginFail">Login Falhou. Username ou Password errados.</string>
-  <string name="duplicated_apk">O Apk já existe no repositório, nada a fazer.</string>
+  <string name="loginFail">Login failed. Wrong username or password.</string>
+  <string name="duplicated_apk">The apk already exists in the repository. You don\'t need to do anything.</string>
 
   <string name="store">Store</string>
   <string name="store_privacy">Store privacy</string>
@@ -21,14 +22,11 @@
   <string name="store_username">Store username</string>
   <string name="store_password">Store password</string>
 
-  <string name="store_without_name">Your store must have a name</string>
   <string name="repo_creation_title">"Create your store"</string>
   <string name="create_repo">"Create"</string>
-  <string name="cancel">Cancel</string>
 
   <string name="facebook_error">You should provide your email in order to login.</string>
 
-  <string name="upload_done_network_error">Upload done!!! Check your store.</string>
   <string name="upload_prepare">Preparing to upload %s</string>
 
   <string name="age_rating_1">All</string>
@@ -77,6 +75,73 @@
   <string name="app_category_39">Libraries &amp; Demo</string>
   <string name="app_category_40">Transport</string>
 
+
+  <string name="language">Language</string>
+  <string name="language_1" translatable="false">العربية</string>
+  <string name="language_2" translatable="false">বাংলা</string>
+  <string name="language_3" translatable="false">ဗမာစာ</string>
+  <string name="language_4" translatable="false">Deutsch</string>
+  <string name="language_5" translatable="false">English</string>
+  <string name="language_6" translatable="false">Español</string>
+  <string name="language_7" translatable="false">فارسی</string>
+  <string name="language_8" translatable="false">Filipino</string>
+  <string name="language_9" translatable="false">Français</string>
+  <string name="language_10" translatable="false">हिंदी</string>
+  <string name="language_11" translatable="false">Bahasa Indonesia</string>
+  <string name="language_12" translatable="false">Italiano</string>
+  <string name="language_13" translatable="false">Bahasa Melayu</string>
+  <string name="language_14" translatable="false">Português</string>
+  <string name="language_15" translatable="false">Português (Brasil)</string>
+  <string name="language_16" translatable="false">Русский</string>
+  <string name="language_17" translatable="false">ภาษาไทย</string>
+  <string name="language_18" translatable="false">Türk</string>
+  <string name="language_19" translatable="false">Tiếng Việt</string>
+  <string name="language_20" translatable="false">中文</string>
+
+
   <string name="sort_spinner_values_1">By Date</string>
   <string name="sort_spinner_values_2">By Name</string>
+  <string name="select_apps_to_upload_to_your_store">Select apps to upload to your store</string>
+  <string name="submit_apps">Submit Apps</string>
+  <string name="new_to_aptoide_create_a_free_account">New to Aptoide? Create a free account.</string>
+  <string name="or">OR</string>
+  <string name="signing_in">Signing in...</string>
+  <string name="jogos">Games</string>
+  <string name="new_account">New Account</string>
+  <string name="already_have_an_account_sign_in">Already have an account? Sign in</string>
+  <string name="forgotten_your_password">Recover password</string>
+  <string name="by_signing_up_you_are_agreeing_to_the_aptoide_terms_of_service_and_aptoide_content_policy_for_developers">By signing up you agree to the Aptoide\'s Terms of Service and Aptoide Content Policy for Developers.</string>
+  <string name="loading_content">Loading content...</string>
+  <string name="submit">Submit</string>
+  <string name="age_rating">Age Rating</string>
+  <string name="app_category">App Category</string>
+  <string name="app_description">App Description</string>
+  <string name="app_name_form">App name</string>
+  <string name="optional">(optional)</string>
+  <string name="phone_number">Phone Number</string>
+  <string name="e_mail">E-Mail</string>
+  <string name="website">Website</string>
+  <string name="signout">Sign Out</string>
+  <string name="upload_failed">Upload failed. Please try again later.</string>
+  <string name="upload_more_info">We need more info in order to upload your app, tap here in order to provide it</string>
+  <string name="ok">OK</string>
+  <string name="sending_background">Sending app in the background</string>
+  <string name="sorting_by_date">Sorting by Date</string>
+  <string name="sorting">Sorting…</string>
+  <string name="sorting_by_name">Sorting by Name</string>
+  <string name="missing_username_password">Please fill username and password</string>
+  <string name="error_occurred">Sorry, an error occurred</string>
+  <string name="missing_fields">Missing mandatory fields</string>
+  <string name="no_store_error">The account doesn\'t have a store associated, please create one.</string>
+  <string name="yes">Yes</string>
+  <string name="no">No</string>
+  <string name="quit_message">Are you sure you want to leave?</string>
+  <string name="exit_confirmation">Really Quit</string>
+  <string name="fill_empty_fields">Please fill empty fields!</string>
+  <string name="error_marg_100" translatable="false">MARG-100</string>
+  <string name="error_marg_101" translatable="false">MARG-101</string>
+  <string name="error_marg_102" translatable="false">MARG-102</string>
+  <string name="error_marg_103" translatable="false">MARG-103</string>
+  <string name="logging_as">Logging in as</string>
+  <string name="submit_app">Submit App</string>
 </resources>

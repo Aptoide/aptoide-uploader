@@ -23,6 +23,10 @@ public class RetrofitSpiceServiceUploader extends RetrofitJackson2SpiceService {
     return new JacksonConverter(objectMapper);
   }
 
+  @Override public int getThreadCount() {
+    return 2;
+  }
+
   @Override protected String getServerUrl() {
     return WebserviceOptions.WebServicesLink;
   }
@@ -34,9 +38,5 @@ public class RetrofitSpiceServiceUploader extends RetrofitJackson2SpiceService {
         .setConverter(getConverter());
 
     return builder;
-  }
-
-  @Override public int getThreadCount() {
-    return 2;
   }
 }

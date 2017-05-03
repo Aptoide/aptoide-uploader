@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <RelativeLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
-    android:id="@+id/apagar"
+    android:id="@+id/app_view_fragment"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="#ececec"
@@ -16,38 +16,59 @@
       android:orientation="vertical"
       >
 
-    <TextView
-        android:id="@+id/select_apps_hint"
+    <LinearLayout
+        android:id="@+id/store_info"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="#0078ab"
-        android:padding="10dp"
-        android:text="Store"
+        android:orientation="horizontal"
+        >
+      <ImageView
+          android:id="@+id/store_icon"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:padding="10dp"
+          android:src="@drawable/ic_store"
+          android:textSize="18dp"
+          />
 
-        android:textSize="18dp"
-        />
-
-    <RelativeLayout
-        android:layout_width="wrap_content"
+      <TextView
+          android:id="@+id/store_name"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:textSize="16sp"
+          />
+      <!--android:text="Store"-->
+    </LinearLayout>
+    <LinearLayout
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:gravity="center_vertical"
+        android:orientation="horizontal"
+        android:padding="5dp"
         >
 
       <TextView
-          android:layout_width="wrap_content"
+          android:layout_width="0dp"
           android:layout_height="wrap_content"
-          android:layout_centerVertical="true"
-          android:layout_marginLeft="10dp"
-          android:text="Select apps to upload to your store"
+          android:layout_marginEnd="5dp"
+          android:layout_marginRight="5dp"
+          android:layout_weight="1"
+          android:ellipsize="start"
+          android:maxLines="2"
+          android:text="@string/select_apps_to_upload_to_your_store"
           android:textColor="@android:color/darker_gray"
           />
 
       <FrameLayout
           android:layout_width="112dp"
           android:layout_height="wrap_content"
-          android:layout_alignParentRight="true"
           android:layout_marginBottom="3dp"
+          android:layout_marginEnd="6dp"
           android:layout_marginLeft="3dp"
           android:layout_marginRight="6dp"
+          android:layout_marginStart="3dp"
           android:layout_marginTop="3dp"
           android:background="@drawable/spinner_custom_background"
           android:padding="4dp"
@@ -57,28 +78,34 @@
             android:id="@+id/sort_spinner"
             android:layout_width="match_parent"
             android:layout_height="30dp"
-            android:layout_marginLeft="3dp"
             >
-
         </Spinner>
 
       </FrameLayout>
 
-    </RelativeLayout>
+    </LinearLayout>
 
-    <GridView
-        xmlns:android="http://schemas.android.com/apk/res/android"
-        android:id="@+id/grid_view"
+    <android.support.v4.widget.SwipeRefreshLayout
+        android:id="@+id/swipe"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_below="@id/select_apps_hint"
-        android:layout_marginLeft="7dp"
-        android:layout_marginRight="7dp"
-        android:horizontalSpacing="5dp"
-        android:numColumns="3"
-        android:stretchMode="columnWidth"
-        android:verticalSpacing="5dp"
-        />
+        >
+
+      <GridView
+          xmlns:android="http://schemas.android.com/apk/res/android"
+          android:id="@+id/grid_view"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:layout_below="@id/store_icon"
+          android:layout_marginLeft="7dp"
+          android:layout_marginRight="7dp"
+          android:horizontalSpacing="5dp"
+          android:numColumns="3"
+          android:stretchMode="columnWidth"
+          android:verticalSpacing="5dp"
+          />
+
+    </android.support.v4.widget.SwipeRefreshLayout>
 
   </LinearLayout>
 
@@ -97,7 +124,7 @@
       android:layout_height="wrap_content"
       android:layout_alignParentBottom="true"
       android:background="#0078ab"
-      android:text="Submit Apps"
+      android:text="@string/submit_apps"
       android:visibility="gone"
       />
 
