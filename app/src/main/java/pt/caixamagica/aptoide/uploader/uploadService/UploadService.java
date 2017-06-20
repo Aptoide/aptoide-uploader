@@ -168,12 +168,11 @@ public class UploadService extends Service {
 
     spiceManager.execute(uploadAppToRepoRequest, new RequestListener<UploadAppToRepoJson>() {
       @Override public void onRequestFailure(SpiceException spiceException) {
-
+        //todo: analytics
         Log.e(TAG, "onRequestFailure: ", spiceException);
 
         if (spiceException instanceof NetworkException) {
           checkUploadSuccess(uploadAppToRepoRequest);
-
           //setNotification(uploadAppToRepoRequest.getPackageName(),
           //    getString(R.string.upload_done_network_error), null);
         } else {
@@ -220,7 +219,10 @@ public class UploadService extends Service {
 
       private boolean hasErrorCode(List<Error> errors, String errCode) {
         for (Error e : errors) {
-          if (e.getCode().equals(errCode)) return true;
+          if (e.getCode()
+              .equals(errCode)) {
+            return true;
+          }
         }
 
         return false;
@@ -247,6 +249,7 @@ public class UploadService extends Service {
       }
 
       @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
+        //todo: analytics
         Log.v(TAG, "onRequestSuccess: ");
         if (uploadAppToRepoJson.getErrors() != null) {
 
@@ -297,8 +300,6 @@ public class UploadService extends Service {
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
         }
       }
-
-
     });
   }
 
@@ -313,15 +314,22 @@ public class UploadService extends Service {
     Bitmap b = loadIcon(packageName);
     if (b != null) mBuilder.setLargeIcon(b);
     b = null;
-    mBuilder.setSmallIcon(R.drawable.notification_icon).
-        setContentTitle(getApplication().getString(R.string.app_name)).
-        setContentIntent(buildFillMissingInfoIntent(selectablePackageInfo)).
-        setOngoing(false).
-        setAutoCancel(true).
-        setStyle(new NotificationCompat.BigTextStyle().bigText(
-            getString(R.string.upload_more_info))).
-        setSubText(getString(R.string.upload_more_info)).
-        setContentText(label);
+    mBuilder.setSmallIcon(R.drawable.notification_icon)
+        .
+            setContentTitle(getApplication().getString(R.string.app_name))
+        .
+            setContentIntent(buildFillMissingInfoIntent(selectablePackageInfo))
+        .
+            setOngoing(false)
+        .
+            setAutoCancel(true)
+        .
+            setStyle(
+                new NotificationCompat.BigTextStyle().bigText(getString(R.string.upload_more_info)))
+        .
+            setSubText(getString(R.string.upload_more_info))
+        .
+            setContentText(label);
 
     NotificationManager mNotificationManager =
         (NotificationManager) getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -376,7 +384,8 @@ public class UploadService extends Service {
 
     if (intent != null) {
       if (getString(R.string.cancel).equals(intent.getAction())) {
-        cancelUpload(intent.getExtras().getString("packageName"));
+        cancelUpload(intent.getExtras()
+            .getString("packageName"));
       }
       if (getString(R.string.retry).equals(intent.getAction())) {
         UploadAppToRepoRequest req =
@@ -462,7 +471,9 @@ public class UploadService extends Service {
         newLine = true;
       }
 
-      stringBuilder.append(error.getCode()).append(": ").append(error.getMsg());
+      stringBuilder.append(error.getCode())
+          .append(": ")
+          .append(error.getMsg());
     }
 
     bigTextStyle.bigText(stringBuilder.toString());
@@ -542,13 +553,16 @@ public class UploadService extends Service {
         UploaderUtils.md5Calc(new File(originalRequest.getApkPath())));
     spiceManager.execute(uploadAppToRepoRequest, new RequestListener<UploadAppToRepoJson>() {
       @Override public void onRequestFailure(SpiceException spiceException) {
+        //todo: analytics
         simpleNotification(uploadAppToRepoRequest.getPackageName(),
             uploadAppToRepoRequest.getLabel(), getString(R.string.upload_failed));
       }
 
       @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
         if (uploadAppToRepoJson.getErrors() != null) {
-          String errorCode = uploadAppToRepoJson.getErrors().get(0).getCode();
+          String errorCode = uploadAppToRepoJson.getErrors()
+              .get(0)
+              .getCode();
           if (errorCode.equals("APK-5")) {
             setErrorsNotification(uploadAppToRepoRequest.getPackageName(),
                 uploadAppToRepoRequest.getLabel(), uploadAppToRepoJson.getErrors());
@@ -562,6 +576,7 @@ public class UploadService extends Service {
                 uploadAppToRepoRequest.getLabel(), getString(R.string.upload_failed));
           }
         } else {
+          //todo: analytics
           setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
               uploadAppToRepoRequest.getLabel());
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
