@@ -54,13 +54,13 @@ android {
     targetSdkVersion 23
     Integer value = project.APTOIDE_UPLOADER_VERSION_CODE.toInteger();
     versionCode value
-    versionName "2.5"
+    versionName "2.6"
 
     manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
 
     buildConfigField "String", "GMS_SERVER_ID", "\"" + project.GMS_SERVER_ID + "\""
 
-    resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID + "\""
+    resValue "string", "facebook_app_id", "\"" + project.UPLOADER_FACEBOOK_APP_ID + "\""
   }
 
   buildTypes {
@@ -89,6 +89,7 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+
 
   applicationVariants.all { variant ->
     variant.outputs.each { output ->

@@ -252,7 +252,6 @@ public class SubmitAppFragment extends Fragment {
     if (validadeFields()) {
 
       setEditedFields();
-      //todo: analytics
       uploadApp();
 
       Toast.makeText(getActivity(), R.string.sending_background, Toast.LENGTH_SHORT).show();
