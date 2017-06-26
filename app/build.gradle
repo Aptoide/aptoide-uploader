@@ -136,6 +136,6 @@ dependencies {
   compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
     transitive = true;
   }
-  compile 'com.squareup.okhttp:okhttp:2.0.0'
-  compile 'com.squareup.okhttp:okhttp-urlconnection:2.0.0'
+  compile 'com.squareup.okhttp:okhttp:2.7.5'
+  compile 'com.squareup.okhttp:okhttp-urlconnection:2.7.5'
 }
