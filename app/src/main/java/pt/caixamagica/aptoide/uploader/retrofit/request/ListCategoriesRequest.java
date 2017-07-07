@@ -21,6 +21,7 @@ public class ListCategoriesRequest
     extends RetrofitSpiceRequest<CategoriesJson, ListCategoriesRequest.Webservice> {
 
   @Getter @Setter private String mode;
+  @Getter @Setter private String language;
 
   public ListCategoriesRequest() {
     super(CategoriesJson.class, ListCategoriesRequest.Webservice.class);
@@ -29,7 +30,8 @@ public class ListCategoriesRequest
   @Override public CategoriesJson loadDataFromNetwork() throws Exception {
     HashMap<String, String> parameters = new HashMap<String, String>();
 
-    parameters.put("mode", "json");
+    parameters.put("mode", mode);
+    parameters.put("lang", language);
 
     return getService().listCategories(parameters);
   }

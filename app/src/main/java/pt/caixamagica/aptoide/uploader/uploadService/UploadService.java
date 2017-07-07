@@ -20,6 +20,7 @@ import android.os.IBinder;
 import android.provider.Settings;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import com.facebook.AppEventsLogger;
 import com.google.android.vending.licensing.AESObfuscator;
 import com.google.android.vending.licensing.ValidationException;
 import com.octo.android.robospice.SpiceManager;
@@ -34,6 +35,7 @@ import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 import pt.caixamagica.aptoide.uploader.UploaderUtils;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
+import pt.caixamagica.aptoide.uploader.analytics.UploaderAnalytics;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploadService;
 import pt.caixamagica.aptoide.uploader.retrofit.request.StoreTokenInterface;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UploadAppToRepoRequest;
@@ -53,10 +55,9 @@ public class UploadService extends Service {
   private final MyBinder myBinder = new MyBinder(this);
   public String inputTitle = null;
   public String languageCode = null;
-
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploadService.class);
-
   NotificationManager mNotificationManager;
+  private UploaderAnalytics uploaderAnalytics;
   private UserCredentialsJson userCredentialsJson;
   private Map<String, UploadAppToRepoRequest> sendingAppsUploadRequests = new HashMap<>();
   private Map<String, SelectablePackageInfo> sendingAppsSelectablePackageInfos = new HashMap<>();
@@ -168,15 +169,14 @@ public class UploadService extends Service {
 
     spiceManager.execute(uploadAppToRepoRequest, new RequestListener<UploadAppToRepoJson>() {
       @Override public void onRequestFailure(SpiceException spiceException) {
-
         Log.e(TAG, "onRequestFailure: ", spiceException);
 
         if (spiceException instanceof NetworkException) {
           checkUploadSuccess(uploadAppToRepoRequest);
-
           //setNotification(uploadAppToRepoRequest.getPackageName(),
           //    getString(R.string.upload_done_network_error), null);
         } else {
+          uploaderAnalytics.uploadComplete("fail", "Upload App to Repo");
           setRetryNotification(uploadAppToRepoRequest.getPackageName(),
               uploadAppToRepoRequest.getLabel());
         }
@@ -220,7 +220,10 @@ public class UploadService extends Service {
 
       private boolean hasErrorCode(List<Error> errors, String errCode) {
         for (Error e : errors) {
-          if (e.getCode().equals(errCode)) return true;
+          if (e.getCode()
+              .equals(errCode)) {
+            return true;
+          }
         }
 
         return false;
@@ -275,6 +278,7 @@ public class UploadService extends Service {
           }
 
           if (systemError(uploadAppToRepoJson.getErrors())) {
+            uploaderAnalytics.uploadComplete("fail", "Upload App to Repo");
             setRetryNotification(uploadAppToRepoRequest.getPackageName(),
                 uploadAppToRepoRequest.getLabel());
           } else {
@@ -284,6 +288,7 @@ public class UploadService extends Service {
             if (retry) {
               uploadApp(uploadAppToRepoRequest, selectablePackageInfo);
             } else {
+              uploaderAnalytics.uploadComplete("fail", "Upload App to Repo");
               List<Error> errors = uploadAppToRepoJson.getErrors();
               String packageName = uploadAppToRepoRequest.getPackageName();
               String label = uploadAppToRepoRequest.getLabel();
@@ -291,14 +296,13 @@ public class UploadService extends Service {
             }
           }
         } else {
+          uploaderAnalytics.uploadComplete("success", "Upload App to Repo");
           setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
               uploadAppToRepoRequest.getLabel());
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
         }
       }
-
-
     });
   }
 
@@ -313,15 +317,22 @@ public class UploadService extends Service {
     Bitmap b = loadIcon(packageName);
     if (b != null) mBuilder.setLargeIcon(b);
     b = null;
-    mBuilder.setSmallIcon(R.drawable.notification_icon).
-        setContentTitle(getApplication().getString(R.string.app_name)).
-        setContentIntent(buildFillMissingInfoIntent(selectablePackageInfo)).
-        setOngoing(false).
-        setAutoCancel(true).
-        setStyle(new NotificationCompat.BigTextStyle().bigText(
-            getString(R.string.upload_more_info))).
-        setSubText(getString(R.string.upload_more_info)).
-        setContentText(label);
+    mBuilder.setSmallIcon(R.drawable.notification_icon)
+        .
+            setContentTitle(getApplication().getString(R.string.app_name))
+        .
+            setContentIntent(buildFillMissingInfoIntent(selectablePackageInfo))
+        .
+            setOngoing(false)
+        .
+            setAutoCancel(true)
+        .
+            setStyle(
+                new NotificationCompat.BigTextStyle().bigText(getString(R.string.upload_more_info)))
+        .
+            setSubText(getString(R.string.upload_more_info))
+        .
+            setContentText(label);
 
     NotificationManager mNotificationManager =
         (NotificationManager) getApplication().getSystemService(Context.NOTIFICATION_SERVICE);
@@ -365,6 +376,7 @@ public class UploadService extends Service {
 
   @Override public void onCreate() {
     spiceManager.start(this);
+    uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getApplicationContext()));
   }
 
   @Override public int onStartCommand(Intent intent, int flags, int startId) {
@@ -376,7 +388,8 @@ public class UploadService extends Service {
 
     if (intent != null) {
       if (getString(R.string.cancel).equals(intent.getAction())) {
-        cancelUpload(intent.getExtras().getString("packageName"));
+        cancelUpload(intent.getExtras()
+            .getString("packageName"));
       }
       if (getString(R.string.retry).equals(intent.getAction())) {
         UploadAppToRepoRequest req =
@@ -418,7 +431,7 @@ public class UploadService extends Service {
   }
 
   private void setRetryNotification(String packageName, String label) {
-
+    uploaderAnalytics.uploadComplete("fail", "Upload App to Repo");
     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplication());
     Bitmap b = loadIcon(packageName);
     if (b != null) mBuilder.setLargeIcon(b);
@@ -462,7 +475,9 @@ public class UploadService extends Service {
         newLine = true;
       }
 
-      stringBuilder.append(error.getCode()).append(": ").append(error.getMsg());
+      stringBuilder.append(error.getCode())
+          .append(": ")
+          .append(error.getMsg());
     }
 
     bigTextStyle.bigText(stringBuilder.toString());
@@ -542,26 +557,33 @@ public class UploadService extends Service {
         UploaderUtils.md5Calc(new File(originalRequest.getApkPath())));
     spiceManager.execute(uploadAppToRepoRequest, new RequestListener<UploadAppToRepoJson>() {
       @Override public void onRequestFailure(SpiceException spiceException) {
+        uploaderAnalytics.uploadComplete("fail", "Check if in Store");
         simpleNotification(uploadAppToRepoRequest.getPackageName(),
             uploadAppToRepoRequest.getLabel(), getString(R.string.upload_failed));
       }
 
       @Override public void onRequestSuccess(UploadAppToRepoJson uploadAppToRepoJson) {
         if (uploadAppToRepoJson.getErrors() != null) {
-          String errorCode = uploadAppToRepoJson.getErrors().get(0).getCode();
+          String errorCode = uploadAppToRepoJson.getErrors()
+              .get(0)
+              .getCode();
           if (errorCode.equals("APK-5")) {
+            uploaderAnalytics.uploadComplete("fail", "Check if in Store");
             setErrorsNotification(uploadAppToRepoRequest.getPackageName(),
                 uploadAppToRepoRequest.getLabel(), uploadAppToRepoJson.getErrors());
           } else if (errorCode.equals("APK-103")) {
+            uploaderAnalytics.uploadComplete("success", "Check if in Store");
             setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
                 uploadAppToRepoRequest.getLabel());
             sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
             sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
           } else {
+            uploaderAnalytics.uploadComplete("fail", "Check if in Store");
             simpleNotification(uploadAppToRepoRequest.getPackageName(),
                 uploadAppToRepoRequest.getLabel(), getString(R.string.upload_failed));
           }
         } else {
+          uploaderAnalytics.uploadComplete("success", "Check if in Store");
           setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
               uploadAppToRepoRequest.getLabel());
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());

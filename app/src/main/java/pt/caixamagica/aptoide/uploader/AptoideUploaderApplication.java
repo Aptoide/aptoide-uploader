@@ -8,6 +8,7 @@ package pt.caixamagica.aptoide.uploader;
 import android.app.Application;
 import android.content.Context;
 import com.crashlytics.android.Crashlytics;
+import com.facebook.AppEventsLogger;
 import io.fabric.sdk.android.Fabric;
 import lombok.Getter;
 import lombok.Setter;
@@ -29,7 +30,7 @@ public class AptoideUploaderApplication extends Application {
   @Override public void onCreate() {
     super.onCreate();
     Fabric.with(this, new Crashlytics());
-
     context = this;
+    AppEventsLogger.activateApp(this);
   }
 }

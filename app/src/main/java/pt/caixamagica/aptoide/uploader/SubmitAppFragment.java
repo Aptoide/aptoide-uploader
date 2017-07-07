@@ -32,6 +32,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Locale;
 import pt.caixamagica.aptoide.uploader.liquid.Event;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetApkInfoRequest;
@@ -131,10 +132,8 @@ public class SubmitAppFragment extends Fragment {
     }
 
     prepareButtons();
-
-    prepareSpinners();
-
     loadBundleData();
+    prepareSpinners();
 
     if (savedInstanceState == null || !dataLoaded) prepareInfo();
 
@@ -253,7 +252,6 @@ public class SubmitAppFragment extends Fragment {
     if (validadeFields()) {
 
       setEditedFields();
-
       uploadApp();
 
       Toast.makeText(getActivity(), R.string.sending_background, Toast.LENGTH_SHORT).show();
@@ -359,11 +357,21 @@ public class SubmitAppFragment extends Fragment {
     spinner.setAdapter(adapter);
   }
 
+  private void prepareCategorySpinner() {
+    Spinner spinner = (Spinner) rootView.findViewById(R.id.app_category_spinner);
+    ArrayAdapter<String> spinnerArrayAdapter =
+        new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, spinnerArray);
+    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spinner.setAdapter(spinnerArrayAdapter);
+  }
+
   private void retrieveCategorySpinnerArray() {
 
     if (spinnerArray == null) {
       ListCategoriesRequest listCategoriesRequest = new ListCategoriesRequest();
       listCategoriesRequest.setMode("json");
+      listCategoriesRequest.setLanguage(Locale.getDefault()
+          .getLanguage());
 
       spiceManager.execute(listCategoriesRequest, new RequestListener<CategoriesJson>() {
         @Override public void onRequestFailure(SpiceException spiceException) {
@@ -395,14 +403,6 @@ public class SubmitAppFragment extends Fragment {
     } else {
       prepareCategorySpinner();
     }
-  }
-
-  private void prepareCategorySpinner() {
-    Spinner spinner = (Spinner) rootView.findViewById(R.id.app_category_spinner);
-    ArrayAdapter<String> spinnerArrayAdapter =
-        new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, spinnerArray);
-    spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    spinner.setAdapter(spinnerArrayAdapter);
   }
 
   /**

@@ -38,6 +38,7 @@ import android.widget.LinearLayout;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.facebook.AppEventsLogger;
 import com.google.android.vending.licensing.ValidationException;
 import com.manuelpeinado.multichoiceadapter.MultiChoiceAdapter;
 import com.octo.android.robospice.SpiceManager;
@@ -51,6 +52,7 @@ import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
+import pt.caixamagica.aptoide.uploader.analytics.UploaderAnalytics;
 import pt.caixamagica.aptoide.uploader.dialog.ConfirmationDialog;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetProposedRequest;
@@ -80,6 +82,7 @@ public class FragmentAppView extends Fragment {
   private ManelAdapter adapter;
   private boolean mBound = false;
   private UploadService mService;
+  private UploaderAnalytics uploaderAnalytics;
   /**
    * Defines callbacks for service binding, passed to bindService()
    */
@@ -196,6 +199,7 @@ public class FragmentAppView extends Fragment {
 
     userCredentialsJson = (UserCredentialsJson) getArguments().get("userCredentialsJson");
     setAdapter(savedInstanceState, null);
+    uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getContext()));
   }
 
   @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -422,7 +426,7 @@ public class FragmentAppView extends Fragment {
         for (Long aLong : adapter.getCheckedItems()) {
           selectablePackageInfos.add(adapter.getItem(aLong.intValue()));
         }
-
+        uploaderAnalytics.submitApps(selectablePackageInfos.size());
         for (final SelectablePackageInfo selectablePackageInfo : selectablePackageInfos) {
           GetProposedRequest getProposedRequest =
               new GetProposedRequest(Utils.getLanguage(), selectablePackageInfo.packageName,
