@@ -44,7 +44,7 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UploadAppToRepoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
 import static pt.caixamagica.aptoide.uploader.activities.LoginActivity.SALT;
-import static pt.caixamagica.aptoide.uploader.activities.LoginActivity.SHARED_PREFERENCES_FILE;
+import static pt.caixamagica.aptoide.uploader.util.StoredCredentialsManager.SHARED_PREFERENCES_FILE;
 
 /**
  * Created by neuro on 07-03-2015.
