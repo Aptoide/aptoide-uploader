@@ -36,7 +36,7 @@ public class SubmitActivity extends ActionBarActivity {
         (UserCredentialsJson) extras.getSerializable("userCredentialsJson");
     SelectablePackageInfo selectablePackageInfo =
         new SelectablePackageInfo(((PackageInfo) extras.getParcelable("selectablePackageInfo")),
-            getPackageManager());
+            getPackageManager(), false);
     String title = extras.getString("title");
     String description = extras.getString("description");
     String languageCode = extras.getString("languageCode");
