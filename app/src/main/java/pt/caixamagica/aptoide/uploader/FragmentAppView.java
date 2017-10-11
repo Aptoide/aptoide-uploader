@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -44,12 +43,9 @@ import com.manuelpeinado.multichoiceadapter.MultiChoiceAdapter;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
 import pt.caixamagica.aptoide.uploader.analytics.UploaderAnalytics;
@@ -58,6 +54,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSeco
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetProposedRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
+import pt.caixamagica.aptoide.uploader.util.InstalledUtils;
 import pt.caixamagica.aptoide.uploader.util.Utils;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetProposedResponse;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
@@ -83,6 +80,7 @@ public class FragmentAppView extends Fragment {
   private boolean mBound = false;
   private UploadService mService;
   private UploaderAnalytics uploaderAnalytics;
+  private InstalledUtils installedUtils;
   /**
    * Defines callbacks for service binding, passed to bindService()
    */
@@ -200,6 +198,7 @@ public class FragmentAppView extends Fragment {
     userCredentialsJson = (UserCredentialsJson) getArguments().get("userCredentialsJson");
     setAdapter(savedInstanceState, null);
     uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getContext()));
+    installedUtils = new InstalledUtils();
   }
 
   @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -290,7 +289,7 @@ public class FragmentAppView extends Fragment {
       @Override public void onRefresh() {
         //call method(s) responsible for creating the list.
         //notifyDataSetChanged on adapter
-        adapter.mDataset = nonSystemPackages(true);
+        adapter.mDataset = installedUtils.nonSystemPackages(true, getContext());
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
       }
@@ -517,7 +516,7 @@ public class FragmentAppView extends Fragment {
 
     new Thread(new Runnable() {
       @Override public void run() {
-        Collections.sort(adapter.mDataset, newLastInstallComparator());
+        Collections.sort(adapter.mDataset, installedUtils.newLastInstallComparator(getContext()));
         getActivity().runOnUiThread(new Runnable() {
           @Override public void run() {
             adapter.notifyDataSetChanged();
@@ -549,7 +548,8 @@ public class FragmentAppView extends Fragment {
 
   private void setAdapter(Bundle savedInstanceState, final View view) {
 
-    adapter = new ManelAdapter(savedInstanceState, view, this, nonSystemPackages(true),
+    adapter = new ManelAdapter(savedInstanceState, view, this,
+        installedUtils.nonSystemPackages(true, getContext()),
         userCredentialsJson);
 
     adapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
@@ -559,49 +559,5 @@ public class FragmentAppView extends Fragment {
     });
   }
 
-  private List<SelectablePackageInfo> nonSystemPackages(boolean ordered) {
-    List<PackageInfo> packs = getActivity().getPackageManager().getInstalledPackages(0);
 
-    Iterator<PackageInfo> infoIterator = packs.iterator();
-
-    LinkedList<PackageInfo> packageInfos = new LinkedList<>();
-    while (infoIterator.hasNext()) {
-      PackageInfo next = infoIterator.next();
-      if (isSystemUpdatedPackage(next) || !isSystemPackage(next)) packageInfos.add(next);
-    }
-
-    List<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>();
-
-    selectablePackageInfos.clear();
-    for (PackageInfo p : packageInfos) {
-      selectablePackageInfos.add(new SelectablePackageInfo(p, getActivity().getPackageManager()));
-    }
-
-    if (ordered) Collections.sort(selectablePackageInfos, newLastInstallComparator());
-
-    return selectablePackageInfos;
-  }
-
-  private boolean isSystemUpdatedPackage(PackageInfo packageInfo) {
-    int maskUpdade = ApplicationInfo.FLAG_UPDATED_SYSTEM_APP;
-    return (packageInfo.applicationInfo.flags & maskUpdade) != 0;
-  }
-
-  private boolean isSystemPackage(PackageInfo packageInfo) {
-    return ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
-  }
-
-  public Comparator<SelectablePackageInfo> newLastInstallComparator() {
-    return new Comparator<SelectablePackageInfo>() {
-      @Override public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
-        return (int) (getLastInstallDate(rhs) / 1000 - getLastInstallDate(lhs) / 1000);
-      }
-    };
-  }
-
-  private long getLastInstallDate(PackageInfo packageInfo) {
-    PackageManager pm = getContext().getPackageManager();
-    String appFile = packageInfo.applicationInfo.sourceDir;
-    return new File(appFile).lastModified(); //Epoch Time
-  }
 }
