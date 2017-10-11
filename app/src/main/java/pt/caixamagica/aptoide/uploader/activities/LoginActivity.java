@@ -93,6 +93,7 @@ public class LoginActivity extends AppCompatActivity
   private Fragment mContent;
   private UserInfo userInfo;
   private UserCredentialsJson userCredentials;
+  private String accessToken;
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
@@ -467,7 +468,12 @@ public class LoginActivity extends AppCompatActivity
 
   private void getUserInfo(OAuth oAuth) {
     UserCredentialsRequest request = new UserCredentialsRequest();
-    request.setToken(oAuth.getAccess_token());
+    accessToken = oAuth.getAccess_token();
+    if (userCredentials != null) {
+      userCredentials.setToken(accessToken);
+    }
+
+    request.setToken(accessToken);
     storeToken(oAuth);
 
     spiceManager.execute(request, "getUserInfo", DEFAULT_CACHE_TIME,
@@ -567,6 +573,10 @@ public class LoginActivity extends AppCompatActivity
       if (userCredentialsJson == null) {
         UploaderUtils.popLoadingFragment(LoginActivity.this);
         return;
+      } else {
+        if (accessToken != null) {
+          userCredentialsJson.setToken(accessToken);
+        }
       }
 
       if (userCredentialsJson.getRepo() == null) {
