@@ -198,7 +198,7 @@ public class FragmentAppView extends Fragment {
     userCredentialsJson = (UserCredentialsJson) getArguments().get("userCredentialsJson");
     setAdapter(savedInstanceState, null);
     uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getContext()));
-    installedUtils = new InstalledUtils();
+    installedUtils = new InstalledUtils(getContext());
   }
 
   @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -289,7 +289,7 @@ public class FragmentAppView extends Fragment {
       @Override public void onRefresh() {
         //call method(s) responsible for creating the list.
         //notifyDataSetChanged on adapter
-        adapter.mDataset = installedUtils.nonSystemPackages(true, getContext());
+        adapter.mDataset = installedUtils.nonSystemPackages(true);
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
       }
@@ -516,7 +516,7 @@ public class FragmentAppView extends Fragment {
 
     new Thread(new Runnable() {
       @Override public void run() {
-        Collections.sort(adapter.mDataset, installedUtils.newLastInstallComparator(getContext()));
+        Collections.sort(adapter.mDataset, installedUtils.newLastInstallComparator());
         getActivity().runOnUiThread(new Runnable() {
           @Override public void run() {
             adapter.notifyDataSetChanged();
@@ -549,7 +549,7 @@ public class FragmentAppView extends Fragment {
   private void setAdapter(Bundle savedInstanceState, final View view) {
 
     adapter = new ManelAdapter(savedInstanceState, view, this,
-        installedUtils.nonSystemPackages(true, getContext()),
+        installedUtils.nonSystemPackages(true),
         userCredentialsJson);
 
     adapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {

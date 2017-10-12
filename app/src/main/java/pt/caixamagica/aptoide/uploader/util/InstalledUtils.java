@@ -19,7 +19,13 @@ import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 
 public class InstalledUtils {
 
-  public List<SelectablePackageInfo> nonSystemPackages(boolean ordered, Context context) {
+  private final Context context;
+
+  public InstalledUtils(Context context) {
+    this.context = context.getApplicationContext();
+  }
+
+  public List<SelectablePackageInfo> nonSystemPackages(boolean ordered) {
     List<PackageInfo> packs = context.getPackageManager()
         .getInstalledPackages(0);
 
@@ -38,7 +44,7 @@ public class InstalledUtils {
       selectablePackageInfos.add(new SelectablePackageInfo(p, context.getPackageManager(), false));
     }
 
-    if (ordered) Collections.sort(selectablePackageInfos, newLastInstallComparator(context));
+    if (ordered) Collections.sort(selectablePackageInfos, newLastInstallComparator());
 
     return selectablePackageInfos;
   }
@@ -52,16 +58,15 @@ public class InstalledUtils {
     return ((packageInfo.applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) != 0);
   }
 
-  public Comparator<SelectablePackageInfo> newLastInstallComparator(final Context context) {
+  public Comparator<SelectablePackageInfo> newLastInstallComparator() {
     return new Comparator<SelectablePackageInfo>() {
       @Override public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
-        return (int) (getLastInstallDate(rhs, context) / 1000
-            - getLastInstallDate(lhs, context) / 1000);
+        return (int) (getLastInstallDate(rhs) / 1000 - getLastInstallDate(lhs) / 1000);
       }
     };
   }
 
-  private long getLastInstallDate(PackageInfo packageInfo, Context context) {
+  private long getLastInstallDate(PackageInfo packageInfo) {
     PackageManager pm = context.getPackageManager();
     String appFile = packageInfo.applicationInfo.sourceDir;
     return new File(appFile).lastModified(); //Epoch Time
