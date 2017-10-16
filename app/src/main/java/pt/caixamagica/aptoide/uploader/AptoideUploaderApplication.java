@@ -37,6 +37,7 @@ public class AptoideUploaderApplication extends Application {
   @Getter @Setter private String username;
   private double BUFFER_SIZE = 5;
   private SpiceManager spiceManager;
+  private StoredCredentialsManager storedCredentialsManager;
 
   public static Context getContext() {
     return context;
@@ -47,9 +48,12 @@ public class AptoideUploaderApplication extends Application {
     Fabric.with(this, new Crashlytics());
     context = this;
     AppEventsLogger.activateApp(this);
-    spiceManager = new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
-    spiceManager.start(this);
-    refreshInstalledAppsMd5List();
+    storedCredentialsManager = new StoredCredentialsManager(this.getApplicationContext());
+    if (isUserLoggedIn()) {
+      spiceManager = new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
+      spiceManager.start(this);
+      refreshInstalledAppsMd5List();
+    }
   }
 
   private void refreshInstalledAppsMd5List() {
@@ -119,5 +123,9 @@ public class AptoideUploaderApplication extends Application {
     str += "]";
 
     return str;
+  }
+
+  private boolean isUserLoggedIn() {
+    return storedCredentialsManager.getStoredUserCredentials() != null;
   }
 }
