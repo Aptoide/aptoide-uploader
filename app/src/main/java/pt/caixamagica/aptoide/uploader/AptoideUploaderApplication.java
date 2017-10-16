@@ -85,7 +85,11 @@ public class AptoideUploaderApplication extends Application {
         List<Md5AsyncUtils.Model> list = new LinkedList<>();
 
         for (int i = 0; i < BUFFER_SIZE; i++) {
-          list.add(concurrentLinkedQueue.poll());
+          if (!concurrentLinkedQueue.isEmpty()) {
+            list.add(concurrentLinkedQueue.poll());
+          } else {
+            break;
+          }
         }
 
         return list;
@@ -106,7 +110,7 @@ public class AptoideUploaderApplication extends Application {
               }
 
               @Override public void onRequestSuccess(UserCredentialsJson userCredentialsJson) {
-
+                System.out.println("request was successful");
               }
             });
       }
