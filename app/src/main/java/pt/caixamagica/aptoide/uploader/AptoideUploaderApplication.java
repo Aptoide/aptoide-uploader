@@ -84,11 +84,9 @@ public class AptoideUploaderApplication extends Application {
       private List<Md5AsyncUtils.Model> createModelList() {
         List<Md5AsyncUtils.Model> list = new LinkedList<>();
 
-        for (int i = 0; i < BUFFER_SIZE; i++) {
+        for (int i = 0; i < Math.min(BUFFER_SIZE, concurrentLinkedQueue.size()); i++) {
           if (!concurrentLinkedQueue.isEmpty()) {
             list.add(concurrentLinkedQueue.poll());
-          } else {
-            break;
           }
         }
 
@@ -103,7 +101,7 @@ public class AptoideUploaderApplication extends Application {
         String storeName = storedUserCredentials.getRepo();
 
         spiceManager.execute(
-            new UploadedAppsRequest(token, storeName, buildInstalledAppsMd5String(modelList)),
+            new UploadedAppsRequest(token, storeName, createMd5StringList(modelList)),
             new RequestListener<UserCredentialsJson>() {
               @Override public void onRequestFailure(SpiceException spiceException) {
                 spiceException.printStackTrace();
@@ -117,16 +115,22 @@ public class AptoideUploaderApplication extends Application {
     };
   }
 
-  private String buildInstalledAppsMd5String(List<Md5AsyncUtils.Model> modelList) {
+  private List<String> createMd5StringList(List<Md5AsyncUtils.Model> modelList) {
     String str = "[";
 
     for (Md5AsyncUtils.Model model : modelList) {
-      str += model;
+      str += model.getMd5sum() + ",";
     }
 
-    str += "]";
+    char[] chars = str.toCharArray();
+    chars[str.length() - 1] = ']';
 
-    return str;
+    List<String> strings = new LinkedList<>();
+    for (Md5AsyncUtils.Model model : modelList) {
+      strings.add(model.getMd5sum());
+    }
+
+    return strings;
   }
 
   private boolean isUserLoggedIn() {
