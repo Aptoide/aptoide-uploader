@@ -157,7 +157,7 @@ dependencies {
   // explicitly depend on RxJava's latest version for bug fixes and new features.
   implementation "io.reactivex.rxjava2:rxjava:${rxjava_version}"
 
-  testimplementation "org.jetbrains.spek:spek-api:${spek_api_version}"
-  testimplementation "org.jetbrains.spek:spek-junit-platform-engine:${spek_junit_version}"
-  testimplementation "org.junit.platform:junit-platform-runner:${junit_runner_version}"
+  testImplementation "org.jetbrains.spek:spek-api:${spek_api_version}"
+  testImplementation "org.jetbrains.spek:spek-junit-platform-engine:${spek_junit_version}"
+  testImplementation "org.junit.platform:junit-platform-runner:${junit_runner_version}"
 }
