@@ -1,4 +1,7 @@
 apply plugin: 'com.android.application'
+apply plugin: 'kotlin-android'
+apply plugin: 'kotlin-kapt'
+apply plugin: 'io.fabric'
 
 buildscript {
   repositories {
@@ -6,7 +9,7 @@ buildscript {
   }
 
   dependencies {
-    classpath 'io.fabric.tools:gradle:1.+'
+    classpath 'io.fabric.tools:gradle:1.24.4'
   }
 }
 
@@ -31,30 +34,19 @@ repositories {
 
 
 android {
-  lintOptions {
-    disable 'MissingTranslation'
-    abortOnError false
-  }
-  signingConfigs {
-    release {
-      storeFile = file(project.STORE_FILE_BACKUP)
-      storePassword = project.STORE_PASSWORD_BACKUP
-      keyAlias = project.KEY_ALIAS_UPLOADER
-      keyPassword = project.KEY_PASSWORD_UPLOADER
-      //            v2SigningEnabled = false
-    }
-  }
 
-  compileSdkVersion 23
-  buildToolsVersion "23.0.3"
+  compileSdkVersion Integer.parseInt(project.COMPILE_SDK_VERSION)
+  buildToolsVersion BUILD_TOOLS_VERSION
 
   defaultConfig {
-    applicationId "pt.caixamagica.aptoide.uploader"
-    minSdkVersion 9
-    targetSdkVersion 23
-    Integer value = project.APTOIDE_UPLOADER_VERSION_CODE.toInteger();
-    versionCode value
-    versionName "2.6"
+    minSdkVersion project.MINIMUM_SDK_VERSION
+    targetSdkVersion Integer.parseInt(project.TARGET_SDK_VERSION)
+    applicationId project.APPLICATION_ID
+    versionCode project.VERSION_CODE.toInteger()
+    versionName VERSION_NAME
+
+    testProguardFile 'proguard-rules-test.pro'
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
 
@@ -63,36 +55,44 @@ android {
     resValue "string", "facebook_app_id", "\"" + project.UPLOADER_FACEBOOK_APP_ID + "\""
   }
 
-  buildTypes {
+  lintOptions {
+    disable 'MissingTranslation'
+    abortOnError false
+  }
+
+  signingConfigs {
     release {
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      signingConfig signingConfigs.release
-
-      applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-          project.ext { appName = 'aptoide-uploader' }
-          def newName = output.outputFile.name
-          newName = newName.replace("app-", "$project.ext.appName-")
-          //"MyAppName" -> I set my app variables in the root project
-          newName = newName.replace("-release", "-" + versionName)
-          //noinspection GroovyAssignabilityCheck
-          output.outputFile = new File(output.outputFile.parent, newName)
-        }
-      }
-    }
-
-    debug {
-      signingConfig signingConfigs.release
-      applicationIdSuffix ".debug"
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+      storeFile = file(project.STORE_FILE_BACKUP)
+      storePassword = project.STORE_PASSWORD_BACKUP
+      keyAlias = project.KEY_ALIAS_UPLOADER
+      keyPassword = project.KEY_PASSWORD_UPLOADER
     }
   }
 
+  buildTypes {
+    release {
+      signingConfig signingConfigs.release
+
+      ext.enableCrashlytics = false
+      zipAlignEnabled true
+      minifyEnabled true
+      shrinkResources true
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-debug.pro'
+    }
+
+    debug {
+      applicationIdSuffix ".debug"
+
+      ext.enableCrashlytics = false
+      zipAlignEnabled false
+      minifyEnabled false
+      shrinkResources false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-debug.pro'
+    }
+  }
 
   applicationVariants.all { variant ->
-    variant.outputs.each { output ->
+    variant.outputs.all { output ->
       def project = "uploader"
       def SEP = "_"
       def buildType = variant.variantData.variantConfiguration.buildType.name
@@ -100,8 +100,7 @@ android {
       def versionCode = variant.versionCode
 
       def newApkName = project + SEP + buildType + SEP + versionName + SEP + versionCode + ".apk"
-
-      output.outputFile = new File(output.outputFile.parent, newApkName)
+      outputFileName = newApkName
     }
   }
 
@@ -114,24 +113,47 @@ android {
     exclude 'META-INF/LICENSE'
     exclude 'META-INF/ASL2.0'
   }
-  useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
-  compile fileTree(dir: 'libs', include: ['*.jar'])
-  compile 'com.android.support:appcompat-v7:23.2.1'
+  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
-  compile 'com.octo.android.robospice:robospice:1.4.14'
-  compile 'com.octo.android.robospice:robospice-retrofit:1.4.14'
-  compile 'com.fasterxml.jackson.core:jackson-databind:2.5.4'
-  compile 'com.squareup.retrofit:converter-jackson:1.3.0'
-  compile 'com.squareup.picasso:picasso:2.4.0'
-  compile 'com.android.support:recyclerview-v7:23.2.1'
-  compile 'com.github.manuelpeinado.multichoiceadapter:multichoiceadapter:3.1.0'
-  compile 'com.facebook.android:facebook-android-sdk:3.23.1'
-  compile 'com.google.android.gms:play-services:6.5.87'
-  provided 'org.projectlombok:lombok:1.16.0'
-  compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
-    transitive = true;
+  implementation 'com.android.support.constraint:constraint-layout:1.0.2'
+  testImplementation "junit:junit:${junit_version}"
+  testImplementation "org.mockito:mockito-core:${mockito_core_version}"
+  // Force usage of support annotations in the test app, since it is internally used by the runner module.
+  androidTestImplementation("com.android.support.test:runner:${test_runner_version}") {
+    exclude group: "com.android.support", module: "support-annotations"
   }
+
+  androidTestImplementation "com.android.support:support-annotations:${support_lib_annotations_version}"
+  implementation "com.android.support:support-annotations:${support_lib_annotations_version}"
+
+  implementation "com.android.support:appcompat-v7:${support_lib_version}"
+  implementation "com.android.support:cardview-v7:${support_lib_version}"
+  implementation "com.android.support:animated-vector-drawable:${support_lib_version}"
+  implementation "com.android.support:customtabs:${support_lib_version}"
+  implementation "com.android.support:recyclerview-v7:${support_lib_version}"
+  implementation "com.android.support:design:${support_lib_version}"
+
+  implementation "com.android.support.constraint:constraint-layout:${constraint_layout_version}"
+
+  implementation "com.google.android.gms:play-services-basement:${play_services_version}"
+  implementation "com.google.android.gms:play-services-auth:${play_services_version}"
+
+  implementation "com.facebook.android:facebook-android-sdk:${facebook_sdk_version}"
+
+  // missing leak flavour and configuration
+  //leakImplementation "com.squareup.leakcanary:leakcanary-android:${leakcanary_version}"
+
+  implementation("com.crashlytics.sdk.android:crashlytics:${crashlytics_version}@aar") {
+    transitive = true
+  }
+
+  implementation "com.github.bumptech.glide:glide:${glide_version}"
+
+  implementation "io.reactivex.rxjava2:rxandroid:${rxandroid_version}"
+  // Because RxAndroid releases are few and far between, it is recommended you also
+  // explicitly depend on RxJava's latest version for bug fixes and new features.
+  implementation "io.reactivex.rxjava2:rxjava:${rxjava_version}"
 }

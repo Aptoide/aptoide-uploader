@@ -5,4 +5,5 @@
   <dimen name="sideMargin">10dp</dimen>
   <dimen name="sideMarginTitle">24dp</dimen>
   <dimen name="textSize">18dp</dimen>
+  <dimen name="fab_margin">16dp</dimen>
 </resources>

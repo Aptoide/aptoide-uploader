@@ -1,19 +1,47 @@
-// Top-level build file where you can add configuration options common to all sub-projects/modules.
-
 buildscript {
+
+    ext.kotlin_version = '1.1.51'
+
     repositories {
         jcenter()
+        google()
+        mavenLocal()
     }
     dependencies {
-        classpath 'com.android.tools.build:gradle:2.2.3'
-
-        // NOTE: Do not place your application dependencies here; they belong
-        // in the individual module build.gradle files
+        classpath 'com.android.tools.build:gradle:3.0.0'
+        classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlin_version"
     }
 }
 
 allprojects {
     repositories {
+        google()
+        // If you're using a version of Gradle lower than 4.1, you must instead use:
+        // maven {
+        //     url 'https://maven.google.com'
+        // }
+        // An alternative URL is 'https://dl.google.com/dl/android/maven2/'
         jcenter()
+        maven { url 'https://maven.fabric.io/public' }
+        maven { url 'https://oss.sonatype.org/content/repositories/snapshots' }
+        maven { url "https://jitpack.io" }
+        mavenCentral()
     }
+}
+
+ext {
+    play_services_version = '11.4.2'
+    BUILD_TOOLS_VERSION = '26.0.2'
+    support_lib_version = '27.0.0'
+    support_lib_annotations_version = '26.1.0'
+    constraint_layout_version = '1.0.2'
+    leakcanary_version = '1.5.4'
+    junit_version = '4.12'
+    mockito_core_version = '2.9.0'
+    facebook_sdk_version = '4.27.0'
+    glide_version = '4.2.0'
+    crashlytics_version = '2.7.1'
+    test_runner_version = '1.0.1'
+    rxjava_version = '2.1.6'
+    rxandroid_version = '2.0.1'
 }

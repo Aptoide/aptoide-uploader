@@ -8,7 +8,6 @@
     android:orientation="vertical"
     >
 
-
   <LinearLayout
       android:id="@+id/grid_view_and_hint"
       android:layout_width="match_parent"
@@ -39,7 +38,6 @@
           android:layout_gravity="center"
           android:textSize="16sp"
           />
-      <!--android:text="Store"-->
     </LinearLayout>
     <LinearLayout
         android:layout_width="match_parent"
@@ -109,15 +107,6 @@
 
   </LinearLayout>
 
-  <!--<ImageView-->
-  <!--android:id="@+id/icon_test"-->
-  <!--android:layout_width="100dp"-->
-  <!--android:layout_height="100dp" />-->
-
-  <!--<ScrollView-->
-  <!--android:layout_width="match_parent"-->
-  <!--android:layout_height="match_parent">-->
-
   <Button
       android:id="@+id/submitAppsButton"
       android:layout_width="match_parent"
@@ -127,14 +116,5 @@
       android:text="@string/submit_apps"
       android:visibility="gone"
       />
-
-
-  <!--</ScrollView>-->
-
-  <!--<EditText-->
-  <!--android:layout_width="match_parent"-->
-  <!--android:layout_height="match_parent"-->
-  <!--android:hint="Ola"-->
-  <!--/>-->
 
 </RelativeLayout>
