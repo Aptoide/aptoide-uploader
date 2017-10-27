@@ -46,7 +46,7 @@ android {
     versionName VERSION_NAME
 
     testProguardFile 'proguard-rules-test.pro'
-    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+//    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
 
     manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
 
