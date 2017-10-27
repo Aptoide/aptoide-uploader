@@ -73,7 +73,7 @@ android {
     release {
       signingConfig signingConfigs.release
 
-      ext.enableCrashlytics = false
+      ext.enableCrashlytics = true
       zipAlignEnabled true
       minifyEnabled true
       shrinkResources true
@@ -156,4 +156,8 @@ dependencies {
   // Because RxAndroid releases are few and far between, it is recommended you also
   // explicitly depend on RxJava's latest version for bug fixes and new features.
   implementation "io.reactivex.rxjava2:rxjava:${rxjava_version}"
+
+  testimplementation "org.jetbrains.spek:spek-api:${spek_api_version}"
+  testimplementation "org.jetbrains.spek:spek-junit-platform-engine:${spek_junit_version}"
+  testimplementation "org.junit.platform:junit-platform-runner:${junit_runner_version}"
 }
