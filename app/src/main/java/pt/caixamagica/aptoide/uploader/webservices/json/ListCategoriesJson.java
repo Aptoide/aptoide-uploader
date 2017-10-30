@@ -12,7 +12,7 @@ import lombok.Setter;
 /**
  * Created by neuro on 16-02-2015.
  */
-public class CategoriesJson {
+public class ListCategoriesJson {
 
   @Getter @Setter public String status;
   @Getter @Setter public Categories categories;

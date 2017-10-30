@@ -40,7 +40,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.request.ListCategoriesRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
 import pt.caixamagica.aptoide.uploader.util.LanguageCodesHelper;
-import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesJson;
+import pt.caixamagica.aptoide.uploader.webservices.json.ListCategoriesJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetApkInfoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -51,7 +51,7 @@ public class SubmitAppFragment extends Fragment {
 
   private static List<String> spinnerArray;
 
-  private static List<CategoriesJson.Category> categories = new LinkedList<>();
+  private static List<ListCategoriesJson.Category> categories = new LinkedList<>();
 
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
 
@@ -373,26 +373,26 @@ public class SubmitAppFragment extends Fragment {
       listCategoriesRequest.setLanguage(Locale.getDefault()
           .getLanguage());
 
-      spiceManager.execute(listCategoriesRequest, new RequestListener<CategoriesJson>() {
+      spiceManager.execute(listCategoriesRequest, new RequestListener<ListCategoriesJson>() {
         @Override public void onRequestFailure(SpiceException spiceException) {
         }
 
-        @Override public void onRequestSuccess(CategoriesJson categoriesJson) {
+        @Override public void onRequestSuccess(ListCategoriesJson categoriesJson) {
 
-          categoriesJson.categories.standard.remove(new CategoriesJson.Category(1));
-          categoriesJson.categories.standard.remove(new CategoriesJson.Category(2));
+          categoriesJson.categories.standard.remove(new ListCategoriesJson.Category(1));
+          categoriesJson.categories.standard.remove(new ListCategoriesJson.Category(2));
 
           categories.addAll(categoriesJson.categories.standard);
           categories.addAll(categoriesJson.categories.custom);
-          Collections.sort(categories, new Comparator<CategoriesJson.Category>() {
-            @Override public int compare(CategoriesJson.Category lhs, CategoriesJson.Category rhs) {
+          Collections.sort(categories, new Comparator<ListCategoriesJson.Category>() {
+            @Override public int compare(ListCategoriesJson.Category lhs, ListCategoriesJson.Category rhs) {
               return lhs.getName().compareTo(rhs.getName());
             }
           });
 
           spinnerArray = new LinkedList<String>();
 
-          for (CategoriesJson.Category category : categories) {
+          for (ListCategoriesJson.Category category : categories) {
             spinnerArray.add(category.getName());
           }
           spinnerArray.add(0, "App Category");
@@ -417,7 +417,7 @@ public class SubmitAppFragment extends Fragment {
     // Default Value
     if (name.equals("App Category (Optional)")) return -1;
 
-    for (CategoriesJson.Category category : categories) {
+    for (ListCategoriesJson.Category category : categories) {
       if (category.getName().equals(name)) return category.getId().intValue();
     }
 
@@ -435,7 +435,7 @@ public class SubmitAppFragment extends Fragment {
   public int getCategorySpinnerIndex(Number id) {
 
     int i = 0;
-    for (CategoriesJson.Category category : categories) {
+    for (ListCategoriesJson.Category category : categories) {
       i++;
       if (category.getId().equals(id)) {
         return i;
@@ -532,7 +532,7 @@ public class SubmitAppFragment extends Fragment {
   }
 
   private int idFromCategoryName(String name) {
-    for (CategoriesJson.Category category : categories) {
+    for (ListCategoriesJson.Category category : categories) {
       if (category.getName().equals(name)) return (int) category.getId();
     }
     return 0;

@@ -9,7 +9,7 @@ import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 import java.util.HashMap;
 import lombok.Getter;
 import lombok.Setter;
-import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesJson;
+import pt.caixamagica.aptoide.uploader.webservices.json.ListCategoriesJson;
 import retrofit.http.FieldMap;
 import retrofit.http.FormUrlEncoded;
 import retrofit.http.POST;
@@ -18,16 +18,16 @@ import retrofit.http.POST;
  * Created by neuro on 16-02-2015.
  */
 public class ListCategoriesRequest
-    extends RetrofitSpiceRequest<CategoriesJson, ListCategoriesRequest.Webservice> {
+    extends RetrofitSpiceRequest<ListCategoriesJson, ListCategoriesRequest.Webservice> {
 
   @Getter @Setter private String mode;
   @Getter @Setter private String language;
 
   public ListCategoriesRequest() {
-    super(CategoriesJson.class, ListCategoriesRequest.Webservice.class);
+    super(ListCategoriesJson.class, ListCategoriesRequest.Webservice.class);
   }
 
-  @Override public CategoriesJson loadDataFromNetwork() throws Exception {
+  @Override public ListCategoriesJson loadDataFromNetwork() throws Exception {
     HashMap<String, String> parameters = new HashMap<String, String>();
 
     parameters.put("mode", mode);
@@ -38,7 +38,7 @@ public class ListCategoriesRequest
 
   public interface Webservice {
 
-    @FormUrlEncoded @POST("/2/listCategories") CategoriesJson listCategories(
+    @FormUrlEncoded @POST("/2/listCategories") ListCategoriesJson listCategories(
         @FieldMap HashMap<String, String> args);
   }
 }
