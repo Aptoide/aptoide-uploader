@@ -7,6 +7,7 @@ package pt.caixamagica.aptoide.uploader;
 
 import android.app.Application;
 import android.content.Context;
+import android.support.multidex.MultiDex;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.AppEventsLogger;
 import com.octo.android.robospice.SpiceManager;
@@ -48,6 +49,10 @@ public class AptoideUploaderApplication extends Application {
     Fabric.with(this, new Crashlytics());
     context = this;
     AppEventsLogger.activateApp(this);
+
+    if (BuildConfig.DEBUG) {
+      MultiDex.install(this);
+    }
     storedCredentialsManager = new StoredCredentialsManager(this.getApplicationContext());
     if (isUserLoggedIn()) {
       spiceManager = new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
