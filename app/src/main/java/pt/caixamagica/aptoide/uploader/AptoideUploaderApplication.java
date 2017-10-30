@@ -53,6 +53,7 @@ public class AptoideUploaderApplication extends Application {
     if (BuildConfig.DEBUG) {
       MultiDex.install(this);
     }
+
     storedCredentialsManager = new StoredCredentialsManager(this.getApplicationContext());
     if (isUserLoggedIn()) {
       spiceManager = new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
