@@ -65,6 +65,7 @@ android {
 
   buildTypes {
     release {
+      multiDexEnabled false
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
@@ -85,6 +86,7 @@ android {
     debug {
       signingConfig signingConfigs.release
       applicationIdSuffix ".debug"
+      multiDexEnabled true
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
@@ -134,4 +136,5 @@ dependencies {
   compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
     transitive = true;
   }
+  compile 'com.android.support:multidex:1.0.1'
 }
