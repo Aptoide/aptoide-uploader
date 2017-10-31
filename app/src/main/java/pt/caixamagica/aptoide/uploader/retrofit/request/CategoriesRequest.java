@@ -2,7 +2,6 @@ package pt.caixamagica.aptoide.uploader.retrofit.request;
 
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
 import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesResponse;
-import retrofit.http.FormUrlEncoded;
 import retrofit.http.POST;
 
 /**
@@ -22,6 +21,6 @@ public class CategoriesRequest
   }
 
   public interface Webservice {
-    @POST("/apks/groups/get") @FormUrlEncoded CategoriesResponse get();
+    @POST("/apks/groups/get") CategoriesResponse get();
   }
 }
