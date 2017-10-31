@@ -10,7 +10,7 @@ public class CategoriesResponse {
 
   public Info info;
   public List<Error> errors;
-  public List<DataList> datalist;
+  public DataList datalist;
 
   public Error getError() {
     if (errors != null && errors.size() > 0) {
@@ -47,7 +47,7 @@ public class CategoriesResponse {
     private Number next;
     private Number hidden;
     private boolean loaded;
-    private List list;
+    private java.util.List<List> list;
 
     @lombok.Data public static class List {
       private Number id;
