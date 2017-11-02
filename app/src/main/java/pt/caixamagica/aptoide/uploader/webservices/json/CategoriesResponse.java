@@ -49,6 +49,9 @@ public class CategoriesResponse {
     private boolean loaded;
     private java.util.List<List> list;
 
+    /**
+     * Represents a category - List is the name that was on the webservice
+     */
     @lombok.Data public static class List {
       private Number id;
       private String name;
@@ -71,6 +74,19 @@ public class CategoriesResponse {
       @lombok.Data public static class Stats {
         private Number groups;
         private Number items;
+      }
+
+      @Override public boolean equals(Object o) {
+        if (o == this) {
+          return true;
+        }
+
+        if (o instanceof CategoriesResponse.DataList.List) {
+          return ((CategoriesResponse.DataList.List) o).getId()
+              .equals(id);
+        }
+
+        return super.equals(o);
       }
     }
   }

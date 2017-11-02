@@ -32,15 +32,15 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import pt.caixamagica.aptoide.uploader.liquid.Event;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
+import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
+import pt.caixamagica.aptoide.uploader.retrofit.request.CategoriesRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetApkInfoRequest;
-import pt.caixamagica.aptoide.uploader.retrofit.request.ListCategoriesRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
 import pt.caixamagica.aptoide.uploader.util.LanguageCodesHelper;
-import pt.caixamagica.aptoide.uploader.webservices.json.ListCategoriesJson;
+import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesResponse;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetApkInfoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -51,9 +51,11 @@ public class SubmitAppFragment extends Fragment {
 
   private static List<String> spinnerArray;
 
-  private static List<ListCategoriesJson.Category> categories = new LinkedList<>();
+  private static List<CategoriesResponse.DataList.List> categories = new LinkedList<>();
 
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
+  protected SpiceManager secondarySpiceManager =
+      new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
 
   protected View rootView;
 
@@ -151,9 +153,11 @@ public class SubmitAppFragment extends Fragment {
     emailEditText = (EditText) view.findViewById(R.id.email);
     websiteEditText = (EditText) view.findViewById(R.id.website);
 
-    if (applicationNameEditText.getText().toString().equals("")
-        && selectablePackageInfos != null && proposedTitle == null) {
-      applicationNameEditText.setText(selectablePackageInfos.get(0).getLabel());
+    if (applicationNameEditText.getText()
+        .toString()
+        .equals("") && selectablePackageInfos != null && proposedTitle == null) {
+      applicationNameEditText.setText(selectablePackageInfos.get(0)
+          .getLabel());
     }
 
     if (proposedTitle != null && !proposedTitle.isEmpty()) {
@@ -174,6 +178,7 @@ public class SubmitAppFragment extends Fragment {
   @Override public void onStart() {
     super.onStart();
     spiceManager.start(getActivity());
+    secondarySpiceManager.start(getActivity());
 
     Intent intent = new Intent(getActivity(), UploadService.class);
 
@@ -183,8 +188,8 @@ public class SubmitAppFragment extends Fragment {
   }
 
   @Override public void onSaveInstanceState(Bundle outState) {
-    outState.putString("loading",
-        ((TextView) rootView.findViewById(R.id.progressBarText)).getText().toString());
+    outState.putString("loading", ((TextView) rootView.findViewById(R.id.progressBarText)).getText()
+        .toString());
     outState.putBoolean("dataLoaded", dataLoaded);
     super.onSaveInstanceState(outState);
   }
@@ -192,6 +197,7 @@ public class SubmitAppFragment extends Fragment {
   @Override public void onStop() {
     super.onStop();
     spiceManager.shouldStop();
+    secondarySpiceManager.shouldStop();
     if (mBound) {
       getActivity().unbindService(mConnection);
       mBound = false;
@@ -254,9 +260,11 @@ public class SubmitAppFragment extends Fragment {
       setEditedFields();
       uploadApp();
 
-      Toast.makeText(getActivity(), R.string.sending_background, Toast.LENGTH_SHORT).show();
+      Toast.makeText(getActivity(), R.string.sending_background, Toast.LENGTH_SHORT)
+          .show();
     } else {
-      Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_LONG).show();
+      Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_LONG)
+          .show();
     }
   }
 
@@ -283,7 +291,8 @@ public class SubmitAppFragment extends Fragment {
   private void uploadApp() throws ValidationException {
 
     if (proposedTitle != null) { //In case this fragment is filled with content from getProposed
-      mService.inputTitle = applicationNameEditText.getText().toString();
+      mService.inputTitle = applicationNameEditText.getText()
+          .toString();
     } else {
       mService.inputTitle = null;
     }
@@ -299,9 +308,13 @@ public class SubmitAppFragment extends Fragment {
 
     boolean validation = true;
 
-    validation &= !applicationNameEditText.getText().toString().equals("");
+    validation &= !applicationNameEditText.getText()
+        .toString()
+        .equals("");
     validation &= appCategorySpinner.getSelectedItemPosition() != 0;
-    validation &= !appDescriptionEditText.getText().toString().equals("");
+    validation &= !appDescriptionEditText.getText()
+        .toString()
+        .equals("");
     validation &= appLanguageSpinner.getSelectedItemPosition() != 0;
 
     return validation;
@@ -368,32 +381,34 @@ public class SubmitAppFragment extends Fragment {
   private void retrieveCategorySpinnerArray() {
 
     if (spinnerArray == null) {
-      ListCategoriesRequest listCategoriesRequest = new ListCategoriesRequest();
-      listCategoriesRequest.setMode("json");
-      listCategoriesRequest.setLanguage(Locale.getDefault()
-          .getLanguage());
+      //ListCategoriesRequest listCategoriesRequest = new ListCategoriesRequest();
+      //listCategoriesRequest.setMode("json");
+      //listCategoriesRequest.setLanguage(Locale.getDefault()
+      //    .getLanguage());
 
-      spiceManager.execute(listCategoriesRequest, new RequestListener<ListCategoriesJson>() {
+      CategoriesRequest categoriesRequest = new CategoriesRequest();
+
+      secondarySpiceManager.execute(categoriesRequest, new RequestListener<CategoriesResponse>() {
         @Override public void onRequestFailure(SpiceException spiceException) {
+          spiceException.printStackTrace();
         }
 
-        @Override public void onRequestSuccess(ListCategoriesJson categoriesJson) {
+        @Override public void onRequestSuccess(CategoriesResponse categoriesResponseJson) {
+          categories.addAll(categoriesResponseJson.datalist.getList());
 
-          categoriesJson.categories.standard.remove(new ListCategoriesJson.Category(1));
-          categoriesJson.categories.standard.remove(new ListCategoriesJson.Category(2));
+          Collections.sort(categories, new Comparator<CategoriesResponse.DataList.List>() {
 
-          categories.addAll(categoriesJson.categories.standard);
-          categories.addAll(categoriesJson.categories.custom);
-          Collections.sort(categories, new Comparator<ListCategoriesJson.Category>() {
-            @Override public int compare(ListCategoriesJson.Category lhs, ListCategoriesJson.Category rhs) {
-              return lhs.getName().compareTo(rhs.getName());
+            @Override public int compare(CategoriesResponse.DataList.List lhs,
+                CategoriesResponse.DataList.List rhs) {
+              return lhs.getTitle()
+                  .compareTo(rhs.getTitle());
             }
           });
 
           spinnerArray = new LinkedList<String>();
 
-          for (ListCategoriesJson.Category category : categories) {
-            spinnerArray.add(category.getName());
+          for (CategoriesResponse.DataList.List category : categories) {
+            spinnerArray.add(category.getTitle());
           }
           spinnerArray.add(0, "App Category");
 
@@ -417,8 +432,12 @@ public class SubmitAppFragment extends Fragment {
     // Default Value
     if (name.equals("App Category (Optional)")) return -1;
 
-    for (ListCategoriesJson.Category category : categories) {
-      if (category.getName().equals(name)) return category.getId().intValue();
+    for (CategoriesResponse.DataList.List category : categories) {
+      if (category.getTitle()
+          .equals(name)) {
+        return category.getId()
+            .intValue();
+      }
     }
 
     return -1;
@@ -435,9 +454,10 @@ public class SubmitAppFragment extends Fragment {
   public int getCategorySpinnerIndex(Number id) {
 
     int i = 0;
-    for (ListCategoriesJson.Category category : categories) {
+    for (CategoriesResponse.DataList.List category : categories) {
       i++;
-      if (category.getId().equals(id)) {
+      if (category.getId()
+          .equals(id)) {
         return i;
       }
     }
@@ -489,7 +509,8 @@ public class SubmitAppFragment extends Fragment {
 
   private void setAppInfo(GetApkInfoJson.Meta meta) {
     if (meta != null) {
-      setAppName(selectablePackageInfos.get(0).getLabel());
+      setAppName(selectablePackageInfos.get(0)
+          .getLabel());
       setAppDescription(meta.getDescription());
       setCategorySpinner(meta.categories.standard.get(1).id);
       setAgeRatingSpinner(meta.min_age);
@@ -501,7 +522,8 @@ public class SubmitAppFragment extends Fragment {
   }
 
   private String getAppName() {
-    return ((EditText) rootView.findViewById(R.id.appName)).getText().toString();
+    return ((EditText) rootView.findViewById(R.id.appName)).getText()
+        .toString();
   }
 
   private void setAppName(String appName) {
@@ -522,7 +544,8 @@ public class SubmitAppFragment extends Fragment {
   }
 
   private String getDescription() {
-    return ((EditText) rootView.findViewById(R.id.app_description)).getText().toString();
+    return ((EditText) rootView.findViewById(R.id.app_description)).getText()
+        .toString();
   }
 
   private String getLanguage() {
@@ -532,8 +555,11 @@ public class SubmitAppFragment extends Fragment {
   }
 
   private int idFromCategoryName(String name) {
-    for (ListCategoriesJson.Category category : categories) {
-      if (category.getName().equals(name)) return (int) category.getId();
+    for (CategoriesResponse.DataList.List category : categories) {
+      if (category.getTitle()
+          .equals(name)) {
+        return (int) category.getId();
+      }
     }
     return 0;
   }
@@ -582,10 +608,13 @@ public class SubmitAppFragment extends Fragment {
 
       public boolean onTouch(View view, MotionEvent event) {
         if (view.getId() == R.id.app_description) {
-          view.getParent().getParent().requestDisallowInterceptTouchEvent(true);
+          view.getParent()
+              .getParent()
+              .requestDisallowInterceptTouchEvent(true);
           switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
-              view.getParent().requestDisallowInterceptTouchEvent(false);
+              view.getParent()
+                  .requestDisallowInterceptTouchEvent(false);
               break;
           }
         }
