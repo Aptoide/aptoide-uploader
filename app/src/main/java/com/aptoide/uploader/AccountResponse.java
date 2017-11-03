@@ -14,11 +14,19 @@ public class AccountResponse extends ResponseV7 {
         this.nodes = nodes;
     }
 
+    public Nodes getNodes() {
+        return nodes;
+    }
+
     public static class Nodes {
         private GetUserMeta meta;
 
         public Nodes(GetUserMeta meta) {
             this.meta = meta;
+        }
+
+        public GetUserMeta getMeta() {
+            return meta;
         }
     }
 

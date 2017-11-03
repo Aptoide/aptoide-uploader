@@ -6,7 +6,10 @@ package com.aptoide.uploader;
 
 public class AccountResponseMapper {
 
-    public AptoideAccount map(AccountResponse response) {
-        return new AptoideAccount();
-    }
+  public AptoideAccount map(AccountResponse response) {
+    return new AptoideAccount(response.getNodes()
+        .getMeta()
+        .getData()
+        .getStore() != null);
+  }
 }

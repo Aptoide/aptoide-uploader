@@ -5,4 +5,14 @@ package com.aptoide.uploader;
  */
 
 public class AptoideAccount {
+
+  private final boolean hasStore;
+
+  public AptoideAccount(boolean hasStore) {
+    this.hasStore = hasStore;
+  }
+
+  public boolean hasStore() {
+    return hasStore;
+  }
 }

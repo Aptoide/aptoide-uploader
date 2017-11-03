@@ -1,6 +1,6 @@
 package com.aptoide.uploader;
 
-import io.reactivex.Completable;
+import io.reactivex.Single;
 
 public class AptoideAccountManager {
 
@@ -10,8 +10,7 @@ public class AptoideAccountManager {
     this.accountService = accountService;
   }
 
-  public Completable login(String username, String password) {
-    return accountService.getAccount(username, password)
-        .toCompletable();
+  public Single<AptoideAccount> login(String username, String password) {
+    return accountService.getAccount(username, password);
   }
 }

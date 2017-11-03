@@ -23,10 +23,11 @@ public class AccountPresenter implements Presenter {
     compositeDisposable.add(view.getLifecycle()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.getLoginEvent())
-        .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
+        .flatMapSingle(credentials -> accountManager.login(credentials.getUsername(),
             credentials.getPassword()))
-        .doOnComplete(() -> accountNavigator.navigateToAppsView())
-        .subscribe(() -> {
+        .filter(account -> account.hasStore())
+        .doOnNext(account -> accountNavigator.navigateToAppsView())
+        .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
