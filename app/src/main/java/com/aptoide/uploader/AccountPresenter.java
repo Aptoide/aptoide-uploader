@@ -1,6 +1,7 @@
 package com.aptoide.uploader;
 
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.exceptions.OnErrorNotImplementedException;
 
 public class AccountPresenter implements Presenter {
 
@@ -25,11 +26,17 @@ public class AccountPresenter implements Presenter {
         .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
             credentials.getPassword()))
         .doOnComplete(() -> accountNavigator.navigateToAppsView())
-        .subscribe());
+        .subscribe(() -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
 
     compositeDisposable.add(view.getLifecycle()
         .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
         .doOnNext(__ -> compositeDisposable.clear())
-        .subscribe());
+        .subscribe(lifecycleEvent -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 }
