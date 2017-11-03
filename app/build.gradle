@@ -1,163 +1,57 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
-apply plugin: 'io.fabric'
-
-buildscript {
-  repositories {
-    maven { url 'https://maven.fabric.io/public' }
-  }
-
-  dependencies {
-    classpath 'io.fabric.tools:gradle:1.24.4'
-  }
-}
-
-def fabricApiKey = project.FABRIC_API_KEY
-def fabricConfigured = fabricApiKey != null
-if (fabricConfigured) {
-  task fabricGenerateProperties {
-    doFirst {
-      def fabricProperties = project.file("fabric.properties")
-      fabricProperties.delete()
-      fabricProperties.append("# Do not modify this file -- YOUR CHANGES WILL BE ERASED!\n")
-      fabricProperties.append("apiKey=" + fabricApiKey)
-    }
-  }
-  preBuild.dependsOn(fabricGenerateProperties)
-  apply plugin: 'io.fabric'
-}
-
-repositories {
-  maven { url 'https://maven.fabric.io/public' }
-}
-
+apply plugin: 'kotlin-android-extensions'
+apply plugin: "de.mannodermaus.android-junit5"
 
 android {
-
-  compileSdkVersion Integer.parseInt(project.COMPILE_SDK_VERSION)
-  buildToolsVersion BUILD_TOOLS_VERSION
-
+  compileSdkVersion 26
+  buildToolsVersion "26.0.2"
   defaultConfig {
-    minSdkVersion project.MINIMUM_SDK_VERSION
-    targetSdkVersion Integer.parseInt(project.TARGET_SDK_VERSION)
-    applicationId project.APPLICATION_ID
-    versionCode project.VERSION_CODE.toInteger()
-    versionName VERSION_NAME
-
-    testProguardFile 'proguard-rules-test.pro'
-//    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-
-    manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
-
-    buildConfigField "String", "GMS_SERVER_ID", "\"" + project.GMS_SERVER_ID + "\""
-
-    resValue "string", "facebook_app_id", "\"" + project.UPLOADER_FACEBOOK_APP_ID + "\""
+    applicationId "pt.caixamagica.aptoide.uploader"
+    minSdkVersion 15
+    targetSdkVersion 26
+    versionCode 1
+    versionName "1.0"
+    testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
   }
-
-  lintOptions {
-    disable 'MissingTranslation'
-    abortOnError false
-  }
-
-  signingConfigs {
-    release {
-      storeFile = file(project.STORE_FILE_BACKUP)
-      storePassword = project.STORE_PASSWORD_BACKUP
-      keyAlias = project.KEY_ALIAS_UPLOADER
-      keyPassword = project.KEY_PASSWORD_UPLOADER
-    }
-  }
-
   buildTypes {
     release {
-      signingConfig signingConfigs.release
-
-      ext.enableCrashlytics = true
-      zipAlignEnabled true
-      minifyEnabled true
-      shrinkResources true
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-debug.pro'
-    }
-
-    debug {
-      applicationIdSuffix ".debug"
-
-      ext.enableCrashlytics = false
-      zipAlignEnabled false
       minifyEnabled false
-      shrinkResources false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules-debug.pro'
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
-
-  applicationVariants.all { variant ->
-    variant.outputs.all { output ->
-      def project = "uploader"
-      def SEP = "_"
-      def buildType = variant.variantData.variantConfiguration.buildType.name
-      def versionName = variant.versionName
-      def versionCode = variant.versionCode
-
-      def newApkName = project + SEP + buildType + SEP + versionName + SEP + versionCode + ".apk"
-      outputFileName = newApkName
-    }
+  sourceSets {
+    main.java.srcDirs += 'src/main/kotlin'
+    test.java.srcDirs += 'src/test/kotlin'
+    androidTest.java.srcDirs += 'src/androidTest/kotlin'
   }
-
-  packagingOptions {
-    exclude 'META-INF/notice.txt'
-    exclude 'META-INF/NOTICE.txt'
-    exclude 'META-INF/NOTICE'
-    exclude 'META-INF/license.txt'
-    exclude 'META-INF/LICENSE.txt'
-    exclude 'META-INF/LICENSE'
-    exclude 'META-INF/ASL2.0'
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_1_8
+    targetCompatibility JavaVersion.VERSION_1_8
   }
 }
 
 dependencies {
-  implementation "org.jetbrains.kotlin:kotlin-stdlib-jre7:$kotlin_version"
 
-  implementation 'com.android.support.constraint:constraint-layout:1.0.2'
-  testImplementation "junit:junit:${junit_version}"
-  testImplementation "org.mockito:mockito-core:${mockito_core_version}"
-  // Force usage of support annotations in the test app, since it is internally used by the runner module.
-  androidTestImplementation("com.android.support.test:runner:${test_runner_version}") {
-    exclude group: "com.android.support", module: "support-annotations"
-  }
+  // Support Libraries
+  compile 'com.android.support:appcompat-v7:26.1.0'
+  compile 'com.android.support:design:26.1.0'
 
-  androidTestImplementation "com.android.support:support-annotations:${support_lib_annotations_version}"
-  implementation "com.android.support:support-annotations:${support_lib_annotations_version}"
+  // Reactive Programming
+  compile "io.reactivex.rxjava2:rxjava:2.1.6"
 
-  implementation "com.android.support:appcompat-v7:${support_lib_version}"
-  implementation "com.android.support:cardview-v7:${support_lib_version}"
-  implementation "com.android.support:animated-vector-drawable:${support_lib_version}"
-  implementation "com.android.support:customtabs:${support_lib_version}"
-  implementation "com.android.support:recyclerview-v7:${support_lib_version}"
-  implementation "com.android.support:design:${support_lib_version}"
+  // Kotlin
+  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-  implementation "com.android.support.constraint:constraint-layout:${constraint_layout_version}"
-
-  implementation "com.google.android.gms:play-services-basement:${play_services_version}"
-  implementation "com.google.android.gms:play-services-auth:${play_services_version}"
-
-  implementation "com.facebook.android:facebook-android-sdk:${facebook_sdk_version}"
-
-  // missing leak flavour and configuration
-  //leakImplementation "com.squareup.leakcanary:leakcanary-android:${leakcanary_version}"
-
-  implementation("com.crashlytics.sdk.android:crashlytics:${crashlytics_version}@aar") {
-    transitive = true
-  }
-
-  implementation "com.github.bumptech.glide:glide:${glide_version}"
-
-  implementation "io.reactivex.rxjava2:rxandroid:${rxandroid_version}"
-  // Because RxAndroid releases are few and far between, it is recommended you also
-  // explicitly depend on RxJava's latest version for bug fixes and new features.
-  implementation "io.reactivex.rxjava2:rxjava:${rxjava_version}"
-
-  testImplementation "org.jetbrains.spek:spek-api:${spek_api_version}"
-  testImplementation "org.jetbrains.spek:spek-junit-platform-engine:${spek_junit_version}"
-  testImplementation "org.junit.platform:junit-platform-runner:${junit_runner_version}"
+  // Unit Test
+  testCompile 'org.jetbrains.spek:spek-api:1.1.5'
+  testCompile 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
+  testCompile 'org.junit.platform:junit-platform-runner:1.0.1'
+  testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.1'
+  testCompile "com.nhaarman:mockito-kotlin:1.5.0"
+  testCompile 'org.mockito:mockito-core:2.11.0'
+  testCompile 'io.reactivex.rxjava2:rxkotlin:2.1.0'
+  testCompile junit5()
+  testCompileOnly junit5EmbeddedRuntime()
 }
