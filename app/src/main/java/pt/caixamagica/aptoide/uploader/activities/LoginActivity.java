@@ -187,7 +187,9 @@ public class LoginActivity extends AppCompatActivity
     SharedPreferences sharedpreferences =
         this.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-    if (sharedpreferences != null && sharedpreferences.getAll().size() > 0) {
+    if (sharedpreferences != null
+        && sharedpreferences.getAll()
+        .size() > 0) {
       String deviceId =
           Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -512,7 +514,8 @@ public class LoginActivity extends AppCompatActivity
 
     @Override public void onRequestFailure(SpiceException spiceException) {
       if (spiceException.getCause() instanceof LoginErrorException) {
-        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
+        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT)
+            .show();
       }
       UploaderUtils.popLoadingFragment(LoginActivity.this);
     }
@@ -548,7 +551,8 @@ public class LoginActivity extends AppCompatActivity
       // Caso o login seja enviado em branco, cai aqui.
       else {
         UploaderUtils.popLoadingFragment(LoginActivity.this);
-        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
+        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT)
+            .show();
       }
 
       spiceManager.removeAllDataFromCache();
