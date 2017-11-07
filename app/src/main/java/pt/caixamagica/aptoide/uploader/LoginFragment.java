@@ -74,8 +74,8 @@ public class LoginFragment extends Fragment {
 
           @Override public void onCompleted(final GraphUser user, Response response) {
 
-            String username =
-                user.getProperty("email") == null ? "" : user.getProperty("email").toString();
+            String username = user.getProperty("email") == null ? "" : user.getProperty("email")
+                .toString();
 
             if (TextUtils.isEmpty(username)) {
               session.close();
@@ -100,6 +100,9 @@ public class LoginFragment extends Fragment {
             }
           }
         });
+        Bundle parameters = new Bundle();
+        parameters.putString("fields", "id,name,email");
+        request.setParameters(parameters);
         request.executeAsync();
       }
     }
@@ -217,7 +220,10 @@ public class LoginFragment extends Fragment {
     fbButton.setOnErrorListener(new LoginButton.OnErrorListener() {
       @Override public void onError(FacebookException error) {
 
-        if (error.getMessage().equals("Log in attempt aborted.")) return;
+        if (error.getMessage()
+            .equals("Log in attempt aborted.")) {
+          return;
+        }
 
         error.printStackTrace();
       }
@@ -225,7 +231,8 @@ public class LoginFragment extends Fragment {
   }
 
   private void setUpGooglePlusButton() {
-    rootView.findViewById(R.id.sign_in_button).setOnClickListener((LoginActivity) getActivity());
+    rootView.findViewById(R.id.sign_in_button)
+        .setOnClickListener((LoginActivity) getActivity());
   }
 
   private void setUpSignUpButton() {
@@ -250,9 +257,11 @@ public class LoginFragment extends Fragment {
         TextView textView;
 
         textView = (TextView) rootView.findViewById(R.id.usernameText);
-        username = textView.getText().toString();
+        username = textView.getText()
+            .toString();
         textView = (TextView) rootView.findViewById(R.id.passwordText);
-        password = textView.getText().toString();
+        password = textView.getText()
+            .toString();
 
         if (!username.equals("") && !password.equals("")) {
           mCallback.submitAuthentication(
