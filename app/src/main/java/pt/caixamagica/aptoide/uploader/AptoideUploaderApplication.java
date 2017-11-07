@@ -34,8 +34,8 @@ public class AptoideUploaderApplication extends Application {
     context = this;
     AppEventsLogger.activateApp(this);
 
-    if (BuildConfig.DEBUG) {
+    //if (BuildConfig.DEBUG) {
       MultiDex.install(this);
-    }
+    //}
   }
 }
