@@ -60,6 +60,7 @@ import retrofit.http.POST;
         case facebook:
           parameters.put("authMode", "facebook");
           parameters.put("oauthToken", bean.getPassword());
+          parameters.put("password", bean.getPassword());
           break;
       }
     } else {
@@ -94,7 +95,8 @@ import retrofit.http.POST;
     aptoide, google, facebook;
 
     @Override public String toString() {
-      return super.toString().toLowerCase();
+      return super.toString()
+          .toLowerCase();
     }
   }
 
