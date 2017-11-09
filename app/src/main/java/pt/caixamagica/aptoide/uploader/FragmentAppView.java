@@ -11,6 +11,7 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
+import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -43,9 +44,12 @@ import com.manuelpeinado.multichoiceadapter.MultiChoiceAdapter;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Iterator;
+import java.util.LinkedList;
 import java.util.List;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
 import pt.caixamagica.aptoide.uploader.analytics.UploaderAnalytics;
@@ -429,6 +433,8 @@ public class FragmentAppView extends Fragment {
   }
 
   private void setUploadButtonListener() {
+    final String filter =
+        "true"; //this value is used to cause getProposed not to send the same response twice.
     rootView.findViewById(R.id.submitAppsButton)
         .setOnClickListener(new View.OnClickListener() {
           @Override public void onClick(View v) {
@@ -442,7 +448,7 @@ public class FragmentAppView extends Fragment {
             for (final SelectablePackageInfo selectablePackageInfo : selectablePackageInfos) {
               GetProposedRequest getProposedRequest =
                   new GetProposedRequest(Utils.getLanguage(), selectablePackageInfo.packageName,
-                      selectablePackageInfo.versionCode);
+                      filter);
               spiceManagerSecondary.execute(getProposedRequest,
                   new RequestListener<GetProposedResponse>() {
                     @Override public void onRequestFailure(SpiceException spiceException) {
