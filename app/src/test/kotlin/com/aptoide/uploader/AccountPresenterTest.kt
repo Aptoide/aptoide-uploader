@@ -67,5 +67,28 @@ class AccountPresenterTest : Spek({
             verify(view).showNetworkError()
         }
 
+        it("should show error when user taps login button with incorrect credentials") {
+            val view = mock<AccountView> {}
+            val navigator = mock<AccountNavigator> {}
+            val serviceV3 = mock<RetrofitAccountService.ServiceV3> {}
+            val serviceV7 = mock<RetrofitAccountService.ServiceV7>() {}
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3, serviceV7, AccountResponseMapper()))
+            val accountPresenter = AccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            whenever(view.lifecycleEvent).doReturn(View.LifecycleEvent.CREATE.toSingle().toObservable())
+
+            val username = "marcelo@aptoide.com"
+            val loginEvent = PublishSubject.create<AccountView.CredentialsViewModel>()
+            whenever(view.loginEvent).doReturn(loginEvent)
+
+            whenever(serviceV3.oauth2Authentication(any()))
+                    .doReturn(OAuth(null, null, "Invalid Credentials", "AUTH-1").toSingle().toObservable())
+
+            accountPresenter.present()
+            loginEvent.onNext(AccountView.CredentialsViewModel(username, "aptoide1234"))
+            verify(view).showLoading(username)
+            verify(view).hideLoading()
+            verify(view).showError()
+        }
+
     }
 })
