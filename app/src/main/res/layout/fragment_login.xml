@@ -2,10 +2,21 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:animateLayoutChanges="true"
     >
 
+  <android.support.v7.widget.Toolbar
+      android:id="@+id/fragment_login_toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:minHeight="?attr/actionBarSize"
+      app:title="@string/app_name"
+      app:titleTextAppearance="@style/AppTheme.Toolbar.Title"
+      />
+
   <ScrollView
+      android:layout_below="@id/fragment_login_toolbar"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       >
@@ -31,7 +42,7 @@
           />
 
       <EditText
-          android:id="@+id/usernameText"
+          android:id="@+id/fragment_login_username_edit_text"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginLeft="30dp"
@@ -44,10 +55,10 @@
           />
 
       <EditText
-          android:id="@+id/passwordText"
+          android:id="@+id/fragment_login_password_edit_text"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
-          android:layout_below="@id/usernameText"
+          android:layout_below="@id/fragment_login_username_edit_text"
           android:layout_marginLeft="30dp"
           android:layout_marginRight="30dp"
           android:layout_marginTop="10dp"
@@ -59,88 +70,15 @@
           />
 
       <Button
-          android:id="@+id/loginButton"
+          android:id="@+id/fragment_login_button"
           android:layout_width="150dp"
           android:layout_height="50dp"
-          android:layout_below="@id/passwordText"
+          android:layout_below="@id/fragment_login_password_edit_text"
           android:layout_centerInParent="true"
           android:layout_marginTop="30dp"
           android:text="@string/login"
           style="@style/Buttonuploader_button_theme"
           />
-
-      <com.facebook.widget.LoginButton
-          android:id="@+id/fb_login_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_below="@+id/app_view_fragment"
-          android:layout_margin="4dp"
-          />
-
-      <com.google.android.gms.common.SignInButton
-          android:id="@+id/sign_in_button"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_below="@id/fb_login_button"
-          android:layout_marginTop="5dp"
-          />
-
-      <TextView
-          android:id="@+id/sign_up_link"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_below="@id/sign_in_button"
-          android:layout_centerHorizontal="true"
-          android:layout_marginTop="10dp"
-          android:background="@drawable/text_view_selectable"
-          android:clickable="true"
-          android:gravity="center"
-          android:padding="10dp"
-          android:text="@string/new_to_aptoide_create_a_free_account"
-          android:textColor="@android:color/white"
-          />
-
-      <RelativeLayout
-          android:id="@+id/app_view_fragment"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_below="@id/loginButton"
-          android:layout_marginBottom="10dp"
-          android:layout_marginTop="20dp"
-          >
-
-        <View
-            android:layout_width="match_parent"
-            android:layout_height="2dp"
-            android:layout_centerInParent="true"
-            android:layout_marginTop="20dp"
-            android:layout_toLeftOf="@+id/teste"
-            android:background="#FFF"
-            />
-
-        <TextView
-            android:id="@+id/teste"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_centerHorizontal="true"
-            android:layout_centerInParent="true"
-            android:paddingLeft="10dp"
-            android:paddingRight="10dp"
-            android:text="@string/or"
-            />
-
-        <View
-            android:layout_width="match_parent"
-
-            android:layout_height="2dp"
-            android:layout_centerInParent="true"
-            android:layout_marginTop="20dp"
-            android:layout_toRightOf="@+id/teste"
-            android:background="#FFF"
-            />
-
-      </RelativeLayout>
-
     </RelativeLayout>
 
   </ScrollView>

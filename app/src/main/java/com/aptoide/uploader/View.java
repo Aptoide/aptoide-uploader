@@ -4,7 +4,7 @@ import io.reactivex.Observable;
 
 public interface View {
 
-  Observable<LifecycleEvent> getLifecycle();
+  Observable<LifecycleEvent> getLifecycleEvent();
 
   enum LifecycleEvent {
     CREATE, START, RESUME, PAUSE, STOP, DESTROY,
