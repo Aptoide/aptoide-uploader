@@ -9,6 +9,7 @@ import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -125,5 +126,15 @@ public class AccountViewFragment extends Fragment implements AccountView {
   @Override public void hideLoading() {
     progressContainer.setVisibility(View.GONE);
     fragmentContainer.setVisibility(View.VISIBLE);
+  }
+
+  @Override public void showError() {
+    Toast.makeText(getContext(), R.string.loginFail, Toast.LENGTH_SHORT)
+        .show();
+  }
+
+  @Override public void showNetworkError() {
+    Toast.makeText(getContext(), R.string.error_occurred, Toast.LENGTH_SHORT)
+        .show();
   }
 }

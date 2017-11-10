@@ -10,6 +10,10 @@ public interface AccountView extends View {
 
   void hideLoading();
 
+  void showError();
+
+  void showNetworkError();
+
   public static class CredentialsViewModel {
 
     private final String username;

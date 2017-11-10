@@ -26,16 +26,25 @@ public class AccountPresenter implements Presenter {
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> view.getLoginEvent())
-        .doOnNext(credentials -> view.showLoading(credentials.getUsername()))
-        .flatMapSingle(credentials -> accountManager.login(credentials.getUsername(),
-            credentials.getPassword()))
-        .filter(account -> account.hasStore())
-        .observeOn(viewScheduler)
-        .doOnNext(account -> {
-          view.hideLoading();
-          accountNavigator.navigateToAppsView();
-        })
+        .flatMap(__ -> view.getLoginEvent()
+            .doOnNext(credentials -> view.showLoading(credentials.getUsername()))
+            .flatMapSingle(credentials -> accountManager.login(credentials.getUsername(),
+                credentials.getPassword()))
+            .filter(account -> account.hasStore())
+            .observeOn(viewScheduler)
+            .doOnNext(account -> {
+              view.hideLoading();
+              accountNavigator.navigateToAppsView();
+            })
+            .doOnError(throwable -> {
+              view.hideLoading();
+              if (isInternetError(throwable)) {
+                view.showNetworkError();
+              } else {
+                view.showError();
+              }
+            })
+            .retry())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -48,5 +57,12 @@ public class AccountPresenter implements Presenter {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+  }
+
+  private boolean isInternetError(Throwable throwable) {
+    if (throwable instanceof IllegalStateException) {
+      return false;
+    }
+    return true;
   }
 }
