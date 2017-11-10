@@ -27,11 +27,15 @@ public class AccountPresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.getLoginEvent())
+        .doOnNext(credentials -> view.showLoading(credentials.getUsername()))
         .flatMapSingle(credentials -> accountManager.login(credentials.getUsername(),
             credentials.getPassword()))
         .filter(account -> account.hasStore())
         .observeOn(viewScheduler)
-        .doOnNext(account -> accountNavigator.navigateToAppsView())
+        .doOnNext(account -> {
+          view.hideLoading();
+          accountNavigator.navigateToAppsView();
+        })
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);

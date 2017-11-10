@@ -8,6 +8,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.TextView;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -25,8 +26,11 @@ public class AccountViewFragment extends Fragment implements AccountView {
   private EditText passwordEditText;
   private EditText usernameEditText;
   private Button loginButton;
+  private View progressContainer;
 
   private Subject<LifecycleEvent> events;
+  private View fragmentContainer;
+  private TextView loadingTextView;
 
   public static AccountViewFragment newInstance() {
     return new AccountViewFragment();
@@ -49,6 +53,9 @@ public class AccountViewFragment extends Fragment implements AccountView {
     passwordEditText = view.findViewById(R.id.fragment_login_password_edit_text);
     usernameEditText = view.findViewById(R.id.fragment_login_username_edit_text);
     loginButton = view.findViewById(R.id.fragment_login_button);
+    progressContainer = view.findViewById(R.id.fragment_login_progress_container);
+    loadingTextView = view.findViewById(R.id.fragment_login_loading_text_view);
+    fragmentContainer = view.findViewById(R.id.fragment_login_content);
 
     events.onNext(LifecycleEvent.CREATE);
     final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
@@ -107,5 +114,16 @@ public class AccountViewFragment extends Fragment implements AccountView {
         .map(__ -> new CredentialsViewModel(usernameEditText.getText()
             .toString(), passwordEditText.getText()
             .toString()));
+  }
+
+  @Override public void showLoading(String username) {
+    loadingTextView.setText(getString(R.string.logging_as).concat(" " + username));
+    fragmentContainer.setVisibility(View.GONE);
+    progressContainer.setVisibility(View.VISIBLE);
+  }
+
+  @Override public void hideLoading() {
+    progressContainer.setVisibility(View.GONE);
+    fragmentContainer.setVisibility(View.VISIBLE);
   }
 }

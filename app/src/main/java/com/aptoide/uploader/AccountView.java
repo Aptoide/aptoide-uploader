@@ -6,6 +6,10 @@ public interface AccountView extends View {
 
   Observable<CredentialsViewModel> getLoginEvent();
 
+  void showLoading(String username);
+
+  void hideLoading();
+
   public static class CredentialsViewModel {
 
     private final String username;
