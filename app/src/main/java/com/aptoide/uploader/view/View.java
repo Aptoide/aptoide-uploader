@@ -1,4 +1,4 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.view;
 
 import io.reactivex.Observable;
 

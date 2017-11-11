@@ -1,4 +1,4 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.apps;
 
 /**
  * Created by pedroribeiro on 10/11/17.

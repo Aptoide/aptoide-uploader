@@ -1,4 +1,4 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.account;
 
 /**
  * Created by jdandrade on 03/11/2017.

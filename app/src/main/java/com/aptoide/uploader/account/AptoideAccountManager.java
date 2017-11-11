@@ -1,4 +1,4 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.account;
 
 import io.reactivex.Single;
 

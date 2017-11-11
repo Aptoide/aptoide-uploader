@@ -1,4 +1,4 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.network;
 
 import java.util.List;
 

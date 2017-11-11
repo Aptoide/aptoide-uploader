@@ -1,4 +1,4 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.account.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
@@ -10,6 +10,10 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.aptoide.uploader.R;
+import com.aptoide.uploader.account.network.AccountResponseMapper;
+import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -22,7 +26,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-public class AccountViewFragment extends Fragment implements AccountView {
+public class AccountFragment extends Fragment implements AccountView {
 
   private EditText passwordEditText;
   private EditText usernameEditText;
@@ -33,8 +37,8 @@ public class AccountViewFragment extends Fragment implements AccountView {
   private View fragmentContainer;
   private TextView loadingTextView;
 
-  public static AccountViewFragment newInstance() {
-    return new AccountViewFragment();
+  public static AccountFragment newInstance() {
+    return new AccountFragment();
   }
 
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {

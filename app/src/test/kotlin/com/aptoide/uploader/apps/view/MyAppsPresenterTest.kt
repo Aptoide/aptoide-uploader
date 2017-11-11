@@ -1,5 +1,11 @@
-package com.aptoide.uploader
+package com.aptoide.uploader.apps.view
 
+import com.aptoide.uploader.apps.App
+import com.aptoide.uploader.apps.AppsManager
+import com.aptoide.uploader.apps.PackageProvider
+import com.aptoide.uploader.apps.view.MyAppsPresenter
+import com.aptoide.uploader.apps.view.MyAppsView
+import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
@@ -17,13 +23,13 @@ import org.junit.runner.RunWith
  * Created by pedroribeiro on 10/11/17.
  */
 @RunWith(JUnitPlatform::class)
-class InstalledAppsPresenterTest : Spek({
+class MyAppsPresenterTest : Spek({
     describe("a installed apps presenter") {
         it("should display installed apps when view is created") {
-            val view = mock<InstalledAppsView> {}
+            val view = mock<MyAppsView> {}
             val packageProvider = mock<PackageProvider> {}
             val appsManager = AppsManager(packageProvider)
-            val installedAppsPresenter = InstalledAppsPresenter(view, appsManager, CompositeDisposable())
+            val installedAppsPresenter = MyAppsPresenter(view, appsManager, CompositeDisposable())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val appList = mutableListOf<App>()

@@ -1,4 +1,4 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.account.view;
 
 import android.content.Context;
 import android.widget.Toast;

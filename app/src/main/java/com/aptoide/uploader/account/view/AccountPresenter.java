@@ -1,5 +1,8 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.account.view;
 
+import com.aptoide.uploader.view.Presenter;
+import com.aptoide.uploader.view.View;
+import com.aptoide.uploader.account.AptoideAccountManager;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;

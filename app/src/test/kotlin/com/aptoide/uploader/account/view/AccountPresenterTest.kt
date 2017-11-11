@@ -1,5 +1,15 @@
-package com.aptoide.uploader
+package com.aptoide.uploader.account.view
 
+import com.aptoide.uploader.account.*
+import com.aptoide.uploader.account.network.AccountResponse
+import com.aptoide.uploader.account.network.AccountResponseMapper
+import com.aptoide.uploader.account.network.OAuth
+import com.aptoide.uploader.account.network.RetrofitAccountService
+import com.aptoide.uploader.account.view.AccountNavigator
+import com.aptoide.uploader.account.view.AccountPresenter
+import com.aptoide.uploader.account.view.AccountView
+import com.aptoide.uploader.network.ResponseV7
+import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable

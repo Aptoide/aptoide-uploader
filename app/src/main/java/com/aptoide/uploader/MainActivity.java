@@ -5,6 +5,7 @@ import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
 import butterknife.ButterKnife;
 import butterknife.Unbinder;
+import com.aptoide.uploader.account.view.AccountFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -17,7 +18,7 @@ public class MainActivity extends AppCompatActivity {
 
     if (savedInstanceState == null) {
       getSupportFragmentManager().beginTransaction()
-          .replace(R.id.activity_main_container, AccountViewFragment.newInstance())
+          .replace(R.id.activity_main_container, AccountFragment.newInstance())
           .commit();
     }
   }

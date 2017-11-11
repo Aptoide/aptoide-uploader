@@ -1,5 +1,7 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.apps.view;
 
+import com.aptoide.uploader.view.View;
+import com.aptoide.uploader.apps.App;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -7,6 +9,6 @@ import org.jetbrains.annotations.NotNull;
  * Created by pedroribeiro on 10/11/17.
  */
 
-public interface InstalledAppsView extends View {
+public interface MyAppsView extends View {
   void showApps(@NotNull List<App> appsList);
 }

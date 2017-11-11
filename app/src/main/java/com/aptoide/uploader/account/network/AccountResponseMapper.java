@@ -1,4 +1,6 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.account.network;
+
+import com.aptoide.uploader.account.AptoideAccount;
 
 /**
  * Created by franciscoaleixo on 03/11/2017.

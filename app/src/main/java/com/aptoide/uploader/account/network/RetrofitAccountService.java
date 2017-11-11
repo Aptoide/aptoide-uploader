@@ -1,5 +1,7 @@
-package com.aptoide.uploader;
+package com.aptoide.uploader.account.network;
 
+import com.aptoide.uploader.account.AptoideAccount;
+import com.aptoide.uploader.account.AccountService;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.Arrays;
