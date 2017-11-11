@@ -32,10 +32,10 @@ public class AccountFragment extends Fragment implements AccountView {
   private EditText usernameEditText;
   private Button loginButton;
   private View progressContainer;
-
-  private Subject<LifecycleEvent> events;
   private View fragmentContainer;
   private TextView loadingTextView;
+
+  private Subject<LifecycleEvent> events;
 
   public static AccountFragment newInstance() {
     return new AccountFragment();
@@ -107,6 +107,12 @@ public class AccountFragment extends Fragment implements AccountView {
 
   @Override public void onDestroyView() {
     events.onNext(LifecycleEvent.DESTROY);
+    passwordEditText = null;
+    usernameEditText = null;
+    loginButton = null;
+    fragmentContainer = null;
+    progressContainer = null;
+    loadingTextView = null;
     super.onDestroyView();
   }
 
