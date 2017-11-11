@@ -2,7 +2,6 @@ package com.aptoide.uploader.account.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -11,22 +10,21 @@ import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 import com.aptoide.uploader.R;
-import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
+import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.schedulers.Schedulers;
-import io.reactivex.subjects.BehaviorSubject;
-import io.reactivex.subjects.Subject;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-public class AccountFragment extends Fragment implements AccountView {
+public class AccountFragment extends FragmentView implements AccountView {
 
   private EditText passwordEditText;
   private EditText usernameEditText;
@@ -35,19 +33,12 @@ public class AccountFragment extends Fragment implements AccountView {
   private View fragmentContainer;
   private TextView loadingTextView;
 
-  private Subject<LifecycleEvent> events;
-
   public static AccountFragment newInstance() {
     return new AccountFragment();
   }
 
-  @Override public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    events = BehaviorSubject.create();
-  }
-
   @Nullable @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+  public android.view.View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
     return inflater.inflate(R.layout.fragment_login, container, false);
   }
@@ -62,7 +53,6 @@ public class AccountFragment extends Fragment implements AccountView {
     loadingTextView = view.findViewById(R.id.fragment_login_loading_text_view);
     fragmentContainer = view.findViewById(R.id.fragment_login_content);
 
-    events.onNext(LifecycleEvent.CREATE);
     final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
         RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
         .client(new OkHttpClient())
@@ -85,28 +75,7 @@ public class AccountFragment extends Fragment implements AccountView {
         new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
   }
 
-  @Override public void onStart() {
-    super.onStart();
-    events.onNext(LifecycleEvent.START);
-  }
-
-  @Override public void onResume() {
-    super.onResume();
-    events.onNext(LifecycleEvent.RESUME);
-  }
-
-  @Override public void onPause() {
-    events.onNext(LifecycleEvent.PAUSE);
-    super.onPause();
-  }
-
-  @Override public void onStop() {
-    events.onNext(LifecycleEvent.STOP);
-    super.onStop();
-  }
-
   @Override public void onDestroyView() {
-    events.onNext(LifecycleEvent.DESTROY);
     passwordEditText = null;
     usernameEditText = null;
     loginButton = null;
@@ -114,10 +83,6 @@ public class AccountFragment extends Fragment implements AccountView {
     progressContainer = null;
     loadingTextView = null;
     super.onDestroyView();
-  }
-
-  @Override public Observable<LifecycleEvent> getLifecycleEvent() {
-    return events;
   }
 
   @Override public Observable<CredentialsViewModel> getLoginEvent() {
