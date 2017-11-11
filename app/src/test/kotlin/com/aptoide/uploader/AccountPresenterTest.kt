@@ -17,7 +17,6 @@ import java.io.IOException
 class AccountPresenterTest : Spek({
     describe("an account presenter") {
 
-
         it("should navigate to apps view when user taps login button with valid e-mail and password") {
             val view = mock<AccountView> {}
             val navigator = mock<AccountNavigator> {}
@@ -25,12 +24,13 @@ class AccountPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>() {}
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3, serviceV7, AccountResponseMapper()))
             val accountPresenter = AccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
-            whenever(view.lifecycleEvent).doReturn(View.LifecycleEvent.CREATE.toSingle().toObservable())
 
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+            val loginEvent = PublishSubject.create<AccountView.CredentialsViewModel>()
             val username = "marcelo@aptoide.com"
-            whenever(view.loginEvent).doReturn(AccountView
-                    .CredentialsViewModel(username, "aptoide1234")
-                    .toSingle().toObservable())
+
+            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
+            whenever(view.loginEvent).doReturn(loginEvent)
             whenever(serviceV3.oauth2Authentication(any()))
                     .doReturn(OAuth("abc", "def", null, null).toSingle().toObservable())
             whenever(serviceV7.getUserInfo(any())).doReturn(AccountResponse(AccountResponse
@@ -39,6 +39,9 @@ class AccountPresenterTest : Spek({
                     .toSingle().toObservable())
 
             accountPresenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            loginEvent.onNext(AccountView
+                    .CredentialsViewModel(username, "aptoide1234"))
             verify(view).showLoading(username)
             verify(view).hideLoading()
             verify(navigator).navigateToAppsView()
@@ -51,16 +54,18 @@ class AccountPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>() {}
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3, serviceV7, AccountResponseMapper()))
             val accountPresenter = AccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
-            whenever(view.lifecycleEvent).doReturn(View.LifecycleEvent.CREATE.toSingle().toObservable())
 
-            val username = "marcelo@aptoide.com"
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<AccountView.CredentialsViewModel>()
-            whenever(view.loginEvent).doReturn(loginEvent)
+            val username = "marcelo@aptoide.com"
 
+            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
+            whenever(view.loginEvent).doReturn(loginEvent)
             whenever(serviceV3.oauth2Authentication(any())).doReturn(Observable.error<OAuth>(IOException()))
             whenever(serviceV7.getUserInfo(any())).doReturn(Observable.error<AccountResponse>(IOException()))
 
             accountPresenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             loginEvent.onNext(AccountView.CredentialsViewModel(username, "aptoide1234"))
             verify(view).showLoading(username)
             verify(view).hideLoading()
@@ -74,21 +79,22 @@ class AccountPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>() {}
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3, serviceV7, AccountResponseMapper()))
             val accountPresenter = AccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
-            whenever(view.lifecycleEvent).doReturn(View.LifecycleEvent.CREATE.toSingle().toObservable())
 
-            val username = "marcelo@aptoide.com"
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<AccountView.CredentialsViewModel>()
-            whenever(view.loginEvent).doReturn(loginEvent)
+            val username = "marcelo@aptoide.com"
 
+            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
+            whenever(view.loginEvent).doReturn(loginEvent)
             whenever(serviceV3.oauth2Authentication(any()))
                     .doReturn(OAuth(null, null, "Invalid Credentials", "AUTH-1").toSingle().toObservable())
 
             accountPresenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             loginEvent.onNext(AccountView.CredentialsViewModel(username, "aptoide1234"))
             verify(view).showLoading(username)
             verify(view).hideLoading()
             verify(view).showError()
         }
-
     }
 })

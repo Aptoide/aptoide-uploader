@@ -6,6 +6,7 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.toSingle
+import io.reactivex.subjects.PublishSubject
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
@@ -23,11 +24,15 @@ class InstalledAppsPresenterTest : Spek({
             val packageProvider = mock<PackageProvider> {}
             val appsManager = AppsManager(packageProvider)
             val installedAppsPresenter = InstalledAppsPresenter(view, appsManager, CompositeDisposable())
+
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val appList = mutableListOf<App>()
 
-            whenever(view.lifecycleEvent).doReturn(View.LifecycleEvent.CREATE.toSingle().toObservable())
+            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(packageProvider.installedApps).doReturn(appList.toSingle().toObservable())
+
             installedAppsPresenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             verify(view).showApps(appList)
         }
     }
