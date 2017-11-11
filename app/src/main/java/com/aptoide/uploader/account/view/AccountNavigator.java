@@ -11,7 +11,11 @@ public class AccountNavigator {
     this.context = context;
   }
 
-  public void navigateToAppsView() {
-    Toast.makeText(context, "Not implemented", Toast.LENGTH_SHORT).show();
+  public void navigateToMyAppsView() {
+    Toast.makeText(context, "my apps view not implemented", Toast.LENGTH_SHORT).show();
+  }
+
+  public void navigateToCreateStoreView() {
+    Toast.makeText(context, "create store view not implemented", Toast.LENGTH_SHORT).show();
   }
 }

@@ -24,7 +24,7 @@ import org.junit.runner.RunWith
  */
 @RunWith(JUnitPlatform::class)
 class MyAppsPresenterTest : Spek({
-    describe("a installed apps presenter") {
+    describe("a my apps presenter") {
         it("should display installed apps when view is created") {
             val view = mock<MyAppsView> {}
             val packageProvider = mock<PackageProvider> {}

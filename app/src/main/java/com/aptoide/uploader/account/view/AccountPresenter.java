@@ -33,18 +33,21 @@ public class AccountPresenter implements Presenter {
             .doOnNext(credentials -> view.showLoading(credentials.getUsername()))
             .flatMapSingle(credentials -> accountManager.login(credentials.getUsername(),
                 credentials.getPassword()))
-            .filter(account -> account.hasStore())
             .observeOn(viewScheduler)
             .doOnNext(account -> {
               view.hideLoading();
-              accountNavigator.navigateToAppsView();
+              if (account.hasStore()) {
+                accountNavigator.navigateToMyAppsView();
+              } else {
+                accountNavigator.navigateToCreateStoreView();
+              }
             })
             .doOnError(throwable -> {
               view.hideLoading();
               if (isInternetError(throwable)) {
                 view.showNetworkError();
               } else {
-                view.showError();
+                view.showCrendentialsError();
               }
             })
             .retry())

@@ -11,7 +11,7 @@ public interface AccountView extends View {
 
   void hideLoading();
 
-  void showError();
+  void showCrendentialsError();
 
   void showNetworkError();
 
