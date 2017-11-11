@@ -5,6 +5,7 @@ import io.reactivex.Single;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import retrofit2.Response;
 import retrofit2.http.Body;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -36,29 +37,33 @@ public class RetrofitAccountService implements AccountService {
     args.put("mode", "json");
     return serviceV3.oauth2Authentication(args)
         .singleOrError()
-        .flatMap(oAuth -> {
-          if (oAuth.hasErrors()){
-            return Single.error(new IllegalStateException(oAuth.getError()));
+        .flatMap(response -> {
+          if (response.isSuccessful() && !response.body()
+              .hasErrors()) {
+            return serviceV7.getUserInfo(new AccountRequestBody(Arrays.asList("meta"),
+                response.body()
+                    .getAccessToken()))
+                .singleOrError();
           }
-          return serviceV7.getUserInfo(
-              new AccountRequestBody(Arrays.asList("meta"), oAuth.getAccessToken()))
-              .singleOrError();
+
+          return Single.error(new IllegalStateException(response.message()));
         })
             .flatMap(response -> {
-              if(response.isOk()){
-                return Single.just(mapper.map(response));
+              if (response.isSuccessful() && response.body()
+                  .isOk()) {
+                return Single.just(mapper.map(response.body()));
               }
-              return Single.error(new IllegalStateException(response.getError().getDescription()));
+              return Single.error(new IllegalStateException(response.message()));
             });
   }
 
   public interface ServiceV3 {
     @POST("webservices/3/oauth2Authentication") @FormUrlEncoded
-    Observable<OAuth> oauth2Authentication(@FieldMap Map<String, String> args);
+    Observable<Response<OAuth>> oauth2Authentication(@FieldMap Map<String, String> args);
   }
 
   public interface ServiceV7 {
-    @POST("api/7/user/get") Observable<AccountResponse> getUserInfo(
+    @POST("api/7/user/get") Observable<Response<AccountResponse>> getUserInfo(
         @Body AccountRequestBody body);
   }
 }

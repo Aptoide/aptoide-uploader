@@ -11,6 +11,7 @@ import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
 import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
+import retrofit2.Response
 import java.io.IOException
 
 @RunWith(JUnitPlatform::class)
@@ -28,14 +29,19 @@ class AccountPresenterTest : Spek({
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<AccountView.CredentialsViewModel>()
             val username = "marcelo@aptoide.com"
+            val loginResponse = Response.success(OAuth("abc", "def",
+                    null, null))
+            val accountResponse = Response.success(AccountResponse(AccountResponse
+                    .Nodes(AccountResponse.GetUserMeta(AccountResponse.GetUserMeta
+                            .Data(AccountResponse.Store("marcelo",
+                                    "http://aptoide.com/avatar", 1)))),
+                    ResponseV7.Info(ResponseV7.Info.Status.OK), null))
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(view.loginEvent).doReturn(loginEvent)
             whenever(serviceV3.oauth2Authentication(any()))
-                    .doReturn(OAuth("abc", "def", null, null).toSingle().toObservable())
-            whenever(serviceV7.getUserInfo(any())).doReturn(AccountResponse(AccountResponse
-                    .Nodes(AccountResponse.GetUserMeta(AccountResponse.GetUserMeta
-                            .Data(AccountResponse.Store("marcelo", "http://aptoide.com/avatar", 1)))), ResponseV7.Info(ResponseV7.Info.Status.OK), null)
+                    .doReturn(loginResponse.toSingle().toObservable())
+            whenever(serviceV7.getUserInfo(any())).doReturn(accountResponse
                     .toSingle().toObservable())
 
             accountPresenter.present()
@@ -61,8 +67,8 @@ class AccountPresenterTest : Spek({
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(view.loginEvent).doReturn(loginEvent)
-            whenever(serviceV3.oauth2Authentication(any())).doReturn(Observable.error<OAuth>(IOException()))
-            whenever(serviceV7.getUserInfo(any())).doReturn(Observable.error<AccountResponse>(IOException()))
+            whenever(serviceV3.oauth2Authentication(any())).doReturn(Observable.error<Response<OAuth>>(IOException()))
+            whenever(serviceV7.getUserInfo(any())).doReturn(Observable.error<Response<AccountResponse>>(IOException()))
 
             accountPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
@@ -83,11 +89,13 @@ class AccountPresenterTest : Spek({
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<AccountView.CredentialsViewModel>()
             val username = "marcelo@aptoide.com"
+            val loginResponse = Response.success(OAuth(null, null,
+                    "Invalid Credentials", "AUTH-1"))
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(view.loginEvent).doReturn(loginEvent)
             whenever(serviceV3.oauth2Authentication(any()))
-                    .doReturn(OAuth(null, null, "Invalid Credentials", "AUTH-1").toSingle().toObservable())
+                    .doReturn(loginResponse.toSingle().toObservable())
 
             accountPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
