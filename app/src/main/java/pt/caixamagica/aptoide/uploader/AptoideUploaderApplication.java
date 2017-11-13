@@ -25,6 +25,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.request.UploadedAppsRequest;
 import pt.caixamagica.aptoide.uploader.util.InstalledUtils;
 import pt.caixamagica.aptoide.uploader.util.Md5AsyncUtils;
 import pt.caixamagica.aptoide.uploader.util.StoredCredentialsManager;
+import pt.caixamagica.aptoide.uploader.webservices.json.UploadedAppsJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
 /**
@@ -108,12 +109,12 @@ public class AptoideUploaderApplication extends Application {
 
         spiceManager.execute(
             new UploadedAppsRequest(token, storeName, createMd5StringList(modelList)),
-            new RequestListener<UserCredentialsJson>() {
+            new RequestListener<UploadedAppsJson>() {
               @Override public void onRequestFailure(SpiceException spiceException) {
                 spiceException.printStackTrace();
               }
 
-              @Override public void onRequestSuccess(UserCredentialsJson userCredentialsJson) {
+              @Override public void onRequestSuccess(UploadedAppsJson uploadedAppsJson) {
                 System.out.println("request was successful");
               }
             });
