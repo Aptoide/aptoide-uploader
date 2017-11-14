@@ -14,6 +14,7 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import io.fabric.sdk.android.Fabric;
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
@@ -25,6 +26,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.request.UploadedAppsRequest;
 import pt.caixamagica.aptoide.uploader.util.InstalledUtils;
 import pt.caixamagica.aptoide.uploader.util.Md5AsyncUtils;
 import pt.caixamagica.aptoide.uploader.util.StoredCredentialsManager;
+import pt.caixamagica.aptoide.uploader.util.StoredUploadedAppsManager;
 import pt.caixamagica.aptoide.uploader.webservices.json.UploadedAppsJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -40,6 +42,9 @@ public class AptoideUploaderApplication extends Application {
   private double BUFFER_SIZE = 5;
   private SpiceManager spiceManager;
   private StoredCredentialsManager storedCredentialsManager;
+  private List<UploadedApp> listOfAppsInStore;
+  private StoredUploadedAppsManager storedUploadedAppsManager;
+  public static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
 
   public static Context getContext() {
     return context;
@@ -56,6 +61,12 @@ public class AptoideUploaderApplication extends Application {
     }
 
     storedCredentialsManager = new StoredCredentialsManager(this.getApplicationContext());
+
+    storedUploadedAppsManager = new StoredUploadedAppsManager(this.getApplicationContext()
+        .getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE));
+
+    listOfAppsInStore = new ArrayList<>();
+
     if (isUserLoggedIn()) {
       spiceManager = new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
       spiceManager.start(this);
@@ -116,10 +127,28 @@ public class AptoideUploaderApplication extends Application {
 
               @Override public void onRequestSuccess(UploadedAppsJson uploadedAppsJson) {
                 System.out.println("request was successful");
+
+                List<UploadedAppsJson.DataList.App> remoteAppsList =
+                    uploadedAppsJson.datalist.getList();
+
+                for (int i = 0; i < uploadedAppsJson.datalist.getList()
+                    .size(); i++) {
+                  listOfAppsInStore.add(new UploadedApp(remoteAppsList.get(i)
+                      .getFile()
+                      .getPackageName()
+                      .getName(), remoteAppsList.get(i)
+                      .getFile()
+                      .getVercode()));
+                }
+                updateStoredUploadedApps(listOfAppsInStore);
               }
             });
       }
     };
+  }
+
+  private void updateStoredUploadedApps(List<UploadedApp> listOfAppsInStore) {
+    storedUploadedAppsManager.saveUploadedApps(listOfAppsInStore);
   }
 
   private List<String> createMd5StringList(List<Md5AsyncUtils.Model> modelList) {
