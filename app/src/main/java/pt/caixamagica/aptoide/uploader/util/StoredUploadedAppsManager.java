@@ -24,11 +24,11 @@ public class StoredUploadedAppsManager {
 
   private void addAppToSharedPreferences(UploadedApp app) {
     sharedPreferences.edit()
-        .putLong(app.getPackageName(), app.getVercode())
+        .putInt(app.getPackageName(), app.getVercode())
         .apply();
   }
 
   public boolean isAppInStore(String appName, long versionCode) {
-    return sharedPreferences.getLong(appName, Long.MAX_VALUE) == versionCode;
+    return sharedPreferences.getInt(appName, Integer.MAX_VALUE) == versionCode;
   }
 }

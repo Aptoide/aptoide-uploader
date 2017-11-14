@@ -6,9 +6,9 @@ package pt.caixamagica.aptoide.uploader;
 
 public class UploadedApp {
   private String packageName;
-  private long vercode;
+  private int vercode;
 
-  public UploadedApp(String packageName, long vercode) {
+  public UploadedApp(String packageName, int vercode) {
     this.packageName = packageName;
     this.vercode = vercode;
   }
@@ -17,7 +17,7 @@ public class UploadedApp {
     return packageName;
   }
 
-  public long getVercode() {
+  public int getVercode() {
     return vercode;
   }
 }

@@ -72,7 +72,7 @@ public class UploadedAppsJson {
 
       @lombok.Data public static class File {
         private String vername;
-        private long vercode;
+        private int vercode;
         private String md5sum;
         private String status;
         @JsonProperty("package") private Package packageName;
