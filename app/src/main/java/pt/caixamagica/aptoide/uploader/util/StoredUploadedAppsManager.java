@@ -28,7 +28,7 @@ public class StoredUploadedAppsManager {
         .apply();
   }
 
-  public boolean isAppInStore(String appName, long versionCode) {
-    return sharedPreferences.getInt(appName, Integer.MAX_VALUE) == versionCode;
+  public boolean isAppInStore(String packageName, long versionCode) {
+    return sharedPreferences.getInt(packageName, Integer.MAX_VALUE) == versionCode;
   }
 }
