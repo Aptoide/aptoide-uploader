@@ -14,9 +14,9 @@ public class Md5AsyncUtils {
   private final Context context;
   private final InstalledUtils installedUtils;
 
-  public Md5AsyncUtils(Context context) {
+  public Md5AsyncUtils(Context context, InstalledUtils installedUtils) {
     this.context = context.getApplicationContext();
-    this.installedUtils = new InstalledUtils(context);
+    this.installedUtils = installedUtils;
   }
 
   public void computeMd5(List<SelectablePackageInfo> selectablePackageInfos,
