@@ -23,6 +23,7 @@ public class Md5AsyncUtils {
       OnNewUploadedApps onNewUploadedApps) {
     for (SelectablePackageInfo selectablePackageInfo : selectablePackageInfos) {
       String md5sum = AlgorithmUtils.computeMd5(selectablePackageInfo);
+      //// TODO: 15-11-2017 filipe check if already checked this app.
       onNewUploadedApps.onNewUploadedApps(Model.from(selectablePackageInfo, md5sum));
     }
   }

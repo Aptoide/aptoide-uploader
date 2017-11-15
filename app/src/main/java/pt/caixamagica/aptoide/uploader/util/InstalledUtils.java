@@ -20,11 +20,11 @@ import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 public class InstalledUtils {
 
   private final Context context;
-  private final StoredUploadedAppsManager storedUploadedAppsManager;
+  private final AppsInStorePersister appsInStorePersister;
 
-  public InstalledUtils(Context context, StoredUploadedAppsManager storedUploadedAppsManager) {
+  public InstalledUtils(Context context, AppsInStorePersister appsInStorePersister) {
     this.context = context.getApplicationContext();
-    this.storedUploadedAppsManager = storedUploadedAppsManager;
+    this.appsInStorePersister = appsInStorePersister;
   }
 
   public List<SelectablePackageInfo> nonSystemPackages(boolean ordered) {
@@ -44,7 +44,7 @@ public class InstalledUtils {
     selectablePackageInfos.clear();
     for (PackageInfo p : packageInfos) {
       selectablePackageInfos.add(new SelectablePackageInfo(p, context.getPackageManager(),
-          storedUploadedAppsManager.isAppInStore(p.packageName, p.versionCode)));
+          appsInStorePersister.isAppInStore(p.packageName, p.versionCode)));
     }
 
     if (ordered) Collections.sort(selectablePackageInfos, newLastInstallComparator());

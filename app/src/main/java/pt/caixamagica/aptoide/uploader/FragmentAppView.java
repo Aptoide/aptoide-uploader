@@ -55,7 +55,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.request.GetProposedRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
 import pt.caixamagica.aptoide.uploader.util.InstalledUtils;
-import pt.caixamagica.aptoide.uploader.util.StoredUploadedAppsManager;
+import pt.caixamagica.aptoide.uploader.util.AppsInStorePersister;
 import pt.caixamagica.aptoide.uploader.util.Utils;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetProposedResponse;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
@@ -202,7 +202,7 @@ public class FragmentAppView extends Fragment {
 
     userCredentialsJson = (UserCredentialsJson) getArguments().get("userCredentialsJson");
     uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getContext()));
-    installedUtils = new InstalledUtils(getContext(), new StoredUploadedAppsManager(
+    installedUtils = new InstalledUtils(getContext(), new AppsInStorePersister(
         getContext().getApplicationContext()
             .getSharedPreferences(AptoideUploaderApplication.SHARED_PREFERENCES_FILE,
                 Context.MODE_PRIVATE)));

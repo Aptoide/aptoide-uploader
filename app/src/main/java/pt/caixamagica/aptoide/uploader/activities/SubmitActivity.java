@@ -16,7 +16,7 @@ import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
 import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 import pt.caixamagica.aptoide.uploader.SubmitAppFragment;
-import pt.caixamagica.aptoide.uploader.util.StoredUploadedAppsManager;
+import pt.caixamagica.aptoide.uploader.util.AppsInStorePersister;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
 /**
@@ -25,7 +25,7 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 public class SubmitActivity extends ActionBarActivity {
 
   public static final String FILL_MISSING_INFO = "fillMissingInfo";
-  private StoredUploadedAppsManager storedUploadedAppsManager;
+  private AppsInStorePersister appsInStorePersister;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -36,7 +36,7 @@ public class SubmitActivity extends ActionBarActivity {
 
     Bundle extras = getIntent().getExtras();
 
-    storedUploadedAppsManager = new StoredUploadedAppsManager(this.getApplicationContext()
+    appsInStorePersister = new AppsInStorePersister(this.getApplicationContext()
         .getSharedPreferences(AptoideUploaderApplication.SHARED_PREFERENCES_FILE,
             Context.MODE_PRIVATE));
 
@@ -45,7 +45,7 @@ public class SubmitActivity extends ActionBarActivity {
     PackageInfo packageInfo = ((PackageInfo) extras.getParcelable("selectablePackageInfo"));
     SelectablePackageInfo selectablePackageInfo =
         new SelectablePackageInfo(packageInfo, getPackageManager(),
-            storedUploadedAppsManager.isAppInStore(packageInfo.packageName,
+            appsInStorePersister.isAppInStore(packageInfo.packageName,
                 packageInfo.versionCode));
     String title = extras.getString("title");
     String description = extras.getString("description");

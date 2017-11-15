@@ -23,10 +23,10 @@ import lombok.Getter;
 import lombok.Setter;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UploadedAppsRequest;
+import pt.caixamagica.aptoide.uploader.util.AppsInStorePersister;
 import pt.caixamagica.aptoide.uploader.util.InstalledUtils;
 import pt.caixamagica.aptoide.uploader.util.Md5AsyncUtils;
 import pt.caixamagica.aptoide.uploader.util.StoredCredentialsManager;
-import pt.caixamagica.aptoide.uploader.util.StoredUploadedAppsManager;
 import pt.caixamagica.aptoide.uploader.webservices.json.UploadedAppsJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -43,7 +43,7 @@ public class AptoideUploaderApplication extends Application {
   private SpiceManager spiceManager;
   private StoredCredentialsManager storedCredentialsManager;
   private List<UploadedApp> listOfAppsInStore;
-  private StoredUploadedAppsManager storedUploadedAppsManager;
+  private AppsInStorePersister appsInStorePersister;
   public static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
 
   public static Context getContext() {
@@ -62,12 +62,10 @@ public class AptoideUploaderApplication extends Application {
 
     storedCredentialsManager = new StoredCredentialsManager(this.getApplicationContext());
 
-    storedUploadedAppsManager = new StoredUploadedAppsManager(this.getApplicationContext()
-        .getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE));
-
-    listOfAppsInStore = new ArrayList<>();
-
     if (isUserLoggedIn()) {
+      appsInStorePersister = new AppsInStorePersister(this.getApplicationContext()
+          .getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE));
+      listOfAppsInStore = new ArrayList<>();
       spiceManager = new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
       spiceManager.start(this);
       refreshInstalledAppsMd5List();
@@ -75,7 +73,7 @@ public class AptoideUploaderApplication extends Application {
   }
 
   private void refreshInstalledAppsMd5List() {
-    InstalledUtils installedUtils = new InstalledUtils(this, storedUploadedAppsManager);
+    InstalledUtils installedUtils = new InstalledUtils(this, appsInStorePersister);
     Md5AsyncUtils md5AsyncUtils = new Md5AsyncUtils(this, installedUtils);
 
     List<SelectablePackageInfo> selectablePackageInfos = installedUtils.nonSystemPackages(false);
@@ -148,7 +146,7 @@ public class AptoideUploaderApplication extends Application {
   }
 
   private void updateStoredUploadedApps(List<UploadedApp> listOfAppsInStore) {
-    storedUploadedAppsManager.saveUploadedApps(listOfAppsInStore);
+    appsInStorePersister.saveUploadedApps(listOfAppsInStore);
   }
 
   private List<String> createMd5StringList(List<Md5AsyncUtils.Model> modelList) {

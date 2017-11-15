@@ -8,11 +8,11 @@ import pt.caixamagica.aptoide.uploader.UploadedApp;
  * Created by filipe on 13-11-2017.
  */
 
-public class StoredUploadedAppsManager {
+public class AppsInStorePersister {
 
   private final SharedPreferences sharedPreferences;
 
-  public StoredUploadedAppsManager(SharedPreferences sharedPreferences) {
+  public AppsInStorePersister(SharedPreferences sharedPreferences) {
     this.sharedPreferences = sharedPreferences;
   }
 
