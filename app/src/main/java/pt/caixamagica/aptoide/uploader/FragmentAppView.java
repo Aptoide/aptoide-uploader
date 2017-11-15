@@ -11,7 +11,6 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.ServiceConnection;
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -44,12 +43,9 @@ import com.manuelpeinado.multichoiceadapter.MultiChoiceAdapter;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
-import java.io.File;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.Iterator;
-import java.util.LinkedList;
 import java.util.List;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
 import pt.caixamagica.aptoide.uploader.analytics.UploaderAnalytics;
@@ -59,6 +55,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.request.GetProposedRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
 import pt.caixamagica.aptoide.uploader.util.InstalledUtils;
+import pt.caixamagica.aptoide.uploader.util.StoredUploadedAppsManager;
 import pt.caixamagica.aptoide.uploader.util.Utils;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetProposedResponse;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
@@ -205,7 +202,10 @@ public class FragmentAppView extends Fragment {
 
     userCredentialsJson = (UserCredentialsJson) getArguments().get("userCredentialsJson");
     uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getContext()));
-    installedUtils = new InstalledUtils(getContext());
+    installedUtils = new InstalledUtils(getContext(), new StoredUploadedAppsManager(
+        getContext().getApplicationContext()
+            .getSharedPreferences(AptoideUploaderApplication.SHARED_PREFERENCES_FILE,
+                Context.MODE_PRIVATE)));
     setAdapter(savedInstanceState, null);
   }
 

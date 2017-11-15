@@ -5,15 +5,18 @@
 
 package pt.caixamagica.aptoide.uploader.activities;
 
+import android.content.Context;
 import android.content.pm.PackageInfo;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
 import java.util.ArrayList;
+import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
 import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 import pt.caixamagica.aptoide.uploader.SubmitAppFragment;
+import pt.caixamagica.aptoide.uploader.util.StoredUploadedAppsManager;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
 /**
@@ -22,6 +25,7 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 public class SubmitActivity extends ActionBarActivity {
 
   public static final String FILL_MISSING_INFO = "fillMissingInfo";
+  private StoredUploadedAppsManager storedUploadedAppsManager;
 
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
@@ -32,11 +36,17 @@ public class SubmitActivity extends ActionBarActivity {
 
     Bundle extras = getIntent().getExtras();
 
+    storedUploadedAppsManager = new StoredUploadedAppsManager(this.getApplicationContext()
+        .getSharedPreferences(AptoideUploaderApplication.SHARED_PREFERENCES_FILE,
+            Context.MODE_PRIVATE));
+
     UserCredentialsJson userCredentialsJson =
         (UserCredentialsJson) extras.getSerializable("userCredentialsJson");
+    PackageInfo packageInfo = ((PackageInfo) extras.getParcelable("selectablePackageInfo"));
     SelectablePackageInfo selectablePackageInfo =
-        new SelectablePackageInfo(((PackageInfo) extras.getParcelable("selectablePackageInfo")),
-            getPackageManager(), false);
+        new SelectablePackageInfo(packageInfo, getPackageManager(),
+            storedUploadedAppsManager.isAppInStore(packageInfo.packageName,
+                packageInfo.versionCode));
     String title = extras.getString("title");
     String description = extras.getString("description");
     String languageCode = extras.getString("languageCode");

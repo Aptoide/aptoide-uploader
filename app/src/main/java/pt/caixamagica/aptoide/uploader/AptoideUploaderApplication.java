@@ -75,8 +75,8 @@ public class AptoideUploaderApplication extends Application {
   }
 
   private void refreshInstalledAppsMd5List() {
-    Md5AsyncUtils md5AsyncUtils = new Md5AsyncUtils(this);
-    InstalledUtils installedUtils = new InstalledUtils(this);
+    InstalledUtils installedUtils = new InstalledUtils(this, storedUploadedAppsManager);
+    Md5AsyncUtils md5AsyncUtils = new Md5AsyncUtils(this, installedUtils);
 
     List<SelectablePackageInfo> selectablePackageInfos = installedUtils.nonSystemPackages(false);
     md5AsyncUtils.computeMd5(selectablePackageInfos,
