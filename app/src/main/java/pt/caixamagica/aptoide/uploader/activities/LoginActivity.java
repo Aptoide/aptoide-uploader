@@ -44,6 +44,7 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 import lombok.Getter;
+import pt.caixamagica.aptoide.uploader.AppsInStoreController;
 import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
 import pt.caixamagica.aptoide.uploader.BuildConfig;
 import pt.caixamagica.aptoide.uploader.LoginFragment;
@@ -54,8 +55,12 @@ import pt.caixamagica.aptoide.uploader.dialog.RepoCreatorDialog;
 import pt.caixamagica.aptoide.uploader.model.UserInfo;
 import pt.caixamagica.aptoide.uploader.retrofit.LoginErrorException;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
+import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
 import pt.caixamagica.aptoide.uploader.retrofit.request.OAuth2AuthenticationRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UserCredentialsRequest;
+import pt.caixamagica.aptoide.uploader.util.AppsInStorePersister;
+import pt.caixamagica.aptoide.uploader.util.InstalledUtils;
+import pt.caixamagica.aptoide.uploader.util.Md5AsyncUtils;
 import pt.caixamagica.aptoide.uploader.util.StoredCredentialsManager;
 import pt.caixamagica.aptoide.uploader.webservices.json.OAuth;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
@@ -562,12 +567,25 @@ public class LoginActivity extends AppCompatActivity
       }
       //storeToken(userCredentialsJson);
       storedCredentialsManager.storeRepo(userCredentialsJson);
+      checkUploadedApps();
       switchToAppViewFragment(userCredentialsJson);
-
       spiceManager.removeAllDataFromCache();
     }
 
     @Override public void onRequestNotFound() {
     }
+  }
+
+  private void checkUploadedApps() {
+    AppsInStorePersister appsInStorePersister = new AppsInStorePersister(
+        this.getApplicationContext()
+            .getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE));
+
+    AppsInStoreController appsInStoreController =
+        new AppsInStoreController(new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class),
+            appsInStorePersister, new InstalledUtils(this, appsInStorePersister),
+            new Md5AsyncUtils(this), getApplicationContext());
+
+    appsInStoreController.start();
   }
 }
