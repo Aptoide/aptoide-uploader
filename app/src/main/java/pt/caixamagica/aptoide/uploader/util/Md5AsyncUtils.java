@@ -12,19 +12,18 @@ import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 public class Md5AsyncUtils {
 
   private final Context context;
-  private final InstalledUtils installedUtils;
 
-  public Md5AsyncUtils(Context context, InstalledUtils installedUtils) {
+  public Md5AsyncUtils(Context context) {
     this.context = context.getApplicationContext();
-    this.installedUtils = installedUtils;
   }
 
   public void computeMd5(List<SelectablePackageInfo> selectablePackageInfos,
       OnNewUploadedApps onNewUploadedApps) {
     for (SelectablePackageInfo selectablePackageInfo : selectablePackageInfos) {
-      String md5sum = AlgorithmUtils.computeMd5(selectablePackageInfo);
-      //// TODO: 15-11-2017 filipe check if already checked this app.
-      onNewUploadedApps.onNewUploadedApps(Model.from(selectablePackageInfo, md5sum));
+      if (!selectablePackageInfo.isUploaded()) {//no need to compute apps that are already in store
+        String md5sum = AlgorithmUtils.computeMd5(selectablePackageInfo);
+        onNewUploadedApps.onNewUploadedApps(Model.from(selectablePackageInfo, md5sum));
+      }
     }
   }
 

@@ -55,12 +55,10 @@ public class AptoideUploaderApplication extends Application {
           this.getApplicationContext()
               .getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE));
 
-      InstalledUtils installedUtils = new InstalledUtils(this, appsInStorePersister);
-
       appsInStoreController =
           new AppsInStoreController(new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class),
-              appsInStorePersister, installedUtils, new Md5AsyncUtils(this, installedUtils),
-              getApplicationContext());
+              appsInStorePersister, new InstalledUtils(this, appsInStorePersister),
+              new Md5AsyncUtils(this), getApplicationContext());
 
       appsInStoreController.start();
     }
