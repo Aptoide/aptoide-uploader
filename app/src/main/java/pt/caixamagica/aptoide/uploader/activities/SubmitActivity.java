@@ -45,8 +45,7 @@ public class SubmitActivity extends ActionBarActivity {
     PackageInfo packageInfo = ((PackageInfo) extras.getParcelable("selectablePackageInfo"));
     SelectablePackageInfo selectablePackageInfo =
         new SelectablePackageInfo(packageInfo, getPackageManager(),
-            appsInStorePersister.isAppInStore(packageInfo.packageName,
-                packageInfo.versionCode));
+            appsInStorePersister.isAppInStore(packageInfo.packageName, packageInfo.versionCode));
     String title = extras.getString("title");
     String description = extras.getString("description");
     String languageCode = extras.getString("languageCode");

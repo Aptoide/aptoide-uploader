@@ -28,7 +28,7 @@ public class AppsInStorePersister {
         .apply();
   }
 
-  public boolean isAppInStore(String packageName, long versionCode) {
+  public boolean isAppInStore(String packageName, int versionCode) {
     return sharedPreferences.getInt(packageName, Integer.MAX_VALUE) == versionCode;
   }
 }
