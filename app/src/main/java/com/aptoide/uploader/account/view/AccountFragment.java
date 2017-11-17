@@ -54,7 +54,7 @@ public class AccountFragment extends FragmentView implements AccountView {
     loadingTextView = view.findViewById(R.id.fragment_login_loading_text_view);
     fragmentContainer = view.findViewById(R.id.fragment_login_content);
 
-    new AccountPresenter(this, accountManager, new AccountNavigator(getContext()),
+    new AccountPresenter(this, accountManager, new AccountNavigator(getContext(), getFragmentManager()),
         new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
   }
 
