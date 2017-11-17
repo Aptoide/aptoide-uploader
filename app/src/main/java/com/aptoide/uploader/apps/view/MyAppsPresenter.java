@@ -5,10 +5,6 @@ import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.disposables.CompositeDisposable;
 
-/**
- * Created by pedroribeiro on 10/11/17.
- */
-
 public class MyAppsPresenter implements Presenter {
 
   private final MyAppsView view;
@@ -25,7 +21,7 @@ public class MyAppsPresenter implements Presenter {
   @Override public void present() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> appsManager.getInstalledApps())
+        .flatMapSingle(__ -> appsManager.getStore())
         .doOnNext(apps -> view.showApps(apps))
         .subscribe());
 

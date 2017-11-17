@@ -1,11 +1,7 @@
 package com.aptoide.uploader.apps;
 
-import io.reactivex.Observable;
+import io.reactivex.Single;
 import java.util.List;
-
-/**
- * Created by pedroribeiro on 10/11/17.
- */
 
 public class AppsManager {
 
@@ -15,7 +11,7 @@ public class AppsManager {
     this.packageProvider = packageProvider;
   }
 
-  public Observable<List<App>> getInstalledApps() {
+  public Single<List<App>> getStore() {
     return packageProvider.getInstalledApps();
   }
 }

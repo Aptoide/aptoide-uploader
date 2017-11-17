@@ -14,17 +14,14 @@ import com.aptoide.uploader.apps.AppsManager;
 import com.aptoide.uploader.apps.PackageManagerProvider;
 import com.aptoide.uploader.view.android.FragmentView;
 import io.reactivex.disposables.CompositeDisposable;
+import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
-
-/**
- * Created by trinkes on 17/11/2017.
- */
 
 public class MyAppsFragment extends FragmentView implements MyAppsView {
 
   private RecyclerView recyclerView;
-  private MyAppsListAdapter adapter;
+  private MyAppsAdapter adapter;
 
   public static MyAppsFragment newInstance() {
     return new MyAppsFragment();
@@ -44,9 +41,10 @@ public class MyAppsFragment extends FragmentView implements MyAppsView {
         new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     recyclerView.addItemDecoration(
         new DividerItemDecoration(getContext(), DividerItemDecoration.HORIZONTAL));
-    adapter = new MyAppsListAdapter();
+    adapter = new MyAppsAdapter(getLayoutInflater(), new ArrayList<>());
     recyclerView.setAdapter(adapter);
-    new MyAppsPresenter(this, new AppsManager(new PackageManagerProvider()),
+    new MyAppsPresenter(this,
+        new AppsManager(new PackageManagerProvider(getContext().getPackageManager())),
         new CompositeDisposable()).present();
   }
 

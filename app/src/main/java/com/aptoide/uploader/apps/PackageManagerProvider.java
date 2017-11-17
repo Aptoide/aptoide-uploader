@@ -1,19 +1,28 @@
 package com.aptoide.uploader.apps;
 
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
 import io.reactivex.Observable;
-import java.util.ArrayList;
+import io.reactivex.Single;
 import java.util.List;
 
-/**
- * Created by trinkes on 17/11/2017.
- */
-
 public class PackageManagerProvider implements PackageProvider {
-  @Override public Observable<List<App>> getInstalledApps() {
-    List<App> appList = new ArrayList<>();
-    for (int i = 0; i < 20; i++) {
-      appList.add(new App("http://lorempixel.com/20/20", "Aptoide" + i));
-    }
-    return Observable.just(appList);
+
+  private final PackageManager packageManager;
+
+  public PackageManagerProvider(PackageManager packageManager) {
+    this.packageManager = packageManager;
+  }
+
+  @Override public Single<List<App>> getInstalledApps() {
+    return Observable.fromIterable(
+        packageManager.getInstalledApplications(PackageManager.GET_META_DATA))
+        .filter(applicationInfo -> (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0
+            && applicationInfo.packageName != null)
+        .map(applicationInfo -> new App(
+            "android.resource://" + applicationInfo.packageName + "/" + applicationInfo.icon,
+            applicationInfo.loadLabel(packageManager)
+                .toString()))
+        .toList();
   }
 }

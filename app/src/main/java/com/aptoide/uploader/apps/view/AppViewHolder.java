@@ -8,16 +8,12 @@ import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.App;
 import com.bumptech.glide.Glide;
 
-/**
- * Created by filipe on 17-11-2017.
- */
-
-public class MyAppsListViewHolder extends RecyclerView.ViewHolder {
+public class AppViewHolder extends RecyclerView.ViewHolder {
 
   private final ImageView image;
   private final TextView appName;
 
-  public MyAppsListViewHolder(View itemView) {
+  public AppViewHolder(View itemView) {
     super(itemView);
     image = itemView.findViewById(R.id.item_app_icon);
     appName = itemView.findViewById(R.id.item_app_name);

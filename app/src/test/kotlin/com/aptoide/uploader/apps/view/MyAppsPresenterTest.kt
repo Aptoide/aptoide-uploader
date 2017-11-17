@@ -3,8 +3,6 @@ package com.aptoide.uploader.apps.view
 import com.aptoide.uploader.apps.App
 import com.aptoide.uploader.apps.AppsManager
 import com.aptoide.uploader.apps.PackageProvider
-import com.aptoide.uploader.apps.view.MyAppsPresenter
-import com.aptoide.uploader.apps.view.MyAppsView
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -19,9 +17,6 @@ import org.jetbrains.spek.api.dsl.it
 import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
 
-/**
- * Created by pedroribeiro on 10/11/17.
- */
 @RunWith(JUnitPlatform::class)
 class MyAppsPresenterTest : Spek({
     describe("a my apps presenter") {
@@ -32,10 +27,11 @@ class MyAppsPresenterTest : Spek({
             val installedAppsPresenter = MyAppsPresenter(view, appsManager, CompositeDisposable())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
-            val appList = mutableListOf<App>()
+            val appList = mutableListOf<App>(App("https://myicon.com/facebook", "Facebook"),
+                    App("https://myicon.com/aptoide", "Aptoide"))
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
-            whenever(packageProvider.installedApps).doReturn(appList.toSingle().toObservable())
+            whenever(packageProvider.installedApps).doReturn(appList.toSingle())
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
