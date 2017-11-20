@@ -57,8 +57,8 @@ import retrofit.http.POST;
           parameters.put("oauthUserName", bean.getNameForGoogle());
           parameters.put("oauthToken", bean.getPassword());
           break;
-        case facebook:
-          parameters.put("authMode", "facebook");
+        case facebook_uploader:
+          parameters.put("authMode", "facebook_uploader");
           parameters.put("oauthToken", bean.getPassword());
           parameters.put("password", bean.getPassword());
           break;
@@ -68,7 +68,7 @@ import retrofit.http.POST;
       parameters.put("password", bean.getPassword());
     }
 
-    if (bean.getRepo() != null && (bean.getAuthMode() == Mode.facebook
+    if (bean.getRepo() != null && (bean.getAuthMode() == Mode.facebook_uploader
         || bean.getAuthMode() == Mode.google)) {
       parameters.put("oauthCreateRepo", "1");
       parameters.put("repo", bean.getRepo());
@@ -92,7 +92,7 @@ import retrofit.http.POST;
   }
 
   public enum Mode {
-    aptoide, google, facebook;
+    aptoide, google, facebook_uploader;
 
     @Override public String toString() {
       return super.toString()

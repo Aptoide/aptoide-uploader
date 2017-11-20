@@ -60,7 +60,7 @@ android {
 
     buildConfigField "String", "GMS_SERVER_ID", "\"" + project.GMS_SERVER_ID + "\""
 
-    resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID + "\""
+    resValue "string", "facebook_app_id", "\"" + project.UPLOADER_FACEBOOK_APP_ID + "\""
   }
 
   buildTypes {

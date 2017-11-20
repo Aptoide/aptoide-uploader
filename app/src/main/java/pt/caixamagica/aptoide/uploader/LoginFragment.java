@@ -92,7 +92,8 @@ public class LoginFragment extends Fragment {
 
             if (session == Session.getActiveSession() && user != null) {
               String authToken = session.getAccessToken();
-              OAuth2AuthenticationRequest.Mode mode = OAuth2AuthenticationRequest.Mode.facebook;
+              OAuth2AuthenticationRequest.Mode mode =
+                  OAuth2AuthenticationRequest.Mode.facebook_uploader;
 
               //                            mCallback.submitAuthentication(username, authToken, mode, null, null, null, null);
               mCallback.submitAuthentication(
