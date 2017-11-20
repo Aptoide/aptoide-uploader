@@ -21,6 +21,6 @@ public class CategoriesRequest
   }
 
   public interface Webservice {
-    @POST("/apks/groups/get") CategoriesResponse get();
+    @POST("/apks/groups/get/groups_depth=1") CategoriesResponse get();
   }
 }
