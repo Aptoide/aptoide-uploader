@@ -61,10 +61,10 @@ public class AptoideUploaderApplication extends Application {
               new Md5AsyncUtils(this), getApplicationContext());
 
       appsInStoreController.start();
+    }
   }
-  }
+
   private boolean isUserLoggedIn() {
     return storedCredentialsManager.getStoredUserCredentials() != null;
-    }
-
+  }
 }
