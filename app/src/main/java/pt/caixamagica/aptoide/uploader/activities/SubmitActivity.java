@@ -50,14 +50,15 @@ public class SubmitActivity extends ActionBarActivity {
     String description = extras.getString("description");
     String languageCode = extras.getString("languageCode");
     boolean fromAppView = extras.getBoolean("fromAppview");
+    String category = extras.getString("category");
 
     switchtoSubmitAppFragment(userCredentialsJson, selectablePackageInfo, title, description,
-        languageCode);
+        languageCode, category);
   }
 
   private void switchtoSubmitAppFragment(UserCredentialsJson userCredentialsJson,
       SelectablePackageInfo selectablePackageInfo, String title, String description,
-      String languageCode) {
+      String languageCode, String category) {
     Fragment submitAppFragment = new SubmitAppFragment();
     Bundle bundle = new Bundle();
     bundle.putSerializable("userCredentialsJson", userCredentialsJson);
@@ -70,6 +71,7 @@ public class SubmitActivity extends ActionBarActivity {
     bundle.putString("description", description);
     bundle.putString("languageCode", languageCode);
     bundle.putBoolean("fromAppview", true);
+    bundle.putString("category", category);
     submitAppFragment.setArguments(bundle);
 
     getSupportFragmentManager().beginTransaction()

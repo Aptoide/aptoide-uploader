@@ -50,13 +50,16 @@ import java.util.List;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
 import pt.caixamagica.aptoide.uploader.analytics.UploaderAnalytics;
 import pt.caixamagica.aptoide.uploader.dialog.ConfirmationDialog;
+import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
+import pt.caixamagica.aptoide.uploader.retrofit.request.GetApkInfoRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetProposedRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
-import pt.caixamagica.aptoide.uploader.util.InstalledUtils;
 import pt.caixamagica.aptoide.uploader.util.AppsInStorePersister;
+import pt.caixamagica.aptoide.uploader.util.InstalledUtils;
 import pt.caixamagica.aptoide.uploader.util.Utils;
+import pt.caixamagica.aptoide.uploader.webservices.json.GetApkInfoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetProposedResponse;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -65,11 +68,10 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
  */
 public class FragmentAppView extends Fragment {
 
-  protected SpiceManager spiceManager;
-
   protected View rootView;
 
   protected UserCredentialsJson userCredentialsJson;
+  protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
   protected SpiceManager spiceManagerSecondary =
       new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
   int checked = 0;
@@ -197,6 +199,7 @@ public class FragmentAppView extends Fragment {
     if (savedInstanceState != null) {
       checked = savedInstanceState.getInt("sortCheckable");
     }
+    spiceManager.start(getContext());
     spiceManagerSecondary.start(getContext());
     setHasOptionsMenu(true);
 
@@ -402,6 +405,7 @@ public class FragmentAppView extends Fragment {
 
   @Override public void onDestroy() {
     super.onDestroy();
+    spiceManager.shouldStop();
     spiceManagerSecondary.shouldStop();
   }
 
@@ -466,37 +470,9 @@ public class FragmentAppView extends Fragment {
                       List<GetProposedResponse.Data> dataList = getProposedResponse.data;
 
                       if (!dataList.isEmpty()) {
-                        //check if present language exists, if not, check default (en) in response
-                        //compare local language with languages received from webservice and send correct strings???
-                    /*Fragment fragment = SubmitAppFragment.newInstance();
-                    Bundle bundle = new Bundle();
-                    bundle.putSerializable("userCredentialsJson", userCredentialsJson);
-
-                    ArrayList<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>(1);
-                    selectablePackageInfos.add(selectablePackageInfo);
-                    bundle.putParcelableArrayList("selectableAppNames", selectablePackageInfos);
-                    bundle.putString("title", dataList.get(0).getTitle());
-                    bundle.putString("description", dataList.get(0).getDescription());
-                    bundle.putString("languageCode", dataList.get(0).getLanguage());
-                    bundle.putBoolean("from_appview", true);
-                    fragment.setArguments(bundle);
-                    getChildFragmentManager().beginTransaction()
-                        .addToBackStack(null)
-                        .replace(R.id.app_view_fragment, fragment)
-                        .commit();*/
-                        Intent intent =
-                            new Intent(getContext().getApplicationContext(), SubmitActivity.class);
-                        intent.putExtra("userCredentialsJson", userCredentialsJson);
-                        intent.putExtra("selectablePackageInfo", selectablePackageInfo);
-                        intent.putExtra("title", dataList.get(0)
-                            .getTitle());
-                        intent.putExtra("description", dataList.get(0)
-                            .getDescription());
-                        intent.putExtra("languageCode", dataList.get(0)
-                            .getLanguage());
-                        intent.putExtra("fromAppview", true);
-
-                        startActivityForResult(intent, SUBMIT_APP_RESULT_CODE);
+                        GetProposedResponse.Data data = dataList.get(0);
+                        requestCategoryFromGetApkInfo(selectablePackageInfo, data.getTitle(),
+                            data.getDescription(), data.getLanguage());
                       } else {
                         //No proposed translations available call upload
                         try {
@@ -513,6 +489,60 @@ public class FragmentAppView extends Fragment {
                 .show();
           }
         });
+  }
+
+  private void requestCategoryFromGetApkInfo(final SelectablePackageInfo selectablePackageInfo,
+      final String title, final String description, final String language) {
+    GetApkInfoRequest getApkInfoRequest = new GetApkInfoRequest();
+
+    getApkInfoRequest.setApkid(selectablePackageInfo.packageName);
+
+    spiceManager.execute(getApkInfoRequest, new RequestListener<GetApkInfoJson>() {
+
+      @Override public void onRequestFailure(SpiceException spiceException) {
+        spiceException.printStackTrace();
+        navigateToSubmitAppFragment(selectablePackageInfo, title, description, language, "");
+      }
+
+      @Override public void onRequestSuccess(GetApkInfoJson getApkInfoJson) {
+        navigateToSubmitAppFragment(selectablePackageInfo, title, description, language,
+            getCategory(getApkInfoJson.getMeta().categories.standard));
+      }
+    });
+  }
+
+  private void navigateToSubmitAppFragment(SelectablePackageInfo selectablePackageInfo,
+      String title, String description, String language, String proposedCategory) {
+    Intent intent = new Intent(getContext().getApplicationContext(), SubmitActivity.class);
+    intent.putExtra("userCredentialsJson", userCredentialsJson);
+    intent.putExtra("selectablePackageInfo", selectablePackageInfo);
+    intent.putExtra("title", title);
+    intent.putExtra("description", description);
+    intent.putExtra("languageCode", language);
+    intent.putExtra("fromAppview", true);
+    intent.putExtra("category", proposedCategory);
+    startActivityForResult(intent, SUBMIT_APP_RESULT_CODE);
+  }
+
+  private String getCategory(List<GetApkInfoJson.Meta.Categories.Category> standard) {
+    String category = "";
+    for (int i = 0; i < standard.size(); i++) {
+      if (standard.get(i).parent != null) {
+        category = standard.get(i).name;
+      }
+    }
+    return category;
+  }
+
+  private ArrayList<String> getCategoriesListAsString(
+      List<GetApkInfoJson.Meta.Categories.Category> standard) {
+    ArrayList<String> categoriesAsString = new ArrayList<>();
+    for (int i = 0; i < standard.size(); i++) {
+      if (standard.get(i).parent != null) {
+        categoriesAsString.add(standard.get(i).name);
+      }
+    }
+    return categoriesAsString;
   }
 
   private void prepareSpinner(int viewId, int arrayId) {

@@ -102,6 +102,7 @@ public class SubmitAppFragment extends Fragment {
 
   private String proposedTitle;
   private String proposedDescription;
+  private String proposedCategory;
   private boolean fromAppView = false;
   private String languageCode;
   private String language;
@@ -116,6 +117,7 @@ public class SubmitAppFragment extends Fragment {
     if (!getArguments().isEmpty()) {
       proposedTitle = getArguments().getString("title");
       proposedDescription = getArguments().getString("description");
+      proposedCategory = getArguments().getString("category");
     }
   }
 
@@ -251,6 +253,7 @@ public class SubmitAppFragment extends Fragment {
     proposedDescription = getArguments().getString("description");
     languageCode = getArguments().getString("languageCode");
     fromAppView = getArguments().getBoolean("fromAppview");
+    proposedCategory = getArguments().getString("category");
   }
 
   private void submitApp() throws ValidationException {
@@ -371,20 +374,23 @@ public class SubmitAppFragment extends Fragment {
   }
 
   private void prepareCategorySpinner() {
+    int categoryIndex = getMatchingCategoryId(proposedCategory);
     Spinner spinner = (Spinner) rootView.findViewById(R.id.app_category_spinner);
     ArrayAdapter<String> spinnerArrayAdapter =
         new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, spinnerArray);
     spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spinner.setAdapter(spinnerArrayAdapter);
+    spinner.setSelection(categoryIndex);//new
+  }
+
+  private int getMatchingCategoryId(String proposedCategory) {
+    int index = spinnerArray.indexOf(proposedCategory);
+    return (index == -1) ? 0 : index;
   }
 
   private void retrieveCategorySpinnerArray() {
 
     if (spinnerArray == null) {
-      //ListCategoriesRequest listCategoriesRequest = new ListCategoriesRequest();
-      //listCategoriesRequest.setMode("json");
-      //listCategoriesRequest.setLanguage(Locale.getDefault()
-      //    .getLanguage());
 
       CategoriesRequest categoriesRequest = new CategoriesRequest();
 
