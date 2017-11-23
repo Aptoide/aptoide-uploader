@@ -5,7 +5,6 @@ import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import pt.caixamagica.aptoide.uploader.retrofit.request.CategoriesRequest;
@@ -53,24 +52,20 @@ public class CategoriesProvider {
         if (count < totalCategories) {
           requestCategories(listener);
         } else {
+          orderCategoriesNames();
           listener.onAllCategoriesProvided(categoriesNamesList);
         }
       }
     });
   }
 
+  private void orderCategoriesNames() {
+    Collections.sort(categoriesNamesList);
+  }
+
   private void addNewCategoriesList(List<CategoriesResponse.DataList.List> list) {
 
     categories.addAll(list);
-
-    Collections.sort(categories, new Comparator<CategoriesResponse.DataList.List>() {
-
-      @Override public int compare(CategoriesResponse.DataList.List lhs,
-          CategoriesResponse.DataList.List rhs) {
-        return lhs.getTitle()
-            .compareTo(rhs.getTitle());
-      }
-    });
 
     for (CategoriesResponse.DataList.List category : categories) {
       if (!categoriesNamesList.contains(category.getTitle())) {
