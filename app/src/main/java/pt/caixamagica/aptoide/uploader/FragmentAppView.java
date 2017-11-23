@@ -505,8 +505,12 @@ public class FragmentAppView extends Fragment {
       }
 
       @Override public void onRequestSuccess(GetApkInfoJson getApkInfoJson) {
-        navigateToSubmitAppFragment(selectablePackageInfo, title, description, language,
-            getCategory(getApkInfoJson.getMeta().categories.standard));
+        if (!getApkInfoJson.status.equals("FAIL") && getApkInfoJson.getMeta() != null) {
+          navigateToSubmitAppFragment(selectablePackageInfo, title, description, language,
+              getCategory(getApkInfoJson.getMeta().categories.standard));
+        } else {
+          navigateToSubmitAppFragment(selectablePackageInfo, title, description, language, "");
+        }
       }
     });
   }
