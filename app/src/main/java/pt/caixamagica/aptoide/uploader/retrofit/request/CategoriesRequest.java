@@ -1,6 +1,7 @@
 package pt.caixamagica.aptoide.uploader.retrofit.request;
 
 import com.octo.android.robospice.request.retrofit.RetrofitSpiceRequest;
+import lombok.Data;
 import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesResponse;
 import retrofit.http.POST;
 
@@ -11,16 +12,27 @@ import retrofit.http.POST;
 public class CategoriesRequest
     extends RetrofitSpiceRequest<CategoriesResponse, CategoriesRequest.Webservice> {
 
-  public CategoriesRequest() {
+  private Body body;
+
+  public CategoriesRequest(int offset) {
     super(CategoriesResponse.class, CategoriesRequest.Webservice.class);
+    this.body = new Body(offset);
   }
 
   @Override public CategoriesResponse loadDataFromNetwork() throws Exception {
-    //webservice has no arguments
-    return getService().get();
+    return getService().get(body);
   }
 
   public interface Webservice {
-    @POST("/apks/groups/get/groups_depth=1") CategoriesResponse get();
+    @POST("/apks/groups/get/groups_depth=1") CategoriesResponse get(@retrofit.http.Body Body args);
+  }
+
+  @Data private class Body {
+
+    private final int offset;
+
+    private Body(int offset) {
+      this.offset = offset;
+    }
   }
 }

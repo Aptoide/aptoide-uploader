@@ -28,19 +28,15 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 import pt.caixamagica.aptoide.uploader.liquid.Event;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
-import pt.caixamagica.aptoide.uploader.retrofit.request.CategoriesRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetApkInfoRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
 import pt.caixamagica.aptoide.uploader.util.LanguageCodesHelper;
-import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesResponse;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetApkInfoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -49,13 +45,10 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
  */
 public class SubmitAppFragment extends Fragment {
 
-  private static List<String> spinnerArray;
-
-  private static List<CategoriesResponse.DataList.List> categories = new LinkedList<>();
+  private List<String> spinnerArray;
 
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
-  protected SpiceManager secondarySpiceManager =
-      new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
+  protected SpiceManager secondarySpiceManager;
 
   protected View rootView;
 
@@ -106,6 +99,7 @@ public class SubmitAppFragment extends Fragment {
   private boolean fromAppView = false;
   private String languageCode;
   private String language;
+  private CategoriesProvider categoriesProvider;
 
   public static SubmitAppFragment newInstance() {
     SubmitAppFragment submitAppFragment = new SubmitAppFragment();
@@ -114,6 +108,7 @@ public class SubmitAppFragment extends Fragment {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    secondarySpiceManager = new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
     if (!getArguments().isEmpty()) {
       proposedTitle = getArguments().getString("title");
       proposedDescription = getArguments().getString("description");
@@ -125,6 +120,7 @@ public class SubmitAppFragment extends Fragment {
       @Nullable Bundle savedInstanceState) {
 
     rootView = inflater.inflate(R.layout.submit_app_fragment, container, false);
+    categoriesProvider = new CategoriesProvider(secondarySpiceManager);
 
     rootView.setFocusableInTouchMode(true);
     rootView.requestFocus();
@@ -391,83 +387,58 @@ public class SubmitAppFragment extends Fragment {
   private void retrieveCategorySpinnerArray() {
 
     if (spinnerArray == null) {
-
-      CategoriesRequest categoriesRequest = new CategoriesRequest();
-
-      secondarySpiceManager.execute(categoriesRequest, new RequestListener<CategoriesResponse>() {
-        @Override public void onRequestFailure(SpiceException spiceException) {
-          spiceException.printStackTrace();
+      //final int totalCategories;
+      //int categoriesCount = 0;
+      //int offset = 0;
+      //do {
+      //  offset += categoriesCount;
+      //  CategoriesRequest categoriesRequest = new CategoriesRequest(offset);
+      //
+      //  secondarySpiceManager.execute(categoriesRequest, new RequestListener<CategoriesResponse>() {
+      //    @Override public void onRequestFailure(SpiceException spiceException) {
+      //      spiceException.printStackTrace();
+      //    }
+      //
+      //    @Override public void onRequestSuccess(CategoriesResponse categoriesResponseJson) {
+      //      int total = (int) categoriesResponseJson.datalist.getTotal();
+      //      int countCategories = (int) categoriesResponseJson.datalist.getCount();
+      //
+      //      updateRequestCountVariables(total, countCategories);
+      //      categories.addAll(categoriesResponseJson.datalist.getList());
+      //
+      //      Collections.sort(categories, new Comparator<CategoriesResponse.DataList.List>() {
+      //
+      //        @Override public int compare(CategoriesResponse.DataList.List lhs,
+      //            CategoriesResponse.DataList.List rhs) {
+      //          return lhs.getTitle()
+      //              .compareTo(rhs.getTitle());
+      //        }
+      //      });
+      //
+      //      spinnerArray = new LinkedList<String>();
+      //
+      //      for (CategoriesResponse.DataList.List category : categories) {
+      //        spinnerArray.add(category.getTitle());
+      //      }
+      //      spinnerArray.add(0, "App Category");
+      //    }
+      //  });
+      //} while (categoriesCount < totalCategories);
+      spinnerArray = new LinkedList<String>();
+      categoriesProvider.getCategoriesNamesList(new CategoriesProviderListener() {
+        @Override public void onAllCategoriesProvided(List<String> categories) {
+          spinnerArray.addAll(categories);
         }
 
-        @Override public void onRequestSuccess(CategoriesResponse categoriesResponseJson) {
-          categories.addAll(categoriesResponseJson.datalist.getList());
-
-          Collections.sort(categories, new Comparator<CategoriesResponse.DataList.List>() {
-
-            @Override public int compare(CategoriesResponse.DataList.List lhs,
-                CategoriesResponse.DataList.List rhs) {
-              return lhs.getTitle()
-                  .compareTo(rhs.getTitle());
-            }
-          });
-
-          spinnerArray = new LinkedList<String>();
-
-          for (CategoriesResponse.DataList.List category : categories) {
-            spinnerArray.add(category.getTitle());
-          }
-          spinnerArray.add(0, "App Category");
-
-          prepareCategorySpinner();
+        @Override public void onErrorProvidingCategories() {
+          //// TODO: 23-11-2017 filipe handle error case.
         }
       });
+      spinnerArray.add(0, "App Category");
+      prepareCategorySpinner();
     } else {
       prepareCategorySpinner();
     }
-  }
-
-  /**
-   * Retorna o id da categoria cujo nome é <code>name</code>, -1 para default (não encontrado).
-   *
-   * @param name nome da categoria
-   *
-   * @return o id da categoria cujo nome é <code>name</code>.
-   */
-  public int getCategoryId(String name) {
-
-    // Default Value
-    if (name.equals("App Category (Optional)")) return -1;
-
-    for (CategoriesResponse.DataList.List category : categories) {
-      if (category.getTitle()
-          .equals(name)) {
-        return category.getId()
-            .intValue();
-      }
-    }
-
-    return -1;
-  }
-
-  /**
-   * Retorna o indice no spinner da categoria com o <code>id</code> fornecido. 0 caso seja
-   * desconhecido.
-   *
-   * @param id id da categoria
-   *
-   * @return o indice no spinner da categoria com o <code>id</code> fornecido.
-   */
-  public int getCategorySpinnerIndex(Number id) {
-
-    int i = 0;
-    for (CategoriesResponse.DataList.List category : categories) {
-      i++;
-      if (category.getId()
-          .equals(id)) {
-        return i;
-      }
-    }
-    return 0;
   }
 
   /**
@@ -546,7 +517,7 @@ public class SubmitAppFragment extends Fragment {
   private int getCategory() {
     String selectedItem =
         (String) ((Spinner) rootView.findViewById(R.id.app_category_spinner)).getSelectedItem();
-    return idFromCategoryName(selectedItem);
+    return categoriesProvider.idFromCategoryName(selectedItem);
   }
 
   private String getDescription() {
@@ -558,16 +529,6 @@ public class SubmitAppFragment extends Fragment {
     String selectedItem =
         (String) ((Spinner) rootView.findViewById(R.id.app_language)).getSelectedItem();
     return selectedItem;
-  }
-
-  private int idFromCategoryName(String name) {
-    for (CategoriesResponse.DataList.List category : categories) {
-      if (category.getTitle()
-          .equals(name)) {
-        return (int) category.getId();
-      }
-    }
-    return 0;
   }
 
   private void addLiquidListener(View view, final String liquidEvent) {
@@ -593,7 +554,7 @@ public class SubmitAppFragment extends Fragment {
 
   private void setCategorySpinner(Number id) {
     Spinner spinner = (Spinner) rootView.findViewById(R.id.app_category_spinner);
-    spinner.setSelection(getCategorySpinnerIndex(id));
+    spinner.setSelection(categoriesProvider.getCategorySpinnerIndex(id));
 
     addLiquidListener(spinner, Event.AppInfoChanges.CATEGORY);
   }
@@ -627,5 +588,14 @@ public class SubmitAppFragment extends Fragment {
         return false;
       }
     });
+  }
+
+  @Override public void onDestroyView() {
+    super.onDestroyView();
+    categoriesProvider.removeListener();
+  }
+
+  @Override public void onDestroy() {
+    super.onDestroy();
   }
 }
