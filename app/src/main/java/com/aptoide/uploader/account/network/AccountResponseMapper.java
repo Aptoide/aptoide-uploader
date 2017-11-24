@@ -12,6 +12,6 @@ public class AccountResponseMapper {
     return new AptoideAccount(response.getNodes()
         .getMeta()
         .getData()
-        .getStore() != null);
+        .getStore() != null, true);
   }
 }

@@ -1,8 +1,8 @@
 package com.aptoide.uploader.account.view;
 
+import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
-import com.aptoide.uploader.account.AptoideAccountManager;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
@@ -29,19 +29,30 @@ public class AccountPresenter implements Presenter {
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> view.getLoginEvent()
+        .flatMap(__ -> accountManager.getAccount())
+        .observeOn(viewScheduler)
+        .doOnNext(account -> {
+          if (account.isLoggedIn()) {
+            view.hideLoading();
+            if (account.hasStore()) {
+              accountNavigator.navigateToMyAppsView();
+            } else {
+              accountNavigator.navigateToCreateStoreView();
+            }
+          }
+        })
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMapCompletable(__ -> view.getLoginEvent()
             .doOnNext(credentials -> view.showLoading(credentials.getUsername()))
-            .flatMapSingle(credentials -> accountManager.login(credentials.getUsername(),
+            .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
                 credentials.getPassword()))
             .observeOn(viewScheduler)
-            .doOnNext(account -> {
-              view.hideLoading();
-              if (account.hasStore()) {
-                accountNavigator.navigateToMyAppsView();
-              } else {
-                accountNavigator.navigateToCreateStoreView();
-              }
-            })
             .doOnError(throwable -> {
               view.hideLoading();
               if (isInternetError(throwable)) {
@@ -51,7 +62,7 @@ public class AccountPresenter implements Presenter {
               }
             })
             .retry())
-        .subscribe(__ -> {
+        .subscribe(() -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));

@@ -1,10 +1,13 @@
 package com.aptoide.uploader;
 
 import android.app.Application;
+import android.preference.PreferenceManager;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
+import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
 import io.reactivex.schedulers.Schedulers;
+import io.reactivex.subjects.PublishSubject;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -33,7 +36,9 @@ public class UploaderApplication extends Application {
       accountManager = new AptoideAccountManager(
           new RetrofitAccountService(retrofitV3.create(RetrofitAccountService.ServiceV3.class),
               retrofitV7.create(RetrofitAccountService.ServiceV7.class),
-              new AccountResponseMapper()));
+              new AccountResponseMapper()),
+          new SharedPreferencesAccountPersistence(PublishSubject.create(),
+              PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()));
     }
     return accountManager;
   }

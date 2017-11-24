@@ -1,18 +1,20 @@
 package com.aptoide.uploader.account;
 
-/**
- * Created by jdandrade on 03/11/2017.
- */
-
 public class AptoideAccount {
 
   private final boolean hasStore;
+  private boolean loggedIn;
 
-  public AptoideAccount(boolean hasStore) {
+  public AptoideAccount(boolean hasStore, boolean loggedIn) {
     this.hasStore = hasStore;
+    this.loggedIn = loggedIn;
   }
 
   public boolean hasStore() {
     return hasStore;
+  }
+
+  public boolean isLoggedIn() {
+    return loggedIn;
   }
 }
