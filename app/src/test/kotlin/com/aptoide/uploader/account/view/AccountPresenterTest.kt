@@ -53,7 +53,7 @@ class AccountPresenterTest : Spek({
 
             whenever(accountPersistence.account).doReturn(accounts)
             whenever(accountPersistence.save(any())).doReturn(Completable.fromAction({
-                accounts.onNext(AptoideAccount(true, true))
+                accounts.onNext(AptoideAccount(true, true, "marcelo"))
             }))
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(view.loginEvent).doReturn(loginEvent)
@@ -76,7 +76,7 @@ class AccountPresenterTest : Spek({
             val navigator = mock<AccountNavigator> {}
             val serviceV3 = mock<RetrofitAccountService.ServiceV3> {}
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>() {}
-            val accountPersistence = mock<AccountPersistence>() {}
+            val accountPersistence = mock<AccountPersistence> {}
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3, serviceV7, AccountResponseMapper()), accountPersistence)
             val accountPresenter = AccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
@@ -102,7 +102,7 @@ class AccountPresenterTest : Spek({
             val navigator = mock<AccountNavigator> {}
             val serviceV3 = mock<RetrofitAccountService.ServiceV3> {}
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>() {}
-            val accountPersistence = mock<AccountPersistence>() {}
+            val accountPersistence = mock<AccountPersistence> {}
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3, serviceV7, AccountResponseMapper()), accountPersistence)
             val accountPresenter = AccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
@@ -131,7 +131,7 @@ class AccountPresenterTest : Spek({
             val navigator = mock<AccountNavigator> {}
             val serviceV3 = mock<RetrofitAccountService.ServiceV3> {}
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>() {}
-            val accountPersistence = mock<AccountPersistence>() {}
+            val accountPersistence = mock<AccountPersistence> {}
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3, serviceV7, AccountResponseMapper()), accountPersistence)
             val accountPresenter = AccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
@@ -148,7 +148,7 @@ class AccountPresenterTest : Spek({
 
             whenever(accountPersistence.account).doReturn(accounts)
             whenever(accountPersistence.save(any())).doReturn(Completable.fromAction({
-                accounts.onNext(AptoideAccount(false, true))
+                accounts.onNext(AptoideAccount(false, true, "marcelo"))
             }))
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(view.loginEvent).doReturn(loginEvent)
@@ -179,7 +179,7 @@ class AccountPresenterTest : Spek({
             val loginEvent = PublishSubject.create<AccountView.CredentialsViewModel>()
 
             whenever(view.loginEvent).doReturn(loginEvent)
-            whenever(accountPersistence.account).doReturn(AptoideAccount(true, true)
+            whenever(accountPersistence.account).doReturn(AptoideAccount(true, true, "marcelo")
                     .toSingle().toObservable())
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
 
@@ -201,7 +201,7 @@ class AccountPresenterTest : Spek({
             val loginEvent = PublishSubject.create<AccountView.CredentialsViewModel>()
 
             whenever(view.loginEvent).doReturn(loginEvent)
-            whenever(accountPersistence.account).doReturn(AptoideAccount(false, true)
+            whenever(accountPersistence.account).doReturn(AptoideAccount(false, true, "marcelo")
                     .toSingle().toObservable())
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
 

@@ -13,6 +13,7 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
 
   private static final String HAS_STORE = "HAS_STORE";
   private static final String IS_LOGGED_IN = "IS_LOGGED_IN";
+  private static final String STORE_NAME = "store_name";
   private final PublishSubject<AptoideAccount> accountSubject;
   private final SharedPreferences preferences;
   private final Scheduler scheduler;
@@ -33,6 +34,7 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
     return Completable.fromAction(() -> preferences.edit()
         .putBoolean(IS_LOGGED_IN, account.isLoggedIn())
         .putBoolean(HAS_STORE, account.hasStore())
+        .putString(STORE_NAME, account.getStoreName())
         .commit())
         .doOnComplete(() -> accountSubject.onNext(account))
         .subscribeOn(scheduler);
@@ -40,6 +42,6 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
 
   private AptoideAccount getPreferencesAccount() {
     return new AptoideAccount(preferences.getBoolean(HAS_STORE, false),
-        preferences.getBoolean(IS_LOGGED_IN, false));
+        preferences.getBoolean(IS_LOGGED_IN, false), preferences.getString(STORE_NAME, null));
   }
 }

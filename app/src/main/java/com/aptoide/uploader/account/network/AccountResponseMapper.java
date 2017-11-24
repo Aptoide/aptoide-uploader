@@ -9,9 +9,10 @@ import com.aptoide.uploader.account.AptoideAccount;
 public class AccountResponseMapper {
 
   public AptoideAccount map(AccountResponse response) {
-    return new AptoideAccount(response.getNodes()
+    AccountResponse.Store store = response.getNodes()
         .getMeta()
         .getData()
-        .getStore() != null, true);
+        .getStore();
+    return new AptoideAccount(store != null, true, store != null ? store.getName() : null);
   }
 }
