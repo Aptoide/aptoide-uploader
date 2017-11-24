@@ -53,6 +53,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void onDestroyView() {
     adapter = null;
+    storeNameText = null;
     recyclerView.setAdapter(null);
     recyclerView = null;
     super.onDestroyView();
