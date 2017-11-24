@@ -1,23 +1,23 @@
 package com.aptoide.uploader.apps.view;
 
-import com.aptoide.uploader.apps.AppsManager;
+import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
 
-public class MyAppsPresenter implements Presenter {
+public class MyStorePresenter implements Presenter {
 
-  private final MyAppsView view;
-  private final AppsManager appsManager;
+  private final MyStoreView view;
+  private final StoreManager storeManager;
   private final CompositeDisposable compositeDisposable;
   private final Scheduler viewScheduler;
 
-  public MyAppsPresenter(MyAppsView view, AppsManager appsManager,
+  public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, Scheduler viewScheduler) {
     this.view = view;
-    this.appsManager = appsManager;
+    this.storeManager = storeManager;
     this.compositeDisposable = compositeDisposable;
     this.viewScheduler = viewScheduler;
   }
@@ -25,7 +25,7 @@ public class MyAppsPresenter implements Presenter {
   @Override public void present() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMapSingle(__ -> appsManager.getApps())
+        .flatMapSingle(__ -> storeManager.getStore())
         .observeOn(viewScheduler)
         .doOnNext(store -> view.showStoreName(store.getName()))
         .doOnNext(store -> view.showApps(store.getApps()))

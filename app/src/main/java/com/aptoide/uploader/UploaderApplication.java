@@ -7,8 +7,8 @@ import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
-import com.aptoide.uploader.apps.AppsManager;
 import com.aptoide.uploader.apps.PackageManagerProvider;
+import com.aptoide.uploader.apps.StoreManager;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import okhttp3.OkHttpClient;
@@ -19,7 +19,7 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 public class UploaderApplication extends Application {
 
   private AptoideAccountManager accountManager;
-  private AppsManager appsManager;
+  private StoreManager storeManager;
 
   public AptoideAccountManager getAccountManager() {
     if (accountManager == null) {
@@ -47,11 +47,11 @@ public class UploaderApplication extends Application {
     return accountManager;
   }
 
-  public AppsManager getAppsManager() {
-    if (appsManager == null) {
-      appsManager = new AppsManager(new PackageManagerProvider(getPackageManager()),
+  public StoreManager getAppsManager() {
+    if (storeManager == null) {
+      storeManager = new StoreManager(new PackageManagerProvider(getPackageManager()),
           new AccountStoreNameProvider(getAccountManager()));
     }
-    return appsManager;
+    return storeManager;
   }
 }

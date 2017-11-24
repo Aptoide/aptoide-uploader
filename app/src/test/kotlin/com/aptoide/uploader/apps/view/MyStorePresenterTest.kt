@@ -6,8 +6,8 @@ import com.aptoide.uploader.account.AptoideAccount
 import com.aptoide.uploader.account.AptoideAccountManager
 import com.aptoide.uploader.apps.AccountStoreNameProvider
 import com.aptoide.uploader.apps.App
-import com.aptoide.uploader.apps.AppsManager
 import com.aptoide.uploader.apps.PackageProvider
+import com.aptoide.uploader.apps.StoreManager
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -24,16 +24,16 @@ import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
 
 @RunWith(JUnitPlatform::class)
-class MyAppsPresenterTest : Spek({
+class MyStorePresenterTest : Spek({
     describe("a my apps presenter") {
         it("should display store name and installed apps when view is created") {
-            val view = mock<MyAppsView> {}
+            val view = mock<MyStoreView> {}
             val packageProvider = mock<PackageProvider> {}
             val accountService = mock<AccountService> {}
             val accountPersistence = mock<AccountPersistence> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
-            val appsManager = AppsManager(packageProvider, storeNameProvider)
-            val installedAppsPresenter = MyAppsPresenter(view, appsManager, CompositeDisposable(), Schedulers.trampoline())
+            val appsManager = StoreManager(packageProvider, storeNameProvider)
+            val installedAppsPresenter = MyStorePresenter(view, appsManager, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val facebook = App("https://myicon.com/facebook", "Facebook", false)
