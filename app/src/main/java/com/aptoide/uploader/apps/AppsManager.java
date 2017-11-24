@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps;
 
+import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.List;
 
@@ -11,7 +12,10 @@ public class AppsManager {
     this.packageProvider = packageProvider;
   }
 
-  public Single<List<App>> getStore() {
-    return packageProvider.getInstalledApps();
+  public Single<List<App>> getApps() {
+    return packageProvider.getInstalledApps()
+        .flatMapObservable(apps -> Observable.fromIterable(apps))
+        .filter(app -> !app.isSystem())
+        .toList();
   }
 }

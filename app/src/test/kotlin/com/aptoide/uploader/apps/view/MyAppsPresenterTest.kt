@@ -27,15 +27,16 @@ class MyAppsPresenterTest : Spek({
             val installedAppsPresenter = MyAppsPresenter(view, appsManager, CompositeDisposable())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
-            val appList = mutableListOf<App>(App("https://myicon.com/facebook", "Facebook"),
-                    App("https://myicon.com/aptoide", "Aptoide"))
+            val facebook = App("https://myicon.com/facebook", "Facebook", false)
+            val aptoide = App("https://myicon.com/aptoide", "Aptoide", true)
+            val appList = mutableListOf<App>(facebook, aptoide)
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(packageProvider.installedApps).doReturn(appList.toSingle())
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            verify(view).showApps(appList)
+            verify(view).showApps(mutableListOf<App>(facebook))
         }
     }
 })

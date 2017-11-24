@@ -1,17 +1,15 @@
 package com.aptoide.uploader.apps;
 
-/**
- * Created by pedroribeiro on 10/11/17.
- */
-
 public class App {
 
   private final String icon;
   private final String name;
+  private final boolean isSystem;
 
-  public App(String icon, String name) {
+  public App(String icon, String name, boolean isSystem) {
     this.icon = icon;
     this.name = name;
+    this.isSystem = isSystem;
   }
 
   public String getIcon() {
@@ -20,5 +18,9 @@ public class App {
 
   public String getName() {
     return name;
+  }
+
+  public boolean isSystem() {
+    return isSystem;
   }
 }

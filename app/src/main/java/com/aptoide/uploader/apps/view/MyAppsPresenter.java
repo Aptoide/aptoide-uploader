@@ -21,7 +21,7 @@ public class MyAppsPresenter implements Presenter {
   @Override public void present() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMapSingle(__ -> appsManager.getStore())
+        .flatMapSingle(__ -> appsManager.getApps())
         .doOnNext(apps -> view.showApps(apps))
         .subscribe());
 

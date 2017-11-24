@@ -17,12 +17,11 @@ public class PackageManagerProvider implements PackageProvider {
   @Override public Single<List<App>> getInstalledApps() {
     return Observable.fromIterable(
         packageManager.getInstalledApplications(PackageManager.GET_META_DATA))
-        .filter(applicationInfo -> (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0
-            && applicationInfo.packageName != null)
+        .filter(applicationInfo -> applicationInfo.packageName != null)
         .map(applicationInfo -> new App(
             "android.resource://" + applicationInfo.packageName + "/" + applicationInfo.icon,
             applicationInfo.loadLabel(packageManager)
-                .toString()))
+                .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0))
         .toList();
   }
 }
