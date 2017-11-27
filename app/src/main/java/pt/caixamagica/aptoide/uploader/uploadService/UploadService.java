@@ -31,6 +31,7 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
 import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 import pt.caixamagica.aptoide.uploader.UploaderUtils;
@@ -39,6 +40,7 @@ import pt.caixamagica.aptoide.uploader.analytics.UploaderAnalytics;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploadService;
 import pt.caixamagica.aptoide.uploader.retrofit.request.StoreTokenInterface;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UploadAppToRepoRequest;
+import pt.caixamagica.aptoide.uploader.util.AppsInStorePersister;
 import pt.caixamagica.aptoide.uploader.webservices.json.Error;
 import pt.caixamagica.aptoide.uploader.webservices.json.UploadAppToRepoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
@@ -61,6 +63,7 @@ public class UploadService extends Service {
   private UserCredentialsJson userCredentialsJson;
   private Map<String, UploadAppToRepoRequest> sendingAppsUploadRequests = new HashMap<>();
   private Map<String, SelectablePackageInfo> sendingAppsSelectablePackageInfos = new HashMap<>();
+  private AppsInStorePersister appsInStorePersister;
 
   private NotificationCompat.Builder setPreparingUploadNotification(String packageName,
       String label) {
@@ -301,6 +304,8 @@ public class UploadService extends Service {
               uploadAppToRepoRequest.getLabel());
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
+          appsInStorePersister.addUploadedAppToSharedPreferences(selectablePackageInfo.packageName,
+              selectablePackageInfo.versionCode);
         }
       }
     });
@@ -377,6 +382,8 @@ public class UploadService extends Service {
   @Override public void onCreate() {
     spiceManager.start(this);
     uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getApplicationContext()));
+    appsInStorePersister = new AppsInStorePersister(
+        getSharedPreferences(AptoideUploaderApplication.SHARED_PREFERENCES_FILE, MODE_PRIVATE));
   }
 
   @Override public int onStartCommand(Intent intent, int flags, int startId) {
@@ -588,6 +595,8 @@ public class UploadService extends Service {
               uploadAppToRepoRequest.getLabel());
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
+          //appsInStorePersister.addUploadedAppToSharedPreferences(originalRequest.getPackageName(), );
+          //// TODO: 24-11-2017 filipe add here
         }
       }
     });
