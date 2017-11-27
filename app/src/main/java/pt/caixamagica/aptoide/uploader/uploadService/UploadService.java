@@ -175,7 +175,7 @@ public class UploadService extends Service {
         Log.e(TAG, "onRequestFailure: ", spiceException);
 
         if (spiceException instanceof NetworkException) {
-          checkUploadSuccess(uploadAppToRepoRequest);
+          checkUploadSuccess(uploadAppToRepoRequest, selectablePackageInfo);
           //setNotification(uploadAppToRepoRequest.getPackageName(),
           //    getString(R.string.upload_done_network_error), null);
         } else {
@@ -545,7 +545,8 @@ public class UploadService extends Service {
     return PendingIntent.getService(this, reqCode, intent, 0);
   }
 
-  private void checkUploadSuccess(final UploadAppToRepoRequest originalRequest) {
+  private void checkUploadSuccess(final UploadAppToRepoRequest originalRequest,
+      final SelectablePackageInfo selectablePackageInfo) {
     final SharedPreferences sharedpreferences =
         getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
@@ -595,8 +596,8 @@ public class UploadService extends Service {
               uploadAppToRepoRequest.getLabel());
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
-          //appsInStorePersister.addUploadedAppToSharedPreferences(originalRequest.getPackageName(), );
-          //// TODO: 24-11-2017 filipe add here
+          appsInStorePersister.addUploadedAppToSharedPreferences(originalRequest.getPackageName(),
+              selectablePackageInfo.versionCode);
         }
       }
     });
