@@ -27,6 +27,33 @@ public class InstalledUtils {
     this.appsInStorePersister = appsInStorePersister;
   }
 
+  public List<SelectablePackageInfo> getNonUploadedNonSystemPackages(boolean ordered) {
+    List<PackageInfo> packs = context.getPackageManager()
+        .getInstalledPackages(0);
+
+    Iterator<PackageInfo> infoIterator = packs.iterator();
+
+    LinkedList<PackageInfo> packageInfos = new LinkedList<>();
+    while (infoIterator.hasNext()) {
+      PackageInfo next = infoIterator.next();
+      if (isSystemUpdatedPackage(next) || !isSystemPackage(next)) packageInfos.add(next);
+    }
+
+    List<SelectablePackageInfo> selectablePackageInfos = new ArrayList<>();
+
+    selectablePackageInfos.clear();
+    for (PackageInfo p : packageInfos) {
+      if (!appsInStorePersister.isAppInStore(p.packageName, p.versionCode)) {
+        selectablePackageInfos.add(
+            new SelectablePackageInfo(p, context.getPackageManager(), false));
+      }
+    }
+
+    if (ordered) Collections.sort(selectablePackageInfos, newLastInstallComparator());
+
+    return selectablePackageInfos;
+  }
+
   public List<SelectablePackageInfo> nonSystemPackages(boolean ordered) {
     List<PackageInfo> packs = context.getPackageManager()
         .getInstalledPackages(0);
