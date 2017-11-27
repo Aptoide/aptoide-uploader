@@ -49,13 +49,15 @@ public class AppsInStoreController {
   }
 
   private void refreshInstalledAppsMd5List() {
-    List<SelectablePackageInfo> selectablePackageInfos = installedUtils.nonSystemPackages(false);
+    List<SelectablePackageInfo> selectablePackageInfos =
+        installedUtils.getNonUploadedNonSystemPackages(false);
 
     Md5AsyncUtils.OnNewUploadedApps newUploadedAppsListener =
         createMd5Listener(selectablePackageInfos.size());
 
     md5AsyncUtils.computeMd5(selectablePackageInfos, newUploadedAppsListener);
   }
+
 
   private Md5AsyncUtils.OnNewUploadedApps createMd5Listener(final int size) {
     return new Md5AsyncUtils.OnNewUploadedApps() {
@@ -64,19 +66,19 @@ public class AppsInStoreController {
           new ConcurrentLinkedQueue<>();
 
       @Override public void onNewUploadedApps(Md5AsyncUtils.Model model) {
+        concurrentLinkedQueue.add(model);
         int count = atomicInteger.incrementAndGet();
         if (count % BUFFER_SIZE == 0 || count == size) {
           List<Md5AsyncUtils.Model> modelList = createModelList();
           sendUploadedAppsRequest(modelList);
-        } else {
-          concurrentLinkedQueue.add(model);
         }
       }
 
       private List<Md5AsyncUtils.Model> createModelList() {
         List<Md5AsyncUtils.Model> list = new LinkedList<>();
 
-        for (int i = 0; i < Math.min(BUFFER_SIZE, concurrentLinkedQueue.size()); i++) {
+        double queueSize = Math.min(BUFFER_SIZE, concurrentLinkedQueue.size());
+        for (int i = 0; i < queueSize; i++) {
           if (!concurrentLinkedQueue.isEmpty()) {
             list.add(concurrentLinkedQueue.poll());
           }
