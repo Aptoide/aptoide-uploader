@@ -50,6 +50,8 @@ public class AppsListActivity extends ActionBarActivity
   }
 
   @Override public void onClick(DialogInterface dialog, int which) {
+    ((AptoideUploaderApplication) getApplicationContext()).getAppsInStoreController()
+        .stop();
     removeUserCredentials();
     clearSessionInformation();
     AptoideUploaderApplication.setForcedLogout(true);
@@ -68,15 +70,19 @@ public class AppsListActivity extends ActionBarActivity
 
   private void clearSessionInformation() {
     //Stop the activity
-    AptoideUploaderApplication.setForcedLogout(true);
+    //AptoideUploaderApplication.setForcedLogout(true);
     if (Session.getActiveSession() == null) {
       if (Session.openActiveSessionFromCache(getApplicationContext()) != null) {
-        Session.getActiveSession().closeAndClearTokenInformation();
-        Session.getActiveSession().close();
+        Session.getActiveSession()
+            .closeAndClearTokenInformation();
+        Session.getActiveSession()
+            .close();
       }
     } else if (Session.getActiveSession() != null) {
-      Session.getActiveSession().closeAndClearTokenInformation();
-      Session.getActiveSession().close();
+      Session.getActiveSession()
+          .closeAndClearTokenInformation();
+      Session.getActiveSession()
+          .close();
     }
     Session.setActiveSession(null);
   }
