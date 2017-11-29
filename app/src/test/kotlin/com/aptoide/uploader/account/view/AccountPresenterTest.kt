@@ -84,6 +84,7 @@ class AccountPresenterTest : Spek({
             val loginEvent = PublishSubject.create<AccountView.CredentialsViewModel>()
             val username = "marcelo@aptoide.com"
 
+            whenever(accountPersistence.account).doReturn(PublishSubject.create<AptoideAccount>())
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(view.loginEvent).doReturn(loginEvent)
             whenever(serviceV3.oauth2Authentication(any())).doReturn(Observable.error<Response<OAuth>>(IOException()))
@@ -112,6 +113,7 @@ class AccountPresenterTest : Spek({
             val loginResponse = Response.success(OAuth(null, null,
                     "Invalid Credentials", "AUTH-1"))
 
+            whenever(accountPersistence.account).doReturn(PublishSubject.create<AptoideAccount>())
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(view.loginEvent).doReturn(loginEvent)
             whenever(serviceV3.oauth2Authentication(any()))
