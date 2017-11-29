@@ -51,6 +51,16 @@ public class AptoideUploaderApplication extends Application {
     storedCredentialsManager = new StoredCredentialsManager(this.getApplicationContext());
 
     if (isUserLoggedIn()) {
+      getAppsInStoreController().start();
+    }
+  }
+
+  private boolean isUserLoggedIn() {
+    return storedCredentialsManager.getStoredUserCredentials() != null;
+  }
+
+  public AppsInStoreController getAppsInStoreController() {
+    if (appsInStoreController == null) {
       AppsInStorePersister appsInStorePersister = new AppsInStorePersister(
           this.getApplicationContext()
               .getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE));
@@ -59,12 +69,7 @@ public class AptoideUploaderApplication extends Application {
           new AppsInStoreController(new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class),
               appsInStorePersister, new InstalledUtils(this, appsInStorePersister),
               new Md5AsyncUtils(this), getApplicationContext());
-
-      appsInStoreController.start();
     }
-  }
-
-  private boolean isUserLoggedIn() {
-    return storedCredentialsManager.getStoredUserCredentials() != null;
+    return appsInStoreController;
   }
 }
