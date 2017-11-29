@@ -8,6 +8,8 @@ import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.concurrent.atomic.AtomicInteger;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UploadedAppsRequest;
 import pt.caixamagica.aptoide.uploader.util.AppsInStorePersister;
@@ -29,6 +31,7 @@ public class AppsInStoreController {
   private Md5AsyncUtils md5AsyncUtils;
   private Context applicationContext;
   private double BUFFER_SIZE = 5;
+  private ExecutorService executorService;
 
   public AppsInStoreController(SpiceManager spiceManager, AppsInStorePersister appsInStorePersister,
       InstalledUtils installedUtils, Md5AsyncUtils md5AsyncUtils, Context applicationContext) {
@@ -41,11 +44,13 @@ public class AppsInStoreController {
 
   public void start() {
     spiceManager.start(applicationContext);
-    new Thread(new Runnable() {
+
+    executorService = Executors.newSingleThreadExecutor();
+    executorService.submit(new Thread(new Runnable() {
       @Override public void run() {
         refreshInstalledAppsMd5List();
       }
-    }).start();
+    }));
   }
 
   private void refreshInstalledAppsMd5List() {
@@ -57,7 +62,6 @@ public class AppsInStoreController {
 
     md5AsyncUtils.computeMd5(selectablePackageInfos, newUploadedAppsListener);
   }
-
 
   private Md5AsyncUtils.OnNewUploadedApps createMd5Listener(final int size) {
     return new Md5AsyncUtils.OnNewUploadedApps() {
@@ -144,5 +148,10 @@ public class AppsInStoreController {
     }
 
     return strings;
+  }
+
+  public void stop() {
+    spiceManager.shouldStop();
+    executorService.shutdown();
   }
 }
