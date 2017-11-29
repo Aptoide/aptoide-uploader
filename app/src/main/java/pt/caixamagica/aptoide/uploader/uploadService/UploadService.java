@@ -13,11 +13,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.facebook.AppEventsLogger;
@@ -504,7 +505,17 @@ public class UploadService extends Service {
       e.printStackTrace();
     }
 
-    return drawable == null ? null : ((BitmapDrawable) drawable).getBitmap();
+    return drawable == null ? null : getBitmapFromDrawable(drawable);
+  }
+
+  private Bitmap getBitmapFromDrawable(@NonNull Drawable drawable) {
+    final Bitmap bmp =
+        Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
+            Bitmap.Config.ARGB_8888);
+    final Canvas canvas = new Canvas(bmp);
+    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+    drawable.draw(canvas);
+    return bmp;
   }
 
   private PendingIntent buildFillMissingInfoIntent(SelectablePackageInfo selectablePackageInfo) {
