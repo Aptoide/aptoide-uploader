@@ -70,7 +70,7 @@ public class AppsListActivity extends ActionBarActivity
 
   private void clearSessionInformation() {
     //Stop the activity
-    //AptoideUploaderApplication.setForcedLogout(true);
+    AptoideUploaderApplication.setForcedLogout(true);
     if (Session.getActiveSession() == null) {
       if (Session.openActiveSessionFromCache(getApplicationContext()) != null) {
         Session.getActiveSession()
