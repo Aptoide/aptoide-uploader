@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
@@ -52,6 +53,10 @@
       android:id="@+id/fragment_my_apps_list"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-
+      android:background="@android:color/darker_gray"
+      android:padding="@dimen/apps_grid_item_margin"
+      tools:layoutManager="android.support.v7.widget.GridLayoutManager"
+      tools:listitem="@android:layout/simple_list_item_checked"
+      tools:spanCount="3"
       />
 </LinearLayout>

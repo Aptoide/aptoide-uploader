@@ -6,4 +6,6 @@
   <dimen name="sideMarginTitle">24dp</dimen>
   <dimen name="textSize">18dp</dimen>
   <dimen name="fab_margin">16dp</dimen>
+
+  <dimen name="apps_grid_item_margin">3dp</dimen>
 </resources>

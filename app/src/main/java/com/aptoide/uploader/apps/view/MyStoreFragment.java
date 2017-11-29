@@ -2,7 +2,6 @@ package com.aptoide.uploader.apps.view;
 
 import android.os.Bundle;
 import android.support.annotation.Nullable;
-import android.support.v7.widget.DividerItemDecoration;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -40,10 +39,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView = view.findViewById(R.id.fragment_my_apps_list);
     storeNameText = view.findViewById(R.id.fragment_my_apps_store_name);
     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-    recyclerView.addItemDecoration(
-        new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
-    recyclerView.addItemDecoration(
-        new DividerItemDecoration(getContext(), DividerItemDecoration.HORIZONTAL));
+    recyclerView.addItemDecoration(new GridDividerItemDecoration(getItemSpacingInPixels()));
     adapter = new MyAppsAdapter(getLayoutInflater(), new ArrayList<>());
     recyclerView.setAdapter(adapter);
     new MyStorePresenter(this,
@@ -57,6 +53,10 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView.setAdapter(null);
     recyclerView = null;
     super.onDestroyView();
+  }
+
+  private int getItemSpacingInPixels() {
+    return getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin);
   }
 
   @Override public void showApps(@NotNull List<App> appsList) {
