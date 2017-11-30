@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view
 
+import com.aptoide.uploader.TestData
 import com.aptoide.uploader.account.AccountPersistence
 import com.aptoide.uploader.account.AccountService
 import com.aptoide.uploader.account.AptoideAccount
@@ -40,17 +41,16 @@ class MyStorePresenterTest : Spek({
             val facebook = App("https://myicon.com/facebook", "Facebook", false, "cm.aptoide.pt")
             val aptoide = App("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt")
             val appList = mutableListOf(facebook, aptoide)
-            val storeName = "marcelo"
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(view.submitAppEvent()).doReturn(Observable.empty())
             whenever(languageManager.currentLanguageCode).doReturn("PT-BR".toSingle())
             whenever(packageProvider.installedApps).doReturn(appList.toSingle())
-            whenever(accountPersistence.account).doReturn(AptoideAccount(true, true, storeName).toSingle().toObservable())
+            whenever(accountPersistence.account).doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            verify(view).showStoreName("marcelo")
+            verify(view).showStoreName(TestData.STORE_NAME)
             verify(view).showApps(mutableListOf(facebook))
         }
 
