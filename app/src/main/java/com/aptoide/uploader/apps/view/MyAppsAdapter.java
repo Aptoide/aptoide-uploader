@@ -6,23 +6,19 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.App;
-import io.reactivex.Observable;
-import io.reactivex.subjects.PublishSubject;
 import java.util.List;
 
 public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
-  private final PublishSubject<App> appClickSubject;
   private final List<App> list;
 
-  public MyAppsAdapter(@NonNull List<App> list, @NonNull PublishSubject<App> appClickSubject) {
+  public MyAppsAdapter(@NonNull List<App> list) {
     this.list = list;
-    this.appClickSubject = appClickSubject;
   }
 
   @Override public AppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     return new AppViewHolder(LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.item_app, parent, false), appClickSubject);
+        .inflate(R.layout.item_app, parent, false));
   }
 
   @Override public void onBindViewHolder(AppViewHolder holder, int position) {
@@ -41,9 +37,5 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     list.clear();
     list.addAll(appsList);
     notifyDataSetChanged();
-  }
-
-  public Observable<App> listenForAppClicks() {
-    return appClickSubject;
   }
 }

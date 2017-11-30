@@ -5,13 +5,13 @@ public class App {
   private final String icon;
   private final String name;
   private final boolean isSystem;
-  private boolean isSelected;
+  private final String packageName;
 
-  public App(String icon, String name, boolean isSystem, boolean isSelected) {
+  public App(String icon, String name, boolean isSystem, String packageName) {
     this.icon = icon;
     this.name = name;
     this.isSystem = isSystem;
-    this.isSelected = isSelected;
+    this.packageName = packageName;
   }
 
   public String getIcon() {
@@ -26,11 +26,8 @@ public class App {
     return isSystem;
   }
 
-  public boolean isSelected() {
-    return isSelected;
+  public String getPackageName() {
+    return packageName;
   }
 
-  public void setSelected(boolean selected) {
-    isSelected = selected;
-  }
 }

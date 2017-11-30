@@ -50,7 +50,7 @@ public class UploaderApplication extends Application {
   public StoreManager getAppsManager() {
     if (storeManager == null) {
       storeManager = new StoreManager(new PackageManagerProvider(getPackageManager()),
-          new AccountStoreNameProvider(getAccountManager()));
+          new AccountStoreNameProvider(getAccountManager()), null, null);
     }
     return storeManager;
   }

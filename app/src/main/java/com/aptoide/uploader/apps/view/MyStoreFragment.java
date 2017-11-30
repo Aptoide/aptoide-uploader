@@ -15,7 +15,6 @@ import com.aptoide.uploader.view.android.FragmentView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
-import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -41,8 +40,9 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView = view.findViewById(R.id.fragment_my_apps_list);
     storeNameText = view.findViewById(R.id.fragment_my_apps_store_name);
     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
-    recyclerView.addItemDecoration(new GridDividerItemDecoration(getItemSpacingInPixels()));
-    adapter = new MyAppsAdapter(new ArrayList<>(), PublishSubject.create());
+    recyclerView.addItemDecoration(new GridDividerItemDecoration(
+        getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
+    adapter = new MyAppsAdapter(new ArrayList<>());
     adapter.setHasStableIds(true);
     recyclerView.setAdapter(adapter);
     new MyStorePresenter(this,
@@ -58,12 +58,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     super.onDestroyView();
   }
 
-  @Override public Observable<App> listenForAppClicks() {
-    return adapter.listenForAppClicks();
-  }
-
-  private int getItemSpacingInPixels() {
-    return getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin);
+  @Override public Observable<List<App>> submitAppEvent() {
+    return Observable.empty();
   }
 
   @Override public void showApps(@NotNull List<App> appsList) {
