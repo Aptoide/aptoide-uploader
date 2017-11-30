@@ -43,7 +43,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView.addItemDecoration(new GridDividerItemDecoration(
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
     adapter = new MyAppsAdapter(new ArrayList<>());
-    adapter.setHasStableIds(true);
     recyclerView.setAdapter(adapter);
     new MyStorePresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
