@@ -54,8 +54,17 @@ public class AppsListActivity extends ActionBarActivity
         .stop();
     removeUserCredentials();
     clearSessionInformation();
+    clearAppsInStore();
     AptoideUploaderApplication.setForcedLogout(true);
     switchToLoginFragment();
+  }
+
+  private void clearAppsInStore() {
+    SharedPreferences.Editor editor =
+        getSharedPreferences(AptoideUploaderApplication.APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE,
+            MODE_PRIVATE).edit();
+    editor.clear();
+    editor.apply();
   }
 
   public void removeUserCredentials() {
