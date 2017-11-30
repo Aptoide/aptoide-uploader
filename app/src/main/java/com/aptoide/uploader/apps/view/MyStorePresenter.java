@@ -2,7 +2,6 @@ package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.apps.StoreManager;
 import android.util.Log;
-import com.aptoide.uploader.apps.AppsManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
