@@ -295,8 +295,7 @@ public class SubmitAppFragment extends Fragment {
     } else {
       mService.inputTitle = null;
     }
-    mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfos.get(0));
-
+    mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfos.get(0), null);
     nextApp();
   }
 

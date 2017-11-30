@@ -459,7 +459,12 @@ public class FragmentAppView extends Fragment {
                     @Override public void onRequestFailure(SpiceException spiceException) {
                       //If it fails, follow the same case than when it returns an empty list
                       try {
-                        mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);
+                        mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo,
+                            new UploadAppsListener() {
+                              @Override public void onSuccessUpload() {
+                                updateAdapterList();
+                              }
+                            });
                       } catch (ValidationException e) {
                         e.printStackTrace();
                       }
@@ -477,7 +482,12 @@ public class FragmentAppView extends Fragment {
                       } else {
                         //No proposed translations available call upload
                         try {
-                          mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);
+                          mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo,
+                              new UploadAppsListener() {
+                                @Override public void onSuccessUpload() {
+                                  updateAdapterList();
+                                }
+                              });
                         } catch (ValidationException e) {
                           e.printStackTrace();
                         }
@@ -490,6 +500,10 @@ public class FragmentAppView extends Fragment {
                 .show();
           }
         });
+  }
+
+  private void updateAdapterList() {
+    adapter.notifyDataSetChanged();
   }
 
   private void requestCategoryFromGetApkInfo(final SelectablePackageInfo selectablePackageInfo,
