@@ -19,14 +19,14 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-public class MyAppsFragment extends FragmentView implements MyAppsView {
+public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   private RecyclerView recyclerView;
   private MyAppsAdapter adapter;
   private TextView storeNameText;
 
-  public static MyAppsFragment newInstance() {
-    return new MyAppsFragment();
+  public static MyStoreFragment newInstance() {
+    return new MyStoreFragment();
   }
 
   @Nullable @Override
@@ -46,13 +46,14 @@ public class MyAppsFragment extends FragmentView implements MyAppsView {
         new DividerItemDecoration(getContext(), DividerItemDecoration.HORIZONTAL));
     adapter = new MyAppsAdapter(getLayoutInflater(), new ArrayList<>());
     recyclerView.setAdapter(adapter);
-    new MyAppsPresenter(this,
+    new MyStorePresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
         new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
   }
 
   @Override public void onDestroyView() {
     adapter = null;
+    storeNameText = null;
     recyclerView.setAdapter(null);
     recyclerView = null;
     super.onDestroyView();

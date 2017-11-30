@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * Created by pedroribeiro on 10/11/17.
  */
 
-public interface MyAppsView extends View {
+public interface MyStoreView extends View {
   void showApps(@NotNull List<App> appsList);
 
   void showStoreName(@NotNull String storeName);
