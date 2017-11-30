@@ -1,6 +1,8 @@
 package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.apps.StoreManager;
+import android.util.Log;
+import com.aptoide.uploader.apps.AppsManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
@@ -37,6 +39,18 @@ public class MyStorePresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
         .doOnNext(__ -> compositeDisposable.clear())
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.listenForAppClicks())
+        .doOnNext(app -> {
+          // ...or should I modify the app state here?
+          Log.d("App click", "clicked app with name: " + app.getName());
+        })
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);

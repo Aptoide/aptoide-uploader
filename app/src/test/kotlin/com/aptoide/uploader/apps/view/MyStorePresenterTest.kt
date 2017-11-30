@@ -36,8 +36,8 @@ class MyStorePresenterTest : Spek({
             val installedAppsPresenter = MyStorePresenter(view, appsManager, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
-            val facebook = App("https://myicon.com/facebook", "Facebook", false)
-            val aptoide = App("https://myicon.com/aptoide", "Aptoide", true)
+            val facebook = App("https://myicon.com/facebook", "Facebook", false, false)
+            val aptoide = App("https://myicon.com/aptoide", "Aptoide", true, false)
             val appList = mutableListOf(facebook, aptoide)
             val storeName = "marcelo"
 

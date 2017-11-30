@@ -12,8 +12,10 @@ import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.App;
 import com.aptoide.uploader.view.android.FragmentView;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +42,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     storeNameText = view.findViewById(R.id.fragment_my_apps_store_name);
     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
     recyclerView.addItemDecoration(new GridDividerItemDecoration(getItemSpacingInPixels()));
-    adapter = new MyAppsAdapter(getLayoutInflater(), new ArrayList<>());
+    adapter = new MyAppsAdapter(new ArrayList<>(), PublishSubject.create());
+    adapter.setHasStableIds(true);
     recyclerView.setAdapter(adapter);
     new MyStorePresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
@@ -53,6 +56,10 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView.setAdapter(null);
     recyclerView = null;
     super.onDestroyView();
+  }
+
+  @Override public Observable<App> listenForAppClicks() {
+    return adapter.listenForAppClicks();
   }
 
   private int getItemSpacingInPixels() {

@@ -21,7 +21,7 @@ public class PackageManagerProvider implements PackageProvider {
         .map(applicationInfo -> new App(
             "android.resource://" + applicationInfo.packageName + "/" + applicationInfo.icon,
             applicationInfo.loadLabel(packageManager)
-                .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0))
+                .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0, false))
         .toList();
   }
 }
