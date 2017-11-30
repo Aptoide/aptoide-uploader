@@ -30,7 +30,7 @@ public class AptoideUploaderApplication extends Application {
   @Getter @Setter private static boolean forcedLogout = false;
   @Getter @Setter private String username;
   private StoredCredentialsManager storedCredentialsManager;
-  public static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
+  public static final String APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE = "AppsInMyStore";
 
   private AppsInStoreController appsInStoreController;
 
@@ -63,7 +63,8 @@ public class AptoideUploaderApplication extends Application {
     if (appsInStoreController == null) {
       AppsInStorePersister appsInStorePersister = new AppsInStorePersister(
           this.getApplicationContext()
-              .getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE));
+              .getSharedPreferences(APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE,
+                  Context.MODE_PRIVATE));
 
       appsInStoreController =
           new AppsInStoreController(new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class),

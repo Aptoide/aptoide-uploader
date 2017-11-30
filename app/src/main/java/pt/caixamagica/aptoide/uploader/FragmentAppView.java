@@ -207,7 +207,8 @@ public class FragmentAppView extends Fragment {
     uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getContext()));
     installedUtils = new InstalledUtils(getContext(), new AppsInStorePersister(
         getContext().getApplicationContext()
-            .getSharedPreferences(AptoideUploaderApplication.SHARED_PREFERENCES_FILE,
+            .getSharedPreferences(
+                AptoideUploaderApplication.APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE,
                 Context.MODE_PRIVATE)));
     setAdapter(savedInstanceState, null);
   }

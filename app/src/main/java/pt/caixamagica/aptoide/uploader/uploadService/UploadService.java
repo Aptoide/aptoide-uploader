@@ -384,7 +384,8 @@ public class UploadService extends Service {
     spiceManager.start(this);
     uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getApplicationContext()));
     appsInStorePersister = new AppsInStorePersister(
-        getSharedPreferences(AptoideUploaderApplication.SHARED_PREFERENCES_FILE, MODE_PRIVATE));
+        getSharedPreferences(AptoideUploaderApplication.APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE,
+            MODE_PRIVATE));
   }
 
   @Override public int onStartCommand(Intent intent, int flags, int startId) {

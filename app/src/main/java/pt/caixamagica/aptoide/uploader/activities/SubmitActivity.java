@@ -37,7 +37,7 @@ public class SubmitActivity extends ActionBarActivity {
     Bundle extras = getIntent().getExtras();
 
     appsInStorePersister = new AppsInStorePersister(this.getApplicationContext()
-        .getSharedPreferences(AptoideUploaderApplication.SHARED_PREFERENCES_FILE,
+        .getSharedPreferences(AptoideUploaderApplication.APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE,
             Context.MODE_PRIVATE));
 
     UserCredentialsJson userCredentialsJson =
