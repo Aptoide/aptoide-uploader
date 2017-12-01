@@ -22,4 +22,9 @@ public class AptoideAccountManager {
   public Observable<AptoideAccount> getAccount() {
     return accountPersistence.getAccount();
   }
+
+  public Completable create(String email, String password, String storeName) {
+    return accountService.createAccount(email, password, storeName)
+        .flatMapCompletable(account -> accountPersistence.save(account));
+  }
 }

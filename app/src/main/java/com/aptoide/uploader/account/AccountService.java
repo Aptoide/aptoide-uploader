@@ -9,4 +9,9 @@ import io.reactivex.Single;
 public interface AccountService {
 
   Single<AptoideAccount> getAccount(String username, String password);
+
+  Single<AptoideAccount> createAccount(String email, String password, String storeName);
+
+  Single<AptoideAccount> createAccount(String email, String password, String storeName,
+      String storeUser, String storePass);
 }
