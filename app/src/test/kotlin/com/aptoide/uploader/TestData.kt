@@ -9,6 +9,8 @@ class TestData {
         val STORE_NAME = "marcelo"
         val USER_NAME = "marcelo@aptoide.com"
         val USER_PASSWORD = "aptoide1234"
+        val STORE_USER = "marcelo@aptoide.com"
+        val STORE_PASSWORD = "aptoide1234"
         val SUCCESS_RESPONSE = Response.success(OAuth("abc", "def",
                 null, null))
 
