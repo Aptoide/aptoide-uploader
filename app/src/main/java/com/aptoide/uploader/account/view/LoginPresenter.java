@@ -7,20 +7,20 @@ import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
 
-public class AccountPresenter implements Presenter {
+public class LoginPresenter implements Presenter {
 
-  private final AccountView view;
+  private final LoginView view;
   private final AptoideAccountManager accountManager;
-  private final AccountNavigator accountNavigator;
+  private final LoginNavigator loginNavigator;
   private final CompositeDisposable compositeDisposable;
   private final Scheduler viewScheduler;
 
-  public AccountPresenter(AccountView view, AptoideAccountManager accountManager,
-      AccountNavigator accountNavigator, CompositeDisposable compositeDisposable,
+  public LoginPresenter(LoginView view, AptoideAccountManager accountManager,
+      LoginNavigator loginNavigator, CompositeDisposable compositeDisposable,
       Scheduler viewScheduler) {
     this.view = view;
     this.accountManager = accountManager;
-    this.accountNavigator = accountNavigator;
+    this.loginNavigator = loginNavigator;
     this.compositeDisposable = compositeDisposable;
     this.viewScheduler = viewScheduler;
   }
@@ -35,9 +35,9 @@ public class AccountPresenter implements Presenter {
           if (account.isLoggedIn()) {
             view.hideLoading();
             if (account.hasStore()) {
-              accountNavigator.navigateToMyAppsView();
+              loginNavigator.navigateToMyAppsView();
             } else {
-              accountNavigator.navigateToCreateStoreView();
+              loginNavigator.navigateToCreateStoreView();
             }
           }
         })

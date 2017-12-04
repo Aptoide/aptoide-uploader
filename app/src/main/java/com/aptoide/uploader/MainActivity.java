@@ -3,7 +3,7 @@ package com.aptoide.uploader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
-import com.aptoide.uploader.account.view.AccountFragment;
+import com.aptoide.uploader.account.view.LoginFragment;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -13,7 +13,7 @@ public class MainActivity extends AppCompatActivity {
 
     if (savedInstanceState == null) {
       getSupportFragmentManager().beginTransaction()
-          .replace(R.id.activity_main_container, AccountFragment.newInstance())
+          .replace(R.id.activity_main_container, LoginFragment.newInstance())
           .commit();
     }
   }

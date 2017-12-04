@@ -3,7 +3,7 @@ package com.aptoide.uploader.account.view;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
 
-public interface AccountView extends View {
+public interface LoginView extends View {
 
   Observable<CredentialsViewModel> getLoginEvent();
 
@@ -15,7 +15,7 @@ public interface AccountView extends View {
 
   void showNetworkError();
 
-  public static class CredentialsViewModel {
+  class CredentialsViewModel {
 
     private final String username;
     private final String password;

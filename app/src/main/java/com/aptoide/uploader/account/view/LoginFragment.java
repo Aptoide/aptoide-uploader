@@ -18,7 +18,7 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
-public class AccountFragment extends FragmentView implements AccountView {
+public class LoginFragment extends FragmentView implements LoginView {
 
   private EditText passwordEditText;
   private EditText usernameEditText;
@@ -28,8 +28,8 @@ public class AccountFragment extends FragmentView implements AccountView {
   private TextView loadingTextView;
   private AptoideAccountManager accountManager;
 
-  public static AccountFragment newInstance() {
-    return new AccountFragment();
+  public static LoginFragment newInstance() {
+    return new LoginFragment();
   }
 
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -54,7 +54,7 @@ public class AccountFragment extends FragmentView implements AccountView {
     loadingTextView = view.findViewById(R.id.fragment_login_loading_text_view);
     fragmentContainer = view.findViewById(R.id.fragment_login_content);
 
-    new AccountPresenter(this, accountManager, new AccountNavigator(getContext(), getFragmentManager()),
+    new LoginPresenter(this, accountManager, new LoginNavigator(getContext(), getFragmentManager()),
         new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
   }
 

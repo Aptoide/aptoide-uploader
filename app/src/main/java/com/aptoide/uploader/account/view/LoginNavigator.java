@@ -6,12 +6,12 @@ import android.widget.Toast;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.view.MyStoreFragment;
 
-public class AccountNavigator {
+public class LoginNavigator {
 
   private final Context context;
   private final FragmentManager fragmentManager;
 
-  public AccountNavigator(Context context, FragmentManager fragmentManager) {
+  public LoginNavigator(Context context, FragmentManager fragmentManager) {
     this.context = context;
     this.fragmentManager = fragmentManager;
   }

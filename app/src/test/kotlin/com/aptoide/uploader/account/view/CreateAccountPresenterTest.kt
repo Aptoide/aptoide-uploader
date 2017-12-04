@@ -37,7 +37,7 @@ class CreateAccountPresenterTest : Spek({
                     serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
 
             val view = mock<CreateAccountView>()
-            val accountPresenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val accounts = PublishSubject.create<AptoideAccount>()
@@ -61,7 +61,7 @@ class CreateAccountPresenterTest : Spek({
             whenever(serviceV7.getUserInfo(any())).doReturn(accountResponse
                     .toSingle().toObservable())
 
-            accountPresenter.present()
+            presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             createAccountEvent.onNext(CreateAccountView.ViewModel(
                     TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME
