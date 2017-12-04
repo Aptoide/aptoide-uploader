@@ -512,8 +512,8 @@ public class FragmentAppView extends Fragment {
         });
   }
 
-  private void updateAdapterList() {
-    adapter.notifyDataSetChanged();
+  private void uploadedApp(String packageName) {
+    adapter.itemChanged(packageName);
   }
 
   private void requestCategoryFromGetApkInfo(final SelectablePackageInfo selectablePackageInfo,
@@ -650,8 +650,11 @@ public class FragmentAppView extends Fragment {
     @Override public void onReceive(Context context, Intent intent) {
       if (intent.getAction()
           .equals(UPLOADED_APP_ACTION)) {
-        updateAdapterList();
-        System.out.println("teste : received action uploaded app");
+        String packageName = intent.getStringExtra("packageName");
+        int versionCode = intent.getIntExtra("versionCode", Integer.MAX_VALUE);
+        if (versionCode != Integer.MAX_VALUE) {
+          uploadedApp(packageName);
+        }
       }
     }
   }

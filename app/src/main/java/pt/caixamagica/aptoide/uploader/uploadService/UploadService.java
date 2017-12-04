@@ -308,14 +308,18 @@ public class UploadService extends Service {
           selectablePackageInfo.setUploaded(true);
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
-          sendUploadSuccessBroadcast();
+          sendUploadSuccessBroadcast(selectablePackageInfo.packageName,
+              selectablePackageInfo.versionCode);
         }
       }
     });
   }
 
-  private void sendUploadSuccessBroadcast() {
-    sendBroadcast(new Intent(FragmentAppView.UPLOADED_APP_ACTION));
+  private void sendUploadSuccessBroadcast(String packageName, int versionCode) {
+    Intent intent = new Intent(FragmentAppView.UPLOADED_APP_ACTION);
+    intent.putExtra("packageName", packageName);
+    intent.putExtra("versionCode", versionCode);
+    sendBroadcast(intent);
   }
 
   private void setFillMissingInfoNotification(UploadAppToRepoRequest uploadAppToRepoJson,
@@ -606,7 +610,8 @@ public class UploadService extends Service {
                 uploadAppToRepoRequest.getLabel());
             sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
             sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
-            sendUploadSuccessBroadcast();
+            sendUploadSuccessBroadcast(selectablePackageInfo.packageName,
+                selectablePackageInfo.versionCode);
           } else {
             uploaderAnalytics.uploadComplete("fail", "Check if in Store");
             simpleNotification(uploadAppToRepoRequest.getPackageName(),
@@ -621,7 +626,8 @@ public class UploadService extends Service {
           selectablePackageInfo.setUploaded(true);
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
-          sendUploadSuccessBroadcast();
+          sendUploadSuccessBroadcast(selectablePackageInfo.packageName,
+              selectablePackageInfo.versionCode);
         }
       }
     });

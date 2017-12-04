@@ -170,6 +170,23 @@ public class ManelAdapter extends MultiChoiceBaseAdapter {
     }
   }
 
+  public void itemChanged(String packageName) {
+    mDataset.get(getItemPosition(packageName))
+        .setUploaded(true);
+    notifyDataSetChanged();
+  }
+
+  private int getItemPosition(String packageName) {
+    int position = 0;
+    for (int i = 0; i < mDataset.size(); i++) {
+      if (mDataset.get(i).packageName.equals(packageName)) {
+        position = i;
+        break;
+      }
+    }
+    return position;
+  }
+
   public interface ManelAdapterShowListener {
 
     void show();
