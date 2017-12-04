@@ -6,10 +6,12 @@
 package pt.caixamagica.aptoide.uploader;
 
 import android.app.AlertDialog;
+import android.content.BroadcastReceiver;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.ServiceConnection;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
@@ -84,6 +86,8 @@ public class FragmentAppView extends Fragment {
   private UploadService mService;
   private UploaderAnalytics uploaderAnalytics;
   private InstalledUtils installedUtils;
+  public static final String UPLOADED_APP_ACTION = "UploadedApp";
+  private UploadedAppReceiver uploadedAppReceiver;
   /**
    * Defines callbacks for service binding, passed to bindService()
    */
@@ -321,7 +325,14 @@ public class FragmentAppView extends Fragment {
 
   @Override public void onResume() {
     super.onResume();
+    System.out.println("teste : on resume");
     getActivity().setTitle(getActivity().getApplicationInfo().labelRes);
+
+    if (uploadedAppReceiver == null) {
+      uploadedAppReceiver = new UploadedAppReceiver();
+    }
+    IntentFilter intentFilter = new IntentFilter(UPLOADED_APP_ACTION);
+    getActivity().registerReceiver(uploadedAppReceiver, intentFilter);
 
     adapter.setListener(new ManelAdapter.ManelAdapterShowListener() {
 
@@ -395,6 +406,15 @@ public class FragmentAppView extends Fragment {
     adapter.save(outState);
   }
 
+  @Override public void onPause() {
+    super.onPause();
+    System.out.println("teste : on pause");
+    if (uploadedAppReceiver != null) {
+      getActivity().unregisterReceiver(uploadedAppReceiver);
+      uploadedAppReceiver = null;
+    }
+  }
+
   @Override public void onStop() {
     super.onStop();
 
@@ -459,12 +479,7 @@ public class FragmentAppView extends Fragment {
                     @Override public void onRequestFailure(SpiceException spiceException) {
                       //If it fails, follow the same case than when it returns an empty list
                       try {
-                        mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo,
-                            new UploadAppsListener() {
-                              @Override public void onSuccessUpload() {
-                                updateAdapterList();
-                              }
-                            });
+                        mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);
                       } catch (ValidationException e) {
                         e.printStackTrace();
                       }
@@ -482,12 +497,7 @@ public class FragmentAppView extends Fragment {
                       } else {
                         //No proposed translations available call upload
                         try {
-                          mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo,
-                              new UploadAppsListener() {
-                                @Override public void onSuccessUpload() {
-                                  updateAdapterList();
-                                }
-                              });
+                          mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfo);
                         } catch (ValidationException e) {
                           e.printStackTrace();
                         }
@@ -634,5 +644,15 @@ public class FragmentAppView extends Fragment {
         ((MultiChoiceAdapter) parent.getAdapter()).setItemChecked(id, true);
       }
     });
+  }
+
+  private class UploadedAppReceiver extends BroadcastReceiver {
+    @Override public void onReceive(Context context, Intent intent) {
+      if (intent.getAction()
+          .equals(UPLOADED_APP_ACTION)) {
+        updateAdapterList();
+        System.out.println("teste : received action uploaded app");
+      }
+    }
   }
 }

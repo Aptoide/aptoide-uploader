@@ -33,9 +33,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
+import pt.caixamagica.aptoide.uploader.FragmentAppView;
 import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
-import pt.caixamagica.aptoide.uploader.UploadAppsListener;
 import pt.caixamagica.aptoide.uploader.UploaderUtils;
 import pt.caixamagica.aptoide.uploader.activities.SubmitActivity;
 import pt.caixamagica.aptoide.uploader.analytics.UploaderAnalytics;
@@ -66,7 +66,6 @@ public class UploadService extends Service {
   private Map<String, UploadAppToRepoRequest> sendingAppsUploadRequests = new HashMap<>();
   private Map<String, SelectablePackageInfo> sendingAppsSelectablePackageInfos = new HashMap<>();
   private AppsInStorePersister appsInStorePersister;
-  private UploadAppsListener uploadAppsListener;
 
   private NotificationCompat.Builder setPreparingUploadNotification(String packageName,
       String label) {
@@ -108,9 +107,7 @@ public class UploadService extends Service {
   }
 
   public void prepareUploadAndSend(final UserCredentialsJson userCredentialsJson,
-      SelectablePackageInfo packageInfo, UploadAppsListener uploadAppsListener)
-      throws ValidationException {
-    this.uploadAppsListener = uploadAppsListener;
+      SelectablePackageInfo packageInfo) throws ValidationException {
     if (this.userCredentialsJson == null) this.userCredentialsJson = userCredentialsJson;
 
     // Parece me a mim k esta intent não serve para nada.... ou pode nao servir.
@@ -304,19 +301,21 @@ public class UploadService extends Service {
           }
         } else {
           uploaderAnalytics.uploadComplete("success", "Upload App to Repo");
-          setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
-              uploadAppToRepoRequest.getLabel());
           appsInStorePersister.addUploadedAppToSharedPreferences(selectablePackageInfo.packageName,
               selectablePackageInfo.versionCode);
+          setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
+              uploadAppToRepoRequest.getLabel());
           selectablePackageInfo.setUploaded(true);
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
-          if (uploadAppsListener != null) {
-            uploadAppsListener.onSuccessUpload();
-          }
+          sendUploadSuccessBroadcast();
         }
       }
     });
+  }
+
+  private void sendUploadSuccessBroadcast() {
+    sendBroadcast(new Intent(FragmentAppView.UPLOADED_APP_ACTION));
   }
 
   private void setFillMissingInfoNotification(UploadAppToRepoRequest uploadAppToRepoJson,
@@ -392,7 +391,7 @@ public class UploadService extends Service {
     uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getApplicationContext()));
     appsInStorePersister = new AppsInStorePersister(
         getSharedPreferences(AptoideUploaderApplication.APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE,
-            MODE_PRIVATE));
+            Context.MODE_PRIVATE));
   }
 
   @Override public int onStartCommand(Intent intent, int flags, int startId) {
@@ -443,7 +442,6 @@ public class UploadService extends Service {
   }
 
   @Override public boolean onUnbind(Intent intent) {
-    uploadAppsListener = null;
     return super.onUnbind(intent);
   }
 
@@ -601,10 +599,14 @@ public class UploadService extends Service {
                 uploadAppToRepoRequest.getLabel(), uploadAppToRepoJson.getErrors());
           } else if (errorCode.equals("APK-103")) {
             uploaderAnalytics.uploadComplete("success", "Check if in Store");
+            appsInStorePersister.addUploadedAppToSharedPreferences(
+                selectablePackageInfo.packageName, selectablePackageInfo.versionCode);
+            selectablePackageInfo.setUploaded(true);
             setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
                 uploadAppToRepoRequest.getLabel());
             sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
             sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
+            sendUploadSuccessBroadcast();
           } else {
             uploaderAnalytics.uploadComplete("fail", "Check if in Store");
             simpleNotification(uploadAppToRepoRequest.getPackageName(),
@@ -612,16 +614,14 @@ public class UploadService extends Service {
           }
         } else {
           uploaderAnalytics.uploadComplete("success", "Check if in Store");
+          appsInStorePersister.addUploadedAppToSharedPreferences(selectablePackageInfo.packageName,
+              selectablePackageInfo.versionCode);
           setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
               uploadAppToRepoRequest.getLabel());
           selectablePackageInfo.setUploaded(true);
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
-          appsInStorePersister.addUploadedAppToSharedPreferences(originalRequest.getPackageName(),
-              selectablePackageInfo.versionCode);
-          if (uploadAppsListener != null) {
-            uploadAppsListener.onSuccessUpload();
-          }
+          sendUploadSuccessBroadcast();
         }
       }
     });
