@@ -14,6 +14,8 @@ public interface CreateAccountView extends View {
 
   void showNetworkError();
 
+  void showErrorUserAlreadyExists();
+
   class ViewModel {
     private final String email;
     private final String password;
