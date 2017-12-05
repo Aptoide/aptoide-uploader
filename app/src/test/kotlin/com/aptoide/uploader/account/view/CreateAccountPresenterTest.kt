@@ -13,6 +13,7 @@ import com.aptoide.uploader.security.SecurityAlgorithms
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Completable
+import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
@@ -23,6 +24,7 @@ import org.jetbrains.spek.api.dsl.it
 import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
 import retrofit2.Response
+import java.io.IOException
 
 
 @RunWith(JUnitPlatform::class)
@@ -156,6 +158,47 @@ class CreateAccountPresenterTest : Spek({
             verify(view).showLoading()
             verify(view).hideLoading()
             verify(view).showErrorUserAlreadyExists()
+        }
+
+
+
+        it("should show error when user taps create account button without internet") {
+            val navigator = mock<CreateAccountNavigator>()
+            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
+            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
+            val accountPersistence = mock<AccountPersistence>()
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+
+            val view = mock<CreateAccountView>()
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+            val accounts = PublishSubject.create<AptoideAccount>()
+            val createAccountEvent = PublishSubject.create<CreateAccountView.ViewModel>()
+
+            whenever(accountPersistence.account).doReturn(accounts)
+            whenever(accountPersistence.save(any())).doReturn(Completable.fromAction({
+                accounts.onNext(AptoideAccount(true, true, TestData.STORE_NAME))
+            }))
+            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
+            whenever(view.createAccountEvent).doReturn(createAccountEvent)
+
+            whenever(serviceV2.createAccount(any()))
+                    .doReturn(Observable.error<Response<OAuth>>(IOException()))
+            whenever(serviceV7.getUserInfo(any())).doReturn(Observable.error<Response<AccountResponse>>(IOException()))
+
+            presenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            createAccountEvent.onNext(CreateAccountView.ViewModel(
+                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME,
+                    TestData.STORE_USER, TestData.STORE_PASSWORD
+            ))
+
+            verify(view).showLoading()
+            verify(view).hideLoading()
+            verify(view).showNetworkError()
         }
     }
 })
