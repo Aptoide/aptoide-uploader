@@ -17,4 +17,10 @@ class CreateAccountNavigator {
         .replace(R.id.activity_main_container, MyStoreFragment.newInstance())
         .commit();
   }
+
+  public void navigateToLoginView() {
+    fragmentManager.beginTransaction()
+        .replace(R.id.activity_main_container, LoginFragment.newInstance())
+        .commit();
+  }
 }

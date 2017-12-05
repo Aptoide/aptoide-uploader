@@ -237,5 +237,37 @@ class CreateAccountPresenterTest : Spek({
             verify(view).hideLoading()
             verify(view).showErrorStoreAlreadyExists()
         }
+
+        it("should navigate to my apps when the user creates a new account in aptoide inserting valid data: email, password, store name, store privacy, store user and store pass") {
+            val navigator = mock<CreateAccountNavigator>()
+            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
+            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
+            val accountPersistence = mock<AccountPersistence>()
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+
+            val view = mock<CreateAccountView>()
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+            val accounts = PublishSubject.create<AptoideAccount>()
+            val clickGoToLoginViewEvent = PublishSubject.create<Object>()
+
+            whenever(accountPersistence.account).doReturn(accounts)
+            whenever(accountPersistence.save(any())).doReturn(Completable.fromAction({
+                accounts.onNext(AptoideAccount(true, true, TestData.STORE_NAME))
+            }))
+            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
+            whenever(view.openLoginView).doReturn(clickGoToLoginViewEvent.flatMapCompletable { _ ->
+                Completable.complete()
+            })
+
+            presenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            clickGoToLoginViewEvent.onNext(Object())
+
+            verify(navigator).navigateToLoginView()
+        }
     }
 })
