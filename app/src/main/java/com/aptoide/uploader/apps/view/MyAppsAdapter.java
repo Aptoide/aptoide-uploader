@@ -5,14 +5,14 @@ import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import com.aptoide.uploader.R;
-import com.aptoide.uploader.apps.App;
+import com.aptoide.uploader.apps.InstalledApp;
 import java.util.List;
 
 public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
-  private final List<App> list;
+  private final List<InstalledApp> list;
 
-  public MyAppsAdapter(@NonNull List<App> list) {
+  public MyAppsAdapter(@NonNull List<InstalledApp> list) {
     this.list = list;
   }
 
@@ -33,7 +33,7 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     return list.size();
   }
 
-  public void setList(List<App> appsList) {
+  public void setList(List<InstalledApp> appsList) {
     list.clear();
     list.addAll(appsList);
     notifyDataSetChanged();

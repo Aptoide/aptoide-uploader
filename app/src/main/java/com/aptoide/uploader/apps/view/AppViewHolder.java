@@ -5,7 +5,7 @@ import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 import com.aptoide.uploader.R;
-import com.aptoide.uploader.apps.App;
+import com.aptoide.uploader.apps.InstalledApp;
 import com.bumptech.glide.Glide;
 
 public class AppViewHolder extends RecyclerView.ViewHolder {
@@ -19,7 +19,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder {
     appName = itemView.findViewById(R.id.item_app_name);
   }
 
-  public void setApp(App app) {
+  public void setApp(InstalledApp app) {
     Glide.with(itemView)
         .load(app.getIcon())
         .into(image);

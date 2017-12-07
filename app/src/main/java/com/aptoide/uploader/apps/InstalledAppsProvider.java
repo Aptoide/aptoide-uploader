@@ -3,7 +3,7 @@ package com.aptoide.uploader.apps;
 import io.reactivex.Single;
 import java.util.List;
 
-public interface PackageProvider {
+public interface InstalledAppsProvider {
 
-  Single<List<App>> getInstalledApps();
+  Single<List<InstalledApp>> getInstalledApps();
 }

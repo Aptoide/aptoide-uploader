@@ -1,11 +1,11 @@
 package com.aptoide.uploader.apps;
 
-public class UploadApp {
+public class Upload {
 
   private final boolean uploaded;
   private final boolean proposedData;
 
-  public UploadApp(boolean uploaded, boolean proposedData) {
+  public Upload(boolean uploaded, boolean proposedData) {
     this.uploaded = uploaded;
     this.proposedData = proposedData;
   }
@@ -19,6 +19,6 @@ public class UploadApp {
   }
 
   public enum Status {
-    PENDING, UPLOADED
+    PENDING, COMPLETED
   }
 }

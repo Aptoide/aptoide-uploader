@@ -28,7 +28,7 @@ class MyStorePresenterTest : Spek({
     describe("a my apps presenter") {
         it("should display store name and installed apps when view is created") {
             val view = mock<MyStoreView> {}
-            val packageProvider = mock<PackageProvider> {}
+            val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
             val accountPersistence = mock<AccountPersistence> {}
             val uploadManager = mock<UploadManager> {}
@@ -38,8 +38,8 @@ class MyStorePresenterTest : Spek({
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
-            val facebook = App("https://myicon.com/facebook", "Facebook", false, "cm.aptoide.pt")
-            val aptoide = App("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt")
+            val facebook = InstalledApp("https://myicon.com/facebook", "Facebook", false, "cm.aptoide.pt")
+            val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt")
             val appList = mutableListOf(facebook, aptoide)
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
@@ -57,7 +57,7 @@ class MyStorePresenterTest : Spek({
         it("should upload selected apps when submit button is clicked") {
 
             val view = mock<MyStoreView> {}
-            val packageProvider = mock<PackageProvider> {}
+            val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
             val accountPersistence = mock<AccountPersistence> {}
             val uploadManager = mock<UploadManager> {}
@@ -67,8 +67,8 @@ class MyStorePresenterTest : Spek({
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
-            val submitAppEvent = PublishSubject.create<MutableList<App>>()
-            val aptoide = App("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt")
+            val submitAppEvent = PublishSubject.create<MutableList<InstalledApp>>()
+            val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt")
             val storeName = "Marcelo"
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)

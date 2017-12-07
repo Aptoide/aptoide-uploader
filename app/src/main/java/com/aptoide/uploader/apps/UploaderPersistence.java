@@ -5,8 +5,8 @@ import io.reactivex.Observable;
 import java.util.List;
 
 public interface UploaderPersistence {
-  Observable<List<UploadApp>> getUploads();
+  Observable<List<Upload>> getUploads();
 
-  Completable save(UploadApp uploadApp, UploadApp.Status status);
+  Completable save(Upload upload, Upload.Status status);
 
 }

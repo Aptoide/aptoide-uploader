@@ -1,6 +1,8 @@
 package com.aptoide.uploader.apps;
 
 import io.reactivex.Completable;
+import io.reactivex.Observable;
+import java.util.List;
 
 public class UploadManager {
 
@@ -15,17 +17,21 @@ public class UploadManager {
     this.md5Calculator = md5Calculator;
   }
 
-  public Completable upload(String storeName, String language, App app) {
+  public Completable upload(String storeName, String language, InstalledApp app) {
     return md5Calculator.calculate(app)
         .flatMapCompletable(
-            md5 -> service.getUploadApp(md5, app.getPackageName(), language, storeName)
-                .flatMapCompletable(uploadApp -> {
-                  if (uploadApp.isUploaded()) {
-                    if (!uploadApp.hasProposedData()) {
-                      return persistence.save(uploadApp, UploadApp.Status.UPLOADED);
+            md5 -> service.getAppUpload(md5, app.getPackageName(), language, storeName)
+                .flatMapCompletable(upload -> {
+                  if (upload.isUploaded()) {
+                    if (!upload.hasProposedData()) {
+                      return persistence.save(upload, Upload.Status.COMPLETED);
                     }
                   }
-                  return persistence.save(uploadApp, UploadApp.Status.PENDING);
+                  return persistence.save(upload, Upload.Status.PENDING);
                 }));
+  }
+
+  public Observable<List<Upload>> getUploads() {
+    return persistence.getUploads();
   }
 }

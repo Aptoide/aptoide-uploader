@@ -7,7 +7,7 @@ import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
-import com.aptoide.uploader.apps.PackageManagerProvider;
+import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import io.reactivex.schedulers.Schedulers;
@@ -57,7 +57,7 @@ public class UploaderApplication extends Application {
 
   public StoreManager getAppsManager() {
     if (storeManager == null) {
-      storeManager = new StoreManager(new PackageManagerProvider(getPackageManager()),
+      storeManager = new StoreManager(new PackageManagerInstalledAppsProvider(getPackageManager()),
           new AccountStoreNameProvider(getAccountManager()), null, null);
     }
     return storeManager;

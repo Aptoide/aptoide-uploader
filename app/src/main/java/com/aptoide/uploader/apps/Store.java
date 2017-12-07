@@ -2,16 +2,12 @@ package com.aptoide.uploader.apps;
 
 import java.util.List;
 
-/**
- * Created by jdandrade on 24/11/2017.
- */
-
 public class Store {
 
   private final String name;
-  private final List<App> apps;
+  private final List<InstalledApp> apps;
 
-  Store(String name, List<App> apps) {
+  Store(String name, List<InstalledApp> apps) {
     this.name = name;
     this.apps = apps;
   }
@@ -20,7 +16,7 @@ public class Store {
     return name;
   }
 
-  public List<App> getApps() {
+  public List<InstalledApp> getApps() {
     return apps;
   }
 }

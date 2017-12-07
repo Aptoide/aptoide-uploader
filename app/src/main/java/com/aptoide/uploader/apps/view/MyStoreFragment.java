@@ -10,7 +10,7 @@ import android.view.ViewGroup;
 import android.widget.TextView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
-import com.aptoide.uploader.apps.App;
+import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.view.android.FragmentView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -57,11 +57,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     super.onDestroyView();
   }
 
-  @Override public Observable<List<App>> submitAppEvent() {
+  @Override public Observable<List<InstalledApp>> submitAppEvent() {
     return Observable.empty();
   }
 
-  @Override public void showApps(@NotNull List<App> appsList) {
+  @Override public void showApps(@NotNull List<InstalledApp> appsList) {
     adapter.setList(appsList);
   }
 

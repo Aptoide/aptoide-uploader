@@ -7,14 +7,14 @@ import java.util.List;
 
 public class StoreManager {
 
-  private final PackageProvider packageProvider;
+  private final InstalledAppsProvider installedAppsProvider;
   private final StoreNameProvider storeNameProvider;
   private final UploadManager uploadManager;
   private final LanguageManager languageManager;
 
-  public StoreManager(PackageProvider packageProvider, StoreNameProvider storeNameProvider,
+  public StoreManager(InstalledAppsProvider installedAppsProvider, StoreNameProvider storeNameProvider,
       UploadManager uploadManager, LanguageManager languageManager) {
-    this.packageProvider = packageProvider;
+    this.installedAppsProvider = installedAppsProvider;
     this.storeNameProvider = storeNameProvider;
     this.uploadManager = uploadManager;
     this.languageManager = languageManager;
@@ -25,15 +25,15 @@ public class StoreManager {
         (apps, storeName) -> new Store(storeName, apps));
   }
 
-  public Completable upload(List<App> apps) {
+  public Completable upload(List<InstalledApp> apps) {
     return storeNameProvider.getStoreName()
         .flatMapCompletable(storeName -> languageManager.getCurrentLanguageCode()
             .flatMapCompletable(languageCode -> Observable.fromIterable(apps)
                 .flatMapCompletable(app -> uploadManager.upload(storeName, languageCode, app))));
   }
 
-  private Single<List<App>> getNonSystemApps() {
-    return packageProvider.getInstalledApps()
+  private Single<List<InstalledApp>> getNonSystemApps() {
+    return installedAppsProvider.getInstalledApps()
         .flatMapObservable(apps -> Observable.fromIterable(apps))
         .filter(app -> !app.isSystem())
         .toList();
