@@ -35,7 +35,7 @@ class NotificationPresenterTest : Spek({
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             val md5 = "asdasdasd"
             whenever(md5Calculator.calculate(app)).doReturn(md5.toSingle())
-            val upload = Upload(true, true)
+            val upload = Upload(true, true, app)
             whenever(uploadService.getAppUpload(md5, "com.facebook.katana", "en", "FabioStore"))
                     .doReturn(upload.toSingle())
             whenever(uploaderPersistence.save(upload, Upload.Status.COMPLETED)).doReturn(Completable.complete())
