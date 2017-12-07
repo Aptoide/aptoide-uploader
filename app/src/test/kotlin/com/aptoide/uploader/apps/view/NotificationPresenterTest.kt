@@ -29,7 +29,7 @@ class NotificationPresenterTest : Spek({
             val presenter = NotificationPresenter(view, uploadManager)
 
             val app = InstalledApp("https://myicon.com/facebook", "Facebook", false,
-                    "com.facebook.katana")
+                    "com.facebook.katana", "/Files/facebook.apk")
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             val md5 = "asdasdasd"

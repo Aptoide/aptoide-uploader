@@ -6,12 +6,15 @@ public class InstalledApp {
   private final String name;
   private final boolean isSystem;
   private final String packageName;
+  private final String apkPath;
 
-  public InstalledApp(String icon, String name, boolean isSystem, String packageName) {
+  public InstalledApp(String icon, String name, boolean isSystem, String packageName,
+      String apkPath) {
     this.icon = icon;
     this.name = name;
     this.isSystem = isSystem;
     this.packageName = packageName;
+    this.apkPath = apkPath;
   }
 
   public String getIcon() {
@@ -41,5 +44,9 @@ public class InstalledApp {
 
   @Override public int hashCode() {
     return packageName.hashCode();
+  }
+
+  public String getApkPath() {
+    return apkPath;
   }
 }
