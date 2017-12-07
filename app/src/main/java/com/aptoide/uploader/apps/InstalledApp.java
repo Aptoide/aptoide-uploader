@@ -30,4 +30,16 @@ public class InstalledApp {
     return packageName;
   }
 
+  @Override public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    InstalledApp that = (InstalledApp) o;
+
+    return packageName.equals(that.packageName);
+  }
+
+  @Override public int hashCode() {
+    return packageName.hashCode();
+  }
 }

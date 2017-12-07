@@ -25,7 +25,7 @@ public class NotificationApplicationView extends Application implements Notifica
     return lifecycleSubject;
   }
 
-  @Override public void showUploadNotification(Upload upload) {
+  @Override public void showCompletedUploadNotification(Upload upload) {
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)

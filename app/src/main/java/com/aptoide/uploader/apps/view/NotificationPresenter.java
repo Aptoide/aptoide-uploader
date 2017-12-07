@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
@@ -19,7 +20,10 @@ public class NotificationPresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadManager.getUploads())
         .flatMapIterable(uploads -> uploads)
-        .subscribe(upload -> view.showUploadNotification(upload),throwable -> {
-          throw new OnErrorNotImplementedException(throwable);});
+        .filter(upload -> upload.getStatus()
+            .equals(Upload.Status.COMPLETED))
+        .subscribe(upload -> view.showCompletedUploadNotification(upload), throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        });
   }
 }

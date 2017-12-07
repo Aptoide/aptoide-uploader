@@ -5,5 +5,5 @@ import com.aptoide.uploader.view.View;
 
 public interface NotificationView extends View {
 
-  void showUploadNotification(Upload upload);
+  void showCompletedUploadNotification(Upload upload);
 }

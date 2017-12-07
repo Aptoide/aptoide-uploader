@@ -24,10 +24,10 @@ public class UploadManager {
                 .flatMapCompletable(upload -> {
                   if (upload.isUploaded()) {
                     if (!upload.hasProposedData()) {
-                      return persistence.save(upload, Upload.Status.COMPLETED);
+                      return persistence.save(upload);
                     }
                   }
-                  return persistence.save(upload, Upload.Status.PENDING);
+                  return persistence.save(upload);
                 }));
   }
 

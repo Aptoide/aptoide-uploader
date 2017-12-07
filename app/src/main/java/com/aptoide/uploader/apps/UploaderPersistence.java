@@ -7,6 +7,6 @@ import java.util.List;
 public interface UploaderPersistence {
   Observable<List<Upload>> getUploads();
 
-  Completable save(Upload upload, Upload.Status status);
+  Completable save(Upload upload);
 
 }

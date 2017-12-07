@@ -6,7 +6,6 @@ import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
-import io.reactivex.Completable
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.subjects.PublishSubject
 import org.jetbrains.spek.api.Spek
@@ -23,7 +22,7 @@ class NotificationPresenterTest : Spek({
 
             val view = mock<NotificationView>()
             val uploadService = mock<UploaderService>()
-            val uploaderPersistence = mock<UploaderPersistence>()
+            val uploaderPersistence = MemoryUploaderPersistence(HashSet<Upload>())
             val md5Calculator = mock<Md5Calculator>()
             val uploadManager = UploadManager(uploadService, uploaderPersistence, md5Calculator)
 
@@ -35,11 +34,9 @@ class NotificationPresenterTest : Spek({
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             val md5 = "asdasdasd"
             whenever(md5Calculator.calculate(app)).doReturn(md5.toSingle())
-            val upload = Upload(true, true, app)
+            val upload = Upload(true, true, app, Upload.Status.COMPLETED)
             whenever(uploadService.getAppUpload(md5, "com.facebook.katana", "en", "FabioStore"))
                     .doReturn(upload.toSingle())
-            whenever(uploaderPersistence.save(upload, Upload.Status.COMPLETED)).doReturn(Completable.complete())
-            whenever(uploaderPersistence.getUploads()).doReturn(mutableListOf(upload).toSingle().toObservable())
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
@@ -47,7 +44,7 @@ class NotificationPresenterTest : Spek({
             uploadManager.upload("FabioStore", "en", app).subscribe()
 
 
-            verify(view).showUploadNotification(upload)
+            verify(view).showCompletedUploadNotification(upload)
         }
     }
 })
