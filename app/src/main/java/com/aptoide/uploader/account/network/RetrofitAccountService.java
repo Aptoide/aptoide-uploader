@@ -2,6 +2,8 @@ package com.aptoide.uploader.account.network;
 
 import com.aptoide.uploader.account.AccountService;
 import com.aptoide.uploader.account.AptoideAccount;
+import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
+import com.aptoide.uploader.account.network.error.DuplicatedUserException;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -119,11 +121,21 @@ public class RetrofitAccountService implements AccountService {
     return serviceV2.createAccount(parameters)
         .singleOrError()
         .flatMap(response -> {
-          if (response.isSuccessful() && !response.body()
-              .hasErrors()) {
-            return serviceV7.getUserInfo(new AccountRequestBody(Arrays.asList("meta"),
-                response.body()
-                    .getAccessToken()))
+          final OAuth body = response.body();
+
+          if (body != null && body.hasErrors()) {
+            if (DuplicatedStoreException.CODE.equalsIgnoreCase(body.getError())) {
+              return Single.error(new DuplicatedStoreException());
+            }
+
+            if (DuplicatedUserException.CODE.equalsIgnoreCase(body.getError())) {
+              return Single.error(new DuplicatedUserException());
+            }
+          }
+
+          if (response.isSuccessful() && body != null && !body.hasErrors()) {
+            return serviceV7.getUserInfo(
+                new AccountRequestBody(Arrays.asList("meta"), body.getAccessToken()))
                 .singleOrError();
           }
 

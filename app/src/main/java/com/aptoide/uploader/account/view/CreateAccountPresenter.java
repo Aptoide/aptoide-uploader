@@ -1,6 +1,8 @@
 package com.aptoide.uploader.account.view;
 
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
+import com.aptoide.uploader.account.network.error.DuplicatedUserException;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
@@ -59,14 +61,31 @@ public class CreateAccountPresenter implements Presenter {
         .observeOn(viewScheduler)
         .doOnError(throwable -> {
           view.hideLoading();
+
           if (isInternetError(throwable)) {
             view.showNetworkError();
+          }
+
+          if (isStoreNameTaken(throwable)) {
+            view.showErrorStoreAlreadyExists();
+          }
+
+          if (isUserNameTaken(throwable)) {
+            view.showErrorUserAlreadyExists();
           }
         })
         .retry()
         .subscribe(() -> accountNavigator.navigateToMyAppsView(), throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+  }
+
+  private boolean isUserNameTaken(Throwable throwable) {
+    return throwable instanceof DuplicatedUserException;
+  }
+
+  private boolean isStoreNameTaken(Throwable throwable) {
+    return throwable instanceof DuplicatedStoreException;
   }
 
   private boolean isInternetError(Throwable throwable) {
