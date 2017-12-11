@@ -101,9 +101,13 @@ public class LoginActivity extends AppCompatActivity
     super.onActivityResult(requestCode, resultCode, data);
 
     // Google Plus API
-    if (requestCode == REQUEST_CODE_RESOLVE_ERR && resultCode == RESULT_OK) {
-      mConnectionResult = null;
-      mGoogleApiClient.connect();
+    if (requestCode == REQUEST_CODE_RESOLVE_ERR) {
+      if (resultCode == RESULT_OK) {
+        mConnectionResult = null;
+        mGoogleApiClient.connect();
+      } else if (resultCode == RESULT_CANCELED) {
+        mIntentInProgress = false;
+      }
     } else {
       if (requestCode == USER_RECOVERY_AUTH_REQUEST_CODE && resultCode == RESULT_OK
           || requestCode == 90 && resultCode == RESULT_OK) {
