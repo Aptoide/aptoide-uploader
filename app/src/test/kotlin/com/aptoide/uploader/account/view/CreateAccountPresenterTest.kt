@@ -238,7 +238,7 @@ class CreateAccountPresenterTest : Spek({
             verify(view).showErrorStoreAlreadyExists()
         }
 
-        it("should navigate to my apps when the user creates a new account in aptoide inserting valid data: email, password, store name, store privacy, store user and store pass") {
+        it("should navigate to login view") {
             val navigator = mock<CreateAccountNavigator>()
             val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
             val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
@@ -246,28 +246,60 @@ class CreateAccountPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
                     serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
-
+            val accounts = PublishSubject.create<AptoideAccount>()
             val view = mock<CreateAccountView>()
             val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
-            val accounts = PublishSubject.create<AptoideAccount>()
-            val clickGoToLoginViewEvent = PublishSubject.create<Object>()
+            val clickGoToLoginViewEvent = PublishSubject.create<CreateAccountView.ViewModel>()
 
             whenever(accountPersistence.account).doReturn(accounts)
             whenever(accountPersistence.save(any())).doReturn(Completable.fromAction({
                 accounts.onNext(AptoideAccount(true, true, TestData.STORE_NAME))
             }))
+
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
-            whenever(view.openLoginView).doReturn(clickGoToLoginViewEvent.flatMapCompletable { _ ->
-                Completable.complete()
-            })
+            whenever(view.openLoginView).doReturn(clickGoToLoginViewEvent)
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            clickGoToLoginViewEvent.onNext(Object())
+            clickGoToLoginViewEvent.onNext(CreateAccountView.ViewModel(
+                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME
+            ))
 
             verify(navigator).navigateToLoginView()
+        }
+
+        it("should navigate to recover password view") {
+            val navigator = mock<CreateAccountNavigator>()
+            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
+            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
+            val accountPersistence = mock<AccountPersistence>()
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accounts = PublishSubject.create<AptoideAccount>()
+            val view = mock<CreateAccountView>()
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+            val clickGoToRecoverPasswordViewEvent = PublishSubject.create<CreateAccountView.ViewModel>()
+
+            whenever(accountPersistence.account).doReturn(accounts)
+            whenever(accountPersistence.save(any())).doReturn(Completable.fromAction({
+                accounts.onNext(AptoideAccount(true, true, TestData.STORE_NAME))
+            }))
+
+            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
+            whenever(view.openRecoverPasswordView).doReturn(clickGoToRecoverPasswordViewEvent)
+
+            presenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            clickGoToRecoverPasswordViewEvent.onNext(CreateAccountView.ViewModel(
+                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME
+            ))
+
+            verify(navigator).navigateToRecoverPassView()
         }
     }
 })

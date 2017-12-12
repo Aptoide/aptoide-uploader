@@ -30,6 +30,28 @@ public class CreateAccountPresenter implements Presenter {
   @Override public void present() {
     handleAccountCreatedEvent();
     handleCreateAccountClick();
+    handleNavigateToLoginViewClick();
+    handleNavigateToRecoverPassViewClick();
+  }
+
+  private void handleNavigateToRecoverPassViewClick() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.getOpenLoginView())
+        .observeOn(viewScheduler)
+        .subscribe(__ -> accountNavigator.navigateToLoginView(), throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void handleNavigateToLoginViewClick() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.getOpenRecoverPasswordView())
+        .observeOn(viewScheduler)
+        .subscribe(__ -> accountNavigator.navigateToRecoverPassView(), throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 
   private void handleAccountCreatedEvent() {

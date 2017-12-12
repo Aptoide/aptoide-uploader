@@ -4,14 +4,15 @@ import android.support.annotation.Nullable;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public interface CreateAccountView extends View {
 
   Observable<ViewModel> getCreateAccountEvent();
 
-  Completable getOpenLoginView();
+  Observable<ViewModel> getOpenLoginView();
 
-  Completable getOpenRecoverPasswordView();
+  Observable<ViewModel> getOpenRecoverPasswordView();
 
   void showLoading();
 

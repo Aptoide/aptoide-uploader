@@ -1,0 +1,209 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    >
+  <ScrollView
+      android:id="@+id/fragment_create_account_content"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:theme="@style/SignUpTheme"
+      android:visibility="visible"
+      tools:visibility="gone"
+      >
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:orientation="vertical"
+        >
+
+      <EditText
+          android:id="@+id/fragment_create_account_user_name"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="20dp"
+          android:layout_marginRight="20dp"
+          android:hint="@string/e_mail"
+          android:inputType="textEmailAddress"
+          tools:text="fabio.dias@aptoide.com"
+          />
+
+      <EditText
+          android:id="@+id/fragment_create_account_user_password"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="20dp"
+          android:layout_marginRight="20dp"
+          android:layout_marginTop="10dp"
+          android:hint="@string/passHint"
+          android:inputType="textPassword"
+          tools:text="password"
+          />
+
+      <EditText
+          android:id="@+id/fragment_create_account_store_name"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="20dp"
+          android:layout_marginRight="20dp"
+          android:layout_marginTop="10dp"
+          android:hint="@string/store"
+          android:maxLength="63"
+          tools:text="sith-apps"
+          />
+
+      <EditText
+          android:id="@+id/fragment_create_account_store_username"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="20dp"
+          android:layout_marginRight="20dp"
+          android:layout_marginTop="20dp"
+          android:hint="@string/store_username"
+          android:visibility="gone"
+          tools:text="fabio.dias@aptoide.com"
+          tools:visibility="visible"
+          />
+
+      <EditText
+          android:id="@+id/fragment_create_account_store_password"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="20dp"
+          android:layout_marginRight="20dp"
+          android:layout_marginTop="10dp"
+          android:hint="@string/store_password"
+          android:inputType="textPassword"
+          android:visibility="gone"
+          tools:text="password"
+          tools:visibility="visible"
+          />
+
+      <TextView
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginTop="15dp"
+          android:text="@string/store_privacy"
+          android:textSize="@dimen/textSize"
+          />
+
+      <RadioGroup
+          android:id="@+id/fragment_create_account_store_privacy"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:gravity="center_horizontal"
+          android:orientation="horizontal"
+          >
+
+        <RadioButton
+            android:id="@+id/fragment_create_account_public_store"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginEnd="5dp"
+            android:layout_marginRight="5dp"
+            android:checked="true"
+            android:text="@string/public_key"
+            android:textColor="@android:color/white"
+            tools:checked="false"
+            />
+
+        <RadioButton
+            android:id="@+id/fragment_create_account_private_store"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginLeft="5dp"
+            android:layout_marginStart="5dp"
+            android:text="@string/private_key"
+            android:textColor="@android:color/white"
+            tools:checked="true"
+            />
+
+      </RadioGroup>
+
+      <Button
+          android:id="@+id/fragment_create_account_submit"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginLeft="30dp"
+          android:layout_marginRight="30dp"
+          android:layout_marginTop="20dp"
+          android:text="@string/new_account"
+          style="@style/Buttonuploader_button_theme"
+          />
+
+      <TextView
+          android:id="@+id/fragment_create_account_go_to_login"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:layout_marginTop="30dp"
+          android:text="@string/already_have_an_account_sign_in"
+          android:textStyle="bold"
+          style="@style/text_view_clickable"
+          />
+
+      <TextView
+          android:id="@+id/fragment_create_account_forgot_password"
+          android:layout_width="wrap_content"
+          android:layout_height="wrap_content"
+          android:layout_gravity="center"
+          android:layout_marginTop="0dp"
+          android:background="@drawable/text_view_selectable"
+          android:text="@string/forgotten_your_password"
+          android:textStyle="bold"
+          style="@style/text_view_clickable"
+          />
+
+      <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="20dp"
+          android:layout_marginEnd="10dp"
+          android:layout_marginLeft="10dp"
+          android:layout_marginRight="10dp"
+          android:layout_marginStart="10dp"
+          android:layout_marginTop="20dp"
+          android:text="@string/by_signing_up_you_are_agreeing_to_the_aptoide_terms_of_service_and_aptoide_content_policy_for_developers"
+          />
+
+    </LinearLayout>
+
+  </ScrollView>
+
+  <RelativeLayout
+      android:id="@+id/fragment_create_account_progress_bar_content"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:visibility="gone"
+      tools:visibility="visible"
+      >
+
+    <ProgressBar
+        android:id="@+id/fragment_create_account_progress_bar"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_centerHorizontal="true"
+        android:layout_centerInParent="true"
+        style="?android:attr/progressBarStyleLarge"
+        />
+
+    <TextView
+        android:id="@+id/fragment_create_account_loading_text_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/fragment_create_account_progress_bar"
+        android:layout_centerHorizontal="true"
+        android:gravity="center_horizontal"
+        android:padding="25dp"
+        android:text="@string/signing_in"
+        android:textAlignment="center"
+        />
+
+  </RelativeLayout>
+
+</FrameLayout>
