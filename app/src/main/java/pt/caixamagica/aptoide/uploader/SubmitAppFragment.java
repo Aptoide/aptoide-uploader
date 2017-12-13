@@ -45,17 +45,12 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
  */
 public class SubmitAppFragment extends Fragment {
 
-  private List<String> spinnerArray;
-
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
   protected SpiceManager secondarySpiceManager;
-
   protected View rootView;
-
   UploadService mService;
-
   boolean mBound = false;
-
+  private List<String> spinnerArray;
   /**
    * Defines callbacks for service binding, passed to bindService()
    */
@@ -200,6 +195,15 @@ public class SubmitAppFragment extends Fragment {
       getActivity().unbindService(mConnection);
       mBound = false;
     }
+  }
+
+  @Override public void onDestroyView() {
+    super.onDestroyView();
+    categoriesProvider.removeListener();
+  }
+
+  @Override public void onDestroy() {
+    super.onDestroy();
   }
 
   private int findLanguageInArray(String language) {
@@ -587,14 +591,5 @@ public class SubmitAppFragment extends Fragment {
         return false;
       }
     });
-  }
-
-  @Override public void onDestroyView() {
-    super.onDestroyView();
-    categoriesProvider.removeListener();
-  }
-
-  @Override public void onDestroy() {
-    super.onDestroy();
   }
 }

@@ -63,19 +63,6 @@ public class CategoriesResponse {
       private Parent parent;
       private Stats stats;
 
-      @lombok.Data public static class Parent {
-        private Number id;
-        private String name;
-        private String title;
-        private String icon;
-        private String graphic;
-      }
-
-      @lombok.Data public static class Stats {
-        private Number groups;
-        private Number items;
-      }
-
       @Override public boolean equals(Object o) {
         if (o == this) {
           return true;
@@ -87,6 +74,19 @@ public class CategoriesResponse {
         }
 
         return super.equals(o);
+      }
+
+      @lombok.Data public static class Parent {
+        private Number id;
+        private String name;
+        private String title;
+        private String icon;
+        private String graphic;
+      }
+
+      @lombok.Data public static class Stats {
+        private Number groups;
+        private Number items;
       }
     }
   }

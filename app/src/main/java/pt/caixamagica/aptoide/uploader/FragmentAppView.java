@@ -70,8 +70,8 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
  */
 public class FragmentAppView extends Fragment {
 
+  public static final String UPLOADED_APP_ACTION = "UploadedApp";
   protected View rootView;
-
   protected UserCredentialsJson userCredentialsJson;
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
   protected SpiceManager spiceManagerSecondary =
@@ -86,7 +86,6 @@ public class FragmentAppView extends Fragment {
   private UploadService mService;
   private UploaderAnalytics uploaderAnalytics;
   private InstalledUtils installedUtils;
-  public static final String UPLOADED_APP_ACTION = "UploadedApp";
   private UploadedAppReceiver uploadedAppReceiver;
   /**
    * Defines callbacks for service binding, passed to bindService()

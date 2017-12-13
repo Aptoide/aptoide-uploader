@@ -25,13 +25,12 @@ import pt.caixamagica.aptoide.uploader.util.StoredCredentialsManager;
  */
 public class AptoideUploaderApplication extends Application {
 
+  public static final String APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE = "AppsInMyStore";
   public static boolean firstLaunchApagar = true;
   private static AptoideUploaderApplication context;
   @Getter @Setter private static boolean forcedLogout = false;
   @Getter @Setter private String username;
   private StoredCredentialsManager storedCredentialsManager;
-  public static final String APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE = "AppsInMyStore";
-
   private AppsInStoreController appsInStoreController;
 
   public static Context getContext() {

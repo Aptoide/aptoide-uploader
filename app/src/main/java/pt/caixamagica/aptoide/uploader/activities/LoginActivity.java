@@ -490,6 +490,11 @@ public class LoginActivity extends AppCompatActivity
         new UserCredentialsPendingRequestListener());
   }
 
+  private void checkUploadedApps() {
+    ((AptoideUploaderApplication) getApplicationContext()).getAppsInStoreController()
+        .start();
+  }
+
   public class OAuthPendingRequestListener implements PendingRequestListener<OAuth> {
 
     @Override public void onRequestFailure(SpiceException spiceException) {
@@ -573,10 +578,5 @@ public class LoginActivity extends AppCompatActivity
 
     @Override public void onRequestNotFound() {
     }
-  }
-
-  private void checkUploadedApps() {
-    ((AptoideUploaderApplication) getApplicationContext()).getAppsInStoreController()
-        .start();
   }
 }
