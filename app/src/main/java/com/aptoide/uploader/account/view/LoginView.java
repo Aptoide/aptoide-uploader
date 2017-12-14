@@ -7,6 +7,8 @@ public interface LoginView extends View {
 
   Observable<CredentialsViewModel> getLoginEvent();
 
+  Observable<CredentialsViewModel> getOpenCreateAccountView();
+
   void showLoading(String username);
 
   void hideLoading();

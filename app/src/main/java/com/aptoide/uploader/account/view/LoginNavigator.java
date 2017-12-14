@@ -26,4 +26,10 @@ public class LoginNavigator {
     Toast.makeText(context, "create store view not implemented", Toast.LENGTH_SHORT)
         .show();
   }
+
+  public void navigateToCreateAccountView() {
+    fragmentManager.beginTransaction()
+        .replace(R.id.activity_main_container, CreateAccountFragment.newInstance())
+        .commit();
+  }
 }

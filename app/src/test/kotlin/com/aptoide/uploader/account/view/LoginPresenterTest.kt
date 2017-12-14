@@ -83,7 +83,7 @@ class LoginPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
                     serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
-            val accountPresenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<LoginView.CredentialsViewModel>()
@@ -94,7 +94,7 @@ class LoginPresenterTest : Spek({
             whenever(serviceV3.oauth2Authentication(any())).doReturn(Observable.error<Response<OAuth>>(IOException()))
             whenever(serviceV7.getUserInfo(any())).doReturn(Observable.error<Response<AccountResponse>>(IOException()))
 
-            accountPresenter.present()
+            presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             loginEvent.onNext(LoginView.CredentialsViewModel(TestData.USER_NAME, TestData.USER_PASSWORD))
             verify(view).showLoading(TestData.USER_NAME)
@@ -111,7 +111,7 @@ class LoginPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
                     serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
-            val accountPresenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<LoginView.CredentialsViewModel>()
@@ -124,7 +124,7 @@ class LoginPresenterTest : Spek({
             whenever(serviceV3.oauth2Authentication(any()))
                     .doReturn(loginResponse.toSingle().toObservable())
 
-            accountPresenter.present()
+            presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             loginEvent.onNext(LoginView.CredentialsViewModel(TestData.USER_NAME, TestData.USER_PASSWORD))
             verify(view).showLoading(TestData.USER_NAME)
@@ -142,7 +142,7 @@ class LoginPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
                     serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
-            val accountPresenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val accounts = PublishSubject.create<AptoideAccount>()
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -166,7 +166,7 @@ class LoginPresenterTest : Spek({
             whenever(serviceV7.getUserInfo(any())).doReturn(accountResponse
                     .toSingle().toObservable())
 
-            accountPresenter.present()
+            presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             loginEvent.onNext(LoginView
                     .CredentialsViewModel(TestData.USER_NAME, TestData.USER_PASSWORD))
@@ -184,7 +184,7 @@ class LoginPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
                     serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
-            val accountPresenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<LoginView.CredentialsViewModel>()
@@ -194,7 +194,7 @@ class LoginPresenterTest : Spek({
                     .toSingle().toObservable())
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
 
-            accountPresenter.present()
+            presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             verify(navigator).navigateToMyAppsView()
         }
@@ -208,7 +208,7 @@ class LoginPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
                     serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
-            val accountPresenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<LoginView.CredentialsViewModel>()
@@ -218,9 +218,41 @@ class LoginPresenterTest : Spek({
                     .toSingle().toObservable())
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
 
-            accountPresenter.present()
+            presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             verify(navigator).navigateToCreateStoreView()
+        }
+
+        it("should navigate to create account view") {
+            val navigator = mock<LoginNavigator>()
+            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
+            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
+            val accountPersistence = mock<AccountPersistence>()
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accounts = PublishSubject.create<AptoideAccount>()
+            val view = mock<LoginView>()
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+            val clickGoToCreateAccountViewEvent = PublishSubject.create<LoginView.CredentialsViewModel>()
+
+            whenever(accountPersistence.account).doReturn(accounts)
+            whenever(accountPersistence.save(any())).doReturn(Completable.fromAction({
+                accounts.onNext(AptoideAccount(true, true, TestData.STORE_NAME))
+            }))
+
+            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
+            whenever(view.openCreateAccountView).doReturn(clickGoToCreateAccountViewEvent)
+
+            presenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            clickGoToCreateAccountViewEvent.onNext(LoginView.CredentialsViewModel(
+                    TestData.USER_NAME, TestData.USER_PASSWORD
+            ))
+
+            verify(navigator).navigateToCreateAccountView()
         }
 
     }

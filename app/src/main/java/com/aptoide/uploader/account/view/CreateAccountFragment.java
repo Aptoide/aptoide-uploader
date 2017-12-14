@@ -36,6 +36,10 @@ public class CreateAccountFragment extends FragmentView implements CreateAccount
   private AptoideAccountManager accountManager;
   private CompositeDisposable compositeDisposable;
 
+  public static CreateAccountFragment newInstance() {
+    return new CreateAccountFragment();
+  }
+
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     accountManager =

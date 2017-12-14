@@ -68,6 +68,14 @@ public class LoginPresenter implements Presenter {
         }));
 
     compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.getOpenCreateAccountView())
+        .observeOn(viewScheduler)
+        .subscribe(__ -> loginNavigator.navigateToCreateAccountView(), throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
         .doOnNext(__ -> compositeDisposable.clear())
         .subscribe(lifecycleEvent -> {
