@@ -9,9 +9,46 @@
 
 # Add any project specific keep options here:
 
-# If your project uses WebView with JS, uncomment the following
-# and specify the fully qualified class name to the JavaScript interface
-# class:
-#-keepclassmembers class fqcn.of.javascript.interface.for.webview {
-#   public *;
-#}
+
+# For RoboSpice
+-dontwarn android.support.**
+-dontwarn com.sun.xml.internal.**
+-dontwarn com.sun.istack.internal.**
+-dontwarn org.codehaus.jackson.**
+-dontwarn org.springframework.**
+-dontwarn java.awt.**
+-dontwarn javax.security.**
+-dontwarn java.beans.**
+-dontwarn javax.xml.**
+-dontwarn java.util.**
+-dontwarn org.w3c.dom.**
+-dontwarn com.google.common.**
+-dontwarn com.octo.android.robospice.persistence.**
+
+### Retrofit
+-keep class com.octo.android.robospice.retrofit.** { *; }
+
+### Jackson SERIALIZER SETTINGS
+-keepclassmembers,allowobfuscation class * {
+    @org.codehaus.jackson.annotate.* <fields>;
+    @org.codehaus.jackson.annotate.* <init>(...);
+}
+
+
+### Uploader
+-keep class pt.caixamagica.aptoide.uploader.** { *; }
+-keep class com.google.android.vending.licensing.** { *; }
+
+-ignorewarnings
+
+-keep class android.support.v7.appcompat.** { *; }
+
+# Fabric
+-keepattributes *Annotation*
+-keepattributes SourceFile,LineNumberTable
+-keep public class * extends java.lang.Exception
+
+-keep class * {
+    public private *;
+}
+
