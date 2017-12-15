@@ -80,6 +80,19 @@ public class CreateAccountFragment extends FragmentView implements CreateAccount
   }
 
   @Override public void onDestroyView() {
+    userNameEditText = null;
+    userPasswordEditText = null;
+    storeNameEditText = null;
+    storeUserEditText = null;
+    storePasswordEditText = null;
+    privateStoreRadioButton = null;
+    submitButton = null;
+    goToLoginViewButton = null;
+    forgotPasswordButton = null;
+    progressBarContent = null;
+    viewContent = null;
+    accountManager = null;
+
     if (!compositeDisposable.isDisposed()) {
       compositeDisposable.dispose();
     }

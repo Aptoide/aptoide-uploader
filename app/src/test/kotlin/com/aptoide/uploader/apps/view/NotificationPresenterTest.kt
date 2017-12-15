@@ -6,6 +6,7 @@ import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
 import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
+import io.reactivex.Single
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.subjects.PublishSubject
 import org.jetbrains.spek.api.Spek
@@ -22,27 +23,37 @@ class NotificationPresenterTest : Spek({
 
             val view = mock<NotificationView>()
             val uploadService = mock<UploaderService>()
+            val appInfoService = mock<AppInformationService>()
             val uploaderPersistence = MemoryUploaderPersistence(HashSet<Upload>())
             val md5Calculator = mock<Md5Calculator>()
             val uploadManager = UploadManager(uploadService, uploaderPersistence, md5Calculator)
 
             val presenter = NotificationPresenter(view, uploadManager)
 
-            val app = InstalledApp("https://myicon.com/facebook", "Facebook", false,
-                    "com.facebook.katana", "/Files/facebook.apk")
+            val appPackageName = "com.facebook.katana"
+            val appIcon = "https://myicon.com/facebook"
+            val appName = "Facebook"
+            val appMd5 = "asdasdasd"
+            val appLanguage = "en"
+            val apkPath = "/Files/facebook.apk"
+            val storeName = "FabioStore"
 
-            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
-            val md5 = "asdasdasd"
-            whenever(md5Calculator.calculate(app)).doReturn(md5.toSingle())
+            val app = InstalledApp(appIcon, appName, false, appPackageName, apkPath)
             val upload = Upload(true, true, app, Upload.Status.COMPLETED)
-            whenever(uploadService.getAppUpload(md5, "com.facebook.katana", "en", "FabioStore"))
+
+            whenever(view.lifecycleEvent)
+                    .doReturn(lifecycleEvent)
+            whenever(appInfoService.getProposedAppInfo(appPackageName, appLanguage))
+                    .doReturn(Single.error<ProposedAppInfo>(ProposedAppInfoException()))
+            whenever(md5Calculator.calculate(app))
+                    .doReturn(appMd5.toSingle())
+            whenever(uploadService.getAppUpload(appMd5, appPackageName, appLanguage, storeName))
                     .doReturn(upload.toSingle())
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
 
-            uploadManager.upload("FabioStore", "en", app).subscribe()
-
+            uploadManager.upload(storeName, appLanguage, app).subscribe()
 
             verify(view).showCompletedUploadNotification(upload)
         }

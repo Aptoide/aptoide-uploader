@@ -1,6 +1,5 @@
 package com.aptoide.uploader.account.network;
 
-import com.aptoide.uploader.network.ResponseV7;
 import java.util.List;
 
 /**

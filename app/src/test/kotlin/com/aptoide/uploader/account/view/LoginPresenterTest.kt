@@ -4,11 +4,7 @@ import com.aptoide.uploader.TestData
 import com.aptoide.uploader.account.AccountPersistence
 import com.aptoide.uploader.account.AptoideAccount
 import com.aptoide.uploader.account.AptoideAccountManager
-import com.aptoide.uploader.account.network.AccountResponse
-import com.aptoide.uploader.account.network.AccountResponseMapper
-import com.aptoide.uploader.account.network.OAuth
-import com.aptoide.uploader.account.network.RetrofitAccountService
-import com.aptoide.uploader.network.ResponseV7
+import com.aptoide.uploader.account.network.*
 import com.aptoide.uploader.security.SecurityAlgorithms
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
@@ -28,7 +24,12 @@ import java.io.IOException
 
 @RunWith(JUnitPlatform::class)
 class LoginPresenterTest : Spek({
+
     describe("an account presenter") {
+
+        val credentialsViewModel = LoginView.CredentialsViewModel(
+                TestData.USER_NAME, TestData.USER_PASSWORD
+        )
 
         it("should navigate to my apps view when user taps login button with correct credentials") {
             val view = mock<LoginView>()
@@ -67,8 +68,7 @@ class LoginPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            loginEvent.onNext(LoginView
-                    .CredentialsViewModel(TestData.USER_NAME, TestData.USER_PASSWORD))
+            loginEvent.onNext(credentialsViewModel)
             verify(view).showLoading(TestData.USER_NAME)
             verify(view).hideLoading()
             verify(navigator).navigateToMyAppsView()
@@ -96,7 +96,7 @@ class LoginPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            loginEvent.onNext(LoginView.CredentialsViewModel(TestData.USER_NAME, TestData.USER_PASSWORD))
+            loginEvent.onNext(credentialsViewModel)
             verify(view).showLoading(TestData.USER_NAME)
             verify(view).hideLoading()
             verify(view).showNetworkError()
@@ -126,7 +126,7 @@ class LoginPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            loginEvent.onNext(LoginView.CredentialsViewModel(TestData.USER_NAME, TestData.USER_PASSWORD))
+            loginEvent.onNext(credentialsViewModel)
             verify(view).showLoading(TestData.USER_NAME)
             verify(view).hideLoading()
             verify(view).showCrendentialsError()
@@ -168,8 +168,7 @@ class LoginPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            loginEvent.onNext(LoginView
-                    .CredentialsViewModel(TestData.USER_NAME, TestData.USER_PASSWORD))
+            loginEvent.onNext(credentialsViewModel)
             verify(view).showLoading(TestData.USER_NAME)
             verify(view).hideLoading()
             verify(navigator).navigateToCreateStoreView()
@@ -248,9 +247,7 @@ class LoginPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            clickGoToCreateAccountViewEvent.onNext(LoginView.CredentialsViewModel(
-                    TestData.USER_NAME, TestData.USER_PASSWORD
-            ))
+            clickGoToCreateAccountViewEvent.onNext(credentialsViewModel)
 
             verify(navigator).navigateToCreateAccountView()
         }

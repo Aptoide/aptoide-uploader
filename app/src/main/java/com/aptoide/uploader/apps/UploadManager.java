@@ -5,14 +5,13 @@ import io.reactivex.Observable;
 import java.util.List;
 
 public class UploadManager {
-
-  private final UploaderService service;
+  private final UploaderService uploaderService;
   private final UploaderPersistence persistence;
   private final Md5Calculator md5Calculator;
 
-  public UploadManager(UploaderService service, UploaderPersistence persistence,
+  public UploadManager(UploaderService uploaderService, UploaderPersistence persistence,
       Md5Calculator md5Calculator) {
-    this.service = service;
+    this.uploaderService = uploaderService;
     this.persistence = persistence;
     this.md5Calculator = md5Calculator;
   }
@@ -20,7 +19,7 @@ public class UploadManager {
   public Completable upload(String storeName, String language, InstalledApp app) {
     return md5Calculator.calculate(app)
         .flatMapCompletable(
-            md5 -> service.getAppUpload(md5, app.getPackageName(), language, storeName)
+            (md5 -> uploaderService.getAppUpload(md5, app.getPackageName(), language, storeName)
                 .flatMapCompletable(upload -> {
                   if (upload.isUploaded()) {
                     if (!upload.hasProposedData()) {
@@ -28,7 +27,7 @@ public class UploadManager {
                     }
                   }
                   return persistence.save(upload);
-                }));
+                })));
   }
 
   public Observable<List<Upload>> getUploads() {

@@ -20,12 +20,20 @@ import io.reactivex.subjects.PublishSubject
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
 import org.jetbrains.spek.api.dsl.it
+import org.junit.Assert.fail
 import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
 
 @RunWith(JUnitPlatform::class)
 class MyStorePresenterTest : Spek({
     describe("a my apps presenter") {
+
+        val storeName = "Marcelo"
+        val language = "PT-BR"
+        val facebook = InstalledApp("https://myicon.com/facebook", "Facebook", false, "cm.aptoide.pt", "/Files/facebook.apk")
+        val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt", "/Files/aptoide.apk")
+        val appList = mutableListOf(facebook, aptoide)
+
         it("should display store name and installed apps when view is created") {
             val view = mock<MyStoreView> {}
             val packageProvider = mock<InstalledAppsProvider> {}
@@ -38,15 +46,17 @@ class MyStorePresenterTest : Spek({
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
-            val facebook = InstalledApp("https://myicon.com/facebook", "Facebook", false, "cm.aptoide.pt", "/Files/facebook.apk")
-            val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt", "/Files/aptoide.apk")
-            val appList = mutableListOf(facebook, aptoide)
 
-            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
-            whenever(view.submitAppEvent()).doReturn(Observable.empty())
-            whenever(languageManager.currentLanguageCode).doReturn("PT-BR".toSingle())
-            whenever(packageProvider.installedApps).doReturn(appList.toSingle())
-            whenever(accountPersistence.account).doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
+            whenever(view.lifecycleEvent)
+                    .doReturn(lifecycleEvent)
+            whenever(view.submitAppEvent())
+                    .doReturn(Observable.empty())
+            whenever(languageManager.currentLanguageCode)
+                    .doReturn(language.toSingle())
+            whenever(packageProvider.installedApps)
+                    .doReturn(appList.toSingle())
+            whenever(accountPersistence.account)
+                    .doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
@@ -68,21 +78,36 @@ class MyStorePresenterTest : Spek({
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val submitAppEvent = PublishSubject.create<MutableList<InstalledApp>>()
-            val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt", "/Files/aptoide.apk")
-            val storeName = "Marcelo"
 
-            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
-            whenever(view.submitAppEvent()).doReturn(submitAppEvent)
-            whenever(languageManager.currentLanguageCode).doReturn("PT-BR".toSingle())
-            whenever(packageProvider.installedApps).doReturn(mutableListOf(aptoide).toSingle())
-            whenever(uploadManager.upload("Marcelo", "PT-BR", aptoide)).doReturn(Completable.complete())
+            whenever(view.lifecycleEvent)
+                    .doReturn(lifecycleEvent)
+            whenever(view.submitAppEvent())
+                    .doReturn(submitAppEvent)
+            whenever(languageManager.currentLanguageCode)
+                    .doReturn(language.toSingle())
+            whenever(packageProvider.installedApps)
+                    .doReturn(mutableListOf(aptoide).toSingle())
+            whenever(uploadManager.upload(storeName, language, aptoide))
+                    .doReturn(Completable.complete())
             whenever(accountPersistence.account)
                     .doReturn(AptoideAccount(true, true, storeName).toSingle().toObservable())
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             submitAppEvent.onNext(mutableListOf(aptoide))
-            verify(uploadManager).upload("Marcelo", "PT-BR", aptoide)
+            verify(uploadManager).upload(storeName, language, aptoide)
+        }
+
+        it("should sort list of apps by installed date") {
+            fail("To Do")
+        }
+
+        it("should sort list of apps by name") {
+            fail("To Do")
+        }
+
+        it("should navigate to app information form view if it is needed before upload") {
+            fail("To Do")
         }
     }
 })

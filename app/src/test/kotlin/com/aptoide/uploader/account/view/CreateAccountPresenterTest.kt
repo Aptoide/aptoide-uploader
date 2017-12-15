@@ -4,11 +4,7 @@ import com.aptoide.uploader.TestData
 import com.aptoide.uploader.account.AccountPersistence
 import com.aptoide.uploader.account.AptoideAccount
 import com.aptoide.uploader.account.AptoideAccountManager
-import com.aptoide.uploader.account.network.AccountResponse
-import com.aptoide.uploader.account.network.AccountResponseMapper
-import com.aptoide.uploader.account.network.OAuth
-import com.aptoide.uploader.account.network.RetrofitAccountService
-import com.aptoide.uploader.network.ResponseV7
+import com.aptoide.uploader.account.network.*
 import com.aptoide.uploader.security.SecurityAlgorithms
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
@@ -30,6 +26,16 @@ import java.io.IOException
 @RunWith(JUnitPlatform::class)
 class CreateAccountPresenterTest : Spek({
     describe("a create account presenter") {
+
+        val publicCreateAccountModel = CreateAccountView.ViewModel(
+                TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME
+        )
+
+        val privateCreateAccountModel = CreateAccountView.ViewModel(
+                TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME,
+                TestData.STORE_USER, TestData.STORE_PASSWORD
+        )
+
         it("should navigate to my apps when the user creates a new account in aptoide inserting valid data: email, password, store name and store privacy") {
             val navigator = mock<CreateAccountNavigator>()
             val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
@@ -66,9 +72,7 @@ class CreateAccountPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            createAccountEvent.onNext(CreateAccountView.ViewModel(
-                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME
-            ))
+            createAccountEvent.onNext(publicCreateAccountModel)
 
             verify(view).showLoading()
             verify(view).hideLoading()
@@ -111,10 +115,7 @@ class CreateAccountPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            createAccountEvent.onNext(CreateAccountView.ViewModel(
-                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME,
-                    TestData.STORE_USER, TestData.STORE_PASSWORD
-            ))
+            createAccountEvent.onNext(privateCreateAccountModel)
 
             verify(view).showLoading()
             verify(view).hideLoading()
@@ -151,9 +152,7 @@ class CreateAccountPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            createAccountEvent.onNext(CreateAccountView.ViewModel(
-                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME
-            ))
+            createAccountEvent.onNext(publicCreateAccountModel)
 
             verify(view).showLoading()
             verify(view).hideLoading()
@@ -189,10 +188,7 @@ class CreateAccountPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            createAccountEvent.onNext(CreateAccountView.ViewModel(
-                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME,
-                    TestData.STORE_USER, TestData.STORE_PASSWORD
-            ))
+            createAccountEvent.onNext(privateCreateAccountModel)
 
             verify(view).showLoading()
             verify(view).hideLoading()
@@ -229,9 +225,7 @@ class CreateAccountPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            createAccountEvent.onNext(CreateAccountView.ViewModel(
-                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME
-            ))
+            createAccountEvent.onNext(publicCreateAccountModel)
 
             verify(view).showLoading()
             verify(view).hideLoading()
@@ -263,9 +257,7 @@ class CreateAccountPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            clickGoToLoginViewEvent.onNext(CreateAccountView.ViewModel(
-                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME
-            ))
+            clickGoToLoginViewEvent.onNext(publicCreateAccountModel)
 
             verify(navigator).navigateToLoginView()
         }
@@ -295,9 +287,7 @@ class CreateAccountPresenterTest : Spek({
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            clickGoToRecoverPasswordViewEvent.onNext(CreateAccountView.ViewModel(
-                    TestData.USER_NAME, TestData.USER_PASSWORD, TestData.STORE_NAME
-            ))
+            clickGoToRecoverPasswordViewEvent.onNext(publicCreateAccountModel)
 
             verify(navigator).navigateToRecoverPassView()
         }
