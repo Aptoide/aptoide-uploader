@@ -187,80 +187,6 @@ public class LoginActivity extends AppCompatActivity
     AptoideUploaderApplication.firstLaunchApagar = false;
   }
 
-  private UserCredentialsJson getStoredUserCredentials() {
-
-    AccountManager accountManager = AccountManager.get(this);
-
-    SharedPreferences sharedpreferences =
-        this.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
-
-    if (sharedpreferences != null
-        && sharedpreferences.getAll()
-        .size() > 0) {
-      String deviceId =
-          Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
-
-      AESObfuscator aesObfuscator = new AESObfuscator(SALT, this.getPackageName(), deviceId);
-
-      try {
-        String token = aesObfuscator.unobfuscate(sharedpreferences.getString("token", ""), "token");
-        String refreshToken =
-            aesObfuscator.unobfuscate(sharedpreferences.getString("refreshToken", ""),
-                "refreshToken");
-        String repo = aesObfuscator.unobfuscate(sharedpreferences.getString("repo", ""), "repo");
-
-        UserCredentialsJson userCredentialsJson = new UserCredentialsJson();
-        userCredentialsJson.setToken(token);
-        userCredentialsJson.setRefreshToken(refreshToken);
-        userCredentialsJson.setRepo(repo);
-        return userCredentialsJson;
-      } catch (ValidationException e) {
-        e.printStackTrace();
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-
-    if (!AptoideUploaderApplication.isForcedLogout()
-        && accountManager.getAccountsByType("cm.aptoide.pt").length != 0) {
-
-      try {
-        String URL = "content://cm.aptoide.pt.StubProvider";
-        Uri token_uri = Uri.parse(URL + "/token");
-        Uri refresh_token_uri = Uri.parse(URL + "/refreshToken");
-        Uri repo_uri = Uri.parse(URL + "/repo");
-
-        Cursor c1 = getContentResolver().query(token_uri, null, null, null, null);
-        Cursor c2 = getContentResolver().query(refresh_token_uri, null, null, null, null);
-        Cursor c3 = getContentResolver().query(repo_uri, null, null, null, null);
-
-        if (c1 != null && c2 != null && c3 != null) {
-
-          c1.moveToFirst();
-          c2.moveToFirst();
-          c3.moveToFirst();
-
-          UserCredentialsJson userCredentialsJson = new UserCredentialsJson();
-          userCredentialsJson.setToken(c1.getString(c1.getColumnIndex("userToken")));
-          userCredentialsJson.setRefreshToken(c2.getString(c2.getColumnIndex("userRefreshToken")));
-          userCredentialsJson.setRepo(c3.getString(c3.getColumnIndex("userRepo")));
-
-          storeToken(userCredentialsJson);
-
-          c1.close();
-          c2.close();
-          c3.close();
-
-          return userCredentialsJson;
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
-      }
-    }
-
-    return null;
-  }
-
   private void switchToAppViewFragment(UserCredentialsJson userCredentialsJson) {
     finish();
 
@@ -270,25 +196,6 @@ public class LoginActivity extends AppCompatActivity
     Intent intent = new Intent(this, AppsListActivity.class);
     intent.putExtras(bundle);
     startActivity(intent);
-  }
-
-  private void storeToken(UserCredentialsJson userCredentialsJson) {
-
-    // Try to use more dgradleata here. ANDROID_ID is a single point of attack.
-    String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-
-    AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), deviceId);
-
-    SharedPreferences sharedpreferences =
-        getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedpreferences.edit();
-
-    editor.putString("token", aesObfuscator.obfuscate(userCredentialsJson.getToken(), "token"));
-    editor.putString("refreshToken",
-        aesObfuscator.obfuscate(userCredentialsJson.getRefreshToken(), "refreshToken"));
-    editor.putString("repo", aesObfuscator.obfuscate(userCredentialsJson.getRepo(), "repo"));
-
-    editor.commit();
   }
 
   private void getGoogleToken() {
