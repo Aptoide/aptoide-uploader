@@ -11,6 +11,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
+import com.crashlytics.android.Crashlytics;
 import java.util.ArrayList;
 import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
 import pt.caixamagica.aptoide.uploader.R;
@@ -43,6 +44,24 @@ public class SubmitActivity extends ActionBarActivity {
     UserCredentialsJson userCredentialsJson =
         (UserCredentialsJson) extras.getSerializable("userCredentialsJson");
     PackageInfo packageInfo = ((PackageInfo) extras.getParcelable("selectablePackageInfo"));
+
+    if (packageInfo == null || userCredentialsJson == null) {
+      StringBuilder sb = new StringBuilder();
+      if (packageInfo == null) {
+        sb.append("packageInfo is null ");
+      } else {
+        sb.append("packageInfo: " + packageInfo.packageName);
+      }
+      sb.append(" ");
+      if (userCredentialsJson == null) {
+        sb.append("userCredentialsJson is null ");
+      } else {
+        sb.append("userCredentialsJson: " + userCredentialsJson.getRepo());
+      }
+      Crashlytics.log(0, "SubmitForm", sb.toString());
+      finish();
+    }
+
     SelectablePackageInfo selectablePackageInfo =
         new SelectablePackageInfo(packageInfo, getPackageManager(),
             appsInStorePersister.isAppInStore(packageInfo.packageName, packageInfo.versionCode));
