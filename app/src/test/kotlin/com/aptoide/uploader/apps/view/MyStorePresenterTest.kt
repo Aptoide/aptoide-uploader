@@ -132,14 +132,47 @@ class MyStorePresenterTest : Spek({
             reset(view)
             orderByDateEvent.onNext(SortingOrder.DATE)
 
-//            verify(view).showApps(any())
-
             verify(view).showApps(sortedAppList)
 
         }
 
         it("should sort list of apps by name") {
-            fail("To Do")
+
+            val view = mock<MyStoreView> {}
+            val packageProvider = mock<InstalledAppsProvider> {}
+            val accountService = mock<AccountService> {}
+            val accountPersistence = mock<AccountPersistence> {}
+            val uploadManager = mock<UploadManager> {}
+            val languageManager = mock<LanguageManager> {}
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
+            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+
+            val unSortedAppList = listOf(facebook, aptoide, aptoide2)
+            val sortedAppList = listOf(aptoide2, facebook)
+
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+            val orderByDateEvent = PublishSubject.create<SortingOrder>()
+
+            whenever(view.lifecycleEvent)
+                    .doReturn(lifecycleEvent)
+            whenever(view.submitAppEvent())
+                    .doReturn(Observable.empty())
+            whenever(languageManager.currentLanguageCode)
+                    .doReturn(language.toSingle())
+            whenever(packageProvider.installedApps).doReturn(unSortedAppList.toSingle())
+            whenever(accountPersistence.account)
+                    .doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
+
+            whenever(view.orderByEvent())
+                    .doReturn(orderByDateEvent)
+
+            installedAppsPresenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            reset(view)
+            orderByDateEvent.onNext(SortingOrder.NAME)
+
+            verify(view).showApps(sortedAppList)
         }
 
         it("should navigate to app information form view if it is needed before upload") {

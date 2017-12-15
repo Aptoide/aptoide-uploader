@@ -67,8 +67,15 @@ public class MyStorePresenter implements Presenter {
   }
 
   private Single<List<InstalledApp>> sort(List<InstalledApp> apps, SortingOrder sortingOrder) {
-    Collections.sort(apps,
-        (app1, app2) -> Long.compare(app1.getInstalledDate(), app2.getInstalledDate()));
+    if (sortingOrder.equals(SortingOrder.DATE)) {
+      Collections.sort(apps,
+          (app1, app2) -> Long.compare(app1.getInstalledDate(), app2.getInstalledDate()));
+    } else if (sortingOrder.equals(SortingOrder.NAME)) {
+      Collections.sort(apps, (app1, app2) -> app1.getName()
+          .toLowerCase()
+          .compareTo(app2.getName()
+              .toLowerCase()));
+    }
     return Single.just(apps);
   }
 }
