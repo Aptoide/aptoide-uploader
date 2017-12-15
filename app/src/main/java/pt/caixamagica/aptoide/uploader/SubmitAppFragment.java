@@ -28,19 +28,15 @@ import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.exception.SpiceException;
 import com.octo.android.robospice.request.listener.RequestListener;
 import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
-import java.util.Locale;
 import pt.caixamagica.aptoide.uploader.liquid.Event;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
+import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetApkInfoRequest;
-import pt.caixamagica.aptoide.uploader.retrofit.request.ListCategoriesRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
 import pt.caixamagica.aptoide.uploader.uploadService.UploadService;
 import pt.caixamagica.aptoide.uploader.util.LanguageCodesHelper;
-import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.GetApkInfoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -49,18 +45,12 @@ import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
  */
 public class SubmitAppFragment extends Fragment {
 
-  private static List<String> spinnerArray;
-
-  private static List<CategoriesJson.Category> categories = new LinkedList<>();
-
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
-
+  protected SpiceManager secondarySpiceManager;
   protected View rootView;
-
   UploadService mService;
-
   boolean mBound = false;
-
+  private List<String> spinnerArray;
   /**
    * Defines callbacks for service binding, passed to bindService()
    */
@@ -100,9 +90,11 @@ public class SubmitAppFragment extends Fragment {
 
   private String proposedTitle;
   private String proposedDescription;
+  private String proposedCategory;
   private boolean fromAppView = false;
   private String languageCode;
   private String language;
+  private CategoriesProvider categoriesProvider;
 
   public static SubmitAppFragment newInstance() {
     SubmitAppFragment submitAppFragment = new SubmitAppFragment();
@@ -111,9 +103,11 @@ public class SubmitAppFragment extends Fragment {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    secondarySpiceManager = new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
     if (!getArguments().isEmpty()) {
       proposedTitle = getArguments().getString("title");
       proposedDescription = getArguments().getString("description");
+      proposedCategory = getArguments().getString("category");
     }
   }
 
@@ -121,6 +115,7 @@ public class SubmitAppFragment extends Fragment {
       @Nullable Bundle savedInstanceState) {
 
     rootView = inflater.inflate(R.layout.submit_app_fragment, container, false);
+    categoriesProvider = new CategoriesProvider(secondarySpiceManager);
 
     rootView.setFocusableInTouchMode(true);
     rootView.requestFocus();
@@ -151,9 +146,11 @@ public class SubmitAppFragment extends Fragment {
     emailEditText = (EditText) view.findViewById(R.id.email);
     websiteEditText = (EditText) view.findViewById(R.id.website);
 
-    if (applicationNameEditText.getText().toString().equals("")
-        && selectablePackageInfos != null && proposedTitle == null) {
-      applicationNameEditText.setText(selectablePackageInfos.get(0).getLabel());
+    if (applicationNameEditText.getText()
+        .toString()
+        .equals("") && selectablePackageInfos != null && proposedTitle == null) {
+      applicationNameEditText.setText(selectablePackageInfos.get(0)
+          .getLabel());
     }
 
     if (proposedTitle != null && !proposedTitle.isEmpty()) {
@@ -174,6 +171,7 @@ public class SubmitAppFragment extends Fragment {
   @Override public void onStart() {
     super.onStart();
     spiceManager.start(getActivity());
+    secondarySpiceManager.start(getActivity());
 
     Intent intent = new Intent(getActivity(), UploadService.class);
 
@@ -183,8 +181,8 @@ public class SubmitAppFragment extends Fragment {
   }
 
   @Override public void onSaveInstanceState(Bundle outState) {
-    outState.putString("loading",
-        ((TextView) rootView.findViewById(R.id.progressBarText)).getText().toString());
+    outState.putString("loading", ((TextView) rootView.findViewById(R.id.progressBarText)).getText()
+        .toString());
     outState.putBoolean("dataLoaded", dataLoaded);
     super.onSaveInstanceState(outState);
   }
@@ -192,10 +190,20 @@ public class SubmitAppFragment extends Fragment {
   @Override public void onStop() {
     super.onStop();
     spiceManager.shouldStop();
+    secondarySpiceManager.shouldStop();
     if (mBound) {
       getActivity().unbindService(mConnection);
       mBound = false;
     }
+  }
+
+  @Override public void onDestroyView() {
+    super.onDestroyView();
+    categoriesProvider.removeListener();
+  }
+
+  @Override public void onDestroy() {
+    super.onDestroy();
   }
 
   private int findLanguageInArray(String language) {
@@ -245,6 +253,7 @@ public class SubmitAppFragment extends Fragment {
     proposedDescription = getArguments().getString("description");
     languageCode = getArguments().getString("languageCode");
     fromAppView = getArguments().getBoolean("fromAppview");
+    proposedCategory = getArguments().getString("category");
   }
 
   private void submitApp() throws ValidationException {
@@ -254,9 +263,11 @@ public class SubmitAppFragment extends Fragment {
       setEditedFields();
       uploadApp();
 
-      Toast.makeText(getActivity(), R.string.sending_background, Toast.LENGTH_SHORT).show();
+      Toast.makeText(getActivity(), R.string.sending_background, Toast.LENGTH_SHORT)
+          .show();
     } else {
-      Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_LONG).show();
+      Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_LONG)
+          .show();
     }
   }
 
@@ -283,12 +294,12 @@ public class SubmitAppFragment extends Fragment {
   private void uploadApp() throws ValidationException {
 
     if (proposedTitle != null) { //In case this fragment is filled with content from getProposed
-      mService.inputTitle = applicationNameEditText.getText().toString();
+      mService.inputTitle = applicationNameEditText.getText()
+          .toString();
     } else {
       mService.inputTitle = null;
     }
     mService.prepareUploadAndSend(userCredentialsJson, selectablePackageInfos.get(0));
-
     nextApp();
   }
 
@@ -299,9 +310,13 @@ public class SubmitAppFragment extends Fragment {
 
     boolean validation = true;
 
-    validation &= !applicationNameEditText.getText().toString().equals("");
+    validation &= !applicationNameEditText.getText()
+        .toString()
+        .equals("");
     validation &= appCategorySpinner.getSelectedItemPosition() != 0;
-    validation &= !appDescriptionEditText.getText().toString().equals("");
+    validation &= !appDescriptionEditText.getText()
+        .toString()
+        .equals("");
     validation &= appLanguageSpinner.getSelectedItemPosition() != 0;
 
     return validation;
@@ -358,90 +373,75 @@ public class SubmitAppFragment extends Fragment {
   }
 
   private void prepareCategorySpinner() {
+    int categoryIndex = getMatchingCategoryId(proposedCategory);
     Spinner spinner = (Spinner) rootView.findViewById(R.id.app_category_spinner);
     ArrayAdapter<String> spinnerArrayAdapter =
         new ArrayAdapter<String>(getActivity(), android.R.layout.simple_spinner_item, spinnerArray);
     spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spinner.setAdapter(spinnerArrayAdapter);
+    spinner.setSelection(categoryIndex);//new
+  }
+
+  private int getMatchingCategoryId(String proposedCategory) {
+    int index = spinnerArray.indexOf(proposedCategory);
+    return (index == -1) ? 0 : index;
   }
 
   private void retrieveCategorySpinnerArray() {
 
     if (spinnerArray == null) {
-      ListCategoriesRequest listCategoriesRequest = new ListCategoriesRequest();
-      listCategoriesRequest.setMode("json");
-      listCategoriesRequest.setLanguage(Locale.getDefault()
-          .getLanguage());
-
-      spiceManager.execute(listCategoriesRequest, new RequestListener<CategoriesJson>() {
-        @Override public void onRequestFailure(SpiceException spiceException) {
+      //final int totalCategories;
+      //int categoriesCount = 0;
+      //int offset = 0;
+      //do {
+      //  offset += categoriesCount;
+      //  CategoriesRequest categoriesRequest = new CategoriesRequest(offset);
+      //
+      //  secondarySpiceManager.execute(categoriesRequest, new RequestListener<CategoriesResponse>() {
+      //    @Override public void onRequestFailure(SpiceException spiceException) {
+      //      spiceException.printStackTrace();
+      //    }
+      //
+      //    @Override public void onRequestSuccess(CategoriesResponse categoriesResponseJson) {
+      //      int total = (int) categoriesResponseJson.datalist.getTotal();
+      //      int countCategories = (int) categoriesResponseJson.datalist.getCount();
+      //
+      //      updateRequestCountVariables(total, countCategories);
+      //      categories.addAll(categoriesResponseJson.datalist.getList());
+      //
+      //      Collections.sort(categories, new Comparator<CategoriesResponse.DataList.List>() {
+      //
+      //        @Override public int compare(CategoriesResponse.DataList.List lhs,
+      //            CategoriesResponse.DataList.List rhs) {
+      //          return lhs.getTitle()
+      //              .compareTo(rhs.getTitle());
+      //        }
+      //      });
+      //
+      //      spinnerArray = new LinkedList<String>();
+      //
+      //      for (CategoriesResponse.DataList.List category : categories) {
+      //        spinnerArray.add(category.getTitle());
+      //      }
+      //      spinnerArray.add(0, "App Category");
+      //    }
+      //  });
+      //} while (categoriesCount < totalCategories);
+      spinnerArray = new LinkedList<String>();
+      categoriesProvider.getCategoriesNamesList(new CategoriesProviderListener() {
+        @Override public void onAllCategoriesProvided(List<String> categories) {
+          spinnerArray.addAll(categories);
         }
 
-        @Override public void onRequestSuccess(CategoriesJson categoriesJson) {
-
-          categoriesJson.categories.standard.remove(new CategoriesJson.Category(1));
-          categoriesJson.categories.standard.remove(new CategoriesJson.Category(2));
-
-          categories.addAll(categoriesJson.categories.standard);
-          categories.addAll(categoriesJson.categories.custom);
-          Collections.sort(categories, new Comparator<CategoriesJson.Category>() {
-            @Override public int compare(CategoriesJson.Category lhs, CategoriesJson.Category rhs) {
-              return lhs.getName().compareTo(rhs.getName());
-            }
-          });
-
-          spinnerArray = new LinkedList<String>();
-
-          for (CategoriesJson.Category category : categories) {
-            spinnerArray.add(category.getName());
-          }
-          spinnerArray.add(0, "App Category");
-
-          prepareCategorySpinner();
+        @Override public void onErrorProvidingCategories() {
+          //// TODO: 23-11-2017 filipe handle error case.
         }
       });
+      spinnerArray.add(0, "App Category");
+      prepareCategorySpinner();
     } else {
       prepareCategorySpinner();
     }
-  }
-
-  /**
-   * Retorna o id da categoria cujo nome é <code>name</code>, -1 para default (não encontrado).
-   *
-   * @param name nome da categoria
-   *
-   * @return o id da categoria cujo nome é <code>name</code>.
-   */
-  public int getCategoryId(String name) {
-
-    // Default Value
-    if (name.equals("App Category (Optional)")) return -1;
-
-    for (CategoriesJson.Category category : categories) {
-      if (category.getName().equals(name)) return category.getId().intValue();
-    }
-
-    return -1;
-  }
-
-  /**
-   * Retorna o indice no spinner da categoria com o <code>id</code> fornecido. 0 caso seja
-   * desconhecido.
-   *
-   * @param id id da categoria
-   *
-   * @return o indice no spinner da categoria com o <code>id</code> fornecido.
-   */
-  public int getCategorySpinnerIndex(Number id) {
-
-    int i = 0;
-    for (CategoriesJson.Category category : categories) {
-      i++;
-      if (category.getId().equals(id)) {
-        return i;
-      }
-    }
-    return 0;
   }
 
   /**
@@ -489,7 +489,8 @@ public class SubmitAppFragment extends Fragment {
 
   private void setAppInfo(GetApkInfoJson.Meta meta) {
     if (meta != null) {
-      setAppName(selectablePackageInfos.get(0).getLabel());
+      setAppName(selectablePackageInfos.get(0)
+          .getLabel());
       setAppDescription(meta.getDescription());
       setCategorySpinner(meta.categories.standard.get(1).id);
       setAgeRatingSpinner(meta.min_age);
@@ -501,7 +502,8 @@ public class SubmitAppFragment extends Fragment {
   }
 
   private String getAppName() {
-    return ((EditText) rootView.findViewById(R.id.appName)).getText().toString();
+    return ((EditText) rootView.findViewById(R.id.appName)).getText()
+        .toString();
   }
 
   private void setAppName(String appName) {
@@ -518,24 +520,18 @@ public class SubmitAppFragment extends Fragment {
   private int getCategory() {
     String selectedItem =
         (String) ((Spinner) rootView.findViewById(R.id.app_category_spinner)).getSelectedItem();
-    return idFromCategoryName(selectedItem);
+    return categoriesProvider.idFromCategoryName(selectedItem);
   }
 
   private String getDescription() {
-    return ((EditText) rootView.findViewById(R.id.app_description)).getText().toString();
+    return ((EditText) rootView.findViewById(R.id.app_description)).getText()
+        .toString();
   }
 
   private String getLanguage() {
     String selectedItem =
         (String) ((Spinner) rootView.findViewById(R.id.app_language)).getSelectedItem();
     return selectedItem;
-  }
-
-  private int idFromCategoryName(String name) {
-    for (CategoriesJson.Category category : categories) {
-      if (category.getName().equals(name)) return (int) category.getId();
-    }
-    return 0;
   }
 
   private void addLiquidListener(View view, final String liquidEvent) {
@@ -561,7 +557,7 @@ public class SubmitAppFragment extends Fragment {
 
   private void setCategorySpinner(Number id) {
     Spinner spinner = (Spinner) rootView.findViewById(R.id.app_category_spinner);
-    spinner.setSelection(getCategorySpinnerIndex(id));
+    spinner.setSelection(categoriesProvider.getCategorySpinnerIndex(id));
 
     addLiquidListener(spinner, Event.AppInfoChanges.CATEGORY);
   }
@@ -582,10 +578,13 @@ public class SubmitAppFragment extends Fragment {
 
       public boolean onTouch(View view, MotionEvent event) {
         if (view.getId() == R.id.app_description) {
-          view.getParent().getParent().requestDisallowInterceptTouchEvent(true);
+          view.getParent()
+              .getParent()
+              .requestDisallowInterceptTouchEvent(true);
           switch (event.getAction() & MotionEvent.ACTION_MASK) {
             case MotionEvent.ACTION_UP:
-              view.getParent().requestDisallowInterceptTouchEvent(false);
+              view.getParent()
+                  .requestDisallowInterceptTouchEvent(false);
               break;
           }
         }

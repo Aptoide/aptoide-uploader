@@ -50,10 +50,21 @@ public class AppsListActivity extends ActionBarActivity
   }
 
   @Override public void onClick(DialogInterface dialog, int which) {
+    ((AptoideUploaderApplication) getApplicationContext()).getAppsInStoreController()
+        .stop();
     removeUserCredentials();
     clearSessionInformation();
+    clearAppsInStore();
     AptoideUploaderApplication.setForcedLogout(true);
     switchToLoginFragment();
+  }
+
+  private void clearAppsInStore() {
+    SharedPreferences.Editor editor =
+        getSharedPreferences(AptoideUploaderApplication.APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE,
+            MODE_PRIVATE).edit();
+    editor.clear();
+    editor.apply();
   }
 
   public void removeUserCredentials() {
@@ -71,12 +82,16 @@ public class AppsListActivity extends ActionBarActivity
     AptoideUploaderApplication.setForcedLogout(true);
     if (Session.getActiveSession() == null) {
       if (Session.openActiveSessionFromCache(getApplicationContext()) != null) {
-        Session.getActiveSession().closeAndClearTokenInformation();
-        Session.getActiveSession().close();
+        Session.getActiveSession()
+            .closeAndClearTokenInformation();
+        Session.getActiveSession()
+            .close();
       }
     } else if (Session.getActiveSession() != null) {
-      Session.getActiveSession().closeAndClearTokenInformation();
-      Session.getActiveSession().close();
+      Session.getActiveSession()
+          .closeAndClearTokenInformation();
+      Session.getActiveSession()
+          .close();
     }
     Session.setActiveSession(null);
   }

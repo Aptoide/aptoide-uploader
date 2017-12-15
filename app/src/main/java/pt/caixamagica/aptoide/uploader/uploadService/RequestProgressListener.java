@@ -45,7 +45,8 @@ public class RequestProgressListener
   }
 
   private void processIntent(Intent intent) {
-    packageInfo = (SelectablePackageInfo) intent.getExtras().get("packageInfo");
+    packageInfo = (SelectablePackageInfo) intent.getExtras()
+        .get("packageInfo");
   }
 
   private PendingIntent newCancelationIntentV3() {

@@ -56,6 +56,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.LoginErrorException;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
 import pt.caixamagica.aptoide.uploader.retrofit.request.OAuth2AuthenticationRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UserCredentialsRequest;
+import pt.caixamagica.aptoide.uploader.util.StoredCredentialsManager;
 import pt.caixamagica.aptoide.uploader.webservices.json.OAuth;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -93,14 +94,20 @@ public class LoginActivity extends AppCompatActivity
   private Fragment mContent;
   private UserInfo userInfo;
   private UserCredentialsJson userCredentials;
+  private String accessToken;
+  private StoredCredentialsManager storedCredentialsManager;
 
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
 
     // Google Plus API
-    if (requestCode == REQUEST_CODE_RESOLVE_ERR && resultCode == RESULT_OK) {
-      mConnectionResult = null;
-      mGoogleApiClient.connect();
+    if (requestCode == REQUEST_CODE_RESOLVE_ERR) {
+      if (resultCode == RESULT_OK) {
+        mConnectionResult = null;
+        mGoogleApiClient.connect();
+      } else if (resultCode == RESULT_CANCELED) {
+        mIntentInProgress = false;
+      }
     } else {
       if (requestCode == USER_RECOVERY_AUTH_REQUEST_CODE && resultCode == RESULT_OK
           || requestCode == 90 && resultCode == RESULT_OK) {
@@ -163,7 +170,7 @@ public class LoginActivity extends AppCompatActivity
 
   @Override public void checkStoredCredentialsCallback() {
 
-    UserCredentialsJson userCredentialsJson = getStoredUserCredentials();
+    UserCredentialsJson userCredentialsJson = storedCredentialsManager.getStoredUserCredentials();
     if (userCredentialsJson != null) {
       switchToAppViewFragment(userCredentialsJson);
     } else {
@@ -187,7 +194,9 @@ public class LoginActivity extends AppCompatActivity
     SharedPreferences sharedpreferences =
         this.getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
-    if (sharedpreferences != null && sharedpreferences.getAll().size() > 0) {
+    if (sharedpreferences != null
+        && sharedpreferences.getAll()
+        .size() > 0) {
       String deviceId =
           Settings.Secure.getString(this.getContentResolver(), Settings.Secure.ANDROID_ID);
 
@@ -338,6 +347,8 @@ public class LoginActivity extends AppCompatActivity
   @Override protected void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
 
+    storedCredentialsManager = new StoredCredentialsManager(this);
+
     checkPermissions();
 
     if (savedInstanceState != null) {
@@ -467,52 +478,29 @@ public class LoginActivity extends AppCompatActivity
 
   private void getUserInfo(OAuth oAuth) {
     UserCredentialsRequest request = new UserCredentialsRequest();
-    request.setToken(oAuth.getAccess_token());
-    storeToken(oAuth);
+    accessToken = oAuth.getAccess_token();
+    if (userCredentials != null) {
+      userCredentials.setToken(accessToken);
+    }
+
+    request.setToken(accessToken);
+    storedCredentialsManager.storeToken(oAuth);
 
     spiceManager.execute(request, "getUserInfo", DEFAULT_CACHE_TIME,
         new UserCredentialsPendingRequestListener());
   }
 
-  private void storeToken(OAuth oAuth) {
-
-    // Try to use more dgradleata here. ANDROID_ID is a single point of attack.
-    String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-
-    AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), deviceId);
-
-    SharedPreferences sharedpreferences =
-        getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedpreferences.edit();
-
-    editor.putString("token", aesObfuscator.obfuscate(oAuth.getAccess_token(), "token"));
-    editor.putString("refreshToken",
-        aesObfuscator.obfuscate(oAuth.getRefreshToken(), "refreshToken"));
-
-    editor.commit();
-  }
-
-  private void storeRepo(UserCredentialsJson userCredentialsJson) {
-
-    // Try to use more dgradleata here. ANDROID_ID is a single point of attack.
-    String deviceId = Settings.Secure.getString(getContentResolver(), Settings.Secure.ANDROID_ID);
-
-    AESObfuscator aesObfuscator = new AESObfuscator(SALT, getPackageName(), deviceId);
-
-    SharedPreferences sharedpreferences =
-        getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
-    SharedPreferences.Editor editor = sharedpreferences.edit();
-
-    editor.putString("repo", aesObfuscator.obfuscate(userCredentialsJson.getRepo(), "repo"));
-
-    editor.commit();
+  private void checkUploadedApps() {
+    ((AptoideUploaderApplication) getApplicationContext()).getAppsInStoreController()
+        .start();
   }
 
   public class OAuthPendingRequestListener implements PendingRequestListener<OAuth> {
 
     @Override public void onRequestFailure(SpiceException spiceException) {
       if (spiceException.getCause() instanceof LoginErrorException) {
-        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
+        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT)
+            .show();
       }
       UploaderUtils.popLoadingFragment(LoginActivity.this);
     }
@@ -548,7 +536,8 @@ public class LoginActivity extends AppCompatActivity
       // Caso o login seja enviado em branco, cai aqui.
       else {
         UploaderUtils.popLoadingFragment(LoginActivity.this);
-        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT).show();
+        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT)
+            .show();
       }
 
       spiceManager.removeAllDataFromCache();
@@ -567,6 +556,10 @@ public class LoginActivity extends AppCompatActivity
       if (userCredentialsJson == null) {
         UploaderUtils.popLoadingFragment(LoginActivity.this);
         return;
+      } else {
+        if (accessToken != null) {
+          userCredentialsJson.setToken(accessToken);
+        }
       }
 
       if (userCredentialsJson.getRepo() == null) {
@@ -577,9 +570,9 @@ public class LoginActivity extends AppCompatActivity
         return;
       }
       //storeToken(userCredentialsJson);
-      storeRepo(userCredentialsJson);
+      storedCredentialsManager.storeRepo(userCredentialsJson);
+      checkUploadedApps();
       switchToAppViewFragment(userCredentialsJson);
-
       spiceManager.removeAllDataFromCache();
     }
 

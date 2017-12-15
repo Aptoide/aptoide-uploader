@@ -20,9 +20,8 @@ import lombok.Setter;
 @Getter @Setter public class SelectablePackageInfo extends PackageInfo {
 
   private final PackageInfo info;
-
   public boolean selected;
-
+  private boolean uploaded;
   private PackageManager pm;
 
   private String label;
@@ -43,10 +42,10 @@ import lombok.Setter;
   private String website;
 
   private String inputTitle;
-      //For proposed translations only - when a title comes from getProposed webservice
-      private String lang;
+  //For proposed translations only - when a title comes from getProposed webservice
+  private String lang;
 
-  public SelectablePackageInfo(PackageInfo info, PackageManager pm) {
+  public SelectablePackageInfo(PackageInfo info, PackageManager pm, boolean uploaded) {
     super();
     this.pm = pm;
     this.info = info;
@@ -59,6 +58,8 @@ import lombok.Setter;
       this.versionCode = info.versionCode;
       this.versionName = info.versionName;
     }
+
+    this.uploaded = uploaded;
   }
 
   public boolean isSelected() {

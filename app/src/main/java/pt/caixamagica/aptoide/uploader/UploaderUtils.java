@@ -120,8 +120,10 @@ public class UploaderUtils {
   }
 
   public static void popLoadingFragment(FragmentActivity context) {
-    if (context.getSupportFragmentManager().getBackStackEntryCount() > 0) {
-      context.getSupportFragmentManager().popBackStack();
+    if (context.getSupportFragmentManager()
+        .getBackStackEntryCount() > 0) {
+      context.getSupportFragmentManager()
+          .popBackStack();
     }
   }
 

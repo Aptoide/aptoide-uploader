@@ -66,7 +66,8 @@ public class ManelAdapter extends MultiChoiceBaseAdapter {
     this.listener = listener;
     if (actionModeActivaded) {
       if (view.findViewById(R.id.submitAppsButton) != null) {
-        view.findViewById(R.id.submitAppsButton).setVisibility(View.VISIBLE);
+        view.findViewById(R.id.submitAppsButton)
+            .setVisibility(View.VISIBLE);
       }
       listener.hide();
     }
@@ -81,17 +82,26 @@ public class ManelAdapter extends MultiChoiceBaseAdapter {
 
     CheckableFrameLayout checkableRelativeLayout = (CheckableFrameLayout) convertView;
     ImageView appIcon = (ImageView) convertView.findViewById(R.id.appIcon);
-
+    ImageView cloudIcon = (ImageView) convertView.findViewById(R.id.appInCloud);
     final TextView appName = (TextView) convertView.findViewById(R.id.appName);
     final SelectablePackageInfo apk = mDataset.get(position);
 
     Uri uri = Uri.parse("android.resource://" + apk.packageName + "/" + apk.applicationInfo.icon);
-    Picasso.with(AptoideUploaderApplication.getContext()).load(uri).into(appIcon);
+    Picasso.with(AptoideUploaderApplication.getContext())
+        .load(uri)
+        .into(appIcon);
+
+    if (apk.isUploaded()) {
+      cloudIcon.setVisibility(View.VISIBLE);
+    } else {
+      cloudIcon.setVisibility(View.GONE);
+    }
 
     threadPool.execute(new PriorityRunnable() {
       @Override public void run() {
         final CharSequence charSequence = apk.applicationInfo.loadLabel(
-            AptoideUploaderApplication.getContext().getPackageManager());
+            AptoideUploaderApplication.getContext()
+                .getPackageManager());
 
         Handler handler = new Handler(Looper.getMainLooper());
         handler.post(new Runnable() {
@@ -158,6 +168,23 @@ public class ManelAdapter extends MultiChoiceBaseAdapter {
     for (Long checked : getCheckedItems()) {
       setItemChecked(checked, false);
     }
+  }
+
+  public void itemChanged(String packageName) {
+    mDataset.get(getItemPosition(packageName))
+        .setUploaded(true);
+    notifyDataSetChanged();
+  }
+
+  private int getItemPosition(String packageName) {
+    int position = 0;
+    for (int i = 0; i < mDataset.size(); i++) {
+      if (mDataset.get(i).packageName.equals(packageName)) {
+        position = i;
+        break;
+      }
+    }
+    return position;
   }
 
   public interface ManelAdapterShowListener {

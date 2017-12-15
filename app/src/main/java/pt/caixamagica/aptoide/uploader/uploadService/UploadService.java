@@ -13,11 +13,12 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
-import android.graphics.drawable.BitmapDrawable;
+import android.graphics.Canvas;
 import android.graphics.drawable.Drawable;
 import android.os.Build;
 import android.os.IBinder;
 import android.provider.Settings;
+import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import com.facebook.AppEventsLogger;
@@ -31,6 +32,8 @@ import java.io.File;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
+import pt.caixamagica.aptoide.uploader.FragmentAppView;
 import pt.caixamagica.aptoide.uploader.R;
 import pt.caixamagica.aptoide.uploader.SelectablePackageInfo;
 import pt.caixamagica.aptoide.uploader.UploaderUtils;
@@ -39,12 +42,13 @@ import pt.caixamagica.aptoide.uploader.analytics.UploaderAnalytics;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploadService;
 import pt.caixamagica.aptoide.uploader.retrofit.request.StoreTokenInterface;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UploadAppToRepoRequest;
+import pt.caixamagica.aptoide.uploader.util.AppsInStorePersister;
 import pt.caixamagica.aptoide.uploader.webservices.json.Error;
 import pt.caixamagica.aptoide.uploader.webservices.json.UploadAppToRepoJson;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
 import static pt.caixamagica.aptoide.uploader.activities.LoginActivity.SALT;
-import static pt.caixamagica.aptoide.uploader.activities.LoginActivity.SHARED_PREFERENCES_FILE;
+import static pt.caixamagica.aptoide.uploader.util.StoredCredentialsManager.SHARED_PREFERENCES_FILE;
 
 /**
  * Created by neuro on 07-03-2015.
@@ -61,6 +65,7 @@ public class UploadService extends Service {
   private UserCredentialsJson userCredentialsJson;
   private Map<String, UploadAppToRepoRequest> sendingAppsUploadRequests = new HashMap<>();
   private Map<String, SelectablePackageInfo> sendingAppsSelectablePackageInfos = new HashMap<>();
+  private AppsInStorePersister appsInStorePersister;
 
   private NotificationCompat.Builder setPreparingUploadNotification(String packageName,
       String label) {
@@ -103,7 +108,6 @@ public class UploadService extends Service {
 
   public void prepareUploadAndSend(final UserCredentialsJson userCredentialsJson,
       SelectablePackageInfo packageInfo) throws ValidationException {
-
     if (this.userCredentialsJson == null) this.userCredentialsJson = userCredentialsJson;
 
     // Parece me a mim k esta intent não serve para nada.... ou pode nao servir.
@@ -172,7 +176,7 @@ public class UploadService extends Service {
         Log.e(TAG, "onRequestFailure: ", spiceException);
 
         if (spiceException instanceof NetworkException) {
-          checkUploadSuccess(uploadAppToRepoRequest);
+          checkUploadSuccess(uploadAppToRepoRequest, selectablePackageInfo);
           //setNotification(uploadAppToRepoRequest.getPackageName(),
           //    getString(R.string.upload_done_network_error), null);
         } else {
@@ -297,13 +301,25 @@ public class UploadService extends Service {
           }
         } else {
           uploaderAnalytics.uploadComplete("success", "Upload App to Repo");
+          appsInStorePersister.addUploadedAppToSharedPreferences(selectablePackageInfo.packageName,
+              selectablePackageInfo.versionCode);
           setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
               uploadAppToRepoRequest.getLabel());
+          selectablePackageInfo.setUploaded(true);
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
+          sendUploadSuccessBroadcast(selectablePackageInfo.packageName,
+              selectablePackageInfo.versionCode);
         }
       }
     });
+  }
+
+  private void sendUploadSuccessBroadcast(String packageName, int versionCode) {
+    Intent intent = new Intent(FragmentAppView.UPLOADED_APP_ACTION);
+    intent.putExtra("packageName", packageName);
+    intent.putExtra("versionCode", versionCode);
+    sendBroadcast(intent);
   }
 
   private void setFillMissingInfoNotification(UploadAppToRepoRequest uploadAppToRepoJson,
@@ -377,6 +393,9 @@ public class UploadService extends Service {
   @Override public void onCreate() {
     spiceManager.start(this);
     uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(getApplicationContext()));
+    appsInStorePersister = new AppsInStorePersister(
+        getSharedPreferences(AptoideUploaderApplication.APPS_IN_MY_STORE_SHARED_PREFERENCES_FILE,
+            Context.MODE_PRIVATE));
   }
 
   @Override public int onStartCommand(Intent intent, int flags, int startId) {
@@ -497,7 +516,17 @@ public class UploadService extends Service {
       e.printStackTrace();
     }
 
-    return drawable == null ? null : ((BitmapDrawable) drawable).getBitmap();
+    return drawable == null ? null : getBitmapFromDrawable(drawable);
+  }
+
+  private Bitmap getBitmapFromDrawable(@NonNull Drawable drawable) {
+    final Bitmap bmp =
+        Bitmap.createBitmap(drawable.getIntrinsicWidth(), drawable.getIntrinsicHeight(),
+            Bitmap.Config.ARGB_8888);
+    final Canvas canvas = new Canvas(bmp);
+    drawable.setBounds(0, 0, canvas.getWidth(), canvas.getHeight());
+    drawable.draw(canvas);
+    return bmp;
   }
 
   private PendingIntent buildFillMissingInfoIntent(SelectablePackageInfo selectablePackageInfo) {
@@ -538,7 +567,8 @@ public class UploadService extends Service {
     return PendingIntent.getService(this, reqCode, intent, 0);
   }
 
-  private void checkUploadSuccess(final UploadAppToRepoRequest originalRequest) {
+  private void checkUploadSuccess(final UploadAppToRepoRequest originalRequest,
+      final SelectablePackageInfo selectablePackageInfo) {
     final SharedPreferences sharedpreferences =
         getSharedPreferences(SHARED_PREFERENCES_FILE, Context.MODE_PRIVATE);
 
@@ -573,10 +603,15 @@ public class UploadService extends Service {
                 uploadAppToRepoRequest.getLabel(), uploadAppToRepoJson.getErrors());
           } else if (errorCode.equals("APK-103")) {
             uploaderAnalytics.uploadComplete("success", "Check if in Store");
+            appsInStorePersister.addUploadedAppToSharedPreferences(
+                selectablePackageInfo.packageName, selectablePackageInfo.versionCode);
+            selectablePackageInfo.setUploaded(true);
             setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
                 uploadAppToRepoRequest.getLabel());
             sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
             sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
+            sendUploadSuccessBroadcast(selectablePackageInfo.packageName,
+                selectablePackageInfo.versionCode);
           } else {
             uploaderAnalytics.uploadComplete("fail", "Check if in Store");
             simpleNotification(uploadAppToRepoRequest.getPackageName(),
@@ -584,10 +619,15 @@ public class UploadService extends Service {
           }
         } else {
           uploaderAnalytics.uploadComplete("success", "Check if in Store");
+          appsInStorePersister.addUploadedAppToSharedPreferences(selectablePackageInfo.packageName,
+              selectablePackageInfo.versionCode);
           setFinishedNotification(uploadAppToRepoRequest.getPackageName(),
               uploadAppToRepoRequest.getLabel());
+          selectablePackageInfo.setUploaded(true);
           sendingAppsUploadRequests.remove(uploadAppToRepoRequest.getPackageName());
           sendingAppsSelectablePackageInfos.remove(uploadAppToRepoRequest.getPackageName());
+          sendUploadSuccessBroadcast(selectablePackageInfo.packageName,
+              selectablePackageInfo.versionCode);
         }
       }
     });

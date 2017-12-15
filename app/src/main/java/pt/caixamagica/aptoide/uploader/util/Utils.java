@@ -9,7 +9,9 @@ import java.util.Locale;
 public class Utils {
 
   public static String getLanguage() {
-    String language = Locale.getDefault().getLanguage() + "_" + Locale.getDefault().getCountry();
+    String language = Locale.getDefault()
+        .getLanguage() + "_" + Locale.getDefault()
+        .getCountry();
     return language;
   }
 }

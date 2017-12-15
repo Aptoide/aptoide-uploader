@@ -101,7 +101,8 @@ public class RepoCreatorDialog extends DialogFragment {
 
               mCallback.submitAuthentication(userInfo);
             } else {
-              Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT).show();
+              Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT)
+                  .show();
             }
 
             //                                if (repository.getText() != null) {
@@ -177,7 +178,8 @@ public class RepoCreatorDialog extends DialogFragment {
       public CharSequence filter(CharSequence source, int start, int end, Spanned dest, int dstart,
           int dend) {
         for (int i = start; i < end; i++) {
-          if (!p.matcher(Character.toString(source.charAt(i))).find()) {
+          if (!p.matcher(Character.toString(source.charAt(i)))
+              .find()) {
             return "";
           }
         }
@@ -212,7 +214,8 @@ public class RepoCreatorDialog extends DialogFragment {
 
             dismiss();
           } else {
-            Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT).show();
+            Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT)
+                .show();
           }
         }
       });
@@ -221,11 +224,15 @@ public class RepoCreatorDialog extends DialogFragment {
 
   private boolean validateNotEmptyFields() {
 
-    if (repository.getText().toString().isEmpty()) {
+    if (repository.getText()
+        .toString()
+        .isEmpty()) {
       return false;
     }
     if (privateButton.isChecked()) {
-      if (repoUsername.getText().toString().isEmpty() || repoPassword.getText()
+      if (repoUsername.getText()
+          .toString()
+          .isEmpty() || repoPassword.getText()
           .toString()
           .isEmpty()) {
         return false;
@@ -236,11 +243,14 @@ public class RepoCreatorDialog extends DialogFragment {
   }
 
   private void fillNewUserInfo() {
-    userInfo.setRepo(repository.getText().toString());
+    userInfo.setRepo(repository.getText()
+        .toString());
 
     if (privateButton.isChecked()) {
-      userInfo.setPrivacyUsername(repoUsername.getText().toString());
-      userInfo.setPrivacyPassword(repoPassword.getText().toString());
+      userInfo.setPrivacyUsername(repoUsername.getText()
+          .toString());
+      userInfo.setPrivacyPassword(repoPassword.getText()
+          .toString());
     }
   }
 }

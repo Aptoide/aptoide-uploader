@@ -129,7 +129,8 @@ public class LicenseChecker implements ServiceConnection {
    */
   private static String getVersionCode(Context context, String packageName) {
     try {
-      return String.valueOf(context.getPackageManager().getPackageInfo(packageName, 0).
+      return String.valueOf(context.getPackageManager()
+          .getPackageInfo(packageName, 0).
           versionCode);
     } catch (NameNotFoundException e) {
       Log.e(TAG, "Package not found. could not get version code.");
@@ -200,9 +201,11 @@ public class LicenseChecker implements ServiceConnection {
     mPolicy.processServerResponse(Policy.RETRY, null);
 
     if (mPolicy.allowAccess()) {
-      validator.getCallback().allow(Policy.RETRY);
+      validator.getCallback()
+          .allow(Policy.RETRY);
     } else {
-      validator.getCallback().dontAllow(Policy.RETRY);
+      validator.getCallback()
+          .dontAllow(Policy.RETRY);
     }
   }
 
@@ -267,7 +270,8 @@ public class LicenseChecker implements ServiceConnection {
    */
   public synchronized void onDestroy() {
     cleanupService();
-    mHandler.getLooper().quit();
+    mHandler.getLooper()
+        .quit();
   }
 
   private class ResultListener extends ILicenseResultListener.Stub {

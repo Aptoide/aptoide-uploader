@@ -62,11 +62,12 @@ public class SplashDialogFragment extends DialogFragment {
       }
     });
 
-    Executors.newSingleThreadScheduledExecutor().schedule(new Runnable() {
-      @Override public void run() {
-        dismissSplashScreen();
-      }
-    }, 3, TimeUnit.SECONDS);
+    Executors.newSingleThreadScheduledExecutor()
+        .schedule(new Runnable() {
+          @Override public void run() {
+            dismissSplashScreen();
+          }
+        }, 3, TimeUnit.SECONDS);
   }
 
   @Override public void onResume() {

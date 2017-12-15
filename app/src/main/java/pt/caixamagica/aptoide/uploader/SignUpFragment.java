@@ -155,16 +155,33 @@ public class SignUpFragment extends Fragment {
   private void setupSubmitButton() {
     createAccountButton.setOnClickListener(new View.OnClickListener() {
       @Override public void onClick(View v) {
-        if (validateFields(emailEditText, passwordEditText, storeEditText)) {
+
+        String username = emailEditText.getText()
+            .toString();
+        String password = passwordEditText.getText()
+            .toString();
+        String store = storeEditText.getText()
+            .toString();
+
+        boolean isPasswordValid = isPasswordValid(password);
+
+        if (!TextUtils.isEmpty(username) && !TextUtils.isEmpty(store) && isPasswordValid) {
           if (publicStore || (!publicStore && validateFields(storeUsernameEditText,
               storePasswordEditText))) {
             createAccount();
             UploaderUtils.hideKeyboard(getActivity(), getView());
           } else {
-            Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
+            Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_SHORT)
+                .show();
           }
         } else {
-          Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_SHORT).show();
+          if (!isPasswordValid) {
+            Toast.makeText(getActivity(), R.string.password_validation_text, Toast.LENGTH_LONG)
+                .show();
+          } else {
+            Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_SHORT)
+                .show();
+          }
         }
       }
     });
@@ -180,21 +197,59 @@ public class SignUpFragment extends Fragment {
     return true;
   }
 
+  private boolean isPasswordValid(String password) {
+    if (password.length() < 8 || !isAlphanumericOrSpecialCharacter(password)) {
+      return false;
+    }
+    return true;
+  }
+
+  private boolean isAlphanumericOrSpecialCharacter(String password) {
+    boolean hasLetter = false;
+    boolean hasNumber = false;
+
+    for (char c : password.toCharArray()) {
+      if (!hasLetter && Character.isLetter(c)) {
+        if (hasNumber) return true;
+        hasLetter = true;
+      } else if (!hasNumber && Character.isDigit(c)) {
+        if (hasLetter) return true;
+        hasNumber = true;
+      }
+    }
+    if (password.contains("!")
+        || password.contains("@")
+        || password.contains("#")
+        || password.contains("$")
+        || password.contains("#")
+        || password.contains("*")) {
+      hasNumber = true;
+    }
+    return hasNumber && hasLetter;
+  }
+
   private void createAccount() {
     final SignUpRequest signUpRequest = new SignUpRequest();
 
-    String passhash = UploaderUtils.computeSHA1sum(passwordEditText.getText().toString());
+    String passhash = UploaderUtils.computeSHA1sum(passwordEditText.getText()
+        .toString());
 
-    signUpRequest.setEmail(emailEditText.getText().toString())
+    signUpRequest.setEmail(emailEditText.getText()
+        .toString())
         .setPasshash(passhash)
-        .setRepo(storeEditText.getText().toString())
+        .setRepo(storeEditText.getText()
+            .toString())
         .setPrivacy(!publicStore);
 
-    if (!storeUsernameEditText.getText().toString().equals("") && !storePasswordEditText.getText()
+    if (!storeUsernameEditText.getText()
+        .toString()
+        .equals("") && !storePasswordEditText.getText()
         .toString()
         .equals("")) {
-      signUpRequest.setPrivacy_user(storeUsernameEditText.getText().toString())
-          .setPrivacy_pass(storePasswordEditText.getText().toString());
+      signUpRequest.setPrivacy_user(storeUsernameEditText.getText()
+          .toString())
+          .setPrivacy_pass(storePasswordEditText.getText()
+              .toString());
     }
 
     spiceManager.execute(signUpRequest, new RequestListener<SignUpJson>() {
@@ -205,9 +260,9 @@ public class SignUpFragment extends Fragment {
       @Override public void onRequestSuccess(SignUpJson signUpJson) {
         if (signUpJson.getErrors() == null) {
           // Loja criada com sucesso, redirecciona para a AppsView
-          mCallback.submitAuthentication(
-              new UserInfo(signUpRequest.getEmail(), passwordEditText.getText().toString(), null,
-                  null, null, null, null, null, 0));
+          mCallback.submitAuthentication(new UserInfo(signUpRequest.getEmail(),
+              passwordEditText.getText()
+                  .toString(), null, null, null, null, null, null, 0));
         } else {
           List<String> errors = new LinkedList<>();
           for (Error error : signUpJson.getErrors()) {
@@ -218,7 +273,8 @@ public class SignUpFragment extends Fragment {
             }
           }
           String message = StringUtils.join(errors.toArray(), ", ");
-          Toast.makeText(getActivity(), message, Toast.LENGTH_LONG).show();
+          Toast.makeText(getActivity(), message, Toast.LENGTH_LONG)
+              .show();
         }
       }
     });

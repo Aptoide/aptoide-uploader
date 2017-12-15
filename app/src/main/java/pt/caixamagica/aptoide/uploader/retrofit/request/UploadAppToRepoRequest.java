@@ -209,7 +209,8 @@ import retrofit.mime.TypedFile;
 
   private void checkObbExistence() {
     if (!checked) {
-      String sdcard = Environment.getExternalStorageDirectory().getAbsolutePath();
+      String sdcard = Environment.getExternalStorageDirectory()
+          .getAbsolutePath();
       File obbDir = new File(sdcard + "/Android/obb/" + getPackageName() + "/");
       if (obbDir.isDirectory()) {
 
@@ -218,9 +219,12 @@ import retrofit.mime.TypedFile;
         if (files != null) {
           for (File file : files) {
 
-            if (file.getName().contains("main") && !file.getName().contains("--downloading")) {
+            if (file.getName()
+                .contains("main") && !file.getName()
+                .contains("--downloading")) {
               obbMainPath = file.getAbsolutePath();
-            } else if (file.getName().contains("patch") && !file.getName()
+            } else if (file.getName()
+                .contains("patch") && !file.getName()
                 .contains("--downloading")) {
               obbPatchPath = file.getAbsolutePath();
             }
@@ -240,7 +244,8 @@ import retrofit.mime.TypedFile;
 
   private TypedFile newTweakedTypedFile(String extension, String apkPath) {
 
-    String mimeType = MimeTypeMap.getSingleton().getMimeTypeFromExtension(extension);
+    String mimeType = MimeTypeMap.getSingleton()
+        .getMimeTypeFromExtension(extension);
 
     if (mimeType == null) mimeType = "application/octet-stream";
 

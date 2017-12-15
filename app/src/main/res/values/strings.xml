@@ -144,4 +144,8 @@
   <string name="error_marg_103" translatable="false">MARG-103</string>
   <string name="logging_as">Logging in as</string>
   <string name="submit_app">Submit App</string>
+
+  <string name="password_validation_text">Password must be at least 8 characters and should have
+  at least one letter and one number or special characters (!@#$%*)</string>
+
 </resources>
