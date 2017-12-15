@@ -6,22 +6,17 @@
 package pt.caixamagica.aptoide.uploader.activities;
 
 import android.Manifest;
-import android.accounts.AccountManager;
-import android.content.Context;
 import android.content.Intent;
 import android.content.IntentSender;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
-import android.database.Cursor;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.HandlerThread;
-import android.provider.Settings;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
@@ -34,8 +29,6 @@ import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.plus.Plus;
-import com.google.android.vending.licensing.AESObfuscator;
-import com.google.android.vending.licensing.ValidationException;
 import com.octo.android.robospice.SpiceManager;
 import com.octo.android.robospice.persistence.DurationInMillis;
 import com.octo.android.robospice.persistence.exception.SpiceException;
@@ -100,24 +93,28 @@ public class LoginActivity extends AppCompatActivity
   @Override protected void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
 
+    Log.e("analara", "" + requestCode + " result: " + resultCode);
     // Google Plus API
     if (requestCode == REQUEST_CODE_RESOLVE_ERR) {
+
       if (resultCode == RESULT_OK) {
         mConnectionResult = null;
         mGoogleApiClient.connect();
       } else if (resultCode == RESULT_CANCELED) {
         mIntentInProgress = false;
       }
-    } else {
-      if (requestCode == USER_RECOVERY_AUTH_REQUEST_CODE && resultCode == RESULT_OK
-          || requestCode == 90 && resultCode == RESULT_OK) {
+    } else if (requestCode == USER_RECOVERY_AUTH_REQUEST_CODE && resultCode == RESULT_OK
+        || requestCode == 90 && resultCode == RESULT_OK) {
 
-        if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
-          getGoogleToken();
-        } else {
-          mGoogleApiClient.connect();
-        }
+      if (mGoogleApiClient != null && mGoogleApiClient.isConnected()) {
+        getGoogleToken();
+      } else {
+        mGoogleApiClient.connect();
       }
+    } else if (requestCode == USER_RECOVERY_AUTH_REQUEST_CODE && resultCode == RESULT_CANCELED) {
+      Log.e("analara", "here");
+      mGoogleApiClient.disconnect();
+      mIntentInProgress = false;
     }
   }
 
