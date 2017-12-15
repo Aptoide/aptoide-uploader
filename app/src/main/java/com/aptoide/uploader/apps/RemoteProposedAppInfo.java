@@ -1,17 +1,17 @@
 package com.aptoide.uploader.apps;
 
-public class ProposedAppInfo {
+public class RemoteProposedAppInfo {
   private final String appName;
   private final int appCategory;
   private final String language;
 
-  public ProposedAppInfo() {
+  public RemoteProposedAppInfo() {
     appName = null;
     language = null;
     appCategory = 0;
   }
 
-  public ProposedAppInfo(String appName, int appCategory, String language) {
+  public RemoteProposedAppInfo(String appName, int appCategory, String language) {
     this.appName = appName;
     this.appCategory = appCategory;
     this.language = language;

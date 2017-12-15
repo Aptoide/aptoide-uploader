@@ -14,5 +14,13 @@ class TestData {
         val SUCCESS_RESPONSE = Response.success(OAuth("abc", "def",
                 null, null))
 
+        val APPINFO_NAME = "Testing"
+        val PROPOSED_APP_RATING = 1
+        val APPINFO_CATEGORY = 18
+        val APPINFO_LANGUAGE = "en"
+        val APPINFO_DESCRIPTION ="Aptoide is an open source independent Android app store that allows you to install and discover apps in an easy, exciting and safe way."
+        val APPINFO_PHONE_NR = "123456789"
+        val APPINFO_EMAIL = "aptoide@aptoide.com"
+        val APPINFO_WEBSITE ="http://aptoide.com"
     }
 }

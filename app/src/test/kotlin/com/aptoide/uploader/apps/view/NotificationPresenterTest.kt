@@ -23,7 +23,7 @@ class NotificationPresenterTest : Spek({
 
             val view = mock<NotificationView>()
             val uploadService = mock<UploaderService>()
-            val appInfoService = mock<AppInformationService>()
+            val appInfoService = mock<RemoteAppInformationService>()
             val uploaderPersistence = MemoryUploaderPersistence(HashSet<Upload>())
             val md5Calculator = mock<Md5Calculator>()
             val uploadManager = UploadManager(uploadService, uploaderPersistence, md5Calculator)
@@ -44,7 +44,7 @@ class NotificationPresenterTest : Spek({
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
             whenever(appInfoService.getProposedAppInfo(appPackageName, appLanguage))
-                    .doReturn(Single.error<ProposedAppInfo>(ProposedAppInfoException()))
+                    .doReturn(Single.error<RemoteProposedAppInfo>(ProposedAppInfoException()))
             whenever(md5Calculator.calculate(app))
                     .doReturn(appMd5.toSingle())
             whenever(uploadService.getAppUpload(appMd5, appPackageName, appLanguage, storeName))
