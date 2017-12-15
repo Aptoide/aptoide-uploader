@@ -61,6 +61,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     return Observable.empty();
   }
 
+  @Override public Observable<SortingOrder> orderByEvent() {
+    return null;
+  }
+
+
   @Override public void showApps(@NotNull List<InstalledApp> appsList) {
     adapter.setList(appsList);
   }

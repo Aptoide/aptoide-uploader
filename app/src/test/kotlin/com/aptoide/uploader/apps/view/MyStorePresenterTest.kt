@@ -7,10 +7,7 @@ import com.aptoide.uploader.account.AptoideAccount
 import com.aptoide.uploader.account.AptoideAccountManager
 import com.aptoide.uploader.apps.*
 import com.aptoide.uploader.view.View
-import com.nhaarman.mockito_kotlin.doReturn
-import com.nhaarman.mockito_kotlin.mock
-import com.nhaarman.mockito_kotlin.verify
-import com.nhaarman.mockito_kotlin.whenever
+import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
@@ -30,9 +27,9 @@ class MyStorePresenterTest : Spek({
 
         val storeName = "Marcelo"
         val language = "PT-BR"
-        val facebook = InstalledApp("https://myicon.com/facebook", "Facebook", false, "cm.aptoide.pt", "/Files/facebook.apk")
-        val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt", "/Files/aptoide.apk")
-        val appList = mutableListOf(facebook, aptoide)
+        val facebook = InstalledApp("https://myicon.com/facebook", "Facebook", false, "cm.aptoide.pt", "/Files/facebook.apk", 0)
+        val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt", "/Files/aptoide.apk", 1)
+        val aptoide2 = InstalledApp("https://myicon.com/aptoide", "Aptoide", false, "cm.aptoide.pt", "/Files/aptoide.apk", 1)
 
         it("should display store name and installed apps when view is created") {
             val view = mock<MyStoreView> {}
@@ -44,6 +41,7 @@ class MyStorePresenterTest : Spek({
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+            val appList = mutableListOf(facebook, aptoide)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
 
@@ -99,7 +97,45 @@ class MyStorePresenterTest : Spek({
         }
 
         it("should sort list of apps by installed date") {
-            fail("To Do")
+
+            val view = mock<MyStoreView> {}
+            val packageProvider = mock<InstalledAppsProvider> {}
+            val accountService = mock<AccountService> {}
+            val accountPersistence = mock<AccountPersistence> {}
+            val uploadManager = mock<UploadManager> {}
+            val languageManager = mock<LanguageManager> {}
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
+            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+
+            val unSortedAppList = listOf(aptoide, aptoide2, facebook)
+            val sortedAppList = listOf(facebook, aptoide2)
+
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+            val orderByDateEvent = PublishSubject.create<SortingOrder>()
+
+            whenever(view.lifecycleEvent)
+                    .doReturn(lifecycleEvent)
+            whenever(view.submitAppEvent())
+                    .doReturn(Observable.empty())
+            whenever(languageManager.currentLanguageCode)
+                    .doReturn(language.toSingle())
+            whenever(packageProvider.installedApps).doReturn(unSortedAppList.toSingle())
+            whenever(accountPersistence.account)
+                    .doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
+
+            whenever(view.orderByEvent())
+                    .doReturn(orderByDateEvent)
+
+            installedAppsPresenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            reset(view)
+            orderByDateEvent.onNext(SortingOrder.DATE)
+
+//            verify(view).showApps(any())
+
+            verify(view).showApps(sortedAppList)
+
         }
 
         it("should sort list of apps by name") {

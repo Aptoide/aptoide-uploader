@@ -38,7 +38,7 @@ class NotificationPresenterTest : Spek({
             val apkPath = "/Files/facebook.apk"
             val storeName = "FabioStore"
 
-            val app = InstalledApp(appIcon, appName, false, appPackageName, apkPath)
+            val app = InstalledApp(appIcon, appName, false, appPackageName, apkPath, 0)
             val upload = Upload(true, true, app, Upload.Status.COMPLETED)
 
             whenever(view.lifecycleEvent)
