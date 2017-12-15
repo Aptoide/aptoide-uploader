@@ -1,11 +1,15 @@
 package com.aptoide.uploader.apps.view;
 
+import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
+import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
+import java.util.Collections;
+import java.util.List;
 
 public class MyStorePresenter implements Presenter {
 
@@ -44,11 +48,27 @@ public class MyStorePresenter implements Presenter {
         }));
 
     compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.orderByEvent())
+        .flatMapSingle(sortingOrder -> storeManager.getStore()
+            .flatMap(store -> sort(store.getApps(), sortingOrder)))
+        .observeOn(viewScheduler)
+        .subscribe(apps -> view.showApps(apps), throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
         .doOnNext(__ -> compositeDisposable.clear())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+  }
+
+  private Single<List<InstalledApp>> sort(List<InstalledApp> apps, SortingOrder sortingOrder) {
+    Collections.sort(apps,
+        (app1, app2) -> Long.compare(app1.getInstalledDate(), app2.getInstalledDate()));
+    return Single.just(apps);
   }
 }

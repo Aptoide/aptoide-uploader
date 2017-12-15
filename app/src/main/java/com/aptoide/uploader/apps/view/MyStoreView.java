@@ -14,4 +14,5 @@ public interface MyStoreView extends View {
 
   Observable<List<InstalledApp>> submitAppEvent();
 
+  Observable<SortingOrder> orderByEvent();
 }

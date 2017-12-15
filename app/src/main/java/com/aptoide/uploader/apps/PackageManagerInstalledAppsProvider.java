@@ -22,7 +22,8 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
             "android.resource://" + applicationInfo.packageName + "/" + applicationInfo.icon,
             applicationInfo.loadLabel(packageManager)
                 .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0,
-            applicationInfo.packageName, applicationInfo.sourceDir))
+            applicationInfo.packageName, applicationInfo.sourceDir,
+            packageManager.getPackageInfo(applicationInfo.packageName, 0).firstInstallTime))
         .toList();
   }
 }
