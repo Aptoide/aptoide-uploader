@@ -20,8 +20,6 @@ import org.junit.runner.RunWith
 @RunWith(JUnitPlatform::class)
 class AppInformationFormPresenterTest : Spek({
     describe("a app upload form presenter") {
-        val language = "PT-BR"
-        val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt", "/Files/aptoide.apk")
 
         it("should present an empty form and return all form data") {
             val mockAppInfo = UserProposedAppInfo(
@@ -32,9 +30,7 @@ class AppInformationFormPresenterTest : Spek({
             )
 
             val view = mock<AppInformationFormView> {}
-            val languageManager = mock<LanguageManager> {}
-            val appInfoService = mock<RemoteAppInformationService>()
-            val remoteAppInfoManager = RemoteAppInformationManager(appInfoService, languageManager)
+            val remoteAppInfoManager = mock<RemoteAppInformationManager>{}
             val appInfoFormPresenter = AppInformationFormPresenter(view, remoteAppInfoManager, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -44,17 +40,18 @@ class AppInformationFormPresenterTest : Spek({
                     .doReturn(lifecycleEvent)
             whenever(view.submitEvent)
                     .doReturn(submitEvent)
-            whenever(remoteAppInfoManager.uploadInfo(any())).doReturn(Completable.complete())
 
             appInfoFormPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             submitEvent.onNext(mockAppInfo)
 
-            verify(view).showProposedAppInfo(RemoteProposedAppInfo())
             verify(remoteAppInfoManager).uploadInfo(mockAppInfo)
         }
 
         it("should present a pre-filled form and return all form data") {
+            val language = "PT-BR"
+            val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", false, "cm.aptoide.pt", "/Files/aptoide.apk", 0)
+
             fail("to do")
         }
     }
