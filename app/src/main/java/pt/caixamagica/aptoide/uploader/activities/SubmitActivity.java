@@ -60,19 +60,19 @@ public class SubmitActivity extends ActionBarActivity {
       }
       Crashlytics.log(0, "SubmitForm", sb.toString());
       finish();
+    } else {
+      SelectablePackageInfo selectablePackageInfo =
+          new SelectablePackageInfo(packageInfo, getPackageManager(),
+              appsInStorePersister.isAppInStore(packageInfo.packageName, packageInfo.versionCode));
+      String title = extras.getString("title");
+      String description = extras.getString("description");
+      String languageCode = extras.getString("languageCode");
+      boolean fromAppView = extras.getBoolean("fromAppview");
+      String category = extras.getString("category");
+
+      switchtoSubmitAppFragment(userCredentialsJson, selectablePackageInfo, title, description,
+          languageCode, category);
     }
-
-    SelectablePackageInfo selectablePackageInfo =
-        new SelectablePackageInfo(packageInfo, getPackageManager(),
-            appsInStorePersister.isAppInStore(packageInfo.packageName, packageInfo.versionCode));
-    String title = extras.getString("title");
-    String description = extras.getString("description");
-    String languageCode = extras.getString("languageCode");
-    boolean fromAppView = extras.getBoolean("fromAppview");
-    String category = extras.getString("category");
-
-    switchtoSubmitAppFragment(userCredentialsJson, selectablePackageInfo, title, description,
-        languageCode, category);
   }
 
   private void switchtoSubmitAppFragment(UserCredentialsJson userCredentialsJson,
