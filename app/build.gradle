@@ -56,6 +56,8 @@ android {
     versionCode value
     versionName "2.8"
 
+    vectorDrawables.useSupportLibrary = true
+
     manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
 
     buildConfigField "String", "GMS_SERVER_ID", "\"" + project.GMS_SERVER_ID + "\""
