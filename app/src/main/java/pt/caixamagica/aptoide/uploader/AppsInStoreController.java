@@ -151,7 +151,7 @@ public class AppsInStoreController {
   }
 
   public void stop() {
-    if (spiceManager != null) {
+    if (spiceManager != null && spiceManager.isStarted()) {
       spiceManager.shouldStop();
     }
     if (executorService != null) {
