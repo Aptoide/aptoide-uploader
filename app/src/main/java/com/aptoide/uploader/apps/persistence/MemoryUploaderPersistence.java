@@ -1,7 +1,7 @@
-package com.aptoide.uploader.apps.view;
+package com.aptoide.uploader.apps.persistence;
 
 import com.aptoide.uploader.apps.Upload;
-import com.aptoide.uploader.apps.UploaderPersistence;
+import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;

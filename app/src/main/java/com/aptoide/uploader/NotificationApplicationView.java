@@ -3,22 +3,46 @@ package com.aptoide.uploader;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.support.v4.app.NotificationCompat;
+import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.Upload;
+import com.aptoide.uploader.apps.UploadManager;
+import com.aptoide.uploader.apps.network.UploadService;
+import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
+import com.aptoide.uploader.apps.view.NotificationPresenter;
 import com.aptoide.uploader.apps.view.NotificationView;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
+import java.util.HashSet;
+import okhttp3.OkHttpClient;
+import retrofit2.Retrofit;
+import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
+import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class NotificationApplicationView extends Application implements NotificationView {
 
   private BehaviorSubject<LifecycleEvent> lifecycleSubject;
   private final String NOTIFICATION_CHANNEL_ID = "Upload";
   private NotificationManager notificationManager;
+  private NotificationPresenter systemNotificationShower;
 
   @Override public void onCreate() {
     super.onCreate();
     lifecycleSubject = BehaviorSubject.create();
     lifecycleSubject.onNext(LifecycleEvent.CREATE);
     notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+
+    final Retrofit retrofitV7 = new Retrofit.Builder().addCallAdapterFactory(
+        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+        .client(new OkHttpClient())
+        .baseUrl("http://ws75.aptoide.com/")
+        .addConverterFactory(MoshiConverterFactory.create())
+        .build();
+
+    systemNotificationShower = new NotificationPresenter(this,
+        new UploadManager(new UploadService(retrofitV7.create(UploadService.ServiceV7.class)),
+            new MemoryUploaderPersistence(new HashSet<Upload>()), new OkioMd5Calculator()));
+    attachPresenter();
   }
 
   @Override public Observable<LifecycleEvent> getLifecycleEvent() {
@@ -38,5 +62,9 @@ public class NotificationApplicationView extends Application implements Notifica
     notificationManager.notify(upload.getInstalledApp()
         .getPackageName()
         .hashCode(), mBuilder.build());
+  }
+
+  private void attachPresenter() {
+    systemNotificationShower.present();
   }
 }

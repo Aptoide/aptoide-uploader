@@ -1,5 +1,7 @@
 package com.aptoide.uploader.apps;
 
+import com.aptoide.uploader.apps.network.UploaderService;
+import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import java.util.List;

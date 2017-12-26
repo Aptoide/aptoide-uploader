@@ -1,6 +1,8 @@
 package com.aptoide.uploader.apps.view
 
 import com.aptoide.uploader.apps.*
+import com.aptoide.uploader.apps.network.UploaderService
+import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
