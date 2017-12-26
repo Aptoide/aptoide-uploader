@@ -34,7 +34,7 @@ public class CreateAccountPresenter implements Presenter {
     handleNavigateToRecoverPassViewClick();
   }
 
-  private void handleNavigateToRecoverPassViewClick() {
+  private void handleNavigateToLoginViewClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.getOpenLoginView())
@@ -44,7 +44,7 @@ public class CreateAccountPresenter implements Presenter {
         }));
   }
 
-  private void handleNavigateToLoginViewClick() {
+  private void handleNavigateToRecoverPassViewClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.getOpenRecoverPasswordView())
