@@ -21,7 +21,7 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
         .map(applicationInfo -> new InstalledApp(
             "android.resource://" + applicationInfo.packageName + "/" + applicationInfo.icon,
             applicationInfo.loadLabel(packageManager)
-                .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 0,
+                .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1,
             applicationInfo.packageName, applicationInfo.sourceDir,
             packageManager.getPackageInfo(applicationInfo.packageName, 0).firstInstallTime))
         .toList();
