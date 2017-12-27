@@ -59,6 +59,10 @@ public class UploadService extends Service implements UploaderService {
         });
   }
 
+  @Override public void uploadAppToRepo() {
+
+  }
+
   public interface ServiceV7 {
     @POST("/apks/package/translations/getProposed") @FormUrlEncoded
     Observable<Response<GetProposedResponse>> getProposed(@FieldMap HashMap<String, String> args);
