@@ -32,6 +32,7 @@ public class CreateAccountPresenter implements Presenter {
     handleCreateAccountClick();
     handleNavigateToLoginViewClick();
     handleNavigateToRecoverPassViewClick();
+    onDestroyClearDisposables();
   }
 
   private void handleNavigateToRecoverPassViewClick() {
@@ -98,6 +99,16 @@ public class CreateAccountPresenter implements Presenter {
         })
         .retry()
         .subscribe(() -> accountNavigator.navigateToMyAppsView(), throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void onDestroyClearDisposables() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
+        .doOnNext(__ -> compositeDisposable.clear())
+        .subscribe(__ -> {
+        }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
   }

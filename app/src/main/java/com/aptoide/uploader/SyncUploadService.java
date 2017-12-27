@@ -32,9 +32,9 @@ public class SyncUploadService extends Service {
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.PENDING))
-        .doOnNext(upload -> uploadManager.uploadAppToRepo(upload))
-        .subscribe(__ -> {
-        }, throwable -> {
+        .flatMap(upload -> uploadManager.uploadAppToRepo(upload))
+        .subscribe(__ -> stopSelf(), throwable -> {
+          stopSelf();
           throw new OnErrorNotImplementedException(throwable);
         });
   }
