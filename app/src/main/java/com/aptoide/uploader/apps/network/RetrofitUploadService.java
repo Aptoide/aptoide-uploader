@@ -6,26 +6,26 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.Map;
 import retrofit2.Response;
-import retrofit2.http.Body;
 import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PartMap;
+import retrofit2.http.Path;
 
-public class UploadService implements UploaderService {
+public class RetrofitUploadService implements UploaderService {
 
   private ServiceV7 serviceV7;
   private ServiceV3 serviceV3;
 
-  public UploadService(ServiceV7 serviceV7, ServiceV3 serviceV3) {
+  public RetrofitUploadService(ServiceV7 serviceV7, ServiceV3 serviceV3) {
     this.serviceV7 = serviceV7;
     this.serviceV3 = serviceV3;
   }
 
   @Override public Single<Upload> getAppUpload(String md5, String language, String storeName,
       InstalledApp installedApp) {
-    return serviceV7.getProposed(
-        new GetProposedRequestBody(language, installedApp.getPackageName(), false))
+    return serviceV7.getProposed(installedApp.getPackageName(), language, false)
         .singleOrError()
         .flatMap(response -> {
           final GetProposedResponse proposedBody = response.body();
@@ -43,8 +43,10 @@ public class UploadService implements UploaderService {
   }
 
   public interface ServiceV7 {
-    @POST("/7/apks/package/translations/getProposed") @FormUrlEncoded
-    Observable<Response<GetProposedResponse>> getProposed(@Body GetProposedRequestBody body);
+    @GET("/7/apks/package/translations/getProposed/package_name/{packageName}/language_code/{languageCode}/filter/{filter}")
+    @FormUrlEncoded Observable<Response<GetProposedResponse>> getProposed(
+        @Path("packageName") String packageName, @Path("languageCode") String languageCode,
+        @Path("filter") boolean filter);
   }
 
   public interface ServiceV3 {

@@ -7,11 +7,13 @@ import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
+import com.aptoide.uploader.apps.AndroidLanguageManager;
+import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
-import com.aptoide.uploader.apps.network.UploadService;
+import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import io.reactivex.schedulers.Schedulers;
@@ -27,6 +29,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
   private UploadManager uploadManager;
+  private LanguageManager languageManager;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -71,7 +74,8 @@ public class UploaderApplication extends NotificationApplicationView {
   public StoreManager getAppsManager() {
     if (storeManager == null) {
       storeManager = new StoreManager(new PackageManagerInstalledAppsProvider(getPackageManager()),
-          new AccountStoreNameProvider(getAccountManager()), null, null);
+          new AccountStoreNameProvider(getAccountManager()), getUploadManager(),
+          getLanguageManager());
     }
     return storeManager;
   }
@@ -94,10 +98,17 @@ public class UploaderApplication extends NotificationApplicationView {
           .build();
 
       uploadManager = new UploadManager(
-          new UploadService(retrofitV7.create(UploadService.ServiceV7.class),
-              retrofitV3.create(UploadService.ServiceV3.class)),
+          new RetrofitUploadService(retrofitV7.create(RetrofitUploadService.ServiceV7.class),
+              retrofitV3.create(RetrofitUploadService.ServiceV3.class)),
           new MemoryUploaderPersistence(new HashSet<>()), new OkioMd5Calculator());
     }
     return uploadManager;
+  }
+
+  public LanguageManager getLanguageManager() {
+    if (languageManager == null) {
+      languageManager = new AndroidLanguageManager();
+    }
+    return languageManager;
   }
 }
