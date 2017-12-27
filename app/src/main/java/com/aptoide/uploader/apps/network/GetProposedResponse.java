@@ -19,7 +19,25 @@ public class GetProposedResponse extends ResponseV7 {
     return data;
   }
 
+  public boolean hasErrors() {
+    return getError() != null;
+  }
+
+  public Info getInfo() {
+    return super.getInfo();
+  }
+
+  public boolean requestFailed() {
+    return getInfo().getStatus()
+        .equals(Info.Status.FAIL);
+  }
+
   public static class Data {
+    private String language;
+    private String title;
+    private String description;
+    private String news;
+
     public String getLanguage() {
       return language;
     }
@@ -35,24 +53,6 @@ public class GetProposedResponse extends ResponseV7 {
     public String getNews() {
       return news;
     }
-
-    private String language;
-    private String title;
-    private String description;
-    private String news;
-  }
-
-  public boolean hasErrors() {
-    return getError() == null;
-  }
-
-  public Info getInfo() {
-    return getInfo();
-  }
-
-  public boolean requestFailed() {
-    return getInfo().getStatus()
-        .equals(Info.Status.FAIL);
   }
 }
 

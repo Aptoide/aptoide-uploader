@@ -41,7 +41,7 @@ public class NotificationApplicationView extends Application implements Notifica
 
     systemNotificationShower = new NotificationPresenter(this,
         new UploadManager(new UploadService(retrofitV7.create(UploadService.ServiceV7.class)),
-            new MemoryUploaderPersistence(new HashSet<Upload>()), new OkioMd5Calculator()));
+            new MemoryUploaderPersistence(new HashSet<>()), new OkioMd5Calculator()));
     attachPresenter();
   }
 

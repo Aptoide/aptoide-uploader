@@ -36,7 +36,7 @@ public class UploadService extends Service implements UploaderService {
     return serviceV7.getProposed(parameters)
         .singleOrError()
         .flatMap(response -> {
-          if (response.isSuccessful() && !response.body()
+          if (response.isSuccessful() && response.body() != null && !response.body()
               .hasErrors()) {
             if (response.body()
                 .requestFailed()) {
