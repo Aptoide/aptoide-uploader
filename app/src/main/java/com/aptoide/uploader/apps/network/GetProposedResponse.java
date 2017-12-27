@@ -19,19 +19,6 @@ public class GetProposedResponse extends ResponseV7 {
     return data;
   }
 
-  public boolean hasErrors() {
-    return getError() != null;
-  }
-
-  public Info getInfo() {
-    return super.getInfo();
-  }
-
-  public boolean requestFailed() {
-    return getInfo().getStatus()
-        .equals(Info.Status.FAIL);
-  }
-
   public static class Data {
     private String language;
     private String title;
