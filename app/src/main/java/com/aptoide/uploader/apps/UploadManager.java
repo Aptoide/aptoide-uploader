@@ -20,16 +20,15 @@ public class UploadManager {
 
   public Completable upload(String storeName, String language, InstalledApp app) {
     return md5Calculator.calculate(app)
-        .flatMapCompletable(
-            (md5 -> uploaderService.getAppUpload(md5, app.getPackageName(), language, storeName)
-                .flatMapCompletable(upload -> {
-                  if (upload.isUploaded()) {
-                    if (!upload.hasProposedData()) {
-                      return persistence.save(upload);
-                    }
-                  }
+        .flatMapCompletable((md5 -> uploaderService.getAppUpload(md5, language, storeName, app)
+            .flatMapCompletable(upload -> {
+              if (upload.isUploaded()) {
+                if (!upload.hasProposedData()) {
                   return persistence.save(upload);
-                })));
+                }
+              }
+              return persistence.save(upload);
+            })));
   }
 
   public Observable<List<Upload>> getUploads() {

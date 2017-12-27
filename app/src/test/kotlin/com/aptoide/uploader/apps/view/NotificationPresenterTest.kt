@@ -49,7 +49,7 @@ class NotificationPresenterTest : Spek({
                     .doReturn(Single.error<RemoteProposedAppInfo>(ProposedAppInfoException()))
             whenever(md5Calculator.calculate(app))
                     .doReturn(appMd5.toSingle())
-            whenever(uploadService.getAppUpload(appMd5, appPackageName, appLanguage, storeName))
+            whenever(uploadService.getAppUpload(appMd5, appLanguage, storeName, app))
                     .doReturn(upload.toSingle())
 
             presenter.present()

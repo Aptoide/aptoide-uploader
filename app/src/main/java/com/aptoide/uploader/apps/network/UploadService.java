@@ -4,6 +4,7 @@ import android.app.Service;
 import android.content.Intent;
 import android.os.IBinder;
 import android.support.annotation.Nullable;
+import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Upload;
 import io.reactivex.Observable;
 import io.reactivex.Single;
@@ -26,11 +27,11 @@ public class UploadService extends Service implements UploaderService {
     return null;
   }
 
-  @Override public Single<Upload> getAppUpload(String md5, String packageName, String language,
-      String storeName) {
+  @Override public Single<Upload> getAppUpload(String md5, String language, String storeName,
+      InstalledApp installedApp) {
     final HashMap<String, String> parameters = new HashMap<>();
     parameters.put("language_code", language);
-    parameters.put("package_name", packageName);
+    parameters.put("package_name", installedApp.getPackageName());
     // TODO: 26-12-2017 filipe  confirm filter value
     parameters.put("filter", Boolean.toString(false));
     return serviceV7.getProposed(parameters)
@@ -41,6 +42,7 @@ public class UploadService extends Service implements UploaderService {
             if (response.body()
                 .requestFailed()) {
               // TODO: 26-12-2017 filipe uploadAppToRepo
+              return Single.just(new Upload(false, false, installedApp, Upload.Status.PENDING));
             } else {
               List<GetProposedResponse.Data> dataList = response.body().data;
               if (!dataList.isEmpty()) {
