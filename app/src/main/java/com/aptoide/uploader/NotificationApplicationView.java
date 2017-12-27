@@ -3,17 +3,12 @@ package com.aptoide.uploader;
 import android.app.Application;
 import android.app.NotificationManager;
 import android.support.v4.app.NotificationCompat;
-import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.Upload;
-import com.aptoide.uploader.apps.UploadManager;
-import com.aptoide.uploader.apps.network.UploadService;
-import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
 import com.aptoide.uploader.apps.view.NotificationPresenter;
 import com.aptoide.uploader.apps.view.NotificationView;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.BehaviorSubject;
-import java.util.HashSet;
 import okhttp3.OkHttpClient;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -39,9 +34,8 @@ public class NotificationApplicationView extends Application implements Notifica
         .addConverterFactory(MoshiConverterFactory.create())
         .build();
 
-    systemNotificationShower = new NotificationPresenter(this,
-        new UploadManager(new UploadService(retrofitV7.create(UploadService.ServiceV7.class)),
-            new MemoryUploaderPersistence(new HashSet<>()), new OkioMd5Calculator()));
+    systemNotificationShower =
+        new NotificationPresenter(this, ((UploaderApplication) this).getUploadManager());
     attachPresenter();
   }
 

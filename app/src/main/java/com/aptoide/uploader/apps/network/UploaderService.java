@@ -9,5 +9,5 @@ public interface UploaderService {
   Single<Upload> getAppUpload(String md5, String language, String storeName,
       InstalledApp installedApp);
 
-  void uploadAppToRepo();
+  void uploadAppToRepo(Upload upload);
 }

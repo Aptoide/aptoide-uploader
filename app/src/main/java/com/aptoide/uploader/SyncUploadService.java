@@ -12,7 +12,7 @@ import io.reactivex.exceptions.OnErrorNotImplementedException;
  * Created by filipe on 27-12-2017.
  */
 
-public class SyncUploadsService extends Service {
+public class SyncUploadService extends Service {
 
   private UploadManager uploadManager;
 
@@ -32,7 +32,7 @@ public class SyncUploadsService extends Service {
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.PENDING))
-        .doOnNext(upload -> uploadManager.uploadAppToRepo())
+        .doOnNext(upload -> uploadManager.uploadAppToRepo(upload))
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);

@@ -30,7 +30,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
   @Override public void onCreate() {
     super.onCreate();
-    startService(new Intent(this, SyncUploadsService.class));
+    startService(new Intent(this, SyncUploadService.class));
     // TODO: 27-12-2017 filipe need to stop the service
   }
 
@@ -86,9 +86,17 @@ public class UploaderApplication extends NotificationApplicationView {
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
 
-      uploadManager =
-          new UploadManager(new UploadService(retrofitV7.create(UploadService.ServiceV7.class)),
-              new MemoryUploaderPersistence(new HashSet<>()), new OkioMd5Calculator());
+      final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
+          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+          .client(new OkHttpClient())
+          .baseUrl("http://webservices.aptoide.com/")
+          .addConverterFactory(MoshiConverterFactory.create())
+          .build();
+
+      uploadManager = new UploadManager(
+          new UploadService(retrofitV7.create(UploadService.ServiceV7.class),
+              retrofitV3.create(UploadService.ServiceV3.class)),
+          new MemoryUploaderPersistence(new HashSet<>()), new OkioMd5Calculator());
     }
     return uploadManager;
   }
