@@ -9,7 +9,7 @@ import java.util.List;
 
 public class GetProposedResponse extends ResponseV7 {
 
-  public List<Data> data;
+  private List<Data> data;
 
   public GetProposedResponse(Info info, List<Error> errors) {
     super(info, errors);

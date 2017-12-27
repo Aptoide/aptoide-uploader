@@ -44,7 +44,8 @@ public class UploadService extends Service implements UploaderService {
               // TODO: 26-12-2017 filipe uploadAppToRepo
               return Single.just(new Upload(false, false, installedApp, Upload.Status.PENDING));
             } else {
-              List<GetProposedResponse.Data> dataList = response.body().data;
+              List<GetProposedResponse.Data> dataList = response.body()
+                  .getData();
               if (!dataList.isEmpty()) {
                 GetProposedResponse.Data proposedData = dataList.get(0);
                 // TODO: 26-12-2017 filipe request category with getApkInfo
