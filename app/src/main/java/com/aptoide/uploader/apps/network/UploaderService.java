@@ -2,6 +2,7 @@ package com.aptoide.uploader.apps.network;
 
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Upload;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface UploaderService {
@@ -9,5 +10,5 @@ public interface UploaderService {
   Single<Upload> getAppUpload(String md5, String language, String storeName,
       InstalledApp installedApp);
 
-  void uploadAppToRepo(Upload upload);
+  Observable<Void> uploadAppToRepo(Upload upload);
 }

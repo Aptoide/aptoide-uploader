@@ -1,9 +1,5 @@
 package com.aptoide.uploader.apps.network;
 
-import android.app.Service;
-import android.content.Intent;
-import android.os.IBinder;
-import android.support.annotation.Nullable;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Upload;
 import io.reactivex.Observable;
@@ -18,7 +14,7 @@ import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.PartMap;
 
-public class UploadService extends Service implements UploaderService {
+public class UploadService implements UploaderService {
 
   private ServiceV7 serviceV7;
   private ServiceV3 serviceV3;
@@ -26,10 +22,6 @@ public class UploadService extends Service implements UploaderService {
   public UploadService(ServiceV7 serviceV7, ServiceV3 serviceV3) {
     this.serviceV7 = serviceV7;
     this.serviceV3 = serviceV3;
-  }
-
-  @Nullable @Override public IBinder onBind(Intent intent) {
-    return null;
   }
 
   @Override public Single<Upload> getAppUpload(String md5, String language, String storeName,
@@ -63,14 +55,8 @@ public class UploadService extends Service implements UploaderService {
         });
   }
 
-  @Override public void uploadAppToRepo(Upload upload) {
-    final HashMap<String, String> parameters = new HashMap<>();
-
-    //serviceV3.uploadAppToRepo(parameters)
-    //    .singleOrError()
-    //    .flatMap(response -> {
-    //
-    //    });
+  @Override public Observable<Void> uploadAppToRepo(Upload upload) {
+    return Observable.empty();
   }
 
   public interface ServiceV7 {

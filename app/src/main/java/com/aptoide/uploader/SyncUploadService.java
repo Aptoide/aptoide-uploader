@@ -16,17 +16,17 @@ public class SyncUploadService extends Service {
 
   private UploadManager uploadManager;
 
+  @Override public int onStartCommand(Intent intent, int flags, int startId) {
+    this.uploadManager = ((UploaderApplication) getApplication()).getUploadManager();
+    dispatchUploads();
+    return super.onStartCommand(intent, flags, startId);
+  }
+
   @Nullable @Override public IBinder onBind(Intent intent) {
     return null;
   }
 
-  @Override public int onStartCommand(Intent intent, int flags, int startId) {
-    this.uploadManager = ((UploaderApplication) getApplication()).getUploadManager();
-    checkUploads();
-    return super.onStartCommand(intent, flags, startId);
-  }
-
-  private void checkUploads() {
+  private void dispatchUploads() {
     uploadManager.getUploads()
         .flatMap(__ -> uploadManager.getUploads())
         .flatMapIterable(uploads -> uploads)
