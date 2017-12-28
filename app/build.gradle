@@ -20,7 +20,7 @@ android {
       minifyEnabled false
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
-    debug{
+    debug {
       minifyEnabled false
       applicationIdSuffix ".debug"
     }
@@ -45,6 +45,7 @@ dependencies {
   // Reactive Programming
   compile "io.reactivex.rxjava2:rxjava:2.1.6"
   compile "com.jakewharton.rxbinding2:rxbinding-support-v4:2.0.0"
+  compile "com.jakewharton.rxrelay:rxrelay:1.2.0"
 
   // Kotlin
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"

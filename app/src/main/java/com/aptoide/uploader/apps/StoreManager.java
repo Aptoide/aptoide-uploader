@@ -12,8 +12,9 @@ public class StoreManager {
   private final UploadManager uploadManager;
   private final LanguageManager languageManager;
 
-  public StoreManager(InstalledAppsProvider installedAppsProvider, StoreNameProvider storeNameProvider,
-      UploadManager uploadManager, LanguageManager languageManager) {
+  public StoreManager(InstalledAppsProvider installedAppsProvider,
+      StoreNameProvider storeNameProvider, UploadManager uploadManager,
+      LanguageManager languageManager) {
     this.installedAppsProvider = installedAppsProvider;
     this.storeNameProvider = storeNameProvider;
     this.uploadManager = uploadManager;
