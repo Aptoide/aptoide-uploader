@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.network;
 
+import com.aptoide.uploader.account.network.ResponseV7;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Upload;
 import io.reactivex.Observable;
@@ -30,7 +31,9 @@ public class RetrofitUploadService implements UploaderService {
         .flatMap(response -> {
           final GetProposedResponse proposedBody = response.body();
 
-          if (response.isSuccessful() && proposedBody != null && proposedBody.isOk()) {
+          if (response.isSuccessful() && proposedBody != null && proposedBody.getInfo()
+              .getStatus()
+              .equals(ResponseV7.Info.Status.FAIL)) {
             return Single.just(new Upload(false, false, installedApp, Upload.Status.PENDING));
           }
 
