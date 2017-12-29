@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view
 
+import android.content.DialogInterface
 import com.aptoide.uploader.TestData
 import com.aptoide.uploader.account.AccountPersistence
 import com.aptoide.uploader.account.AccountService
@@ -202,47 +203,33 @@ class MyStorePresenterTest : Spek({
             verify(view).showApps(sortedAppList)
         }
 
-        it("should navigate to app information form view if it is needed before upload") {
-            fail("To Do")
-        }
-
         it("should navigate to login view after signout confirmation is given") {
             val view = mock<MyStoreView> {}
+            val dialogInterface = mock<DialogInterface>{}
             val navigator = mock<MyStoreNavigator>()
-            val packageProvider = mock<InstalledAppsProvider> {}
-            val accountService = mock<AccountService> {}
-            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
-            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
-            val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
-            val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
-            val uploadManager = mock<UploadManager> {}
-            val languageManager = mock<LanguageManager> {}
-            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
-            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
+            val storeManager = mock<StoreManager>{}
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
-            val appList = mutableListOf(facebook, aptoide)
 
+            val click = PublishSubject.create<DialogInterface>()
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
 
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
-            whenever(view.submitAppEvent())
-                    .doReturn(Observable.empty())
-            whenever(languageManager.currentLanguageCode)
-                    .doReturn(language.toSingle())
-            whenever(packageProvider.installedApps)
-                    .doReturn(appList.toSingle())
-            whenever(accountPersistence.account)
-                    .doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
+
+
+            whenever(view.positiveClick()).doReturn(click)
+            whenever(storeManager.logout()).doReturn(Completable.complete())
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            reset(view)
-            whenever(view.positiveClick())
+            click.onNext(dialogInterface)
             verify(storeManager).logout()
             verify(navigator).navigateToLoginView()
         }
+
+        it("should navigate to app information form view if it is needed before upload") {
+            fail("To Do")
+        }
+
     }
 })
