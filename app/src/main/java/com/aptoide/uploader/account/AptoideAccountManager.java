@@ -27,4 +27,8 @@ public class AptoideAccountManager {
     return accountService.createAccount(email, password, storeName)
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
+
+  public Completable logout() {
+    return accountPersistence.remove();
+  }
 }

@@ -148,4 +148,5 @@
   <string name="application_notification_short_app_success_upload">App successfully uploaded</string>
   <string name="error_user_already_exists">This user already exists</string>
   <string name="error_store_already_exists">This store already exists</string>
+  <string name="logout_confirmation_message">You are about to sign out from Uploader, are you sure? </string>
 </resources>

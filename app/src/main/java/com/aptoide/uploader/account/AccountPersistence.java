@@ -8,4 +8,6 @@ public interface AccountPersistence {
   Observable<AptoideAccount> getAccount();
 
   Completable save(AptoideAccount account);
+
+  Completable remove();
 }

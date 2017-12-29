@@ -1,6 +1,5 @@
 package com.aptoide.uploader;
 
-import android.app.Application;
 import android.preference.PreferenceManager;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
@@ -17,7 +16,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-public class UploaderApplication extends NotificationApplicationView{
+public class UploaderApplication extends NotificationApplicationView {
 
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
@@ -48,7 +47,8 @@ public class UploaderApplication extends NotificationApplicationView{
       accountManager = new AptoideAccountManager(
           new RetrofitAccountService(retrofitV2.create(RetrofitAccountService.ServiceV2.class),
               retrofitV3.create(RetrofitAccountService.ServiceV3.class),
-              retrofitV7.create(RetrofitAccountService.ServiceV7.class), new SecurityAlgorithms(), new AccountResponseMapper()),
+              retrofitV7.create(RetrofitAccountService.ServiceV7.class), new SecurityAlgorithms(),
+              new AccountResponseMapper()),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),
               PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()));
     }
@@ -58,7 +58,7 @@ public class UploaderApplication extends NotificationApplicationView{
   public StoreManager getAppsManager() {
     if (storeManager == null) {
       storeManager = new StoreManager(new PackageManagerInstalledAppsProvider(getPackageManager()),
-          new AccountStoreNameProvider(getAccountManager()), null, null);
+          new AccountStoreNameProvider(getAccountManager()), null, null, accountManager);
     }
     return storeManager;
   }
