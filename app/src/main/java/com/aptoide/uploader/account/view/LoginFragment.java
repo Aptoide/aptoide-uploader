@@ -12,6 +12,8 @@ import android.widget.Toast;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.apps.permission.PermissionManager;
+import com.aptoide.uploader.apps.permission.PermissionService;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;

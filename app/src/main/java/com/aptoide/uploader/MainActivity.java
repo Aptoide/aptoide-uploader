@@ -3,9 +3,9 @@ package com.aptoide.uploader;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import com.aptoide.uploader.account.view.LoginFragment;
-import com.aptoide.uploader.apps.permission.PermissionProviderActivity;
+import com.aptoide.uploader.apps.permission.PermissionServiceActivity;
 
-public class MainActivity extends PermissionProviderActivity {
+public class MainActivity extends PermissionServiceActivity {
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);

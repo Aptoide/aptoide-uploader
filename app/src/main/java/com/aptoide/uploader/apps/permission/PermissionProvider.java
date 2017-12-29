@@ -2,6 +2,7 @@ package com.aptoide.uploader.apps.permission;
 
 import android.support.annotation.IntRange;
 import android.support.annotation.NonNull;
+import io.reactivex.Observable;
 import java.util.List;
 
 /**
@@ -13,7 +14,7 @@ public interface PermissionProvider {
   void providePermissions(final @NonNull String[] permissions,
       final @IntRange(from = 0) int requestCode);
 
-  rx.Observable<List<Permission>> permissionResults(int requestCode);
+  Observable<List<Permission>> permissionResults(int requestCode);
 
   class Permission {
     private final int requestCode;

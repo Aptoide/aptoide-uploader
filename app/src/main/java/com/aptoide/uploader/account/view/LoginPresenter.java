@@ -1,11 +1,14 @@
 package com.aptoide.uploader.account.view;
 
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.apps.permission.PermissionManager;
+import com.aptoide.uploader.apps.permission.PermissionService;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
+import java.util.concurrent.TimeUnit;
 
 public class LoginPresenter implements Presenter {
 
