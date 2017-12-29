@@ -205,9 +205,9 @@ class MyStorePresenterTest : Spek({
 
         it("should navigate to login view after signout confirmation is given") {
             val view = mock<MyStoreView> {}
-            val dialogInterface = mock<DialogInterface>{}
+            val dialogInterface = mock<DialogInterface> {}
             val navigator = mock<MyStoreNavigator>()
-            val storeManager = mock<StoreManager>{}
+            val storeManager = mock<StoreManager> {}
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
 
             val click = PublishSubject.create<DialogInterface>()
