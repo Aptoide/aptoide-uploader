@@ -77,27 +77,27 @@ public class CreateAccountPresenter implements Presenter {
   private void handleCreateAccountClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event == View.LifecycleEvent.CREATE)
-        .flatMap(__ -> view.getCreateAccountEvent())
-        .doOnNext(__ -> view.showLoading())
-        .flatMapCompletable(
-            data -> accountManager.create(data.getEmail(), data.getPassword(), data.getStoreName()))
-        .observeOn(viewScheduler)
-        .doOnError(throwable -> {
-          view.hideLoading();
+        .flatMapCompletable(__ -> view.getCreateAccountEvent()
+            .doOnNext(viewModel -> view.showLoading())
+            .flatMapCompletable(data -> accountManager.create(data.getEmail(), data.getPassword(),
+                data.getStoreName()))
+            .observeOn(viewScheduler)
+            .doOnError(throwable -> {
+              view.hideLoading();
 
-          if (isInternetError(throwable)) {
-            view.showNetworkError();
-          }
+              if (isInternetError(throwable)) {
+                view.showNetworkError();
+              }
 
-          if (isStoreNameTaken(throwable)) {
-            view.showErrorStoreAlreadyExists();
-          }
+              if (isStoreNameTaken(throwable)) {
+                view.showErrorStoreAlreadyExists();
+              }
 
-          if (isUserNameTaken(throwable)) {
-            view.showErrorUserAlreadyExists();
-          }
-        })
-        .retry()
+              if (isUserNameTaken(throwable)) {
+                view.showErrorUserAlreadyExists();
+              }
+            })
+            .retry())
         .subscribe(() -> accountNavigator.navigateToMyAppsView(), throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
