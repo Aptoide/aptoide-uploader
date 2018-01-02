@@ -6,6 +6,8 @@ import com.aptoide.uploader.account.AccountService
 import com.aptoide.uploader.account.AptoideAccount
 import com.aptoide.uploader.account.AptoideAccountManager
 import com.aptoide.uploader.apps.*
+import com.aptoide.uploader.apps.permission.PermissionManager
+import com.aptoide.uploader.apps.permission.PermissionService
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Completable
@@ -38,9 +40,11 @@ class MyStorePresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence> {}
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
+            val permissionManager = mock<PermissionManager> {}
+            val permissionService = mock<PermissionService> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline(), permissionManager, permissionService)
             val appList = mutableListOf(facebook, aptoide)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -70,9 +74,11 @@ class MyStorePresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence> {}
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
+            val permissionManager = mock<PermissionManager> {}
+            val permissionService = mock<PermissionService> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline(), permissionManager, permissionService)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val submitAppEvent = PublishSubject.create<MutableList<InstalledApp>>()
@@ -104,9 +110,11 @@ class MyStorePresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence> {}
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
+            val permissionManager = mock<PermissionManager> {}
+            val permissionService = mock<PermissionService> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline(), permissionManager, permissionService)
 
             val unSortedAppList = listOf(aptoide, aptoide2, facebook)
             val sortedAppList = listOf(facebook, aptoide2)
@@ -144,9 +152,11 @@ class MyStorePresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence> {}
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
+            val permissionManager = mock<PermissionManager> {}
+            val permissionService = mock<PermissionService> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline(), permissionManager, permissionService)
 
             val unSortedAppList = listOf(facebook, aptoide, aptoide2)
             val sortedAppList = listOf(aptoide2, facebook)

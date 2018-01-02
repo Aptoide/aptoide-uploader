@@ -13,6 +13,8 @@ import android.widget.TextView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.InstalledApp;
+import com.aptoide.uploader.apps.permission.PermissionManager;
+import com.aptoide.uploader.apps.permission.PermissionService;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import io.reactivex.Observable;
@@ -52,7 +54,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView.setAdapter(adapter);
     new MyStorePresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
-        new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
+        new CompositeDisposable(), AndroidSchedulers.mainThread(), new PermissionManager(),
+        (PermissionService) getContext()).present();
   }
 
   @Override public void onDestroyView() {
