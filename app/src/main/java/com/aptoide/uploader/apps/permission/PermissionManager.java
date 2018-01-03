@@ -7,9 +7,6 @@ import io.reactivex.Observable;
  */
 
 public class PermissionManager {
-
-
-
   public Observable<Void> requestExternalStoragePermission(PermissionService permissionService) {
     return Observable.create(new RequestAccessToStorageOnSubscribe(permissionService));
   }
