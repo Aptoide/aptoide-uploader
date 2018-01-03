@@ -90,6 +90,13 @@ public class UploaderApplication extends NotificationApplicationView {
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
 
+      final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
+          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+          .client(new OkHttpClient())
+          .baseUrl("http://ws75-secondary.aptoide.com/")
+          .addConverterFactory(MoshiConverterFactory.create())
+          .build();
+
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
           .client(new OkHttpClient())
@@ -99,6 +106,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
       uploadManager = new UploadManager(
           new RetrofitUploadService(retrofitV7.create(RetrofitUploadService.ServiceV7.class),
+              retrofitV7Secondary.create(RetrofitUploadService.ServiceV7Secondary.class),
               retrofitV3.create(RetrofitUploadService.ServiceV3.class)),
           new MemoryUploaderPersistence(new HashSet<>()), new OkioMd5Calculator());
     }

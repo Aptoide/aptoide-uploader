@@ -7,7 +7,6 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.Map;
 import retrofit2.Response;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -16,17 +15,20 @@ import retrofit2.http.Path;
 
 public class RetrofitUploadService implements UploaderService {
 
-  private ServiceV7 serviceV7;
-  private ServiceV3 serviceV3;
+  private final ServiceV7Secondary serviceV7Secondary;
+  private final ServiceV7 serviceV7;
+  private final ServiceV3 serviceV3;
 
-  public RetrofitUploadService(ServiceV7 serviceV7, ServiceV3 serviceV3) {
+  public RetrofitUploadService(ServiceV7 serviceV7, ServiceV7Secondary serviceV7Secondary,
+      ServiceV3 serviceV3) {
     this.serviceV7 = serviceV7;
+    this.serviceV7Secondary = serviceV7Secondary;
     this.serviceV3 = serviceV3;
   }
 
   @Override public Single<Upload> getAppUpload(String md5, String language, String storeName,
       InstalledApp installedApp) {
-    return serviceV7.getProposed(installedApp.getPackageName(), language, false)
+    return serviceV7Secondary.getProposed(installedApp.getPackageName(), language, false)
         .singleOrError()
         .flatMap(response -> {
           final GetProposedResponse proposedBody = response.body();
@@ -46,10 +48,13 @@ public class RetrofitUploadService implements UploaderService {
   }
 
   public interface ServiceV7 {
-    @GET("/7/apks/package/translations/getProposed/package_name/{packageName}/language_code/{languageCode}/filter/{filter}")
-    @FormUrlEncoded Observable<Response<GetProposedResponse>> getProposed(
-        @Path("packageName") String packageName, @Path("languageCode") String languageCode,
-        @Path("filter") boolean filter);
+
+  }
+
+  public interface ServiceV7Secondary {
+    @GET("api/7/apks/package/translations/getProposed/package_name/{packageName}/language_code/{languageCode}/filter/{filter}")
+    Observable<Response<GetProposedResponse>> getProposed(@Path("packageName") String packageName,
+        @Path("languageCode") String languageCode, @Path("filter") boolean filter);
   }
 
   public interface ServiceV3 {
