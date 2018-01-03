@@ -40,18 +40,13 @@ public class MyStorePresenter implements Presenter {
 
     handlePositiveDialogClick();
 
-    handleNegativeDialogClick();
-
     onDestroyDisposeComposite();
-  }
-
-  private void handleNegativeDialogClick() {
   }
 
   private void handlePositiveDialogClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> view.positiveClick())
+        .flatMap(created -> view.positiveClick())
         .flatMapCompletable(click -> storeManager.logout()
             .observeOn(viewScheduler)
             .doOnComplete(() -> storeNavigator.navigateToLoginView())
@@ -69,10 +64,11 @@ public class MyStorePresenter implements Presenter {
   private void handleSignOutClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> view.logoutEvent())
-        .doOnNext(__ -> view.showDialog())
-        .subscribe(__ -> {
+        .flatMap(created -> view.logoutEvent())
+        .doOnNext(click -> view.showDialog())
+        .subscribe(click -> {
         }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
         }));
   }
 

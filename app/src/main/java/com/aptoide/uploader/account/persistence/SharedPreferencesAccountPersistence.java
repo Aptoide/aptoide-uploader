@@ -40,7 +40,7 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
         .subscribeOn(scheduler);
   }
 
-  @Override public Completable remove() {
+  @SuppressLint("ApplySharedPref") @Override public Completable remove() {
     return Completable.fromAction(() -> preferences.edit()
         .clear()
         .commit())

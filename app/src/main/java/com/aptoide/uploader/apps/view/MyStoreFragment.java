@@ -48,10 +48,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     return inflater.inflate(R.layout.fragment_my_apps, container, false);
   }
 
-  @Override public void onCreate(@Nullable Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-  }
-
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     toolbar = view.findViewById(R.id.fragment_my_apps_toolbar);
