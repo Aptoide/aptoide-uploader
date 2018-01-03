@@ -7,6 +7,15 @@ apply plugin: "de.mannodermaus.android-junit5"
 android {
   compileSdkVersion 26
   buildToolsVersion "26.0.2"
+
+  signingConfigs {
+    release {
+      storeFile = file(project.STORE_FILE_BACKUP)
+      storePassword = project.STORE_PASSWORD_BACKUP
+      keyAlias = project.KEY_ALIAS_UPLOADER
+      keyPassword = project.KEY_PASSWORD_UPLOADER
+    }
+  }
   defaultConfig {
     applicationId "pt.caixamagica.aptoide.uploader"
     minSdkVersion 15
@@ -14,6 +23,7 @@ android {
     versionCode 1
     versionName "1.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    signingConfig signingConfigs.release
   }
   buildTypes {
     release {
