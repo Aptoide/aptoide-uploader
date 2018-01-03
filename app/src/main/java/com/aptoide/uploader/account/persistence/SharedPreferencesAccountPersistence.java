@@ -40,6 +40,13 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
         .subscribeOn(scheduler);
   }
 
+  @SuppressLint("ApplySharedPref") @Override public Completable remove() {
+    return Completable.fromAction(() -> preferences.edit()
+        .clear()
+        .commit())
+        .subscribeOn(scheduler);
+  }
+
   private AptoideAccount getPreferencesAccount() {
     return new AptoideAccount(preferences.getBoolean(HAS_STORE, false),
         preferences.getBoolean(IS_LOGGED_IN, false), preferences.getString(STORE_NAME, null));

@@ -1,11 +1,15 @@
 package com.aptoide.uploader.apps.view
 
+import android.content.DialogInterface
 import com.aptoide.uploader.TestData
 import com.aptoide.uploader.account.AccountPersistence
 import com.aptoide.uploader.account.AccountService
 import com.aptoide.uploader.account.AptoideAccount
 import com.aptoide.uploader.account.AptoideAccountManager
+import com.aptoide.uploader.account.network.AccountResponseMapper
+import com.aptoide.uploader.account.network.RetrofitAccountService
 import com.aptoide.uploader.apps.*
+import com.aptoide.uploader.security.SecurityAlgorithms
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Completable
@@ -33,14 +37,20 @@ class MyStorePresenterTest : Spek({
 
         it("should display store name and installed apps when view is created") {
             val view = mock<MyStoreView> {}
+            val navigator = mock<MyStoreNavigator>()
             val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
-            val accountPersistence = mock<AccountPersistence> {}
+            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
+            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
+            val accountPersistence = mock<AccountPersistence>()
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
-            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
             val appList = mutableListOf(facebook, aptoide)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -65,14 +75,20 @@ class MyStorePresenterTest : Spek({
         it("should upload selected apps when submit button is clicked") {
 
             val view = mock<MyStoreView> {}
+            val navigator = mock<MyStoreNavigator>()
             val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
-            val accountPersistence = mock<AccountPersistence> {}
+            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
+            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
+            val accountPersistence = mock<AccountPersistence>()
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
-            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val submitAppEvent = PublishSubject.create<MutableList<InstalledApp>>()
@@ -99,14 +115,20 @@ class MyStorePresenterTest : Spek({
         it("should sort list of apps by installed date") {
 
             val view = mock<MyStoreView> {}
+            val navigator = mock<MyStoreNavigator>()
             val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
-            val accountPersistence = mock<AccountPersistence> {}
+            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
+            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
+            val accountPersistence = mock<AccountPersistence>()
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
-            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
 
             val unSortedAppList = listOf(aptoide, aptoide2, facebook)
             val sortedAppList = listOf(facebook, aptoide2)
@@ -139,14 +161,20 @@ class MyStorePresenterTest : Spek({
         it("should sort list of apps by name") {
 
             val view = mock<MyStoreView> {}
+            val navigator = mock<MyStoreNavigator>()
             val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
-            val accountPersistence = mock<AccountPersistence> {}
+            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
+            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
+            val accountPersistence = mock<AccountPersistence>()
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
-            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), Schedulers.trampoline())
+            val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
 
             val unSortedAppList = listOf(facebook, aptoide, aptoide2)
             val sortedAppList = listOf(aptoide2, facebook)
@@ -175,8 +203,31 @@ class MyStorePresenterTest : Spek({
             verify(view).showApps(sortedAppList)
         }
 
+        it("should navigate to login view after signout confirmation is given") {
+            val view = mock<MyStoreView> {}
+            val dialogInterface = mock<DialogInterface> {}
+            val navigator = mock<MyStoreNavigator>()
+            val storeManager = mock<StoreManager> {}
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
+
+            val click = PublishSubject.create<DialogInterface>()
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+
+            whenever(view.lifecycleEvent)
+                    .doReturn(lifecycleEvent)
+            whenever(view.positiveClick()).doReturn(click)
+            whenever(storeManager.logout()).doReturn(Completable.complete())
+
+            installedAppsPresenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            click.onNext(dialogInterface)
+            verify(storeManager).logout()
+            verify(navigator).navigateToLoginView()
+        }
+
         it("should navigate to app information form view if it is needed before upload") {
             fail("To Do")
         }
+
     }
 })
