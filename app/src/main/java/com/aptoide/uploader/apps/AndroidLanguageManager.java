@@ -10,6 +10,6 @@ import java.util.Locale;
 public class AndroidLanguageManager implements LanguageManager {
   @Override public Single<String> getCurrentLanguageCode() {
     return Single.just(Locale.getDefault()
-        .getDisplayLanguage());
+        .getLanguage());
   }
 }
