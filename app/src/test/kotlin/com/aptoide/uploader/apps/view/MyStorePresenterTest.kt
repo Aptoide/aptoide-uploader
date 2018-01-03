@@ -215,8 +215,6 @@ class MyStorePresenterTest : Spek({
 
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
-
-
             whenever(view.positiveClick()).doReturn(click)
             whenever(storeManager.logout()).doReturn(Completable.complete())
 
