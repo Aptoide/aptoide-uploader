@@ -8,11 +8,11 @@ import io.reactivex.Single;
 
 public interface AuthenticationProvider {
 
-  void saveAccessToken(String accessToken);
-
-  void saveRefreshToken(String refreshToken);
-
-  String getRefreshToken();
-
   Single<String> getAccessToken(String username, String password);
+
+  Single<String> getAccessToken();
+
+  Single<String> getRefreshToken();
+
+  void saveAuthentication(String accessToken, String refreshToken);
 }

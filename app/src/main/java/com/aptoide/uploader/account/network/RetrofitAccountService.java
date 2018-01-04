@@ -119,8 +119,8 @@ public class RetrofitAccountService implements AccountService {
           }
 
           if (response.isSuccessful() && body != null && !body.hasErrors()) {
-            authenticationProvider.saveAccessToken(body.getAccessToken());
-            authenticationProvider.saveRefreshToken(body.getRefreshToken());
+            authenticationProvider.saveAuthentication(body.getAccessToken(),
+                body.getRefreshToken());
             return serviceV7.getUserInfo(
                 new AccountRequestBody(Arrays.asList("meta"), body.getAccessToken()))
                 .singleOrError();

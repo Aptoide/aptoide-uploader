@@ -16,8 +16,10 @@ import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
+import com.aptoide.uploader.security.AuthenticationPersistance;
 import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SecurityAlgorithms;
+import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.util.HashSet;
@@ -81,7 +83,12 @@ public class UploaderApplication extends NotificationApplicationView {
           .baseUrl("http://webservices.aptoide.com/")
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
-      authenticationProvider = new AptoideAccessTokenProvider(
+
+      final AuthenticationPersistance authenticationPersistance =
+          new SharedPreferencesAuthenticationPersistence(
+              PreferenceManager.getDefaultSharedPreferences(this));
+
+      authenticationProvider = new AptoideAccessTokenProvider(authenticationPersistance,
           retrofitV3.create(AptoideAccessTokenProvider.ServiceV3.class));
     }
     return authenticationProvider;

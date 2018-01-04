@@ -7,6 +7,7 @@ import com.aptoide.uploader.account.AptoideAccountManager
 import com.aptoide.uploader.account.network.*
 import com.aptoide.uploader.security.AptoideAccessTokenProvider
 import com.aptoide.uploader.security.SecurityAlgorithms
+import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Completable
@@ -39,8 +40,9 @@ class LoginPresenterTest : Spek({
             val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(serviceV3)), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -82,8 +84,9 @@ class LoginPresenterTest : Spek({
             val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(serviceV3)), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -110,8 +113,9 @@ class LoginPresenterTest : Spek({
             val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(serviceV3)), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -141,8 +145,9 @@ class LoginPresenterTest : Spek({
             val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(serviceV3)), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val accounts = PublishSubject.create<AptoideAccount>()
