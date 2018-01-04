@@ -3,6 +3,7 @@ package com.aptoide.uploader.apps.network;
 import com.aptoide.uploader.account.network.ResponseV7;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Upload;
+import com.aptoide.uploader.security.AuthenticationProvider;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.Map;
@@ -16,14 +17,16 @@ import retrofit2.http.Path;
 public class RetrofitUploadService implements UploaderService {
 
   private final ServiceV7Secondary serviceV7Secondary;
+  private final AuthenticationProvider authenticationProvider;
   private final ServiceV7 serviceV7;
   private final ServiceV3 serviceV3;
 
   public RetrofitUploadService(ServiceV7 serviceV7, ServiceV7Secondary serviceV7Secondary,
-      ServiceV3 serviceV3) {
+      ServiceV3 serviceV3, AuthenticationProvider authenticationProvider) {
     this.serviceV7 = serviceV7;
     this.serviceV7Secondary = serviceV7Secondary;
     this.serviceV3 = serviceV3;
+    this.authenticationProvider = authenticationProvider;
   }
 
   @Override public Single<Upload> getAppUpload(String md5, String language, String storeName,

@@ -15,6 +15,8 @@ import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
+import com.aptoide.uploader.security.AptoideAccessTokenProvider;
+import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -30,6 +32,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private StoreManager storeManager;
   private UploadManager uploadManager;
   private LanguageManager languageManager;
+  private AuthenticationProvider authenticationProvider;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -62,13 +65,26 @@ public class UploaderApplication extends NotificationApplicationView {
 
       accountManager = new AptoideAccountManager(
           new RetrofitAccountService(retrofitV2.create(RetrofitAccountService.ServiceV2.class),
-              retrofitV3.create(RetrofitAccountService.ServiceV3.class),
               retrofitV7.create(RetrofitAccountService.ServiceV7.class), new SecurityAlgorithms(),
-              new AccountResponseMapper()),
+              new AccountResponseMapper(), authenticationProvider),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),
               PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()));
     }
     return accountManager;
+  }
+
+  public AuthenticationProvider getAuthenticationProvider() {
+    if (authenticationProvider == null) {
+      final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
+          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+          .client(new OkHttpClient())
+          .baseUrl("http://webservices.aptoide.com/")
+          .addConverterFactory(MoshiConverterFactory.create())
+          .build();
+      authenticationProvider = new AptoideAccessTokenProvider(
+          retrofitV3.create(AptoideAccessTokenProvider.ServiceV3.class));
+    }
+    return authenticationProvider;
   }
 
   public StoreManager getAppsManager() {
@@ -107,8 +123,9 @@ public class UploaderApplication extends NotificationApplicationView {
       uploadManager = new UploadManager(
           new RetrofitUploadService(retrofitV7.create(RetrofitUploadService.ServiceV7.class),
               retrofitV7Secondary.create(RetrofitUploadService.ServiceV7Secondary.class),
-              retrofitV3.create(RetrofitUploadService.ServiceV3.class)),
-          new MemoryUploaderPersistence(new HashSet<>()), new OkioMd5Calculator());
+              retrofitV3.create(RetrofitUploadService.ServiceV3.class),
+              getAuthenticationProvider()), new MemoryUploaderPersistence(new HashSet<>()),
+          new OkioMd5Calculator());
     }
     return uploadManager;
   }

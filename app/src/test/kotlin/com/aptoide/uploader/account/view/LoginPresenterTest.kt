@@ -5,6 +5,7 @@ import com.aptoide.uploader.account.AccountPersistence
 import com.aptoide.uploader.account.AptoideAccount
 import com.aptoide.uploader.account.AptoideAccountManager
 import com.aptoide.uploader.account.network.*
+import com.aptoide.uploader.security.AptoideAccessTokenProvider
 import com.aptoide.uploader.security.SecurityAlgorithms
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
@@ -35,11 +36,11 @@ class LoginPresenterTest : Spek({
             val view = mock<LoginView>()
             val navigator = mock<LoginNavigator>()
             val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
-            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(serviceV3)), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -78,11 +79,11 @@ class LoginPresenterTest : Spek({
             val view = mock<LoginView>()
             val navigator = mock<LoginNavigator>()
             val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
-            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(serviceV3)), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -106,11 +107,11 @@ class LoginPresenterTest : Spek({
             val view = mock<LoginView>()
             val navigator = mock<LoginNavigator>()
             val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
-            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(serviceV3)), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -137,11 +138,11 @@ class LoginPresenterTest : Spek({
             val view = mock<LoginView>()
             val navigator = mock<LoginNavigator>()
             val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
-            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(serviceV3)), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val accounts = PublishSubject.create<AptoideAccount>()
@@ -178,11 +179,10 @@ class LoginPresenterTest : Spek({
             val view = mock<LoginView>()
             val navigator = mock<LoginNavigator>()
             val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
-            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -202,11 +202,10 @@ class LoginPresenterTest : Spek({
             val view = mock<LoginView>()
             val navigator = mock<LoginNavigator>()
             val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
-            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence)
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -225,11 +224,10 @@ class LoginPresenterTest : Spek({
         it("should navigate to create account view") {
             val navigator = mock<LoginNavigator>()
             val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
-            val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV7,
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence)
             val accounts = PublishSubject.create<AptoideAccount>()
             val view = mock<LoginView>()
             val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
