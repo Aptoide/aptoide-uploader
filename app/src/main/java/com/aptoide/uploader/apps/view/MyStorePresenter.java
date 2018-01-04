@@ -2,8 +2,7 @@ package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.StoreManager;
-import com.aptoide.uploader.apps.permission.PermissionManager;
-import com.aptoide.uploader.apps.permission.PermissionService;
+import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
@@ -19,18 +18,16 @@ public class MyStorePresenter implements Presenter {
   private final StoreManager storeManager;
   private final CompositeDisposable compositeDisposable;
   private final Scheduler viewScheduler;
-  private final PermissionManager permissionManager;
-  private final PermissionService permissionService;
+  private final UploadPermissionProvider uploadPermissionProvider;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, Scheduler viewScheduler,
-      PermissionManager permissionManager, PermissionService permissionService) {
+      UploadPermissionProvider uploadPermissionProvider) {
     this.view = view;
     this.storeManager = storeManager;
     this.compositeDisposable = compositeDisposable;
     this.viewScheduler = viewScheduler;
-    this.permissionManager = permissionManager;
-    this.permissionService = permissionService;
+    this.uploadPermissionProvider = uploadPermissionProvider;
   }
 
   @Override public void present() {
@@ -47,8 +44,18 @@ public class MyStorePresenter implements Presenter {
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> view.submitAppEvent())
-        .doOnNext(__ -> permissionManager.requestExternalStoragePermission(permissionService))
+        .flatMap(created -> view.submitAppEvent())
+        .doOnNext(apps -> uploadPermissionProvider.requestExternalStoragePermission())
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
+        .filter(granted -> granted)
+        .flatMap(__ -> view.getSelectedApps())
         .flatMapCompletable(apps -> storeManager.upload(apps))
         .subscribe(() -> {
         }, throwable -> {
