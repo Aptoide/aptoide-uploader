@@ -27,6 +27,7 @@ public class CreateAccountFragment extends FragmentView implements CreateAccount
   private EditText storeNameEditText;
   private EditText storeUserEditText;
   private EditText storePasswordEditText;
+  private AccountErrorMapper accountErrorMapper;
   private RadioButton privateStoreRadioButton;
   private View submitButton;
   private View goToLoginViewButton;
@@ -44,6 +45,7 @@ public class CreateAccountFragment extends FragmentView implements CreateAccount
     super.onCreate(savedInstanceState);
     accountManager =
         ((UploaderApplication) getContext().getApplicationContext()).getAccountManager();
+    accountErrorMapper = new AccountErrorMapper(getContext());
   }
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -75,7 +77,7 @@ public class CreateAccountFragment extends FragmentView implements CreateAccount
         }));
 
     new CreateAccountPresenter(this, accountManager,
-        new CreateAccountNavigator(getFragmentManager(), getContext()), new CompositeDisposable(),
+        new CreateAccountNavigator(getFragmentManager(), getContext()), new CompositeDisposable(), accountErrorMapper,
         AndroidSchedulers.mainThread()).present();
   }
 
@@ -140,6 +142,11 @@ public class CreateAccountFragment extends FragmentView implements CreateAccount
   @Override public void hideLoading() {
     progressBarContent.setVisibility(View.GONE);
     viewContent.setVisibility(View.VISIBLE);
+  }
+
+  @Override public void showInvalidFieldError(String messageError){
+    Toast.makeText(getContext(), messageError, Toast.LENGTH_SHORT)
+        .show();
   }
 
   @Override public void showNetworkError() {

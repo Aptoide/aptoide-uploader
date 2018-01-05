@@ -24,7 +24,9 @@ public class AptoideAccountManager {
   }
 
   public Completable create(String email, String password, String storeName) {
-    return accountService.createAccount(email, password, storeName)
+    CredentialsValidator credentialsValidator = new CredentialsValidator();
+    return credentialsValidator.validate(email, password, storeName)
+        .andThen(accountService.createAccount(email, password, storeName))
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 

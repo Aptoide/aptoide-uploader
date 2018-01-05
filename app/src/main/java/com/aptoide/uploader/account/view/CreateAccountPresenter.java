@@ -1,5 +1,6 @@
 package com.aptoide.uploader.account.view;
 
+import com.aptoide.uploader.account.AccountValidationException;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
 import com.aptoide.uploader.account.network.error.DuplicatedUserException;
@@ -8,6 +9,7 @@ import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
+import java.io.IOException;
 
 public class CreateAccountPresenter implements Presenter {
 
@@ -15,15 +17,17 @@ public class CreateAccountPresenter implements Presenter {
   private final AptoideAccountManager accountManager;
   private final CreateAccountNavigator accountNavigator;
   private final CompositeDisposable compositeDisposable;
+  private final AccountErrorMapper accountErrorMapper;
   private final Scheduler viewScheduler;
 
   public CreateAccountPresenter(CreateAccountView view, AptoideAccountManager accountManager,
       CreateAccountNavigator accountNavigator, CompositeDisposable compositeDisposable,
-      Scheduler viewScheduler) {
+      AccountErrorMapper accountErrorMapper, Scheduler viewScheduler) {
     this.view = view;
     this.accountManager = accountManager;
     this.accountNavigator = accountNavigator;
     this.compositeDisposable = compositeDisposable;
+    this.accountErrorMapper = accountErrorMapper;
     this.viewScheduler = viewScheduler;
   }
 
@@ -75,31 +79,42 @@ public class CreateAccountPresenter implements Presenter {
 
   private void handleCreateAccountClick() {
     compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event == View.LifecycleEvent.CREATE)
-        .flatMap(__ -> view.getCreateAccountEvent())
-        .doOnNext(__ -> view.showLoading())
-        .flatMapCompletable(
-            data -> accountManager.create(data.getEmail(), data.getPassword(), data.getStoreName()))
-        .observeOn(viewScheduler)
-        .doOnError(throwable -> {
-          view.hideLoading();
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMapCompletable(created -> view.getCreateAccountEvent()
+            .doOnNext(click -> view.showLoading())
+            .flatMapCompletable(data -> accountManager.create(data.getEmail(), data.getPassword(),
+                data.getStoreName()))
+            .observeOn(viewScheduler)
+            .doOnError(throwable -> {
+              view.hideLoading();
 
-          if (isInternetError(throwable)) {
-            view.showNetworkError();
-          }
+              if (isInternetError(throwable)) {
+                view.showNetworkError();
+              }
 
-          if (isStoreNameTaken(throwable)) {
-            view.showErrorStoreAlreadyExists();
-          }
+              if (invalidFieldError(throwable)){
+                view.showInvalidFieldError(accountErrorMapper.map(throwable));
+              }
 
-          if (isUserNameTaken(throwable)) {
-            view.showErrorUserAlreadyExists();
-          }
-        })
-        .retry()
+              else if (isStoreNameTaken(throwable)) {
+                view.showErrorStoreAlreadyExists();
+              }
+
+              else if (isUserNameTaken(throwable)) {
+                view.showErrorUserAlreadyExists();
+              }
+            })
+            .retry())
         .subscribe(() -> accountNavigator.navigateToMyAppsView(), throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+  }
+
+  private boolean invalidFieldError(Throwable throwable) {
+    if(throwable instanceof AccountValidationException){
+      return true;
+    }
+    return false;
   }
 
   private boolean isUserNameTaken(Throwable throwable) {
@@ -111,9 +126,9 @@ public class CreateAccountPresenter implements Presenter {
   }
 
   private boolean isInternetError(Throwable throwable) {
-    if (throwable instanceof IllegalStateException) {
-      return false;
+    if (throwable instanceof IOException) {
+      return true;
     }
-    return true;
+    return false;
   }
 }

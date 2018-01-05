@@ -2,9 +2,7 @@ package com.aptoide.uploader.account.view;
 
 import android.support.annotation.Nullable;
 import com.aptoide.uploader.view.View;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 
 public interface CreateAccountView extends View {
 
@@ -17,6 +15,8 @@ public interface CreateAccountView extends View {
   void showLoading();
 
   void hideLoading();
+
+  void showInvalidFieldError(String messageError);
 
   void showNetworkError();
 
