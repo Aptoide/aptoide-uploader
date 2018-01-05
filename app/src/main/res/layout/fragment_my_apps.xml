@@ -1,25 +1,24 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:layout_height="match_parent"
+    android:layout_width="wrap_content"
+    android:background="#ececec">
+<FrameLayout
+    android:id="@+id/regular_screen"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:orientation="vertical"
     >
 
-  <android.support.v7.widget.Toolbar
-      android:id="@+id/fragment_my_apps_toolbar"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:minHeight="?attr/actionBarSize"
-      app:title="@string/app_name"
-      app:titleTextAppearance="@style/AppTheme.Toolbar.Title"
-      />
+
 
   <LinearLayout
       android:id="@+id/grid_view_and_hint"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
+      android:layout_marginTop="?attr/actionBarSize"
       android:orientation="vertical"
       >
 
@@ -47,6 +46,12 @@
           android:textSize="16sp"
           />
     </LinearLayout>
+    <LinearLayout
+        android:id="@+id/main_screen"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        >
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -90,7 +95,10 @@
       </FrameLayout>
 
     </LinearLayout>
-  </LinearLayout>
+
+
+
+
 
   <android.support.v7.widget.RecyclerView
       android:id="@+id/fragment_my_apps_list"
@@ -101,4 +109,29 @@
       tools:listitem="@android:layout/simple_list_item_checked"
       tools:spanCount="3"
       />
+    </LinearLayout>
 </LinearLayout>
+
+  <android.support.v7.widget.Toolbar
+      android:id="@+id/fragment_my_apps_toolbar"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:minHeight="?attr/actionBarSize"
+      android:background="#498ec2"
+      app:title="@string/app_name"
+      app:titleTextAppearance="@style/AppTheme.Toolbar.Title"
+      />
+
+</FrameLayout>
+  <Button
+      android:id="@+id/submit_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_alignParentBottom="true"
+      android:text="Submit Apps"
+      android:gravity="center"
+      android:background="@drawable/submit_button"
+      android:visibility="gone"
+      />
+
+</RelativeLayout>
