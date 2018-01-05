@@ -48,8 +48,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private Disposable selectionObservable;
   private Animation slideBottomDown;
   private Animation slideBottomUp;
-  private int startUp;
-
 
 
   public static MyStoreFragment newInstance() {
@@ -88,7 +86,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
             .setPositiveButton(R.string.yes)
             .setNegativeButton(R.string.no)
             .build();
-    startUp = 0;
     new MyStorePresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
         new CompositeDisposable(), new MyStoreNavigator(getFragmentManager()),
@@ -110,13 +107,12 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   }
 
   @Override public void resetSelectionState(){
-    if(startUp>=2){
+
+    if(adapter.getSelectedCount()!=0){
       toggleSubmitButton(false);
       selectionObservable.dispose();
       setUpSelectionListener();
     }
-    else
-      startUp++;
   }
 
   private void setUpSelectionListener(){
