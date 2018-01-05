@@ -44,13 +44,6 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public AptoideAccountManager getAccountManager() {
     if (accountManager == null) {
-      final Retrofit retrofitV2 = new Retrofit.Builder().addCallAdapterFactory(
-          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(new OkHttpClient())
-          .baseUrl("http://webservices.aptoide.com/")
-          .addConverterFactory(MoshiConverterFactory.create())
-          .build();
-
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
           .client(new OkHttpClient())
@@ -66,7 +59,7 @@ public class UploaderApplication extends NotificationApplicationView {
           .build();
 
       accountManager = new AptoideAccountManager(
-          new RetrofitAccountService(retrofitV2.create(RetrofitAccountService.ServiceV2.class),
+          new RetrofitAccountService(retrofitV3.create(RetrofitAccountService.ServiceV3.class),
               retrofitV7.create(RetrofitAccountService.ServiceV7.class), new SecurityAlgorithms(),
               new AccountResponseMapper(), authenticationProvider),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),
