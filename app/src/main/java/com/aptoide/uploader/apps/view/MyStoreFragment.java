@@ -1,11 +1,14 @@
 package com.aptoide.uploader.apps.view;
 
 import android.content.DialogInterface;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
+import android.text.SpannableString;
+import android.text.style.ForegroundColorSpan;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -66,6 +69,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     toolbar.inflateMenu(R.menu.app_grid_menu);
     logoutItem = toolbar.getMenu()
         .findItem(R.id.logout_button);
+
+    SpannableString s = new SpannableString("Sign Out");
+    s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length(), 0);
+    logoutItem.setTitle(s);
+
     recyclerView = view.findViewById(R.id.fragment_my_apps_list);
     storeNameText = view.findViewById(R.id.fragment_my_apps_store_name);
     spinner = view.findViewById(R.id.sort_spinner);
