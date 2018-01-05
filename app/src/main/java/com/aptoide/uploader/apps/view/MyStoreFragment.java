@@ -2,8 +2,11 @@ package com.aptoide.uploader.apps.view;
 
 import android.content.DialogInterface;
 import android.graphics.Color;
+import android.graphics.PorterDuff;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.ActionBar;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -21,6 +24,7 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.aptoide.uploader.MainActivity;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.InstalledApp;
@@ -51,7 +55,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private Disposable selectionObservable;
   private Animation slideBottomDown;
   private Animation slideBottomUp;
-
+  private ActionBar toolbarHelper;
 
   public static MyStoreFragment newInstance() {
     return new MyStoreFragment();
@@ -98,6 +102,12 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
         new CompositeDisposable(), new MyStoreNavigator(getFragmentManager()),
         AndroidSchedulers.mainThread()).present();
+    toolbar.setNavigationIcon(null);
+    toolbar.setNavigationOnClickListener(view1 -> {
+      resetTitle();
+      resetSelectionState();
+      adapter.handleBackNavigation();
+    });
   }
 
   @Override public void onDestroyView() {
@@ -271,11 +281,13 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   public Observable<Boolean> handleTitleChange(boolean status) {
     int selected = adapter.getSelectedCount();
     if (selected != 0) {
+      handleToolbarItems(true);
       if(selected == 1)
         toolbar.setTitle(adapter.getSelectedCount() + " app selected");
       else
         toolbar.setTitle(adapter.getSelectedCount() + " apps selected");
     } else {
+      handleToolbarItems(false);
       toolbar.setTitle("Aptoide Uploader");
     }
 
@@ -283,6 +295,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   }
 
   @Override public void resetTitle(){
+    handleToolbarItems(false);
     toolbar.setTitle("Aptoide Uploader");
   }
 
@@ -290,5 +303,16 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     return RxMenuItem.clicks(logoutItem)
         .subscribeOn(AndroidSchedulers.mainThread())
         .unsubscribeOn(AndroidSchedulers.mainThread());
+  }
+
+  private void handleToolbarItems(boolean shouldShow){
+    if(shouldShow){
+      toolbar.setNavigationIcon(R.drawable.ic_arrow_back);
+      logoutItem.setVisible(false);
+    }
+    else{
+      toolbar.setNavigationIcon(null);
+      logoutItem.setVisible(true);
+    }
   }
 }

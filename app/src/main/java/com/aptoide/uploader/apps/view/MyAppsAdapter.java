@@ -53,6 +53,11 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     notifyDataSetChanged();
   }
 
+  public void handleBackNavigation(){
+    selectionList.clear();
+    notifyDataSetChanged();
+  }
+
   public void setSelected(int position){
     if(selectionList.contains(position)) {
       selectionList.remove((Integer) position);
