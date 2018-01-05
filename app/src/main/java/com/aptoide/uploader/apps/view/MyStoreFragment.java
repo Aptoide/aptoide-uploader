@@ -1,12 +1,13 @@
 package com.aptoide.uploader.apps.view;
 
 import android.content.DialogInterface;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
-import android.graphics.PorterDuff;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.ActionBar;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -24,7 +25,6 @@ import android.widget.Button;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
-import com.aptoide.uploader.MainActivity;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.InstalledApp;
@@ -107,6 +107,35 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       resetTitle();
       resetSelectionState();
       adapter.handleBackNavigation();
+    });
+    storeBanner.setOnLongClickListener(view12 -> {
+      PackageInfo pInfo = null;
+      try {
+        pInfo = getActivity().getPackageManager()
+            .getPackageInfo(getActivity().getPackageName(), 0);
+        String version = pInfo.versionName;
+        int versionCode = pInfo.versionCode;
+        String appName = pInfo.packageName;
+
+        AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+        builder.setMessage("App : "
+            + appName
+            + "\n"
+            + "Version : "
+            + version
+            + "\n"
+            + "Version Code : "
+            + versionCode);
+
+        builder.setPositiveButton(R.string.ok,
+            (dialog, id) -> System.out.println("Pressed OK in the error of the app version"));
+
+        AlertDialog dialog = builder.create();
+        dialog.show();
+      } catch (PackageManager.NameNotFoundException e) {
+        e.printStackTrace();
+      }
+      return false;
     });
   }
 
