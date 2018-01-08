@@ -300,10 +300,4 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     return Observable.empty();
   }
 
-  private void prepareSpinner(int arrayId) {
-    ArrayAdapter<CharSequence> adapter =
-        ArrayAdapter.createFromResource(getActivity(), arrayId, R.layout.spinner_item);
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    spinner.setAdapter(adapter);
-  }
 }
