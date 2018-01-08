@@ -31,7 +31,7 @@ public class Upload {
   }
 
   public enum Status {
-    PENDING, COMPLETED
+    PENDING, PROGRESS, COMPLETED
   }
 
   @Override public boolean equals(Object o) {

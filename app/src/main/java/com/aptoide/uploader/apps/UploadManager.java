@@ -35,7 +35,7 @@ public class UploadManager {
     return persistence.getUploads();
   }
 
-  public Observable<Void> uploadAppToRepo(Upload upload) {
+  public Observable<Upload> uploadAppToRepo(Upload upload) {
     return uploaderService.uploadAppToRepo(upload);
   }
 }

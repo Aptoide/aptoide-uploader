@@ -10,6 +10,7 @@ import com.nhaarman.mockito_kotlin.verify
 import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.Single
 import io.reactivex.rxkotlin.toSingle
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.jetbrains.spek.api.Spek
 import org.jetbrains.spek.api.dsl.describe
@@ -26,7 +27,7 @@ class NotificationPresenterTest : Spek({
             val view = mock<NotificationView>()
             val uploadService = mock<UploaderService>()
             val appInfoService = mock<RemoteAppInformationService>()
-            val uploaderPersistence = MemoryUploaderPersistence(HashSet<Upload>())
+            val uploaderPersistence = MemoryUploaderPersistence(mutableMapOf(), Schedulers.trampoline())
             val md5Calculator = mock<Md5Calculator>()
             val uploadManager = UploadManager(uploadService, uploaderPersistence, md5Calculator)
 
@@ -40,7 +41,7 @@ class NotificationPresenterTest : Spek({
             val apkPath = "/Files/facebook.apk"
             val storeName = "FabioStore"
 
-            val app = InstalledApp(appIcon, appName, false, appPackageName, apkPath, 0)
+            val app = InstalledApp(appIcon, appName, false, appPackageName, apkPath, 0, 123)
             val upload = Upload(true, true, app, Upload.Status.COMPLETED)
 
             whenever(view.lifecycleEvent)

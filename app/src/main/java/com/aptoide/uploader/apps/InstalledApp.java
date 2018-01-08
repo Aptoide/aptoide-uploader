@@ -8,15 +8,17 @@ public class InstalledApp {
   private final String packageName;
   private final String apkPath;
   private final long installedDate;
+  private final int versionCode;
 
   public InstalledApp(String icon, String name, boolean isSystem, String packageName,
-      String apkPath, long installedDate) {
+      String apkPath, long installedDate, int versionCode) {
     this.icon = icon;
     this.name = name;
     this.isSystem = isSystem;
     this.packageName = packageName;
     this.apkPath = apkPath;
     this.installedDate = installedDate;
+    this.versionCode = versionCode;
   }
 
   public String getIcon() {
@@ -54,5 +56,9 @@ public class InstalledApp {
 
   public long getInstalledDate() {
     return installedDate;
+  }
+
+  public int getVersionCode() {
+    return versionCode;
   }
 }

@@ -10,10 +10,6 @@ import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
 
-/**
- * Created by jdandrade on 03/01/2018.
- */
-
 public class AptoideAccessTokenProvider implements AuthenticationProvider {
   private static final String RESPONSE_MODE = "json";
   private static final String ACCOUNT_GRANT_TYPE = "password";
@@ -57,14 +53,6 @@ public class AptoideAccessTokenProvider implements AuthenticationProvider {
       return Single.error(new IllegalStateException("There is no access token!"));
     }
     return Single.just(accessToken);
-  }
-
-  @Override public Single<String> getRefreshToken() {
-    String refreshToken = authenticationPersistance.getRefreshToken();
-    if (refreshToken == null) {
-      return Single.error(new IllegalStateException("There is no refresh token!"));
-    }
-    return Single.just(refreshToken);
   }
 
   @Override public void saveAuthentication(String accessToken, String refreshToken) {
