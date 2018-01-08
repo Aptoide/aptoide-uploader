@@ -149,4 +149,7 @@
   <string name="error_user_already_exists">This user already exists</string>
   <string name="error_store_already_exists">This store already exists</string>
   <string name="logout_confirmation_message">You are about to sign out from Uploader, are you sure? </string>
+  <string name="app_selected">App Selected</string>
+  <string name="apps_selected">Apps Selected</string>
+
 </resources>

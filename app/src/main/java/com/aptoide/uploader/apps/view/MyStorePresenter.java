@@ -92,7 +92,9 @@ public class MyStorePresenter implements Presenter {
         .flatMapSingle(sortingOrder -> storeManager.getStore()
             .flatMap(store -> sort(store.getApps(), sortingOrder)))
         .observeOn(viewScheduler)
-        .subscribe(apps -> view.showApps(apps), throwable -> {
+        .subscribe(apps -> {
+          view.showApps(apps);
+        }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
   }
