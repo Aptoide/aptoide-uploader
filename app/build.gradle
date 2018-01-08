@@ -5,8 +5,8 @@ apply plugin: 'kotlin-android-extensions'
 apply plugin: "de.mannodermaus.android-junit5"
 
 android {
-  compileSdkVersion 26
-  buildToolsVersion "26.0.2"
+  compileSdkVersion 27
+  buildToolsVersion "27.0.2"
 
   signingConfigs {
     release {
@@ -19,7 +19,7 @@ android {
   defaultConfig {
     applicationId "pt.caixamagica.aptoide.uploader"
     minSdkVersion 15
-    targetSdkVersion 26
+    targetSdkVersion 27
     versionCode 1
     versionName "1.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -30,7 +30,7 @@ android {
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
     }
-    debug{
+    debug {
       minifyEnabled false
       applicationIdSuffix ".debug"
     }
@@ -49,13 +49,13 @@ android {
 dependencies {
 
   // Support Libraries
-  compile 'com.android.support:appcompat-v7:26.1.0'
-  compile 'com.android.support:design:26.1.0'
+  compile 'com.android.support:appcompat-v7:27.0.2'
+  compile 'com.android.support:design:27.0.2'
 
   // Reactive Programming
-  compile "io.reactivex.rxjava2:rxjava:2.1.6"
+  compile "io.reactivex.rxjava2:rxjava:2.1.7"
   compile "com.jakewharton.rxbinding2:rxbinding-support-v4:2.0.0"
-  compile "com.jakewharton.rxrelay2:rxrelay:2.0.0"
+  compile 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
 
   // Kotlin
   compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
@@ -77,5 +77,5 @@ dependencies {
   compile 'com.squareup.retrofit2:converter-moshi:2.3.0'
 
   // Image Loading
-  compile 'com.github.bumptech.glide:glide:4.3.1'
+  compile 'com.github.bumptech.glide:glide:4.4.0'
 }
