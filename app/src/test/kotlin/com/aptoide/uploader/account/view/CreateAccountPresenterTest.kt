@@ -299,7 +299,7 @@ class CreateAccountPresenterTest : Spek({
 
             verify(navigator).navigateToRecoverPassView()
         }
-        it("should display an error message when user wants to create an account with invalid fields"){
+        it("should display an error message when user wants to create an account with invalid fields") {
             val accountErrorMapper = mock<AccountErrorMapper>()
             val accountValidationException = mock<AccountValidationException>()
             val navigator = mock<CreateAccountNavigator>()
@@ -313,14 +313,15 @@ class CreateAccountPresenterTest : Spek({
 
             whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
             whenever(view.createAccountEvent).doReturn(createAccountEvent)
-            whenever(accountManager.create("", "", "")).doReturn(Completable.error(accountValidationException))
+            whenever(accountManager.create(any(), any(), any())).doReturn(Completable.error(accountValidationException))
+            whenever(accountErrorMapper.map(accountValidationException)).doReturn(buildString { })
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             createAccountEvent.onNext(publicCreateAccountModel)
             verify(view).showLoading()
             verify(view).hideLoading()
-            verify(view).showInvalidFieldError("an error message")
+            verify(view).showInvalidFieldError(any())
         }
     }
 })

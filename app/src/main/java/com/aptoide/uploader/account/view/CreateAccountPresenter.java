@@ -92,15 +92,11 @@ public class CreateAccountPresenter implements Presenter {
                 view.showNetworkError();
               }
 
-              if (invalidFieldError(throwable)){
+              if (invalidFieldError(throwable)) {
                 view.showInvalidFieldError(accountErrorMapper.map(throwable));
-              }
-
-              else if (isStoreNameTaken(throwable)) {
+              } else if (isStoreNameTaken(throwable)) {
                 view.showErrorStoreAlreadyExists();
-              }
-
-              else if (isUserNameTaken(throwable)) {
+              } else if (isUserNameTaken(throwable)) {
                 view.showErrorUserAlreadyExists();
               }
             })
@@ -111,7 +107,7 @@ public class CreateAccountPresenter implements Presenter {
   }
 
   private boolean invalidFieldError(Throwable throwable) {
-    if(throwable instanceof AccountValidationException){
+    if (throwable instanceof AccountValidationException) {
       return true;
     }
     return false;

@@ -11,17 +11,18 @@ public class CredentialsValidator {
   public Completable validate(String email, String password, String storeName) {
     return Completable.defer(() -> {
       if (isEmpty(email) && isEmpty(password) && isEmpty(storeName)) {
-        return Completable.error(new AccountValidationException(AccountValidationException.EMPTY_EMAIL_PASSWORD_AND_STORE));
-      } else if(isEmpty(email) && isEmpty(password)){
-        return Completable.error(new AccountValidationException(AccountValidationException.EMPTY_EMAIL_AND_PASSWORD));
-      }
-      else if(isEmpty(email) && isEmpty(storeName)){
-        return Completable.error(new AccountValidationException(AccountValidationException.EMPTY_EMAIL_AND_STORE));
-      }
-      else if(isEmpty(password) && isEmpty(storeName)){
-        return Completable.error(new AccountValidationException(AccountValidationException.EMPTY_PASSWORD_AND_STORE));
-      }
-      else if (isEmpty(password)) {
+        return Completable.error(new AccountValidationException(
+            AccountValidationException.EMPTY_EMAIL_PASSWORD_AND_STORE));
+      } else if (isEmpty(email) && isEmpty(password)) {
+        return Completable.error(
+            new AccountValidationException(AccountValidationException.EMPTY_EMAIL_AND_PASSWORD));
+      } else if (isEmpty(email) && isEmpty(storeName)) {
+        return Completable.error(
+            new AccountValidationException(AccountValidationException.EMPTY_EMAIL_AND_STORE));
+      } else if (isEmpty(password) && isEmpty(storeName)) {
+        return Completable.error(
+            new AccountValidationException(AccountValidationException.EMPTY_PASSWORD_AND_STORE));
+      } else if (isEmpty(password)) {
         return Completable.error(
             new AccountValidationException(AccountValidationException.EMPTY_PASSWORD));
       } else if (isEmpty(email)) {

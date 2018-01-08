@@ -77,8 +77,8 @@ public class CreateAccountFragment extends FragmentView implements CreateAccount
         }));
 
     new CreateAccountPresenter(this, accountManager,
-        new CreateAccountNavigator(getFragmentManager(), getContext()), new CompositeDisposable(), accountErrorMapper,
-        AndroidSchedulers.mainThread()).present();
+        new CreateAccountNavigator(getFragmentManager(), getContext()), new CompositeDisposable(),
+        accountErrorMapper, AndroidSchedulers.mainThread()).present();
   }
 
   @Override public void onDestroyView() {
@@ -144,7 +144,7 @@ public class CreateAccountFragment extends FragmentView implements CreateAccount
     viewContent.setVisibility(View.VISIBLE);
   }
 
-  @Override public void showInvalidFieldError(String messageError){
+  @Override public void showInvalidFieldError(String messageError) {
     Toast.makeText(getContext(), messageError, Toast.LENGTH_SHORT)
         .show();
   }

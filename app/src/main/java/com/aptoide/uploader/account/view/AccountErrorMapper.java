@@ -12,7 +12,7 @@ public class AccountErrorMapper {
 
   private final Context context;
 
-  public AccountErrorMapper(Context context){
+  public AccountErrorMapper(Context context) {
     this.context = context;
   }
 
