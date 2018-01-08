@@ -1,9 +1,12 @@
 package com.aptoide.uploader.apps.view;
 
 import android.content.DialogInterface;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
@@ -95,6 +98,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
             .setPositiveButton(R.string.yes)
             .setNegativeButton(R.string.no)
             .build();
+    toolbar.setNavigationIcon(null);
+    toolbar.setNavigationOnClickListener(click -> {
+      adapter.clearAppsSelection();
+    });
+    storeBanner.setOnLongClickListener(click -> showVersionDialog());
     new MyStorePresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
         new CompositeDisposable(), new MyStoreNavigator(getFragmentManager()),
@@ -116,11 +124,38 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     super.onDestroyView();
   }
 
+  private boolean showVersionDialog() {
+    PackageInfo pInfo;
+    try {
+      pInfo = getActivity().getPackageManager()
+          .getPackageInfo(getActivity().getPackageName(), 0);
+      String version = pInfo.versionName;
+      int versionCode = pInfo.versionCode;
+      String appName = pInfo.packageName;
+
+      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+      builder.setMessage("App : "
+          + appName
+          + "\n"
+          + "Version : "
+          + version
+          + "\n"
+          + "Version Code : "
+          + versionCode);
+
+      AlertDialog dialog = builder.create();
+      dialog.show();
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
   private void setUpSelectionListener() {
     selectionObservable = adapter.toggleSelection()
-        .doOnNext(status -> handleTitleChange())
+        .doOnNext(appsSelected -> handleTitleChange())
         .distinctUntilChanged()
-        .doOnNext(status -> toggleSubmitButton(status))
+        .doOnNext(appsSelected -> setSubmitButtonVisibility(appsSelected))
         .subscribe();
   }
 
@@ -175,9 +210,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         });
   }
 
-  @Override public void toggleSubmitButton(boolean status) {
-
-    if (status) {
+  @Override public void setSubmitButtonVisibility(boolean appsSelected) {
+    if (appsSelected) {
       TranslateAnimation translateAnimation =
           new TranslateAnimation(0, 0, 0, -storeBanner.getHeight());
       translateAnimation.setDuration(200);
@@ -221,15 +255,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
       mainScreen.startAnimation(translateAnimation);
       submitButton.startAnimation(slideBottomDown);
-    }
-  }
-
-  @Override public void resetSelectionState() {
-
-    if (adapter.getSelectedCount() != 0) {
-      toggleSubmitButton(false);
-      selectionObservable.dispose();
-      setUpSelectionListener();
     }
   }
 
@@ -284,6 +309,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     int selected = adapter.getSelectedCount();
 
     if (selected != 0) {
+      setToolbarVisibility(true);
       if (selected == 1) {
         toolbar.setTitle(
             String.valueOf(adapter.getSelectedCount()) + " " + getResources().getString(
@@ -294,7 +320,18 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
                 R.string.apps_selected));
       }
     } else {
+      setToolbarVisibility(false);
       toolbar.setTitle(R.string.app_name);
+    }
+  }
+
+  private void setToolbarVisibility(boolean shouldShow) {
+    if (shouldShow) {
+      toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
+      logoutItem.setVisible(false);
+    } else {
+      toolbar.setNavigationIcon(null);
+      logoutItem.setVisible(true);
     }
   }
 }
