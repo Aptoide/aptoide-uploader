@@ -26,4 +26,6 @@ public interface MyStoreView extends View {
   Observable<SortingOrder> orderByEvent();
 
   Observable<Object> logoutEvent();
+
+  Observable<List<InstalledApp>> getSelectedApps();
 }
