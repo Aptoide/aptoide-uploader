@@ -3,6 +3,7 @@ package com.aptoide.uploader.apps.view
 import com.aptoide.uploader.apps.*
 import com.aptoide.uploader.apps.network.UploaderService
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence
+import com.aptoide.uploader.upload.BackgroundService
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -29,7 +30,8 @@ class NotificationPresenterTest : Spek({
             val appInfoService = mock<RemoteAppInformationService>()
             val uploaderPersistence = MemoryUploaderPersistence(mutableMapOf(), Schedulers.trampoline())
             val md5Calculator = mock<Md5Calculator>()
-            val uploadManager = UploadManager(uploadService, uploaderPersistence, md5Calculator)
+            val backgroundRunner = mock<BackgroundService>()
+            val uploadManager = UploadManager(uploadService, uploaderPersistence, md5Calculator, backgroundRunner)
 
             val presenter = NotificationPresenter(view, uploadManager)
 

@@ -1,6 +1,5 @@
 package com.aptoide.uploader;
 
-import android.content.Intent;
 import android.preference.PreferenceManager;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
@@ -11,6 +10,7 @@ import com.aptoide.uploader.apps.AndroidLanguageManager;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
+import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
@@ -42,7 +42,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
   @Override public void onCreate() {
     super.onCreate();
-    startService(new Intent(this, SyncUploadService.class));
+    getUploadManager().start();
     // TODO: 27-12-2017 filipe need to stop the service
   }
 
@@ -119,7 +119,8 @@ public class UploaderApplication extends NotificationApplicationView {
       uploadManager = new UploadManager(new RetrofitUploadService(
           retrofitV7Secondary.create(RetrofitUploadService.ServiceV7.class),
           retrofitV3.create(RetrofitUploadService.ServiceV3.class), getAccessTokenProvider(),
-          getMd5Calculator()), getUploadPersistence(), getMd5Calculator());
+          getMd5Calculator()), getUploadPersistence(), getMd5Calculator(),
+          new ServiceBackgroundService(this, SyncUploadService.class));
     }
     return uploadManager;
   }

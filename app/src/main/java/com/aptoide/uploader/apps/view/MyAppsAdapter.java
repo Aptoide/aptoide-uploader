@@ -54,6 +54,18 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     notifyDataSetChanged();
   }
 
+  public int getSelectedCount() {
+    return selectedApps.size();
+  }
+
+  public List<InstalledApp> getSelected() {
+    List<InstalledApp> selectedAppsList = new ArrayList<>();
+    for (Integer appId : selectedApps) {
+      selectedAppsList.add(installedApps.get(appId));
+    }
+    return selectedAppsList;
+  }
+
   public void setSelected(int position) {
     if (selectedApps.contains(position)) {
       selectedApps.remove((Integer) position);
@@ -67,9 +79,5 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
       selectedPublisher.onNext(true);
     }
     notifyItemChanged(position);
-  }
-
-  public int getSelectedCount() {
-    return selectedApps.size();
   }
 }

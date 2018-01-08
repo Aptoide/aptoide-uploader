@@ -4,6 +4,7 @@ import android.content.DialogInterface;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,7 +22,7 @@ public interface MyStoreView extends View {
 
   void showError();
 
-  Observable<List<InstalledApp>> submitAppEvent();
+  Observable<Object> submitAppEvent();
 
   Observable<SortingOrder> orderByEvent();
 
@@ -31,5 +32,5 @@ public interface MyStoreView extends View {
 
   Observable<Object> logoutEvent();
 
-  Observable<List<InstalledApp>> getSelectedApps();
+  Single<List<InstalledApp>> getSelectedApps();
 }

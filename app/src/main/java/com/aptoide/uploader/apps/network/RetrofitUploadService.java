@@ -42,9 +42,10 @@ public class RetrofitUploadService implements UploaderService {
         .flatMap(response -> {
           final GetProposedResponse proposedBody = response.body();
 
-          if (response.isSuccessful() && proposedBody != null && proposedBody.getInfo()
+          if ((response.isSuccessful() && proposedBody != null) && (proposedBody.getInfo()
               .getStatus()
-              .equals(ResponseV7.Info.Status.FAIL)) {
+              .equals(ResponseV7.Info.Status.FAIL) || proposedBody.getData()
+              .isEmpty())) {
             return Single.just(new Upload(false, false, installedApp, Upload.Status.PENDING));
           }
 

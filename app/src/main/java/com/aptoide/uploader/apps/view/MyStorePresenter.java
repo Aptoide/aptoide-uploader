@@ -113,7 +113,7 @@ public class MyStorePresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
         .filter(granted -> granted)
-        .flatMap(__ -> view.getSelectedApps())
+        .flatMapSingle(__ -> view.getSelectedApps())
         .flatMapCompletable(apps -> storeManager.upload(apps))
         .subscribe(() -> {
         }, throwable -> {
