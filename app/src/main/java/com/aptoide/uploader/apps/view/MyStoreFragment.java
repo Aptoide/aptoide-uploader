@@ -54,7 +54,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private Animation slideBottomDown;
   private Animation slideBottomUp;
 
-
   public static MyStoreFragment newInstance() {
     return new MyStoreFragment();
   }
@@ -117,18 +116,18 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     super.onDestroyView();
   }
 
-  @Override public void resetSelectionState(){
+  @Override public void resetSelectionState() {
 
-    if(adapter.getSelectedCount()!=0){
+    if (adapter.getSelectedCount() != 0) {
       toggleSubmitButton(false);
       selectionObservable.dispose();
       setUpSelectionListener();
     }
   }
 
-  private void setUpSelectionListener(){
+  private void setUpSelectionListener() {
     selectionObservable = adapter.toggleSelection()
-        .flatMap(status -> handleTitleChange(status))
+        .doOnNext(status -> handleTitleChange())
         .distinctUntilChanged()
         .doOnNext(status -> toggleSubmitButton(status))
         .subscribe();
@@ -142,7 +141,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   }
 
   @Override public void showApps(@NotNull List<InstalledApp> appsList) {
-    adapter.setList(appsList);
+    adapter.setInstalledApps(appsList);
   }
 
   @Override public void showStoreName(@NotNull String storeName) {
@@ -209,8 +208,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
       mainScreen.startAnimation(translateAnimation);
       submitButton.startAnimation(slideBottomUp);
-    }
-    else {
+    } else {
       TranslateAnimation translateAnimation =
           new TranslateAnimation(0, 0, 0, storeBanner.getHeight());
       translateAnimation.setDuration(200);
@@ -271,22 +269,20 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     slideBottomDown.setAnimationListener(hideBottom);
   }
 
-  public Observable<Boolean> handleTitleChange(boolean status) {
+  public void handleTitleChange() {
     int selected = adapter.getSelectedCount();
+
     if (selected != 0) {
-      if(selected == 1)
-        toolbar.setTitle(adapter.getSelectedCount() + " app selected");
-      else
-        toolbar.setTitle(adapter.getSelectedCount() + " apps selected");
+      if (selected == 1) {
+        toolbar.setTitle(String.valueOf(adapter.getSelectedCount()) + " " + getContext().getString(
+            R.string.app_selected));
+      } else {
+        toolbar.setTitle(String.valueOf(adapter.getSelectedCount()) + " " + getContext().getString(
+            R.string.apps_selected));
+      }
     } else {
-      toolbar.setTitle("Aptoide Uploader");
+      toolbar.setTitle(R.string.app_name);
     }
-
-    return Observable.just(status);
-  }
-
-  @Override public void resetTitle(){
-    toolbar.setTitle("Aptoide Uploader");
   }
 
   @Override public Observable<Object> logoutEvent() {
@@ -299,5 +295,4 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     //// TODO: 03-01-2018 filipe depends on how app selection will be done.
     return Observable.empty();
   }
-
 }

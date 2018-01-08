@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import android.os.Build;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -24,19 +25,24 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
     itemView.setOnClickListener(this);
   }
 
-  public void setApp(InstalledApp app, boolean set) {
+  public void setApp(InstalledApp app, boolean selected) {
     Glide.with(itemView)
         .load(app.getIcon())
         .into(image);
     appName.setText(app.getName());
-    if(!set){
-      background.setBackgroundColor(itemView.getResources().getColor(R.color.white));
-    }
-    else{
-      background.setBackground(itemView.getResources().getDrawable(R.drawable.overlay_focused));
+    if (!selected) {
+      background.setBackgroundColor(itemView.getResources()
+          .getColor(R.color.white));
+    } else {
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN) {
+        background.setBackground(itemView.getResources()
+            .getDrawable(R.drawable.overlay_focused));
+      } else {
+        background.setBackgroundDrawable(itemView.getResources()
+            .getDrawable(R.drawable.overlay_focused));
+      }
     }
   }
-
 
   @Override public void onClick(View view) {
     listener.onClick(view, getAdapterPosition());

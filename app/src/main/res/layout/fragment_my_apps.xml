@@ -4,131 +4,127 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_height="match_parent"
     android:layout_width="wrap_content"
-    android:background="#ececec">
-<FrameLayout
-    android:id="@+id/regular_screen"
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="#ececec"
     >
-
-
-
-  <LinearLayout
-      android:id="@+id/grid_view_and_hint"
+  <FrameLayout
+      android:id="@+id/regular_screen"
       android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginTop="?attr/actionBarSize"
+      android:layout_height="match_parent"
       android:orientation="vertical"
       >
 
-    <LinearLayout
-        android:id="@+id/store_info"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:background="#0078ab"
-        android:orientation="horizontal"
-        >
-      <ImageView
-          android:id="@+id/store_icon"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:padding="10dp"
-          android:src="@drawable/ic_store"
-          android:textSize="18dp"
-          />
 
-      <TextView
-          android:id="@+id/fragment_my_apps_store_name"
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:layout_gravity="center"
-          android:textSize="16sp"
-          />
-    </LinearLayout>
     <LinearLayout
-        android:id="@+id/main_screen"
+        android:id="@+id/grid_view_and_hint"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="?attr/actionBarSize"
         android:orientation="vertical"
         >
-    <LinearLayout
+
+      <LinearLayout
+          android:id="@+id/store_info"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="#0078ab"
+          android:orientation="horizontal"
+          >
+        <ImageView
+            android:id="@+id/store_icon"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:padding="10dp"
+            android:src="@drawable/ic_store"
+            android:textSize="18dp"
+            />
+
+        <TextView
+            android:id="@+id/fragment_my_apps_store_name"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:textSize="16sp"
+            />
+      </LinearLayout>
+      <LinearLayout
+          android:id="@+id/main_screen"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:orientation="vertical"
+          >
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:padding="5dp"
+            >
+
+          <TextView
+              android:layout_width="0dp"
+              android:layout_height="wrap_content"
+              android:layout_marginEnd="5dp"
+              android:layout_marginRight="5dp"
+              android:layout_weight="1"
+              android:ellipsize="start"
+              android:maxLines="2"
+              android:text="@string/select_apps_to_upload_to_your_store"
+              android:textColor="@android:color/darker_gray"
+              />
+
+          <FrameLayout
+              android:layout_width="118dp"
+              android:layout_height="wrap_content"
+              android:layout_marginBottom="3dp"
+              android:layout_marginEnd="6dp"
+              android:layout_marginLeft="3dp"
+              android:layout_marginRight="6dp"
+              android:layout_marginStart="3dp"
+              android:layout_marginTop="3dp"
+              android:background="@drawable/spinner_custom_background"
+              android:padding="4dp"
+              >
+
+            <Spinner
+                android:id="@+id/sort_spinner"
+                android:layout_width="match_parent"
+                android:layout_height="30dp"
+                ></Spinner>
+
+          </FrameLayout>
+
+        </LinearLayout>
+
+
+        <android.support.v7.widget.RecyclerView
+            android:id="@+id/fragment_my_apps_list"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:padding="@dimen/apps_grid_item_margin"
+            tools:layoutManager="android.support.v7.widget.GridLayoutManager"
+            tools:listitem="@android:layout/simple_list_item_checked"
+            tools:spanCount="3"
+            />
+      </LinearLayout>
+    </LinearLayout>
+
+    <android.support.v7.widget.Toolbar
+        android:id="@+id/fragment_my_apps_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:gravity="center_vertical"
-        android:orientation="horizontal"
-        android:padding="5dp"
-        >
+        android:minHeight="?attr/actionBarSize"
+        android:background="#498ec2"
+        app:title="@string/app_name"
+        app:titleTextAppearance="@style/AppTheme.Toolbar.Title"
+        />
 
-      <TextView
-          android:layout_width="0dp"
-          android:layout_height="wrap_content"
-          android:layout_marginEnd="5dp"
-          android:layout_marginRight="5dp"
-          android:layout_weight="1"
-          android:ellipsize="start"
-          android:maxLines="2"
-          android:text="@string/select_apps_to_upload_to_your_store"
-          android:textColor="@android:color/darker_gray"
-          />
-
-      <FrameLayout
-          android:layout_width="118dp"
-          android:layout_height="wrap_content"
-          android:layout_marginBottom="3dp"
-          android:layout_marginEnd="6dp"
-          android:layout_marginLeft="3dp"
-          android:layout_marginRight="6dp"
-          android:layout_marginStart="3dp"
-          android:layout_marginTop="3dp"
-          android:background="@drawable/spinner_custom_background"
-          android:padding="4dp"
-          >
-
-        <Spinner
-            android:id="@+id/sort_spinner"
-            android:layout_width="match_parent"
-            android:layout_height="30dp"
-            >
-        </Spinner>
-
-      </FrameLayout>
-
-    </LinearLayout>
-
-
-
-
-
-  <android.support.v7.widget.RecyclerView
-      android:id="@+id/fragment_my_apps_list"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent"
-      android:padding="@dimen/apps_grid_item_margin"
-      tools:layoutManager="android.support.v7.widget.GridLayoutManager"
-      tools:listitem="@android:layout/simple_list_item_checked"
-      tools:spanCount="3"
-      />
-    </LinearLayout>
-</LinearLayout>
-
-  <android.support.v7.widget.Toolbar
-      android:id="@+id/fragment_my_apps_toolbar"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:minHeight="?attr/actionBarSize"
-      android:background="#498ec2"
-      app:title="@string/app_name"
-      app:titleTextAppearance="@style/AppTheme.Toolbar.Title"
-      />
-
-</FrameLayout>
+  </FrameLayout>
   <Button
       android:id="@+id/submit_button"
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_alignParentBottom="true"
-      android:text="Submit Apps"
+      android:text="@string/submit_apps"
       android:gravity="center"
       android:background="@drawable/submit_button"
       android:visibility="gone"

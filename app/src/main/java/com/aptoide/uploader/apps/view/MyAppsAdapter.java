@@ -3,7 +3,6 @@ package com.aptoide.uploader.apps.view;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
-import android.view.View;
 import android.view.ViewGroup;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.InstalledApp;
@@ -14,15 +13,15 @@ import java.util.List;
 
 public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
-  private final List<InstalledApp> list;
-  private final List<Integer> selectionList;
+  private final List<InstalledApp> installedApps;
+  private final List<Integer> selectedApps;
   private final MyAppsClickListener listener;
   private final PublishSubject<Boolean> selectedPublisher;
 
   public MyAppsAdapter(@NonNull List<InstalledApp> list) {
-    this.list = list;
-    this.selectionList = new ArrayList<>();
-    this.listener= (view, position) -> setSelected(position);
+    this.installedApps = list;
+    this.selectedApps = new ArrayList<>();
+    this.listener = (view, position) -> setSelected(position);
     this.selectedPublisher = PublishSubject.create();
   }
 
@@ -32,7 +31,7 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   @Override public void onBindViewHolder(AppViewHolder holder, int position) {
-    holder.setApp(list.get(position), selectionList.contains(position));
+    holder.setApp(installedApps.get(position), selectedApps.contains(position));
   }
 
   @Override public int getItemViewType(int position) {
@@ -40,35 +39,37 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   @Override public int getItemCount() {
-    return list.size();
+    return installedApps.size();
   }
 
-  public Observable<Boolean> toggleSelection(){
+  public Observable<Boolean> toggleSelection() {
     return selectedPublisher;
   }
-  public void setList(List<InstalledApp> appsList) {
-    list.clear();
-    selectionList.clear();
-    list.addAll(appsList);
+
+  public void setInstalledApps(List<InstalledApp> appsList) {
+    installedApps.clear();
+    selectedApps.clear();
+    installedApps.addAll(appsList);
+    selectedPublisher.onNext(false);
     notifyDataSetChanged();
   }
 
-  public void setSelected(int position){
-    if(selectionList.contains(position)) {
-      selectionList.remove((Integer) position);
-      if(selectionList.size()==0)
+  public void setSelected(int position) {
+    if (selectedApps.contains(position)) {
+      selectedApps.remove((Integer) position);
+      if (selectedApps.size() == 0) {
         selectedPublisher.onNext(false);
-      else
+      } else {
         selectedPublisher.onNext(true);
-    }
-    else {
-      selectionList.add(position);
+      }
+    } else {
+      selectedApps.add(position);
       selectedPublisher.onNext(true);
     }
     notifyItemChanged(position);
   }
 
-  public int getSelectedCount(){
-    return selectionList.size();
+  public int getSelectedCount() {
+    return selectedApps.size();
   }
 }
