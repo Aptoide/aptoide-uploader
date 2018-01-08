@@ -9,6 +9,9 @@ import com.aptoide.uploader.account.AptoideAccountManager
 import com.aptoide.uploader.account.network.AccountResponseMapper
 import com.aptoide.uploader.account.network.RetrofitAccountService
 import com.aptoide.uploader.apps.*
+import com.aptoide.uploader.apps.permission.UploadPermissionProvider
+import com.aptoide.uploader.security.AptoideAccessTokenProvider
+import com.aptoide.uploader.security.AuthenticationPersistance
 import com.aptoide.uploader.security.SecurityAlgorithms
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
@@ -40,20 +43,24 @@ class MyStorePresenterTest : Spek({
             val navigator = mock<MyStoreNavigator>()
             val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
-            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
             val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV3Authentication = mock<AptoideAccessTokenProvider.ServiceV3>()
+            val authenticationPersistence = mock<AuthenticationPersistance>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
+            val uploadPermissionProvider = mock<UploadPermissionProvider> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
             val appList = mutableListOf(facebook, aptoide)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+
+            val permissionsAcceptedEvent = PublishSubject.create<Boolean>()
 
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
@@ -63,11 +70,18 @@ class MyStorePresenterTest : Spek({
                     .doReturn(language.toSingle())
             whenever(packageProvider.installedApps)
                     .doReturn(appList.toSingle())
+
+            whenever(view.selectedApps)
+                    .doReturn(listOf(aptoide).toSingle().toObservable())
+            whenever(uploadPermissionProvider.permissionResultExternalStorage())
+                    .doReturn(permissionsAcceptedEvent)
+
             whenever(accountPersistence.account)
                     .doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            permissionsAcceptedEvent.onNext(true)
             verify(view).showStoreName(TestData.STORE_NAME)
             verify(view).showApps(mutableListOf(facebook))
         }
@@ -78,27 +92,39 @@ class MyStorePresenterTest : Spek({
             val navigator = mock<MyStoreNavigator>()
             val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
-            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
             val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV3Authentication = mock<AptoideAccessTokenProvider.ServiceV3>()
+            val authenticationPersistence = mock<AuthenticationPersistance>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
+            val uploadPermissionProvider = mock<UploadPermissionProvider> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val submitAppEvent = PublishSubject.create<MutableList<InstalledApp>>()
+
+            val permissionsAcceptedEvent = PublishSubject.create<Boolean>()
 
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
             whenever(view.submitAppEvent())
                     .doReturn(submitAppEvent)
+
+            whenever(uploadPermissionProvider.permissionResultExternalStorage())
+                    .doReturn(permissionsAcceptedEvent)
+
+            whenever(view.selectedApps)
+                    .doReturn(mutableListOf(aptoide).toSingle().toObservable())
+
             whenever(languageManager.currentLanguageCode)
                     .doReturn(language.toSingle())
+
             whenever(packageProvider.installedApps)
                     .doReturn(mutableListOf(aptoide).toSingle())
             whenever(uploadManager.upload(storeName, language, aptoide))
@@ -108,6 +134,7 @@ class MyStorePresenterTest : Spek({
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            permissionsAcceptedEvent.onNext(true)
             submitAppEvent.onNext(mutableListOf(aptoide))
             verify(uploadManager).upload(storeName, language, aptoide)
         }
@@ -118,17 +145,19 @@ class MyStorePresenterTest : Spek({
             val navigator = mock<MyStoreNavigator>()
             val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
-            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
             val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV3Authentication = mock<AptoideAccessTokenProvider.ServiceV3>()
+            val authenticationPersistence = mock<AuthenticationPersistance>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
+            val uploadPermissionProvider = mock<UploadPermissionProvider> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
             val unSortedAppList = listOf(aptoide, aptoide2, facebook)
             val sortedAppList = listOf(facebook, aptoide2)
@@ -136,12 +165,20 @@ class MyStorePresenterTest : Spek({
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val orderByDateEvent = PublishSubject.create<SortingOrder>()
 
+            val permissionsAcceptedEvent = PublishSubject.create<Boolean>()
+
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
             whenever(view.submitAppEvent())
                     .doReturn(Observable.empty())
             whenever(languageManager.currentLanguageCode)
                     .doReturn(language.toSingle())
+
+            whenever(view.selectedApps)
+                    .doReturn(listOf(aptoide).toSingle().toObservable())
+            whenever(uploadPermissionProvider.permissionResultExternalStorage())
+                    .doReturn(permissionsAcceptedEvent)
+
             whenever(packageProvider.installedApps).doReturn(unSortedAppList.toSingle())
             whenever(accountPersistence.account)
                     .doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
@@ -151,9 +188,9 @@ class MyStorePresenterTest : Spek({
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            permissionsAcceptedEvent.onNext(true)
             reset(view)
             orderByDateEvent.onNext(SortingOrder.DATE)
-
             verify(view).showApps(sortedAppList)
 
         }
@@ -164,23 +201,29 @@ class MyStorePresenterTest : Spek({
             val navigator = mock<MyStoreNavigator>()
             val packageProvider = mock<InstalledAppsProvider> {}
             val accountService = mock<AccountService> {}
-            val serviceV2 = mock<RetrofitAccountService.ServiceV2>()
             val serviceV3 = mock<RetrofitAccountService.ServiceV3>()
+            val serviceV3Authentication = mock<AptoideAccessTokenProvider.ServiceV3>()
+            val authenticationPersistence = mock<AuthenticationPersistance>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
-            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV2, serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper()), accountPersistence)
+            val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
+            val uploadPermissionProvider = mock<UploadPermissionProvider> {}
             val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
             val unSortedAppList = listOf(facebook, aptoide, aptoide2)
             val sortedAppList = listOf(aptoide2, facebook)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val orderByDateEvent = PublishSubject.create<SortingOrder>()
+
+            val permissionsAcceptedEvent = PublishSubject.create<Boolean>()
+
+
 
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
@@ -192,11 +235,17 @@ class MyStorePresenterTest : Spek({
             whenever(accountPersistence.account)
                     .doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
 
+            whenever(view.selectedApps)
+                    .doReturn(listOf(aptoide).toSingle().toObservable())
+            whenever(uploadPermissionProvider.permissionResultExternalStorage())
+                    .doReturn(permissionsAcceptedEvent)
+
             whenever(view.orderByEvent())
                     .doReturn(orderByDateEvent)
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            permissionsAcceptedEvent.onNext(true)
             reset(view)
             orderByDateEvent.onNext(SortingOrder.NAME)
 
@@ -208,7 +257,8 @@ class MyStorePresenterTest : Spek({
             val dialogInterface = mock<DialogInterface> {}
             val navigator = mock<MyStoreNavigator>()
             val storeManager = mock<StoreManager> {}
-            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline())
+            val uploadPermissionProvider = mock<UploadPermissionProvider> {}
+            val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
             val click = PublishSubject.create<DialogInterface>()
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()

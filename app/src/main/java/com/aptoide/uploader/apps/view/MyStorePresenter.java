@@ -2,6 +2,7 @@ package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.StoreManager;
+import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
@@ -18,15 +19,17 @@ public class MyStorePresenter implements Presenter {
   private final CompositeDisposable compositeDisposable;
   private final MyStoreNavigator storeNavigator;
   private final Scheduler viewScheduler;
+  private final UploadPermissionProvider uploadPermissionProvider;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, MyStoreNavigator storeNavigator,
-      Scheduler viewScheduler) {
+      Scheduler viewScheduler, UploadPermissionProvider uploadPermissionProvider) {
     this.view = view;
     this.storeManager = storeManager;
     this.compositeDisposable = compositeDisposable;
     this.storeNavigator = storeNavigator;
     this.viewScheduler = viewScheduler;
+    this.uploadPermissionProvider = uploadPermissionProvider;
   }
 
   @Override public void present() {
@@ -100,12 +103,24 @@ public class MyStorePresenter implements Presenter {
   private void handleSubmitAppEvent() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> view.submitAppEvent())
+        .flatMap(created -> view.submitAppEvent())
+        .doOnNext(apps -> uploadPermissionProvider.requestExternalStoragePermission())
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
+        .filter(granted -> granted)
+        .flatMap(__ -> view.getSelectedApps())
         .flatMapCompletable(apps -> storeManager.upload(apps))
         .subscribe(() -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+    ;
   }
 
   private void showStoreAndApps() {

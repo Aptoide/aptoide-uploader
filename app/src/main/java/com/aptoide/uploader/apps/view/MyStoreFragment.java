@@ -28,6 +28,8 @@ import android.widget.Toast;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.InstalledApp;
+import com.aptoide.uploader.apps.permission.PermissionProvider;
+import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.view.Rx.RxAlertDialog;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.view.RxMenuItem;
@@ -101,7 +103,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     new MyStorePresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
         new CompositeDisposable(), new MyStoreNavigator(getFragmentManager()),
-        AndroidSchedulers.mainThread()).present();
+        AndroidSchedulers.mainThread(),
+        new UploadPermissionProvider((PermissionProvider) getContext())).present();
     toolbar.setNavigationIcon(null);
     toolbar.setNavigationOnClickListener(view1 -> {
       resetTitle();
@@ -334,6 +337,16 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         .unsubscribeOn(AndroidSchedulers.mainThread());
   }
 
+  @Override public Observable<List<InstalledApp>> getSelectedApps() {
+    //// TODO: 03-01-2018 filipe depends on how app selection will be done.
+    return Observable.empty();
+  }
+
+  private void prepareSpinner(int arrayId) {
+    ArrayAdapter<CharSequence> adapter =
+        ArrayAdapter.createFromResource(getActivity(), arrayId, R.layout.spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spinner.setAdapter(adapter);
   private void handleToolbarItems(boolean shouldShow){
     if(shouldShow){
       toolbar.setNavigationIcon(R.drawable.ic_arrow_back);

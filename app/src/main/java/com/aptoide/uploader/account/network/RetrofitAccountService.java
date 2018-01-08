@@ -4,11 +4,12 @@ import com.aptoide.uploader.account.AccountService;
 import com.aptoide.uploader.account.AptoideAccount;
 import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
 import com.aptoide.uploader.account.network.error.DuplicatedUserException;
+import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.ArrayList;
-import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -25,44 +26,27 @@ import retrofit2.http.POST;
 public class RetrofitAccountService implements AccountService {
 
   public static final String RESPONSE_MODE = "json";
-  public static final String ACCOUNT_GRANT_TYPE = "password";
-  public static final String ACCOUNT_CLIENT_ID = "Aptoide";
-  private final ServiceV2 serviceV2;
   private final ServiceV3 serviceV3;
   private final ServiceV7 serviceV7;
   private final SecurityAlgorithms securityAlgorithms;
   private final AccountResponseMapper mapper;
+  private final AuthenticationProvider authenticationProvider;
 
-  public RetrofitAccountService(ServiceV2 serviceV2, ServiceV3 serviceV3, ServiceV7 serviceV7,
-      SecurityAlgorithms securityAlgorithms, AccountResponseMapper mapper) {
-    this.serviceV2 = serviceV2;
+  public RetrofitAccountService(ServiceV3 serviceV3, ServiceV7 serviceV7,
+      SecurityAlgorithms securityAlgorithms, AccountResponseMapper mapper,
+      AuthenticationProvider authenticationProvider) {
     this.serviceV3 = serviceV3;
     this.serviceV7 = serviceV7;
     this.securityAlgorithms = securityAlgorithms;
     this.mapper = mapper;
+    this.authenticationProvider = authenticationProvider;
   }
 
   @Override public Single<AptoideAccount> getAccount(String username, String password) {
-    final Map<String, String> args = new HashMap<>();
-    args.put("username", username);
-    args.put("password", password);
-    args.put("grant_type", ACCOUNT_GRANT_TYPE);
-    args.put("client_id", ACCOUNT_CLIENT_ID);
-    args.put("mode", RESPONSE_MODE);
-
-    return serviceV3.oauth2Authentication(args)
-        .singleOrError()
-        .flatMap(response -> {
-          if (response.isSuccessful() && !response.body()
-              .hasErrors()) {
-            return serviceV7.getUserInfo(new AccountRequestBody(Arrays.asList("meta"),
-                response.body()
-                    .getAccessToken()))
-                .singleOrError();
-          }
-
-          return Single.error(new IllegalStateException(response.message()));
-        })
+    return authenticationProvider.getAccessToken(username, password)
+        .flatMap(accessToken -> serviceV7.getUserInfo(
+            new AccountRequestBody(Collections.singletonList("meta"), accessToken))
+            .singleOrError())
         .flatMap(response -> {
           if (response.isSuccessful() && response.body()
               .isOk()) {
@@ -92,7 +76,7 @@ public class RetrofitAccountService implements AccountService {
     Map<String, String> parameters = new HashMap<>();
     parameters.put("mode", RESPONSE_MODE);
     parameters.put("email", userEmail);
-    parameters.put("passwordHash", passwordHash);
+    parameters.put("passhash", passwordHash);
     parameters.put("repo", storeName);
     parameters.put("privacy", Boolean.toString(isPrivateStore));
     if (isPrivateStore) {
@@ -118,7 +102,7 @@ public class RetrofitAccountService implements AccountService {
     }
     parameters.put("hmac", hash);
 
-    return serviceV2.createAccount(parameters)
+    return serviceV3.createAccount(parameters)
         .singleOrError()
         .flatMap(response -> {
           final OAuth body = response.body();
@@ -134,8 +118,10 @@ public class RetrofitAccountService implements AccountService {
           }
 
           if (response.isSuccessful() && body != null && !body.hasErrors()) {
+            authenticationProvider.saveAuthentication(body.getAccessToken(),
+                body.getRefreshToken());
             return serviceV7.getUserInfo(
-                new AccountRequestBody(Arrays.asList("meta"), body.getAccessToken()))
+                new AccountRequestBody(Collections.singletonList("meta"), body.getAccessToken()))
                 .singleOrError();
           }
 
@@ -150,14 +136,9 @@ public class RetrofitAccountService implements AccountService {
         });
   }
 
-  public interface ServiceV2 {
-    @POST("webservices/2/createUser") @FormUrlEncoded Observable<Response<OAuth>> createAccount(
-        @FieldMap Map<String, String> args);
-  }
-
   public interface ServiceV3 {
-    @POST("webservices/3/oauth2Authentication") @FormUrlEncoded
-    Observable<Response<OAuth>> oauth2Authentication(@FieldMap Map<String, String> args);
+    @POST("webservices/3/createUser") @FormUrlEncoded Observable<Response<OAuth>> createAccount(
+        @FieldMap Map<String, String> args);
   }
 
   public interface ServiceV7 {

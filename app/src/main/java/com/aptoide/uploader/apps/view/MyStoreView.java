@@ -32,4 +32,6 @@ public interface MyStoreView extends View {
   void resetSelectionState();
 
   Observable<Object> logoutEvent();
+
+  Observable<List<InstalledApp>> getSelectedApps();
 }
