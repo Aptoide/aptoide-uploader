@@ -14,9 +14,9 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
   private final ImageView image;
   private final TextView appName;
   private final View background;
-  private final MyAppsClickListener listener;
+  private final AppSelectedListener listener;
 
-  public AppViewHolder(View itemView, MyAppsClickListener listener) {
+  public AppViewHolder(View itemView, AppSelectedListener listener) {
     super(itemView);
     image = itemView.findViewById(R.id.item_app_icon);
     appName = itemView.findViewById(R.id.item_app_name);

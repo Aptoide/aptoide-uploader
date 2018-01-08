@@ -71,7 +71,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     logoutItem = toolbar.getMenu()
         .findItem(R.id.logout_button);
 
-    SpannableString s = new SpannableString("Sign Out");
+    SpannableString s = new SpannableString(getResources().getString(R.string.signout));
     s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length(), 0);
     logoutItem.setTitle(s);
 
@@ -114,15 +114,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     logoutItem = null;
     toolbar = null;
     super.onDestroyView();
-  }
-
-  @Override public void resetSelectionState() {
-
-    if (adapter.getSelectedCount() != 0) {
-      toggleSubmitButton(false);
-      selectionObservable.dispose();
-      setUpSelectionListener();
-    }
   }
 
   private void setUpSelectionListener() {
@@ -233,6 +224,26 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     }
   }
 
+  @Override public void resetSelectionState() {
+
+    if (adapter.getSelectedCount() != 0) {
+      toggleSubmitButton(false);
+      selectionObservable.dispose();
+      setUpSelectionListener();
+    }
+  }
+
+  @Override public Observable<Object> logoutEvent() {
+    return RxMenuItem.clicks(logoutItem)
+        .subscribeOn(AndroidSchedulers.mainThread())
+        .unsubscribeOn(AndroidSchedulers.mainThread());
+  }
+
+  @Override public Observable<List<InstalledApp>> getSelectedApps() {
+    //// TODO: 03-01-2018 filipe depends on how app selection will be done.
+    return Observable.empty();
+  }
+
   public void setUpSubmitButtonAnimation() {
 
     final Animation.AnimationListener showBottom = new Animation.AnimationListener() {
@@ -274,25 +285,16 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
     if (selected != 0) {
       if (selected == 1) {
-        toolbar.setTitle(String.valueOf(adapter.getSelectedCount()) + " " + getContext().getString(
-            R.string.app_selected));
+        toolbar.setTitle(
+            String.valueOf(adapter.getSelectedCount()) + " " + getResources().getString(
+                R.string.app_selected));
       } else {
-        toolbar.setTitle(String.valueOf(adapter.getSelectedCount()) + " " + getContext().getString(
-            R.string.apps_selected));
+        toolbar.setTitle(
+            String.valueOf(adapter.getSelectedCount()) + " " + getResources().getString(
+                R.string.apps_selected));
       }
     } else {
       toolbar.setTitle(R.string.app_name);
     }
-  }
-
-  @Override public Observable<Object> logoutEvent() {
-    return RxMenuItem.clicks(logoutItem)
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .unsubscribeOn(AndroidSchedulers.mainThread());
-  }
-
-  @Override public Observable<List<InstalledApp>> getSelectedApps() {
-    //// TODO: 03-01-2018 filipe depends on how app selection will be done.
-    return Observable.empty();
   }
 }

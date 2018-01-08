@@ -15,19 +15,19 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
   private final List<InstalledApp> installedApps;
   private final List<Integer> selectedApps;
-  private final MyAppsClickListener listener;
+  private final AppSelectedListener selectedAppListener;
   private final PublishSubject<Boolean> selectedPublisher;
 
   public MyAppsAdapter(@NonNull List<InstalledApp> list) {
     this.installedApps = list;
     this.selectedApps = new ArrayList<>();
-    this.listener = (view, position) -> setSelected(position);
+    this.selectedAppListener = (view, position) -> setSelected(position);
     this.selectedPublisher = PublishSubject.create();
   }
 
   @Override public AppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     return new AppViewHolder(LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.item_app, parent, false), listener);
+        .inflate(R.layout.item_app, parent, false), selectedAppListener);
   }
 
   @Override public void onBindViewHolder(AppViewHolder holder, int position) {

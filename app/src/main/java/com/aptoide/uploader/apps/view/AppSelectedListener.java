@@ -5,7 +5,7 @@ import android.view.View;
 /**
  * Created by franciscocalado on 12/28/17.
  */
-public interface MyAppsClickListener {
+public interface AppSelectedListener {
 
   void onClick(View view, int position);
 }
