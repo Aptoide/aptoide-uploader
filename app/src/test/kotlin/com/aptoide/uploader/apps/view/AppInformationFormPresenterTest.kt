@@ -1,12 +1,15 @@
 package com.aptoide.uploader.apps.view
 
 import com.aptoide.uploader.TestData
-import com.aptoide.uploader.apps.*
+import com.aptoide.uploader.apps.InstalledApp
+import com.aptoide.uploader.apps.RemoteAppInformationManager
+import com.aptoide.uploader.apps.UserProposedAppInfo
 import com.aptoide.uploader.view.View
-import com.nhaarman.mockito_kotlin.*
-import io.reactivex.Completable
+import com.nhaarman.mockito_kotlin.doReturn
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.verify
+import com.nhaarman.mockito_kotlin.whenever
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.PublishSubject
 import org.jetbrains.spek.api.Spek
@@ -30,7 +33,7 @@ class AppInformationFormPresenterTest : Spek({
             )
 
             val view = mock<AppInformationFormView> {}
-            val remoteAppInfoManager = mock<RemoteAppInformationManager>{}
+            val remoteAppInfoManager = mock<RemoteAppInformationManager> {}
             val appInfoFormPresenter = AppInformationFormPresenter(view, remoteAppInfoManager, CompositeDisposable(), Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()

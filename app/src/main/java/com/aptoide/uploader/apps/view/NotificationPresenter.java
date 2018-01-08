@@ -16,6 +16,10 @@ public class NotificationPresenter implements Presenter {
   }
 
   @Override public void present() {
+    checkUploads();
+  }
+
+  private void checkUploads() {
     view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadManager.getUploads())

@@ -1,6 +1,8 @@
 package com.aptoide.uploader.apps.view
 
 import com.aptoide.uploader.apps.*
+import com.aptoide.uploader.apps.network.UploaderService
+import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.doReturn
 import com.nhaarman.mockito_kotlin.mock
@@ -47,7 +49,7 @@ class NotificationPresenterTest : Spek({
                     .doReturn(Single.error<RemoteProposedAppInfo>(ProposedAppInfoException()))
             whenever(md5Calculator.calculate(app))
                     .doReturn(appMd5.toSingle())
-            whenever(uploadService.getAppUpload(appMd5, appPackageName, appLanguage, storeName))
+            whenever(uploadService.getAppUpload(appMd5, appLanguage, storeName, app))
                     .doReturn(upload.toSingle())
 
             presenter.present()
