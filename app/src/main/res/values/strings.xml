@@ -13,6 +13,15 @@
   <!-- Mensagens de erro -->
   <string name="loginFail">Login failed. Wrong username or password.</string>
   <string name="duplicated_apk">The apk already exists in the repository. You don\'t need to do anything.</string>
+  <string name="no_email_pass_and_store_error_message">Please fill all fields</string>
+  <string name="no_email_and_pass_error_message">Please insert an email and password</string>
+  <string name="no_email_and_store_error_message">Please insert an email and store</string>
+  <string name="no_pass_and_store_error_message">Please insert a password and store</string>
+  <string name="no_email_error_message">Please insert an email</string>
+  <string name="no_pass_error_message">Please insert a password</string>
+  <string name="no_store_error_message">Please insert a store</string>
+  <string name="invalid_pass_error_message">Password must be at least 8 characters and should have
+    at least one letter and one number or special characters (!@#$%*)</string>
 
   <string name="store">Store</string>
   <string name="store_privacy">Store privacy</string>

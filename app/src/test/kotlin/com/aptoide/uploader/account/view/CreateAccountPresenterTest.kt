@@ -1,9 +1,7 @@
 package com.aptoide.uploader.account.view
 
 import com.aptoide.uploader.TestData
-import com.aptoide.uploader.account.AccountPersistence
-import com.aptoide.uploader.account.AptoideAccount
-import com.aptoide.uploader.account.AptoideAccountManager
+import com.aptoide.uploader.account.*
 import com.aptoide.uploader.account.network.*
 import com.aptoide.uploader.security.AptoideAccessTokenProvider
 import com.aptoide.uploader.security.SecurityAlgorithms
@@ -39,17 +37,19 @@ class CreateAccountPresenterTest : Spek({
         )
 
         it("should navigate to my apps when the user creates a new account in aptoide inserting valid data: email, password, store name and store privacy") {
+            val accountErrorMapper = mock<AccountErrorMapper>()
             val navigator = mock<CreateAccountNavigator>()
             val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV3Account = mock<RetrofitAccountService.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator)
 
             val view = mock<CreateAccountView>()
-            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val accounts = PublishSubject.create<AptoideAccount>()
@@ -72,6 +72,8 @@ class CreateAccountPresenterTest : Spek({
                     .doReturn(createAccountResponse.toSingle().toObservable())
             whenever(serviceV7.getUserInfo(any())).doReturn(accountResponse
                     .toSingle().toObservable())
+
+            whenever(credentialsValidator.validate(any(), any(), any())).doReturn(Completable.complete())
 
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
@@ -83,17 +85,19 @@ class CreateAccountPresenterTest : Spek({
         }
 
         it("should navigate to my apps when the user creates a new account in aptoide inserting valid data: email, password, store name, store privacy, store user and store pass") {
+            val accountErrorMapper = mock<AccountErrorMapper>()
             val navigator = mock<CreateAccountNavigator>()
             val serviceV3Account = mock<RetrofitAccountService.ServiceV3>()
             val serviceV3 = mock<AptoideAccessTokenProvider.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator)
 
             val view = mock<CreateAccountView>()
-            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val accounts = PublishSubject.create<AptoideAccount>()
@@ -117,6 +121,8 @@ class CreateAccountPresenterTest : Spek({
             whenever(serviceV7.getUserInfo(any())).doReturn(accountResponse
                     .toSingle().toObservable())
 
+            whenever(credentialsValidator.validate(any(), any(), any())).doReturn(Completable.complete())
+
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             createAccountEvent.onNext(privateCreateAccountModel)
@@ -127,15 +133,17 @@ class CreateAccountPresenterTest : Spek({
         }
 
         it("should show an error saying that this user already exists") {
+            val accountErrorMapper = mock<AccountErrorMapper>()
             val navigator = mock<CreateAccountNavigator>()
             val serviceV3Account = mock<RetrofitAccountService.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
 
             val view = mock<CreateAccountView>()
-            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val accounts = PublishSubject.create<AptoideAccount>()
@@ -153,6 +161,8 @@ class CreateAccountPresenterTest : Spek({
             whenever(serviceV3Account.createAccount(any()))
                     .doReturn(accountResponse.toSingle().toObservable())
 
+            whenever(credentialsValidator.validate(any(), any(), any())).doReturn(Completable.complete())
+
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             createAccountEvent.onNext(publicCreateAccountModel)
@@ -163,15 +173,17 @@ class CreateAccountPresenterTest : Spek({
         }
 
         it("should show error when user taps create account button without internet") {
+            val accountErrorMapper = mock<AccountErrorMapper>()
             val navigator = mock<CreateAccountNavigator>()
             val serviceV3Account = mock<RetrofitAccountService.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
 
             val view = mock<CreateAccountView>()
-            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val accounts = PublishSubject.create<AptoideAccount>()
@@ -188,6 +200,8 @@ class CreateAccountPresenterTest : Spek({
                     .doReturn(Observable.error<Response<OAuth>>(IOException()))
             whenever(serviceV7.getUserInfo(any())).doReturn(Observable.error<Response<AccountResponse>>(IOException()))
 
+            whenever(credentialsValidator.validate(any(), any(), any())).doReturn(Completable.complete())
+
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             createAccountEvent.onNext(privateCreateAccountModel)
@@ -198,15 +212,17 @@ class CreateAccountPresenterTest : Spek({
         }
 
         it("should show an error saying that this store already exists") {
+            val accountErrorMapper = mock<AccountErrorMapper>()
             val navigator = mock<CreateAccountNavigator>()
             val serviceV3Account = mock<RetrofitAccountService.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
 
             val view = mock<CreateAccountView>()
-            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val accounts = PublishSubject.create<AptoideAccount>()
@@ -224,6 +240,8 @@ class CreateAccountPresenterTest : Spek({
             whenever(serviceV3Account.createAccount(any()))
                     .doReturn(accountResponse.toSingle().toObservable())
 
+            whenever(credentialsValidator.validate(any(), any(), any())).doReturn(Completable.complete())
+
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
             createAccountEvent.onNext(publicCreateAccountModel)
@@ -234,15 +252,17 @@ class CreateAccountPresenterTest : Spek({
         }
 
         it("should navigate to login view") {
+            val accountErrorMapper = mock<AccountErrorMapper>()
             val navigator = mock<CreateAccountNavigator>()
             val serviceV3Account = mock<RetrofitAccountService.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
             val accounts = PublishSubject.create<AptoideAccount>()
             val view = mock<CreateAccountView>()
-            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val clickGoToLoginViewEvent = PublishSubject.create<CreateAccountView.ViewModel>()
@@ -263,15 +283,17 @@ class CreateAccountPresenterTest : Spek({
         }
 
         it("should navigate to recover password view") {
+            val accountErrorMapper = mock<AccountErrorMapper>()
             val navigator = mock<CreateAccountNavigator>()
             val serviceV3Account = mock<RetrofitAccountService.ServiceV3>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
             val accounts = PublishSubject.create<AptoideAccount>()
             val view = mock<CreateAccountView>()
-            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val clickGoToRecoverPasswordViewEvent = PublishSubject.create<CreateAccountView.ViewModel>()
@@ -289,6 +311,30 @@ class CreateAccountPresenterTest : Spek({
             clickGoToRecoverPasswordViewEvent.onNext(publicCreateAccountModel)
 
             verify(navigator).navigateToRecoverPassView()
+        }
+        it("should display an error message when user wants to create an account with invalid fields") {
+            val accountErrorMapper = mock<AccountErrorMapper>()
+            val accountValidationException = mock<AccountValidationException>()
+            val navigator = mock<CreateAccountNavigator>()
+            val accountManager = mock<AptoideAccountManager>()
+
+            val view = mock<CreateAccountView>()
+            val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
+
+            val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
+            val createAccountEvent = PublishSubject.create<CreateAccountView.ViewModel>()
+
+            whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
+            whenever(view.createAccountEvent).doReturn(createAccountEvent)
+            whenever(accountManager.create(any(), any(), any())).doReturn(Completable.error(accountValidationException))
+            whenever(accountErrorMapper.map(accountValidationException)).doReturn(buildString { })
+
+            presenter.present()
+            lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            createAccountEvent.onNext(publicCreateAccountModel)
+            verify(view).showLoading()
+            verify(view).hideLoading()
+            verify(view).showInvalidFieldError(any())
         }
     }
 })
