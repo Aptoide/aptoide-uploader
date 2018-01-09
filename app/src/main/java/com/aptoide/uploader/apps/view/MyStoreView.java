@@ -25,6 +25,8 @@ public interface MyStoreView extends View {
 
   Observable<SortingOrder> orderByEvent();
 
+  void setSubmitButtonVisibility(boolean status);
+
   Observable<Object> logoutEvent();
 
   Observable<List<InstalledApp>> getSelectedApps();

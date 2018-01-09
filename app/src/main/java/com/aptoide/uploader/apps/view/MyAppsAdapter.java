@@ -6,23 +6,32 @@ import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.InstalledApp;
+import io.reactivex.Observable;
+import io.reactivex.subjects.PublishSubject;
+import java.util.ArrayList;
 import java.util.List;
 
 public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
-  private final List<InstalledApp> list;
+  private final List<InstalledApp> installedApps;
+  private final List<Integer> selectedApps;
+  private final AppSelectedListener selectedAppListener;
+  private final PublishSubject<Boolean> selectedPublisher;
 
   public MyAppsAdapter(@NonNull List<InstalledApp> list) {
-    this.list = list;
+    this.installedApps = list;
+    this.selectedApps = new ArrayList<>();
+    this.selectedAppListener = (view, position) -> setSelected(position);
+    this.selectedPublisher = PublishSubject.create();
   }
 
   @Override public AppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     return new AppViewHolder(LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.item_app, parent, false));
+        .inflate(R.layout.item_app, parent, false), selectedAppListener);
   }
 
   @Override public void onBindViewHolder(AppViewHolder holder, int position) {
-    holder.setApp(list.get(position));
+    holder.setApp(installedApps.get(position), selectedApps.contains(position));
   }
 
   @Override public int getItemViewType(int position) {
@@ -30,12 +39,42 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   @Override public int getItemCount() {
-    return list.size();
+    return installedApps.size();
   }
 
-  public void setList(List<InstalledApp> appsList) {
-    list.clear();
-    list.addAll(appsList);
+  public Observable<Boolean> toggleSelection() {
+    return selectedPublisher;
+  }
+
+  public void setInstalledApps(List<InstalledApp> appsList) {
+    installedApps.clear();
+    clearAppsSelection();
+    installedApps.addAll(appsList);
+    notifyDataSetChanged();
+  }
+
+  public void setSelected(int position) {
+    if (selectedApps.contains(position)) {
+      selectedApps.remove((Integer) position);
+      if (selectedApps.size() == 0) {
+        selectedPublisher.onNext(false);
+      } else {
+        selectedPublisher.onNext(true);
+      }
+    } else {
+      selectedApps.add(position);
+      selectedPublisher.onNext(true);
+    }
+    notifyItemChanged(position);
+  }
+
+  public int getSelectedCount() {
+    return selectedApps.size();
+  }
+
+  public void clearAppsSelection() {
+    selectedApps.clear();
+    selectedPublisher.onNext(false);
     notifyDataSetChanged();
   }
 }
