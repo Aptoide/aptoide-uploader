@@ -1,5 +1,6 @@
 <com.manuelpeinado.multichoiceadapter.CheckableFrameLayout
     xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="130dp"
@@ -23,7 +24,7 @@
         android:layout_marginTop="5dp"
         />
 
-    <ImageView
+    <android.support.v7.widget.AppCompatImageView
         android:id="@+id/appInCloud"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -36,15 +37,14 @@
         android:paddingRight="8dp"
         android:paddingStart="4dp"
         android:paddingTop="8dp"
-        android:src="@drawable/ic_cloud_done_orange_24dp"
         android:visibility="gone"
+        app:srcCompat="@drawable/ic_cloud_done_orange_24dp"
         tools:visibility="visible"
 
 
         />
     <!--android:layout_alignEnd="@id/appIcon"-->
     <!--android:layout_alignRight="@id/appIcon"-->
-
 
     <TextView
         android:id="@+id/appName"
