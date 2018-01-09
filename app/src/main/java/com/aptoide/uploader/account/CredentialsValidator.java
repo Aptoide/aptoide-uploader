@@ -31,7 +31,7 @@ public class CredentialsValidator {
       } else if (isEmpty(storeName)) {
         return Completable.error(
             new AccountValidationException(AccountValidationException.EMPTY_STORE));
-      } else if (password.length() < 8 || !has1number1letter(password)) {
+      } else if (password.length() < 8 || !validatePassword(password)) {
         return Completable.error(
             new AccountValidationException(AccountValidationException.INVALID_PASSWORD));
       }
@@ -43,15 +43,15 @@ public class CredentialsValidator {
     return str == null || str.length() == 0;
   }
 
-  private boolean has1number1letter(String password) {
+  private boolean validatePassword(String password) {
     boolean hasLetter = false;
     boolean hasNumber = false;
 
-    for (char c : password.toCharArray()) {
-      if (!hasLetter && Character.isLetter(c)) {
+    for (char character : password.toCharArray()) {
+      if (!hasLetter && Character.isLetter(character)) {
         if (hasNumber) return true;
         hasLetter = true;
-      } else if (!hasNumber && Character.isDigit(c)) {
+      } else if (!hasNumber && Character.isDigit(character)) {
         if (hasLetter) return true;
         hasNumber = true;
       }
