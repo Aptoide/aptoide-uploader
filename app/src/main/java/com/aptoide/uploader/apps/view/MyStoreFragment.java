@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -93,11 +94,12 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     adapter = new MyAppsAdapter(new ArrayList<>());
     setUpSelectionListener();
     recyclerView.setAdapter(adapter);
-    logoutConfirmation =
-        new RxAlertDialog.Builder(getContext()).setMessage(R.string.logout_confirmation_message)
-            .setPositiveButton(R.string.yes)
-            .setNegativeButton(R.string.no)
-            .build();
+    logoutConfirmation = new RxAlertDialog.Builder(
+        new ContextThemeWrapper(getContext(), R.style.ConfirmationDialog)).setMessage(
+        R.string.logout_confirmation_message)
+        .setPositiveButton(R.string.yes)
+        .setNegativeButton(R.string.no)
+        .build();
     toolbar.setNavigationIcon(null);
     toolbar.setNavigationOnClickListener(click -> {
       adapter.clearAppsSelection();
