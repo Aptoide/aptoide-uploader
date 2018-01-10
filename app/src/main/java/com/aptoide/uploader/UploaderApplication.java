@@ -2,6 +2,7 @@ package com.aptoide.uploader;
 
 import android.preference.PreferenceManager;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.CredentialsValidator;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
@@ -66,7 +67,8 @@ public class UploaderApplication extends NotificationApplicationView {
               retrofitV7.create(RetrofitAccountService.ServiceV7.class), new SecurityAlgorithms(),
               new AccountResponseMapper(), getAuthenticationProvider()),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),
-              PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()));
+              PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()),
+          new CredentialsValidator());
     }
     return accountManager;
   }

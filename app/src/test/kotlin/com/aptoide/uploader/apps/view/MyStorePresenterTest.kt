@@ -2,10 +2,7 @@ package com.aptoide.uploader.apps.view
 
 import android.content.DialogInterface
 import com.aptoide.uploader.TestData
-import com.aptoide.uploader.account.AccountPersistence
-import com.aptoide.uploader.account.AccountService
-import com.aptoide.uploader.account.AptoideAccount
-import com.aptoide.uploader.account.AptoideAccountManager
+import com.aptoide.uploader.account.*
 import com.aptoide.uploader.account.network.AccountResponseMapper
 import com.aptoide.uploader.account.network.RetrofitAccountService
 import com.aptoide.uploader.apps.*
@@ -47,12 +44,13 @@ class MyStorePresenterTest : Spek({
             val authenticationPersistence = mock<AuthenticationPersistance>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence)
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val uploadPermissionProvider = mock<UploadPermissionProvider> {}
-            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
             val appList = mutableListOf(facebook, aptoide)
@@ -96,12 +94,13 @@ class MyStorePresenterTest : Spek({
             val authenticationPersistence = mock<AuthenticationPersistance>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence)
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val uploadPermissionProvider = mock<UploadPermissionProvider> {}
-            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
@@ -149,12 +148,13 @@ class MyStorePresenterTest : Spek({
             val authenticationPersistence = mock<AuthenticationPersistance>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence)
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val uploadPermissionProvider = mock<UploadPermissionProvider> {}
-            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
@@ -205,12 +205,13 @@ class MyStorePresenterTest : Spek({
             val authenticationPersistence = mock<AuthenticationPersistance>()
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
+            val credentialsValidator = mock<CredentialsValidator>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence)
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val uploadPermissionProvider = mock<UploadPermissionProvider> {}
-            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence))
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
