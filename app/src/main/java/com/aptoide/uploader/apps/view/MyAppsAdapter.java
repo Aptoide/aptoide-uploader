@@ -48,9 +48,17 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
   public void setInstalledApps(List<InstalledApp> appsList) {
     installedApps.clear();
-    clearAppsSelection();
     installedApps.addAll(appsList);
+    clearAppsSelection(false);
     notifyDataSetChanged();
+  }
+
+  private void clearAppsSelection(boolean notify) {
+    selectedApps.clear();
+    selectedPublisher.onNext(false);
+    if (notify) {
+      notifyDataSetChanged();
+    }
   }
 
   public int getSelectedCount() {
@@ -81,8 +89,6 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   public void clearAppsSelection() {
-    selectedApps.clear();
-    selectedPublisher.onNext(false);
-    notifyDataSetChanged();
+    clearAppsSelection(true);
   }
 }
