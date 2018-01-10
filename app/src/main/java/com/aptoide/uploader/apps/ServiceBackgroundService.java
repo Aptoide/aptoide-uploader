@@ -2,7 +2,7 @@ package com.aptoide.uploader.apps;
 
 import android.content.Context;
 import android.content.Intent;
-import com.aptoide.uploader.SyncUploadService;
+import com.aptoide.uploader.UploaderService;
 import com.aptoide.uploader.upload.BackgroundService;
 
 /**
@@ -11,9 +11,9 @@ import com.aptoide.uploader.upload.BackgroundService;
 
 public class ServiceBackgroundService implements BackgroundService {
   private final Context context;
-  private final Class<SyncUploadService> serviceClass;
+  private final Class<UploaderService> serviceClass;
 
-  public ServiceBackgroundService(Context context, Class<SyncUploadService> serviceClass) {
+  public ServiceBackgroundService(Context context, Class<UploaderService> serviceClass) {
     this.context = context;
     this.serviceClass = serviceClass;
   }

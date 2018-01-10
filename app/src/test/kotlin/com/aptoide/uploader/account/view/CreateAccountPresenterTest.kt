@@ -59,7 +59,7 @@ class CreateAccountPresenterTest : Spek({
                     .Nodes(AccountResponse.GetUserMeta(AccountResponse.GetUserMeta
                             .Data(AccountResponse.Store(TestData.STORE_NAME,
                                     "http://aptoide.com/avatar", 1)))),
-                    ResponseV7.Info(ResponseV7.Info.Status.OK), null))
+                    ResponseV7.Info(Status.OK), null))
 
             whenever(accountPersistence.account).doReturn(accounts)
             whenever(accountPersistence.save(any())).doReturn(Completable.fromAction({
@@ -103,7 +103,7 @@ class CreateAccountPresenterTest : Spek({
                     .Nodes(AccountResponse.GetUserMeta(AccountResponse.GetUserMeta
                             .Data(AccountResponse.Store(TestData.STORE_NAME,
                                     "http://aptoide.com/avatar", 1)))),
-                    ResponseV7.Info(ResponseV7.Info.Status.OK), null))
+                    ResponseV7.Info(Status.OK), null))
 
             whenever(accountPersistence.account).doReturn(accounts)
             whenever(accountPersistence.save(any())).doReturn(Completable.fromAction({

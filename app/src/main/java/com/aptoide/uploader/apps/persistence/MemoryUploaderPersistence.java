@@ -30,6 +30,7 @@ public class MemoryUploaderPersistence implements UploaderPersistence {
       uploadsMap.put(upload.hashCode(), upload);
       uploadsListSubject.onNext(new ArrayList<>(uploadsMap.values()));
     })
-        .subscribeOn(scheduler);
+        .subscribeOn(scheduler)
+        .doOnError(throwable -> throwable.printStackTrace());
   }
 }

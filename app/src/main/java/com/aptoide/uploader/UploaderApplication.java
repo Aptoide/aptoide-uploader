@@ -43,7 +43,6 @@ public class UploaderApplication extends NotificationApplicationView {
   @Override public void onCreate() {
     super.onCreate();
     getUploadManager().start();
-    // TODO: 27-12-2017 filipe need to stop the service
   }
 
   public AptoideAccountManager getAccountManager() {
@@ -118,9 +117,8 @@ public class UploaderApplication extends NotificationApplicationView {
 
       uploadManager = new UploadManager(new RetrofitUploadService(
           retrofitV7Secondary.create(RetrofitUploadService.ServiceV7.class),
-          retrofitV3.create(RetrofitUploadService.ServiceV3.class), getAccessTokenProvider(),
-          getMd5Calculator()), getUploadPersistence(), getMd5Calculator(),
-          new ServiceBackgroundService(this, SyncUploadService.class));
+          retrofitV3.create(RetrofitUploadService.ServiceV3.class), getAccessTokenProvider()), getUploadPersistence(), getMd5Calculator(),
+          new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider());
     }
     return uploadManager;
   }
@@ -138,7 +136,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public OkioMd5Calculator getMd5Calculator() {
     if (md5Calculator == null) {
-      md5Calculator = new OkioMd5Calculator(new HashMap<>());
+      md5Calculator = new OkioMd5Calculator(new HashMap<>(), Schedulers.computation());
     }
     return md5Calculator;
   }

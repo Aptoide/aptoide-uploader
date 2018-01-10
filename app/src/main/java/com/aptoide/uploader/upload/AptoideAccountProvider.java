@@ -3,6 +3,7 @@ package com.aptoide.uploader.upload;
 import com.aptoide.uploader.account.AptoideAccount;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.security.AuthenticationProvider;
+import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public class AptoideAccountProvider implements AccountProvider {
@@ -15,9 +16,8 @@ public class AptoideAccountProvider implements AccountProvider {
     this.authenticationProvider = authenticationProvider;
   }
 
-  @Override public Single<AptoideAccount> getAccount() {
-    return accountManager.getAccount()
-        .firstOrError();
+  @Override public Observable<AptoideAccount> getAccount() {
+    return accountManager.getAccount();
   }
 
   @Override public Single<String> getToken() {

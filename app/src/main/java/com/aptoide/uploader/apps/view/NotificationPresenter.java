@@ -24,10 +24,27 @@ public class NotificationPresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadManager.getUploads())
         .flatMapIterable(uploads -> uploads)
-        .filter(upload -> upload.getStatus()
-            .equals(Upload.Status.COMPLETED))
-        .subscribe(upload -> view.showCompletedUploadNotification(upload), throwable -> {
+        .subscribe(upload -> showNotification(upload), throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         });
+  }
+
+  private void showNotification(Upload upload) {
+    switch (upload.getStatus()) {
+      case PENDING:
+        view.showPendingUploadNotification();
+        break;
+      case PROGRESS:
+        view.showProgressUploadNotification();
+        break;
+      case COMPLETED:
+        view.showCompletedUploadNotification();
+        break;
+      case DUPLICATE:
+        view.showDuplicateUploadNotification(upload.getInstalledApp()
+            .getName(), upload.getInstalledApp()
+            .getPackageName());
+        break;
+    }
   }
 }

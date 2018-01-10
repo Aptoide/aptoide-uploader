@@ -273,10 +273,5 @@ class MyStorePresenterTest : Spek({
             verify(storeManager).logout()
             verify(navigator).navigateToLoginView()
         }
-
-        it("should navigate to app information form view if it is needed before upload") {
-            fail("To Do")
-        }
-
     }
 })

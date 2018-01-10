@@ -1,10 +1,8 @@
 package com.aptoide.uploader.apps.network;
 
 import android.support.annotation.NonNull;
-import com.aptoide.uploader.account.AptoideAccount;
-import com.aptoide.uploader.account.network.ResponseV7;
+import com.aptoide.uploader.account.network.Status;
 import com.aptoide.uploader.apps.InstalledApp;
-import com.aptoide.uploader.apps.Md5Calculator;
 import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.upload.AccountProvider;
 import io.reactivex.Observable;
@@ -25,17 +23,15 @@ public class RetrofitUploadService implements UploaderService {
   private final ServiceV7 serviceV7;
   private final ServiceV3 serviceV3;
   private final AccountProvider accountProvider;
-  private final Md5Calculator md5Calculator;
 
   public RetrofitUploadService(ServiceV7 serviceV7, ServiceV3 serviceV3,
-      AccountProvider accountProvider, Md5Calculator md5Calculator) {
+      AccountProvider accountProvider) {
     this.serviceV7 = serviceV7;
     this.serviceV3 = serviceV3;
     this.accountProvider = accountProvider;
-    this.md5Calculator = md5Calculator;
   }
 
-  @Override public Single<Upload> getAppUpload(String md5, String language, String storeName,
+  @Override public Single<Upload> getUpload(String md5, String language, String storeName,
       InstalledApp installedApp) {
     return serviceV7.getProposed(installedApp.getPackageName(), language, false)
         .singleOrError()
@@ -44,49 +40,59 @@ public class RetrofitUploadService implements UploaderService {
 
           if ((response.isSuccessful() && proposedBody != null) && (proposedBody.getInfo()
               .getStatus()
-              .equals(ResponseV7.Info.Status.FAIL) || proposedBody.getData()
+              .equals(Status.FAIL) || proposedBody.getData()
               .isEmpty())) {
-            return Single.just(new Upload(false, false, installedApp, Upload.Status.PENDING));
+            return Single.just(
+                new Upload(false, false, installedApp, Upload.Status.PENDING, md5, storeName));
           }
-
           return Single.error(new IllegalStateException(response.message()));
         });
   }
 
-  @Override public Observable<Upload> uploadAppToRepo(Upload upload) {
-    return accountProvider.getAccount()
-        .flatMapObservable(account -> accountProvider.getToken()
-            .flatMapObservable(token -> md5Calculator.calculate(upload.getInstalledApp())
-                .flatMapObservable(
-                    md5 -> serviceV3.uploadAppToRepo(getParams(account, upload, token, md5))
-                        .map(response -> buildUploadFinishStatus(response, upload))
-                        .startWith(buildUploadProgressStatus(upload)))));
+  @Override public Observable<Upload> upload(String md5, String storeName, String installedAppName,
+      boolean hasProposedData, InstalledApp installedApp) {
+    return accountProvider.getToken()
+        .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
+            getParams(accessToken, md5, storeName, installedAppName))
+            .map(response -> buildUploadFinishStatus(response, hasProposedData, installedApp, md5,
+                storeName))
+            .startWith(buildUploadProgressStatus(hasProposedData, installedApp, md5, storeName))
+            .doOnError(throwable -> throwable.printStackTrace())
+            .onErrorReturn(throwable -> new Upload(false, hasProposedData, installedApp,
+                Upload.Status.CLIENT_ERROR, md5, storeName)));
   }
 
-  private Upload buildUploadProgressStatus(Upload upload) {
-    return new Upload(false, upload.hasProposedData(), upload.getInstalledApp(),
-        Upload.Status.PROGRESS);
+  private Upload buildUploadProgressStatus(boolean proposedData, InstalledApp installedApp,
+      String md5, String storeName) {
+    return new Upload(false, proposedData, installedApp, Upload.Status.PROGRESS, md5, storeName);
   }
 
   @NonNull private Upload buildUploadFinishStatus(Response<UploadAppToRepoResponse> response,
-      Upload upload) {
-    return new Upload(response.isSuccessful(), upload.hasProposedData(), upload.getInstalledApp(),
-        Upload.Status.COMPLETED);
+      boolean hasProposedData, InstalledApp installedApp, String md5, String storeName) {
+    if (response.body()
+        .getStatus()
+        .equals(Status.FAIL) && response.body()
+        .getErrors()
+        .get(0)
+        .getCode()
+        .equals("APK-103")) {
+      return new Upload(response.isSuccessful(), hasProposedData, installedApp,
+          Upload.Status.DUPLICATE, md5, storeName);
+    }
+    return new Upload(response.isSuccessful(), hasProposedData, installedApp,
+        Upload.Status.COMPLETED, md5, storeName);
   }
 
-  @NonNull private Map<String, okhttp3.RequestBody> getParams(AptoideAccount account, Upload upload,
-      String token, String md5) {
+  @NonNull
+  private Map<String, okhttp3.RequestBody> getParams(String token, String md5, String storeName,
+      String installedAppName) {
     Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
     parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), token));
-    parameters.put("repo",
-        RequestBody.create(MediaType.parse("text/plain"), account.getStoreName()));
-    InstalledApp installedApp = upload.getInstalledApp();
-    parameters.put("apkname",
-        RequestBody.create(MediaType.parse("text/plain"), installedApp.getName()));
+    parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
+    parameters.put("apkname", RequestBody.create(MediaType.parse("text/plain"), installedAppName));
     parameters.put("apk_md5sum", RequestBody.create(MediaType.parse("text/plain"), md5));
     parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), "json"));
-    parameters.put("repo",
-        RequestBody.create(MediaType.parse("text/plain"), account.getStoreName()));
+    parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
     parameters.put("uploadType", RequestBody.create(MediaType.parse("text/plain"), "aptuploader"));
     return parameters;
   }
