@@ -68,9 +68,12 @@ import retrofit.http.POST;
       parameters.put("password", bean.getPassword());
     }
 
-    if (bean.getRepo() != null && (bean.getAuthMode() == Mode.facebook_uploader
-        || bean.getAuthMode() == Mode.google)) {
-      parameters.put("oauthCreateRepo", "1");
+    if (bean.getRepo() != null) {
+      if (bean.getAuthMode() == Mode.facebook_uploader || bean.getAuthMode() == Mode.google) {
+        parameters.put("oauthCreateRepo", "1");
+      } else {
+        parameters.put("createRepo", bean.getCreateRepo());
+      }
       parameters.put("repo", bean.getRepo());
       if (bean.getPrivacy_user() != null && bean.getPrivacy_pass() != null) {
         parameters.put("privacy_user", bean.getPrivacy_user());
@@ -116,6 +119,7 @@ import retrofit.http.POST;
     @Getter @Setter private String oauthToken;
     @Getter @Setter private String oauthUserName;
     @Getter @Setter private String oauthCreateRepo;
+    @Getter @Setter private String createRepo;
     @Getter @Setter private String isPrivate;
     @Getter @Setter private String repo;
     // Private store

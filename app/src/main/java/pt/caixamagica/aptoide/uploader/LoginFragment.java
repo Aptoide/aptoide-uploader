@@ -266,7 +266,7 @@ public class LoginFragment extends Fragment {
 
         if (!username.equals("") && !password.equals("")) {
           mCallback.submitAuthentication(
-              new UserInfo(username, password, null, null, null, null, null, null, 0));
+              new UserInfo(username, password, null, OAuth2AuthenticationRequest.Mode.aptoide, null, null, null, null, 0));
 
           ((TextView) rootView.findViewById(R.id.signing_in_text)).setText(
               "Signing in as\n" + username);

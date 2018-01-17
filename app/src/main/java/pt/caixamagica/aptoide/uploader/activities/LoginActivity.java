@@ -236,7 +236,13 @@ public class LoginActivity extends AppCompatActivity
     checkUserCredentialsRequest.bean.setAuthMode(userInfo.getMode());
     checkUserCredentialsRequest.bean.setOauthUserName(userInfo.getNameForGoogle());
 
-    checkUserCredentialsRequest.bean.setOauthCreateRepo(Integer.toString(userInfo.getCreateRepo()));
+    if (userInfo.getMode() == OAuth2AuthenticationRequest.Mode.facebook_uploader
+        || userInfo.getMode() == OAuth2AuthenticationRequest.Mode.google) {
+      checkUserCredentialsRequest.bean.setOauthCreateRepo(
+          Integer.toString(userInfo.getCreateRepo()));
+    } else {
+      checkUserCredentialsRequest.bean.setCreateRepo(Integer.toString(userInfo.getCreateRepo()));
+    }
     checkUserCredentialsRequest.bean.setRepo(userInfo.getRepo());
     checkUserCredentialsRequest.bean.setPrivacy_user(userInfo.getPrivacyUsername());
     checkUserCredentialsRequest.bean.setPrivacy_pass(userInfo.getPrivacyPassword());
