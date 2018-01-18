@@ -40,6 +40,10 @@ public class RepoCreatorDialog extends DialogFragment {
   private EditText repoUsername;
   private EditText repoPassword;
   private boolean logoutOnDismiss = true;
+  private static final String DIALOG_TITLE_KEY = "TITLE";
+  private static final String DIALOG_MESSAGE_KEY = "MESSAGE";
+  private int title;
+  private int message;
 
   public RepoCreatorDialog() {
   }
@@ -48,6 +52,18 @@ public class RepoCreatorDialog extends DialogFragment {
     DialogFragment dialog = new RepoCreatorDialog();
     Bundle bundle = new Bundle();
     bundle.putSerializable("userInfo", userInfo);
+    bundle.putInt(DIALOG_TITLE_KEY, R.string.repo_creation_title);
+    dialog.setArguments(bundle);
+    dialog.show(context.getSupportFragmentManager(), "RepoCreatorDialog");
+  }
+
+  public static void showRepoCreatorDialogForAutomaticLogin(FragmentActivity context,
+      UserInfo userInfo) {
+    DialogFragment dialog = new RepoCreatorDialog();
+    Bundle bundle = new Bundle();
+    bundle.putSerializable("userInfo", userInfo);
+    bundle.putInt(DIALOG_TITLE_KEY, R.string.repo_creation_title);
+    bundle.putInt(DIALOG_MESSAGE_KEY, R.string.autologin_message_no_store_created);
     dialog.setArguments(bundle);
     dialog.show(context.getSupportFragmentManager(), "RepoCreatorDialog");
   }
@@ -65,6 +81,8 @@ public class RepoCreatorDialog extends DialogFragment {
     super.onAttach(activity);
     this.context = (FragmentActivity) activity;
     userInfo = (UserInfo) getArguments().getSerializable("userInfo");
+    title = getArguments().getInt(DIALOG_TITLE_KEY);
+    message = getArguments().getInt(DIALOG_MESSAGE_KEY);
     try {
       mCallback = (LoginActivityCallback) activity;
     } catch (ClassCastException e) {
@@ -76,6 +94,8 @@ public class RepoCreatorDialog extends DialogFragment {
 
     if (savedInstanceState != null) {
       userInfo = (UserInfo) savedInstanceState.getSerializable("userInfo");
+      title = savedInstanceState.getInt(DIALOG_TITLE_KEY);
+      message = savedInstanceState.getInt(DIALOG_MESSAGE_KEY);
     }
 
     ContextThemeWrapper contextThemeWrapper = new ContextThemeWrapper(context, R.style.RepoDialog);
@@ -91,7 +111,8 @@ public class RepoCreatorDialog extends DialogFragment {
     repoUsername = (EditText) view.findViewById(R.id.repo_username);
     repoPassword = (EditText) view.findViewById(R.id.repo_password);
 
-    builder.setTitle(R.string.repo_creation_title)
+    builder.setTitle(title)
+        .setMessage(getString(message, userInfo.getUsername()))
         .setView(view)
         .setPositiveButton(R.string.create_repo, new DialogInterface.OnClickListener() {
           @Override public void onClick(DialogInterface dialog, int which) {

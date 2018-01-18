@@ -179,7 +179,8 @@ public class LoginActivity extends AppCompatActivity
                 OAuth2AuthenticationRequest.Mode.aptoide, userCredentialsJson.getUsername(), null,
                 null, null, 1);
 
-        RepoCreatorDialog.showRepoCreatorDialog(LoginActivity.this, autoLoginUserInfo);
+        RepoCreatorDialog.showRepoCreatorDialogForAutomaticLogin(LoginActivity.this,
+            autoLoginUserInfo);
         Toast.makeText(LoginActivity.this, R.string.no_store_error, Toast.LENGTH_LONG)
             .show();
       }
