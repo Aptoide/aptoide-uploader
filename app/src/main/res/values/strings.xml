@@ -14,7 +14,7 @@
   <string name="loginFail">Login failed. Wrong username or password.</string>
   <string name="duplicated_apk">The apk already exists in the repository. You don\'t need to do anything.</string>
 
-  <string name="store">Store</string>
+  <string name="store">Store name</string>
   <string name="store_privacy">Store privacy</string>
   <string name="public_key">Public</string>
   <string name="private_key">Private</string>
@@ -147,6 +147,6 @@
 
   <string name="password_validation_text">Password must be at least 8 characters and should have
   at least one letter and one number or special characters (!@#$%*)</string>
-  <string name="autologin_message_no_store_created">Your account has no store created. You need to create one to be able to upload great apps!</string>
+  <string name="autologin_message_no_store_created">Your account has no store created. You need to create one to upload great apps!</string>
 
 </resources>
