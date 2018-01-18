@@ -16,6 +16,7 @@ import android.os.HandlerThread;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
+import android.text.TextUtils;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.MenuItem;
@@ -169,7 +170,21 @@ public class LoginActivity extends AppCompatActivity
 
     UserCredentialsJson userCredentialsJson = storedCredentialsManager.getStoredUserCredentials();
     if (userCredentialsJson != null) {
-      switchToAppViewFragment(userCredentialsJson);
+      if (!TextUtils.isEmpty(userCredentialsJson.getRepo())) {
+        switchToAppViewFragment(userCredentialsJson);
+      } else {
+        //there is no store.
+        splashDialogFragment.show(getSupportFragmentManager(), "splashDialog");
+
+        UserInfo autoLoginUserInfo =
+            new UserInfo(userCredentialsJson.getUsername(), null, userCredentialsJson.getToken(),
+                OAuth2AuthenticationRequest.Mode.aptoide, userCredentialsJson.getUsername(), null,
+                null, null, 1);
+
+        RepoCreatorDialog.showRepoCreatorDialog(LoginActivity.this, autoLoginUserInfo);
+        Toast.makeText(LoginActivity.this, R.string.no_store_error, Toast.LENGTH_LONG)
+            .show();
+      }
     } else {
       setContentView(R.layout.activity_main);
       setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
