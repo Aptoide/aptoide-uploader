@@ -136,11 +136,15 @@ public class LoginActivity extends AppCompatActivity
     super.onResume();
 
     if (dismissSplash && splashDialogFragment != null && splashDialogFragment.isAdded()) {
-      dismissSplash = false;
       checkStoredCredentialsCallback();
-      splashDialogFragment.dismiss();
-      splashDialogFragment = null;
+      dismissSplashFragment();
     }
+  }
+
+  private void dismissSplashFragment() {
+    dismissSplash = false;
+    splashDialogFragment.dismiss();
+    splashDialogFragment = null;
   }
 
   @Override protected void onStart() {
@@ -174,6 +178,9 @@ public class LoginActivity extends AppCompatActivity
         switchToAppViewFragment(userCredentialsJson);
       } else {
         //there is no store.
+        setContentView(R.layout.activity_main);
+        setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
+
         UserInfo autoLoginUserInfo =
             new UserInfo(userCredentialsJson.getUsername(), null, userCredentialsJson.getToken(),
                 OAuth2AuthenticationRequest.Mode.aptoide, userCredentialsJson.getUsername(), null,
@@ -181,8 +188,6 @@ public class LoginActivity extends AppCompatActivity
 
         RepoCreatorDialog.showRepoCreatorDialogForAutomaticLogin(LoginActivity.this,
             autoLoginUserInfo);
-        Toast.makeText(LoginActivity.this, R.string.no_store_error, Toast.LENGTH_LONG)
-            .show();
       }
     } else {
       setContentView(R.layout.activity_main);
@@ -236,6 +241,11 @@ public class LoginActivity extends AppCompatActivity
         }
       }
     });
+  }
+
+  @Override public void onCreateStore(UserInfo userInfo) {
+    //dismissSplashFragment();
+    submitAuthentication(userInfo);
   }
 
   @Override public void submitAuthentication(UserInfo userInfo) {

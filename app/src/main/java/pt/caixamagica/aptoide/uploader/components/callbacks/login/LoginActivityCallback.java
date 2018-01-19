@@ -9,5 +9,7 @@ import pt.caixamagica.aptoide.uploader.model.UserInfo;
 
 public interface LoginActivityCallback {
 
+  void onCreateStore(UserInfo userInfo);
+
   void submitAuthentication(UserInfo userInfo);
 }
