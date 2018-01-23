@@ -279,4 +279,8 @@ public class SignUpFragment extends Fragment {
       }
     });
   }
+
+  @Override public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+  }
 }
