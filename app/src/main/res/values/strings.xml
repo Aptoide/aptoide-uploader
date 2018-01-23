@@ -148,4 +148,7 @@
   <string name="password_validation_text">Password must be at least 8 characters and should have
   at least one letter and one number or special characters (!@#$%*)</string>
 
+  <string name="autologin_message_no_store_created">Your account has no store created. You need to create one to upload great apps!</string>
+
+
 </resources>
