@@ -54,7 +54,7 @@ public class InstalledUtils {
     return selectablePackageInfos;
   }
 
-  public List<SelectablePackageInfo> nonSystemPackages(boolean ordered) {
+  public List<SelectablePackageInfo> nonSystemPackages() {
     List<PackageInfo> packs = context.getPackageManager()
         .getInstalledPackages(0);
 
@@ -73,9 +73,6 @@ public class InstalledUtils {
       selectablePackageInfos.add(new SelectablePackageInfo(p, context.getPackageManager(),
           appsInStorePersister.isAppInStore(p.packageName, p.versionCode)));
     }
-
-    if (ordered) Collections.sort(selectablePackageInfos, newLastInstallComparator());
-
     return selectablePackageInfos;
   }
 
