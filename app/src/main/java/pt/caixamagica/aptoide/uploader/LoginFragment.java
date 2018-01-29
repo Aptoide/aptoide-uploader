@@ -97,7 +97,8 @@ public class LoginFragment extends Fragment {
 
               //                            mCallback.submitAuthentication(username, authToken, mode, null, null, null, null);
               mCallback.submitAuthentication(
-                  new UserInfo(username, null, authToken, mode, null, null, null, null, 0));
+                  new UserInfo(username, null, authToken, null, mode, null, null, null, null, 0),
+                  "password");
             }
           }
         });
@@ -266,8 +267,8 @@ public class LoginFragment extends Fragment {
 
         if (!username.equals("") && !password.equals("")) {
           mCallback.submitAuthentication(
-              new UserInfo(username, password, null, OAuth2AuthenticationRequest.Mode.aptoide, null,
-                  null, null, null, 0));
+              new UserInfo(username, password, null, null, OAuth2AuthenticationRequest.Mode.aptoide,
+                  null, null, null, null, 0), "password");
 
           ((TextView) rootView.findViewById(R.id.signing_in_text)).setText(
               "Signing in as\n" + username);

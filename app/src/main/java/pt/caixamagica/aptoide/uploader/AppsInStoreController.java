@@ -43,14 +43,16 @@ public class AppsInStoreController {
   }
 
   public void start() {
-    spiceManager.start(applicationContext);
+    if (!spiceManager.isStarted()) {
+      spiceManager.start(applicationContext);
 
-    executorService = Executors.newSingleThreadExecutor();
-    executorService.submit(new Thread(new Runnable() {
-      @Override public void run() {
-        refreshInstalledAppsMd5List();
-      }
-    }));
+      executorService = Executors.newSingleThreadExecutor();
+      executorService.submit(new Thread(new Runnable() {
+        @Override public void run() {
+          refreshInstalledAppsMd5List();
+        }
+      }));
+    }
   }
 
   private void refreshInstalledAppsMd5List() {

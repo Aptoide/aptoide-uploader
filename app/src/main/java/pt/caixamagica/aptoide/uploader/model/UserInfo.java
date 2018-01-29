@@ -19,6 +19,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.request.OAuth2AuthenticationRequ
   private String username;
   private String password;
   private String oauthToken;
+  private String refreshToken;
   private OAuth2AuthenticationRequest.Mode mode;
   private String nameForGoogle;
   private String repo;

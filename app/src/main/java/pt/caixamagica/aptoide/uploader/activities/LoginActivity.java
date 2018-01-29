@@ -180,11 +180,11 @@ public class LoginActivity extends AppCompatActivity
         //there is no store.
         setContentView(R.layout.activity_main);
         setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
-
+        navigateToLogin();
         UserInfo autoLoginUserInfo =
             new UserInfo(userCredentialsJson.getUsername(), null, userCredentialsJson.getToken(),
-                OAuth2AuthenticationRequest.Mode.aptoide, userCredentialsJson.getUsername(), null,
-                null, null, 1);
+                userCredentialsJson.getRefreshToken(), OAuth2AuthenticationRequest.Mode.aptoide,
+                userCredentialsJson.getUsername(), null, null, null, 1);
 
         RepoCreatorDialog.showRepoCreatorDialogForAutomaticLogin(LoginActivity.this,
             autoLoginUserInfo);
@@ -193,14 +193,18 @@ public class LoginActivity extends AppCompatActivity
       setContentView(R.layout.activity_main);
       setSupportActionBar((Toolbar) findViewById(R.id.my_awesome_toolbar));
 
-      mContent = new LoginFragment();
-
-      getSupportFragmentManager().beginTransaction()
-          .replace(R.id.container, mContent, "loginFragment")
-          .commit();
+      navigateToLogin();
     }
 
     AptoideUploaderApplication.firstLaunchApagar = false;
+  }
+
+  private void navigateToLogin() {
+    mContent = new LoginFragment();
+
+    getSupportFragmentManager().beginTransaction()
+        .replace(R.id.container, mContent, "loginFragment")
+        .commit();
   }
 
   private void switchToAppViewFragment(UserCredentialsJson userCredentialsJson) {
@@ -229,9 +233,10 @@ public class LoginActivity extends AppCompatActivity
         try {
           String token = GoogleAuthUtil.getToken(LoginActivity.this, accountName,
               "oauth2:server:client_id:" + serverId + ":api_scope:" + Scopes.PLUS_LOGIN);
-          userInfo = new UserInfo(accountName, null, token, OAuth2AuthenticationRequest.Mode.google,
-              accountName, null, null, null, 0);
-          submitAuthentication(userInfo);
+          userInfo =
+              new UserInfo(accountName, null, token, null, OAuth2AuthenticationRequest.Mode.google,
+                  accountName, null, null, null, 0);
+          submitAuthentication(userInfo, "password");
         } catch (IOException e) {
           e.printStackTrace();
         } catch (UserRecoverableAuthException e) {
@@ -244,18 +249,21 @@ public class LoginActivity extends AppCompatActivity
   }
 
   @Override public void onCreateStore(UserInfo userInfo) {
-    //dismissSplashFragment();
-    submitAuthentication(userInfo);
+    ////dismissSplashFragment();
+    //navigateToLogin();
+    submitAuthentication(userInfo, "refresh_token");
   }
 
-  @Override public void submitAuthentication(UserInfo userInfo) {
+  @Override public void submitAuthentication(UserInfo userInfo, String grantType) {
     this.userInfo = userInfo;
 
     checkUserCredentialsRequest = new OAuth2AuthenticationRequest();
 
+    checkUserCredentialsRequest.bean.setGrant_type(grantType);
     checkUserCredentialsRequest.bean.setUsername(userInfo.getUsername());
     checkUserCredentialsRequest.bean.setPassword(userInfo.getPassword());
     checkUserCredentialsRequest.bean.setOauthToken(userInfo.getOauthToken());
+    checkUserCredentialsRequest.bean.setRefresh_token(userInfo.getRefreshToken());
     // Martelada
     checkUserCredentialsRequest.bean.setAuthMode(userInfo.getMode());
     checkUserCredentialsRequest.bean.setOauthUserName(userInfo.getNameForGoogle());

@@ -262,7 +262,7 @@ public class SignUpFragment extends Fragment {
           // Loja criada com sucesso, redirecciona para a AppsView
           mCallback.submitAuthentication(new UserInfo(signUpRequest.getEmail(),
               passwordEditText.getText()
-                  .toString(), null, null, null, null, null, null, 0));
+                  .toString(), null, null, null, null, null, null, null, 0), "password");
         } else {
           List<String> errors = new LinkedList<>();
           for (Error error : signUpJson.getErrors()) {

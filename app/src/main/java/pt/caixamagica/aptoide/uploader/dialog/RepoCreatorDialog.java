@@ -123,7 +123,7 @@ public class RepoCreatorDialog extends DialogFragment {
             if (validateNotEmptyFields()) {
               fillNewUserInfo();
 
-              mCallback.submitAuthentication(userInfo);
+              mCallback.submitAuthentication(userInfo, "refresh_token");
             } else {
               Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT)
                   .show();

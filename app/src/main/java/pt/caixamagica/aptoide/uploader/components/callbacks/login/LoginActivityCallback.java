@@ -11,5 +11,5 @@ public interface LoginActivityCallback {
 
   void onCreateStore(UserInfo userInfo);
 
-  void submitAuthentication(UserInfo userInfo);
+  void submitAuthentication(UserInfo userInfo, String grant_type);
 }
