@@ -7,6 +7,7 @@ package pt.caixamagica.aptoide.uploader;
 
 import android.content.Context;
 import android.support.v4.app.FragmentActivity;
+import android.support.v4.app.FragmentManager;
 import android.view.View;
 import android.view.inputmethod.InputMethodManager;
 import com.octo.android.robospice.SpiceManager;
@@ -113,7 +114,7 @@ public class UploaderUtils {
     if (!context.isFinishing()) {
       context.getSupportFragmentManager()
           .beginTransaction()
-          .addToBackStack("")
+          .addToBackStack("LoadingFragment")
           .replace(container, loadingFragment)
           .commit();
     }
@@ -123,7 +124,7 @@ public class UploaderUtils {
     if (context.getSupportFragmentManager()
         .getBackStackEntryCount() > 0) {
       context.getSupportFragmentManager()
-          .popBackStack();
+          .popBackStack("LoadingFragment", FragmentManager.POP_BACK_STACK_INCLUSIVE);
     }
   }
 

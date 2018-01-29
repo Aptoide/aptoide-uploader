@@ -76,7 +76,6 @@ public class FragmentAppView extends Fragment {
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
   protected SpiceManager spiceManagerSecondary =
       new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
-  int checked = 0;
   GridView gridview;
   private RecyclerView mRecyclerView;
   private RecyclerView.Adapter mAdapter;
@@ -104,89 +103,7 @@ public class FragmentAppView extends Fragment {
     }
   };
   private int SUBMIT_APP_RESULT_CODE = 1111;
-
-  private MenuItem.OnMenuItemClickListener sortByFirstInstallListener() {
-    return new MenuItem.OnMenuItemClickListener() {
-      @Override public boolean onMenuItemClick(final MenuItem item) {
-
-        Toast.makeText(getActivity(), R.string.sorting, Toast.LENGTH_SHORT)
-            .show();
-
-        new Thread(new Runnable() {
-          @Override public void run() {
-            if (!item.isChecked()) {
-              Collections.sort(adapter.mDataset, newFirstInstallComparator());
-              getActivity().runOnUiThread(new Runnable() {
-                @Override public void run() {
-                  adapter.notifyDataSetChanged();
-                  item.setChecked(true);
-                }
-              });
-              checked = item.getItemId();
-            }
-          }
-        }).start();
-
-        return false;
-      }
-    };
-  }
-
-  public Comparator<SelectablePackageInfo> newFirstInstallComparator() {
-    return new Comparator<SelectablePackageInfo>() {
-      @Override public int compare(SelectablePackageInfo lhs, SelectablePackageInfo rhs) {
-        return (int) (rhs.firstInstallTime / 1000 - lhs.firstInstallTime / 1000);
-      }
-    };
-  }
-
-  private void sortByFirstInstall() {
-    Toast.makeText(getActivity(), R.string.sorting_by_date, Toast.LENGTH_SHORT)
-        .show();
-
-    new Thread(new Runnable() {
-      @Override public void run() {
-        Collections.sort(adapter.mDataset, newFirstInstallComparator());
-        getActivity().runOnUiThread(new Runnable() {
-          @Override public void run() {
-            adapter.notifyDataSetChanged();
-          }
-        });
-      }
-    }).start();
-  }
-
-  private MenuItem.OnMenuItemClickListener sortByNameListener() {
-    return new MenuItem.OnMenuItemClickListener() {
-      @Override public boolean onMenuItemClick(final MenuItem item) {
-
-        Toast.makeText(getActivity(), R.string.sorting, Toast.LENGTH_SHORT)
-            .show();
-
-        new Thread(new Runnable() {
-          @Override public void run() {
-            if (!item.isChecked()) {
-              // Carrega as labels necessárias
-              PackageManager packageManager = getActivity().getPackageManager();
-              for (SelectablePackageInfo selectablePackageInfo : adapter.mDataset)
-                selectablePackageInfo.getLabel();
-
-              Collections.sort(adapter.mDataset, newNameComparator());
-              getActivity().runOnUiThread(new Runnable() {
-                @Override public void run() {
-                  adapter.notifyDataSetChanged();
-                  item.setChecked(true);
-                }
-              });
-              checked = item.getItemId();
-            }
-          }
-        }).start();
-
-        return false;
-      }
-    };
-  }
+  private int appsListSortingOrder = 0;
 
   public Comparator<SelectablePackageInfo> newNameComparator() {
     return new Comparator<SelectablePackageInfo>() {
@@ -200,7 +117,7 @@ public class FragmentAppView extends Fragment {
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     if (savedInstanceState != null) {
-      checked = savedInstanceState.getInt("sortCheckable");
+      appsListSortingOrder = savedInstanceState.getInt("sortOrder");
     }
     spiceManager.start(getContext());
     spiceManagerSecondary.start(getContext());
@@ -233,10 +150,12 @@ public class FragmentAppView extends Fragment {
 
             if (arg2 == 0) {
               sortByLastInstall();
+              appsListSortingOrder = 0;
             }
 
             if (arg2 == 1) {
               sortByName();
+              appsListSortingOrder = 1;
             }
 
             adapter.uncheckAll();
@@ -304,7 +223,13 @@ public class FragmentAppView extends Fragment {
       @Override public void onRefresh() {
         //call method(s) responsible for creating the list.
         //notifyDataSetChanged on adapter
-        adapter.mDataset = installedUtils.nonSystemPackages(true);
+        List<SelectablePackageInfo> appList = installedUtils.nonSystemPackages();
+        if (appsListSortingOrder == 0) {
+          Collections.sort(appList, installedUtils.newLastInstallComparator());
+        } else if (appsListSortingOrder == 1) {
+          Collections.sort(appList, newNameComparator());
+        }
+        adapter.mDataset = appList;
         adapter.notifyDataSetChanged();
         swipeRefreshLayout.setRefreshing(false);
       }
@@ -324,7 +249,6 @@ public class FragmentAppView extends Fragment {
 
   @Override public void onResume() {
     super.onResume();
-    System.out.println("teste : on resume");
     getActivity().setTitle(getActivity().getApplicationInfo().labelRes);
 
     if (uploadedAppReceiver == null) {
@@ -400,14 +324,13 @@ public class FragmentAppView extends Fragment {
     super.onSaveInstanceState(outState);
 
     outState.putSerializable("userCredentialsJson", userCredentialsJson);
-    outState.putInt("sortCheckable", checked);
+    outState.putInt("sortOrder", appsListSortingOrder);
 
     adapter.save(outState);
   }
 
   @Override public void onPause() {
     super.onPause();
-    System.out.println("teste : on pause");
     if (uploadedAppReceiver != null) {
       getActivity().unregisterReceiver(uploadedAppReceiver);
       uploadedAppReceiver = null;
@@ -634,9 +557,14 @@ public class FragmentAppView extends Fragment {
 
   private void setAdapter(Bundle savedInstanceState, final View view) {
 
-    adapter =
-        new ManelAdapter(savedInstanceState, view, this, installedUtils.nonSystemPackages(true),
-            userCredentialsJson);
+    List<SelectablePackageInfo> appsList = installedUtils.nonSystemPackages();
+    if (appsListSortingOrder == 0) {
+      Collections.sort(appsList, installedUtils.newLastInstallComparator());
+    } else if (appsListSortingOrder == 1) {
+      Collections.sort(appsList, newNameComparator());
+    }
+
+    adapter = new ManelAdapter(savedInstanceState, view, this, appsList, userCredentialsJson);
 
     adapter.setOnItemClickListener(new AdapterView.OnItemClickListener() {
       public void onItemClick(AdapterView<?> parent, View v, int position, long id) {
