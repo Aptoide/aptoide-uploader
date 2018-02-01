@@ -9,7 +9,7 @@ import pt.caixamagica.aptoide.uploader.model.UserInfo;
 
 public interface LoginActivityCallback {
 
-  void onCreateStore(UserInfo userInfo);
+  void onCreateStore(UserInfo userInfo, String grantType);
 
   void submitAuthentication(UserInfo userInfo, String grant_type);
 }

@@ -42,8 +42,10 @@ public class RepoCreatorDialog extends DialogFragment {
   private boolean logoutOnDismiss = true;
   private static final String DIALOG_TITLE_KEY = "TITLE";
   private static final String DIALOG_MESSAGE_KEY = "MESSAGE";
+  private static final String GRANT_TYPE_CREATE_STORE_AUTHENTICATION = "GRANT_TYPE_CREATE_STORE";
   private String title;
   private String message;
+  private String grantType;
 
   public RepoCreatorDialog() {
   }
@@ -54,6 +56,7 @@ public class RepoCreatorDialog extends DialogFragment {
     bundle.putSerializable("userInfo", userInfo);
     bundle.putString(DIALOG_TITLE_KEY, context.getResources()
         .getString(R.string.repo_creation_title));
+    bundle.putString(GRANT_TYPE_CREATE_STORE_AUTHENTICATION, "password");
     dialog.setArguments(bundle);
     dialog.show(context.getSupportFragmentManager(), "RepoCreatorDialog");
   }
@@ -67,6 +70,7 @@ public class RepoCreatorDialog extends DialogFragment {
         .getString(R.string.repo_creation_title));
     bundle.putString(DIALOG_MESSAGE_KEY, context.getResources()
         .getString(R.string.autologin_message_no_store_created));
+    bundle.putString(GRANT_TYPE_CREATE_STORE_AUTHENTICATION, "refresh_token");
     dialog.setArguments(bundle);
     dialog.show(context.getSupportFragmentManager(), "RepoCreatorDialog");
   }
@@ -86,6 +90,7 @@ public class RepoCreatorDialog extends DialogFragment {
     userInfo = (UserInfo) getArguments().getSerializable("userInfo");
     title = getArguments().getString(DIALOG_TITLE_KEY);
     message = getArguments().getString(DIALOG_MESSAGE_KEY);
+    grantType = getArguments().getString(GRANT_TYPE_CREATE_STORE_AUTHENTICATION);
     try {
       mCallback = (LoginActivityCallback) activity;
     } catch (ClassCastException e) {
@@ -99,6 +104,7 @@ public class RepoCreatorDialog extends DialogFragment {
       userInfo = (UserInfo) savedInstanceState.getSerializable("userInfo");
       title = savedInstanceState.getString(DIALOG_TITLE_KEY);
       message = savedInstanceState.getString(DIALOG_MESSAGE_KEY);
+      grantType = getArguments().getString(GRANT_TYPE_CREATE_STORE_AUTHENTICATION);
     }
 
     ContextThemeWrapper contextThemeWrapper = new ContextThemeWrapper(context, R.style.RepoDialog);
@@ -123,7 +129,7 @@ public class RepoCreatorDialog extends DialogFragment {
             if (validateNotEmptyFields()) {
               fillNewUserInfo();
 
-              mCallback.submitAuthentication(userInfo, "refresh_token");
+              mCallback.submitAuthentication(userInfo, grantType);
             } else {
               Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT)
                   .show();
@@ -236,7 +242,7 @@ public class RepoCreatorDialog extends DialogFragment {
             userInfo.setCreateRepo(1);
             //mCallback.submitAuthentication(userInfo);
             dismiss();
-            mCallback.onCreateStore(userInfo);
+            mCallback.onCreateStore(userInfo, grantType);
           } else {
             Toast.makeText(context, R.string.fill_empty_fields, Toast.LENGTH_SHORT)
                 .show();

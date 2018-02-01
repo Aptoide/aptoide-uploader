@@ -248,10 +248,10 @@ public class LoginActivity extends AppCompatActivity
     });
   }
 
-  @Override public void onCreateStore(UserInfo userInfo) {
+  @Override public void onCreateStore(UserInfo userInfo, String grantType) {
     ////dismissSplashFragment();
     //navigateToLogin();
-    submitAuthentication(userInfo, "refresh_token");
+    submitAuthentication(userInfo, grantType);
   }
 
   @Override public void submitAuthentication(UserInfo userInfo, String grantType) {
