@@ -282,8 +282,13 @@ public class LoginActivity extends AppCompatActivity
     spiceManager.execute(checkUserCredentialsRequest, "loginActivity", DEFAULT_CACHE_TIME,
         new OAuthPendingRequestListener());
 
-    UploaderUtils.pushLoadingFragment(this, R.id.container,
-        getString(R.string.logging_as) + " " + userInfo.getUsername());
+    if (!TextUtils.isEmpty(userInfo.getUsername())) {
+      UploaderUtils.pushLoadingFragment(this, R.id.container,
+          getString(R.string.logging_as) + " " + userInfo.getUsername());
+    } else {
+      UploaderUtils.pushLoadingFragment(this, R.id.container,
+          getString(R.string.login_message_logging_in));
+    }
   }
 
   @Override protected void onCreate(Bundle savedInstanceState) {
