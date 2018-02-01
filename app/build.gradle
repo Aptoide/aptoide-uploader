@@ -10,8 +10,8 @@ android {
 
   signingConfigs {
     release {
-      storeFile = file(project.STORE_FILE_BACKUP)
-      storePassword = project.STORE_PASSWORD_BACKUP
+      storeFile = file(project.STORE_FILE_BACKUP_UPLOADER)
+      storePassword = project.STORE_PASSWORD_BACKUP_UPLOADER
       keyAlias = project.KEY_ALIAS_UPLOADER
       keyPassword = project.KEY_PASSWORD_UPLOADER
     }
