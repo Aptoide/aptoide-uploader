@@ -149,5 +149,7 @@
 
   <string name="autologin_message_no_store_created">Your account has no store created. You need to create one to upload great apps!</string>
   <string name="login_message_logging_in">Logging in</string>
+  <string name="create_store_message_ws_error_WOP_3">Store name already taken. Choose a different name for your store.</string>
+
 
 </resources>

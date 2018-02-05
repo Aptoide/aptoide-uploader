@@ -51,6 +51,7 @@ import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
 import pt.caixamagica.aptoide.uploader.retrofit.request.OAuth2AuthenticationRequest;
 import pt.caixamagica.aptoide.uploader.retrofit.request.UserCredentialsRequest;
 import pt.caixamagica.aptoide.uploader.util.StoredCredentialsManager;
+import pt.caixamagica.aptoide.uploader.webservices.json.Error;
 import pt.caixamagica.aptoide.uploader.webservices.json.OAuth;
 import pt.caixamagica.aptoide.uploader.webservices.json.UserCredentialsJson;
 
@@ -482,9 +483,19 @@ public class LoginActivity extends AppCompatActivity
 			}*/
       // Caso o login seja enviado em branco, cai aqui.
       else {
-        UploaderUtils.popLoadingFragment(LoginActivity.this);
-        Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT)
-            .show();
+        List<Error> errors = oAuth.getError();
+        if (errors.get(0)
+            .getCode()
+            .equals("WOP-3")) {
+          UploaderUtils.popLoadingFragment(LoginActivity.this);
+          Toast.makeText(LoginActivity.this, R.string.create_store_message_ws_error_WOP_3,
+              Toast.LENGTH_SHORT)
+              .show();
+        } else {
+          UploaderUtils.popLoadingFragment(LoginActivity.this);
+          Toast.makeText(LoginActivity.this, R.string.loginFail, Toast.LENGTH_SHORT)
+              .show();
+        }
       }
 
       spiceManager.removeAllDataFromCache();
