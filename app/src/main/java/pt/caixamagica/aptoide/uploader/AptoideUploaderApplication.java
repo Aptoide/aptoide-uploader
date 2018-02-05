@@ -8,6 +8,7 @@ package pt.caixamagica.aptoide.uploader;
 import android.app.Application;
 import android.content.Context;
 import android.support.multidex.MultiDex;
+import android.text.TextUtils;
 import com.crashlytics.android.Crashlytics;
 import com.facebook.AppEventsLogger;
 import com.octo.android.robospice.SpiceManager;
@@ -49,13 +50,15 @@ public class AptoideUploaderApplication extends Application {
 
     storedCredentialsManager = new StoredCredentialsManager(this.getApplicationContext());
 
-    if (isUserLoggedIn()) {
+    if (hasStore()) {
       getAppsInStoreController().start();
     }
   }
 
-  private boolean isUserLoggedIn() {
-    return storedCredentialsManager.getStoredUserCredentials() != null;
+  private boolean hasStore() {
+    return storedCredentialsManager.getStoredUserCredentials() != null && !TextUtils.isEmpty(
+        storedCredentialsManager.getStoredUserCredentials()
+            .getRepo());
   }
 
   public AppsInStoreController getAppsInStoreController() {
