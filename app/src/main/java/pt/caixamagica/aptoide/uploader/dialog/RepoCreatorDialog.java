@@ -98,6 +98,14 @@ public class RepoCreatorDialog extends DialogFragment {
     }
   }
 
+  @Override public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putSerializable("userInfo", userInfo);
+    outState.putString(DIALOG_TITLE_KEY, title);
+    outState.putString(DIALOG_MESSAGE_KEY, message);
+    outState.putString(GRANT_TYPE_CREATE_STORE_AUTHENTICATION, grantType);
+  }
+
   @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
 
     if (savedInstanceState != null) {
