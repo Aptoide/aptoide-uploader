@@ -12,6 +12,8 @@ import android.widget.Toast;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.permission.AccountPermissionProvider;
+import com.aptoide.uploader.apps.permission.PermissionProvider;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;
@@ -51,7 +53,8 @@ public class LoginFragment extends FragmentView implements LoginView {
     fragmentContainer = view.findViewById(R.id.fragment_login_content);
 
     new LoginPresenter(this, accountManager, new LoginNavigator(getContext(), getFragmentManager()),
-        new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
+        new CompositeDisposable(), AndroidSchedulers.mainThread(),
+        new AccountPermissionProvider((PermissionProvider) getContext())).present();
   }
 
   @Override public void onDestroyView() {

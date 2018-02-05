@@ -70,10 +70,9 @@ public abstract class PermissionProviderActivity extends AppCompatActivity
   }
 
   @Override public Observable<List<Permission>> permissionResults(int requestCode) {
-    return permissionRelay.flatMap(permissions -> Observable.just(permissions)
-        .zipWith(Observable.just(this.requestedCodeGrantedPermissions.get(requestCode)),
-            (systemPermissions, savedPermissions) -> mergeLists(systemPermissions,
-                savedPermissions))
+    return permissionRelay.flatMap(permissions -> Observable.zip(Observable.just(permissions),
+        Observable.just(this.requestedCodeGrantedPermissions.get(requestCode)),
+        (systemPermissions, savedPermissions) -> mergeLists(systemPermissions, savedPermissions))
         .flatMapIterable(mergedPermissions -> mergedPermissions)
         .filter(permission -> requestCode == permission.getRequestCode())
         .toList()

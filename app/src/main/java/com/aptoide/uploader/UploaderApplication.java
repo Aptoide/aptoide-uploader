@@ -1,9 +1,11 @@
 package com.aptoide.uploader;
 
+import android.accounts.AccountManager;
 import android.content.Intent;
 import android.preference.PreferenceManager;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.CredentialsValidator;
+import com.aptoide.uploader.account.VanillaLoginProvider;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
@@ -21,6 +23,7 @@ import com.aptoide.uploader.security.AuthenticationPersistance;
 import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence;
+import com.aptoide.uploader.security.VanillaContentProviderParser;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.util.HashSet;
@@ -36,11 +39,14 @@ public class UploaderApplication extends NotificationApplicationView {
   private UploadManager uploadManager;
   private LanguageManager languageManager;
   private AuthenticationProvider authenticationProvider;
+  private FirstLaunchPersistence firstLaunchPersistence;
 
   @Override public void onCreate() {
     super.onCreate();
+
     startService(new Intent(this, SyncUploadService.class));
     // TODO: 27-12-2017 filipe need to stop the service
+
   }
 
   public AptoideAccountManager getAccountManager() {
@@ -59,15 +65,29 @@ public class UploaderApplication extends NotificationApplicationView {
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
 
+      final SharedPreferencesAccountPersistence accountPersistence =
+          new SharedPreferencesAccountPersistence(PublishSubject.create(),
+              PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io());
+
       accountManager = new AptoideAccountManager(
           new RetrofitAccountService(retrofitV3.create(RetrofitAccountService.ServiceV3.class),
               retrofitV7.create(RetrofitAccountService.ServiceV7.class), new SecurityAlgorithms(),
-              new AccountResponseMapper(), getAuthenticationProvider()),
-          new SharedPreferencesAccountPersistence(PublishSubject.create(),
-              PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()),
-          new CredentialsValidator());
+              new AccountResponseMapper(), getAuthenticationProvider()), accountPersistence,
+          new CredentialsValidator(), new VanillaLoginProvider(accountPersistence,
+          new SharedPreferencesAuthenticationPersistence(
+              PreferenceManager.getDefaultSharedPreferences(this)),
+          new VanillaContentProviderParser(AccountManager.get(this), this.getContentResolver())),
+          getFirstLaunchPersistence());
     }
     return accountManager;
+  }
+
+  private FirstLaunchPersistence getFirstLaunchPersistence() {
+    if (firstLaunchPersistence == null) {
+      firstLaunchPersistence = new SharedPreferencesFirstLaunchPersistence(
+          PreferenceManager.getDefaultSharedPreferences(this));
+    }
+    return firstLaunchPersistence;
   }
 
   public AuthenticationProvider getAuthenticationProvider() {
