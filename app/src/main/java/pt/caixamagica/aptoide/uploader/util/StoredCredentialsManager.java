@@ -6,6 +6,7 @@ import android.content.SharedPreferences;
 import android.database.Cursor;
 import android.net.Uri;
 import android.provider.Settings;
+import android.text.TextUtils;
 import com.google.android.vending.licensing.AESObfuscator;
 import com.google.android.vending.licensing.ValidationException;
 import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
@@ -62,8 +63,10 @@ public class StoredCredentialsManager {
     SharedPreferences.Editor editor = sharedpreferences.edit();
 
     editor.putString("token", aesObfuscator.obfuscate(oAuth.getAccess_token(), "token"));
-    editor.putString("refreshToken",
-        aesObfuscator.obfuscate(oAuth.getRefreshToken(), "refreshToken"));
+    if (!TextUtils.isEmpty(oAuth.getRefreshToken())){
+      editor.putString("refreshToken",
+          aesObfuscator.obfuscate(oAuth.getRefreshToken(), "refreshToken"));
+    }
 
     editor.commit();
   }
