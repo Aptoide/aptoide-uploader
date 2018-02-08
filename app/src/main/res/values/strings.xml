@@ -82,5 +82,8 @@
   <string name="login_message_logging_in">Logging in</string>
   <string name="create_store_message_ws_error_WOP_3">Store name already taken. Choose a different name for your store.</string>
 
+  <string name="language">Language</string>
+
+
 
 </resources>
