@@ -6,79 +6,79 @@
   </string-array>
 
   <string-array name="app_category_array">
-    <item>@string/app_category_1</item>
-    <item>@string/app_category_2</item>
-    <item>@string/app_category_3</item>
-    <item>@string/app_category_4</item>
-    <item>@string/app_category_5</item>
-    <item>@string/app_category_6</item>
-    <item>@string/app_category_7</item>
-    <item>@string/app_category_8</item>
-    <item>@string/app_category_9</item>
-    <item>@string/app_category_10</item>
-    <item>@string/app_category_11</item>
-    <item>@string/app_category_12</item>
-    <item>@string/app_category_13</item>
-    <item>@string/app_category_14</item>
-    <item>@string/app_category_15</item>
-    <item>@string/app_category_16</item>
-    <item>@string/app_category_17</item>
-    <item>@string/app_category_18</item>
-    <item>@string/app_category_19</item>
-    <item>@string/app_category_20</item>
-    <item>@string/app_category_21</item>
-    <item>@string/app_category_22</item>
-    <item>@string/app_category_23</item>
-    <item>@string/app_category_24</item>
-    <item>@string/app_category_25</item>
-    <item>@string/app_category_26</item>
-    <item>@string/app_category_27</item>
-    <item>@string/app_category_28</item>
-    <item>@string/app_category_29</item>
-    <item>@string/app_category_30</item>
-    <item>@string/app_category_31</item>
-    <item>@string/app_category_32</item>
-    <item>@string/app_category_33</item>
-    <item>@string/app_category_34</item>
-    <item>@string/app_category_35</item>
-    <item>@string/app_category_36</item>
-    <item>@string/app_category_37</item>
-    <item>@string/app_category_38</item>
-    <item>@string/app_category_39</item>
-    <item>@string/app_category_40</item>
+    <item>App Category</item>
+    <item>Comics</item>
+    <item>Communication</item>
+    <item>Entertainment</item>
+    <item>Finance</item>
+    <item>Health</item>
+    <item>Lifestyle</item>
+    <item>Multimedia</item>
+    <item>News &amp; Weather</item>
+    <item>Productivity</item>
+    <item>Reference</item>
+    <item>Shopping</item>
+    <item>Social</item>
+    <item>Sports</item>
+    <item>Themes</item>
+    <item>Tools</item>
+    <item>Travel</item>
+    <item>Demo</item>
+    <item>Software Libraries</item>
+    <item>Arcade &amp; Action (Games)</item>
+    <item>Brain &amp; Puzzle (Games)</item>
+    <item>Cards &amp; Casino (Games)</item>
+    <item>Casual (Games)</item>
+    <item>News &amp; Magazines</item>
+    <item>Music &amp; Audio</item>
+    <item>Photography</item>
+    <item>Personalization</item>
+    <item>Racing (Games)</item>
+    <item>Books &amp; Reference</item>
+    <item>Health &amp; Fitness</item>
+    <item>Media &amp; Video</item>
+    <item>Education</item>
+    <item>Business</item>
+    <item>Sports Games</item>
+    <item>Weather</item>
+    <item>Travel &amp; Local</item>
+    <item>Transportation</item>
+    <item>Medical</item>
+    <item>Libraries &amp; Demo</item>
+    <item>Transport</item>
 
   </string-array>
 
   <string-array name="age_rating_array">
-    <item>@string/age_rating_1</item>
-    <item>@string/age_rating_2</item>
-    <item>@string/age_rating_3</item>
-    <item>@string/age_rating_4</item>
+    <item>All</item>
+    <item>Pre-Teen (minimal age: 10)</item>
+    <item>Teen (minimal age: 16)</item>
+    <item>Mature (minimal age: 18)</item>
   </string-array>
 
   <string-array name="language_array">
-    <item>@string/language</item>
-    <item>@string/language_2</item>
-    <item>@string/language_3</item>
-    <item>@string/language_4</item>
-    <item>@string/language_5</item>
-    <item>@string/language_6</item>
-    <item>@string/language_8</item>
-    <item>@string/language_9</item>
-    <item>@string/language_10</item>
-    <item>@string/language_11</item>
-    <item>@string/language_12</item>
-    <item>@string/language_13</item>
-    <item>@string/language_14</item>
-    <item>@string/language_15</item>
-    <item>@string/language_16</item>
-    <item>@string/language_17</item>
-    <item>@string/language_18</item>
-    <item>@string/language_19</item>
-    <item>@string/language_20</item>
-    <item>@string/language_1</item>
+    <item translatable="false">Language</item>
+    <item translatable="false">العربية</item>
+    <item translatable="false">বাংলা</item>
+    <item translatable="false">ဗမာစာ</item>
+    <item translatable="false">Deutsch</item>
+    <item translatable="false">English</item>
+    <item translatable="false">Español</item>
+    <item translatable="false">فارسی</item>
+    <item translatable="false">Filipino</item>
+    <item translatable="false">Français</item>
+    <item translatable="false">हिंदी</item>
+    <item translatable="false">Bahasa Indonesia</item>
+    <item translatable="false">Italiano</item>
+    <item translatable="false">Bahasa Melayu</item>
+    <item translatable="false">Português</item>
+    <item translatable="false">Português (Brasil)</item>
+    <item translatable="false">Русский</item>
+    <item translatable="false">ภาษาไทย</item>
+    <item translatable="false">Türk</item>
+    <item translatable="false">Tiếng Việt</item>
     //These two are in the end because they are rtl languages
-    <item>@string/language_7</item>
+    <item translatable="false">中文</item>
   </string-array>
 
 </resources>
