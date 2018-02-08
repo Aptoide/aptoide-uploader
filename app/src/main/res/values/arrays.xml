@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <string-array name="sort_spinner_array">
-    <item>@string/sort_spinner_values_1</item>
-    <item>@string/sort_spinner_values_2</item>
+    <item>By Date</item>
+    <item>By Name</item>
   </string-array>
 
   <string-array name="app_category_array">

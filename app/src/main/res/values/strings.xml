@@ -30,8 +30,6 @@
   <string name="upload_prepare">Preparing to upload %s</string>
 
 
-  <string name="sort_spinner_values_1">By Date</string>
-  <string name="sort_spinner_values_2">By Name</string>
   <string name="select_apps_to_upload_to_your_store">Select apps to upload to your store</string>
   <string name="submit_apps">Submit Apps</string>
   <string name="new_to_aptoide_create_a_free_account">New to Aptoide? Create a free account.</string>
