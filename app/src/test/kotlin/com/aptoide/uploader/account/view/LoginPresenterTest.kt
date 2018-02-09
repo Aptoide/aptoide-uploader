@@ -1,11 +1,10 @@
 package com.aptoide.uploader.account.view
 
+import com.aptoide.uploader.FirstLaunchPersistence
 import com.aptoide.uploader.TestData
-import com.aptoide.uploader.account.AccountPersistence
-import com.aptoide.uploader.account.AptoideAccount
-import com.aptoide.uploader.account.AptoideAccountManager
-import com.aptoide.uploader.account.CredentialsValidator
+import com.aptoide.uploader.account.*
 import com.aptoide.uploader.account.network.*
+import com.aptoide.uploader.account.permission.AccountPermissionProvider
 import com.aptoide.uploader.security.AptoideAccessTokenProvider
 import com.aptoide.uploader.security.SecurityAlgorithms
 import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence
@@ -43,9 +42,12 @@ class LoginPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
+            val accountPermissionProvider = mock<AccountPermissionProvider>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator)
-            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline(), accountPermissionProvider)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val accounts = PublishSubject.create<AptoideAccount>()
@@ -58,6 +60,7 @@ class LoginPresenterTest : Spek({
                             .Data(AccountResponse.Store(TestData.STORE_NAME,
                                     "http://aptoide.com/avatar", 1)))),
                     ResponseV7.Info(ResponseV7.Info.Status.OK), null))
+            val permissionsAcceptedEvent = PublishSubject.create<Boolean>()
 
 
             whenever(accountPersistence.account).doReturn(accounts)
@@ -71,8 +74,12 @@ class LoginPresenterTest : Spek({
             whenever(serviceV7.getUserInfo(any())).doReturn(accountResponse
                     .toSingle().toObservable())
 
+            whenever(accountPermissionProvider.permissionResultGetAccounts()).doReturn(permissionsAcceptedEvent)
+
+
             presenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
+            permissionsAcceptedEvent.onNext(true)
             loginEvent.onNext(credentialsViewModel)
             verify(view).showLoading(TestData.USER_NAME)
             verify(view).hideLoading()
@@ -88,9 +95,12 @@ class LoginPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
+            val accountPermissionProvider = mock<AccountPermissionProvider>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator)
-            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline(), accountPermissionProvider)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<LoginView.CredentialsViewModel>()
@@ -118,9 +128,12 @@ class LoginPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
+            val accountPermissionProvider = mock<AccountPermissionProvider>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator)
-            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline(), accountPermissionProvider)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<LoginView.CredentialsViewModel>()
@@ -151,9 +164,12 @@ class LoginPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
+            val accountPermissionProvider = mock<AccountPermissionProvider>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator)
-            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline(), accountPermissionProvider)
 
             val accounts = PublishSubject.create<AptoideAccount>()
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -192,9 +208,12 @@ class LoginPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
+            val accountPermissionProvider = mock<AccountPermissionProvider>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
-            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline(), accountPermissionProvider)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<LoginView.CredentialsViewModel>()
@@ -216,9 +235,12 @@ class LoginPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
+            val accountPermissionProvider = mock<AccountPermissionProvider>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
-            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline(), accountPermissionProvider)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val loginEvent = PublishSubject.create<LoginView.CredentialsViewModel>()
@@ -239,11 +261,14 @@ class LoginPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
+            val accountPermissionProvider = mock<AccountPermissionProvider>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
             val accounts = PublishSubject.create<AptoideAccount>()
             val view = mock<LoginView>()
-            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline())
+            val presenter = LoginPresenter(view, accountManager, navigator, CompositeDisposable(), Schedulers.trampoline(), accountPermissionProvider)
 
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
             val clickGoToCreateAccountViewEvent = PublishSubject.create<LoginView.CredentialsViewModel>()

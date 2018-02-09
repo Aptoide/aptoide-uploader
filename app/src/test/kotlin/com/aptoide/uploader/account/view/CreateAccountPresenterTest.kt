@@ -1,5 +1,6 @@
 package com.aptoide.uploader.account.view
 
+import com.aptoide.uploader.FirstLaunchPersistence
 import com.aptoide.uploader.TestData
 import com.aptoide.uploader.account.*
 import com.aptoide.uploader.account.network.*
@@ -45,8 +46,10 @@ class CreateAccountPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator)
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
 
             val view = mock<CreateAccountView>()
             val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
@@ -93,8 +96,10 @@ class CreateAccountPresenterTest : Spek({
             val accountPersistence = mock<AccountPersistence>()
             val authenticationPersistance = mock<SharedPreferencesAuthenticationPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator)
+                    SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
 
             val view = mock<CreateAccountView>()
             val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
@@ -139,8 +144,10 @@ class CreateAccountPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
 
             val view = mock<CreateAccountView>()
             val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
@@ -179,8 +186,10 @@ class CreateAccountPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
 
             val view = mock<CreateAccountView>()
             val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
@@ -218,8 +227,10 @@ class CreateAccountPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
 
             val view = mock<CreateAccountView>()
             val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
@@ -258,8 +269,10 @@ class CreateAccountPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
             val accounts = PublishSubject.create<AptoideAccount>()
             val view = mock<CreateAccountView>()
             val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())
@@ -289,8 +302,10 @@ class CreateAccountPresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator)
+                    SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
             val accounts = PublishSubject.create<AptoideAccount>()
             val view = mock<CreateAccountView>()
             val presenter = CreateAccountPresenter(view, accountManager, navigator, CompositeDisposable(), accountErrorMapper, Schedulers.trampoline())

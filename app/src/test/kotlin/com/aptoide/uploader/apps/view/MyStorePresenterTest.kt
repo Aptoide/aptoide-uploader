@@ -1,6 +1,6 @@
 package com.aptoide.uploader.apps.view
 
-import android.content.DialogInterface
+import com.aptoide.uploader.FirstLaunchPersistence
 import com.aptoide.uploader.TestData
 import com.aptoide.uploader.account.*
 import com.aptoide.uploader.account.network.AccountResponseMapper
@@ -46,12 +46,14 @@ class MyStorePresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator)
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val uploadPermissionProvider = mock<UploadPermissionProvider> {}
-            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator))
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
             val appList = mutableListOf(facebook, aptoide)
@@ -96,12 +98,14 @@ class MyStorePresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator)
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val uploadPermissionProvider = mock<UploadPermissionProvider> {}
-            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator))
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
@@ -150,12 +154,14 @@ class MyStorePresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator)
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val uploadPermissionProvider = mock<UploadPermissionProvider> {}
-            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator))
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
@@ -207,12 +213,14 @@ class MyStorePresenterTest : Spek({
             val serviceV7 = mock<RetrofitAccountService.ServiceV7>()
             val accountPersistence = mock<AccountPersistence>()
             val credentialsValidator = mock<CredentialsValidator>()
+            val vanillaLoginProvider = mock<VanillaLoginProvider>()
+            val firstLaunchPersistence = mock<FirstLaunchPersistence>()
             val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
-                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator)
+                    serviceV7, SecurityAlgorithms(), AccountResponseMapper(), AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)), accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence)
             val uploadManager = mock<UploadManager> {}
             val languageManager = mock<LanguageManager> {}
             val uploadPermissionProvider = mock<UploadPermissionProvider> {}
-            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator))
+            val storeNameProvider = AccountStoreNameProvider(AptoideAccountManager(accountService, accountPersistence, credentialsValidator, vanillaLoginProvider, firstLaunchPersistence))
             val storeManager = StoreManager(packageProvider, storeNameProvider, uploadManager, languageManager, accountManager)
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
@@ -255,13 +263,12 @@ class MyStorePresenterTest : Spek({
 
         it("should navigate to login view after signout confirmation is given") {
             val view = mock<MyStoreView> {}
-            val dialogInterface = mock<DialogInterface> {}
             val navigator = mock<MyStoreNavigator>()
             val storeManager = mock<StoreManager> {}
             val uploadPermissionProvider = mock<UploadPermissionProvider> {}
             val installedAppsPresenter = MyStorePresenter(view, storeManager, CompositeDisposable(), navigator, Schedulers.trampoline(), uploadPermissionProvider)
 
-            val click = PublishSubject.create<DialogInterface>()
+            val click = PublishSubject.create<Boolean>()
             val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
 
             whenever(view.lifecycleEvent)
@@ -271,7 +278,7 @@ class MyStorePresenterTest : Spek({
 
             installedAppsPresenter.present()
             lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
-            click.onNext(dialogInterface)
+            click.onNext(true)
             verify(storeManager).logout()
             verify(navigator).navigateToLoginView()
         }

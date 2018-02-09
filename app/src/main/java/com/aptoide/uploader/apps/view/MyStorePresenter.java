@@ -41,12 +41,12 @@ public class MyStorePresenter implements Presenter {
 
     handleSignOutClick();
 
-    handlePositiveDialogClick();
+    handleSignOutDialogResultClick();
 
     onDestroyDisposeComposite();
   }
 
-  private void handlePositiveDialogClick() {
+  private void handleSignOutDialogResultClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.positiveClick())
@@ -119,7 +119,6 @@ public class MyStorePresenter implements Presenter {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
-    ;
   }
 
   private void showStoreAndApps() {
