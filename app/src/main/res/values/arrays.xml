@@ -6,7 +6,7 @@
   </string-array>
 
   <string-array name="app_category_array">
-    <item>App Category</item>
+    <item>Choose one</item>
     <item>Comics</item>
     <item>Communication</item>
     <item>Entertainment</item>
@@ -57,7 +57,7 @@
   </string-array>
 
   <string-array name="language_array">
-    <item translatable="false">Language</item>
+    <item>Choose one</item>
     <item translatable="false">العربية</item>
     <item translatable="false">বাংলা</item>
     <item translatable="false">ဗမာစာ</item>
