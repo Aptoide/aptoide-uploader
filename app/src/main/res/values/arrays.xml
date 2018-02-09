@@ -50,7 +50,7 @@
   </string-array>
 
   <string-array name="age_rating_array">
-  <item>Choose one</item>
+    <item>Choose one</item>
     <item>All</item>
     <item>Pre-Teen (minimal age: 10)</item>
     <item>Teen (minimal age: 16)</item>
