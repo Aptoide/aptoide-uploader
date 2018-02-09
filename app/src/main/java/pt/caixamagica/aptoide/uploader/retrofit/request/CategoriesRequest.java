@@ -14,9 +14,9 @@ public class CategoriesRequest
 
   private Body body;
 
-  public CategoriesRequest(int offset) {
+  public CategoriesRequest(int offset, String language) {
     super(CategoriesResponse.class, CategoriesRequest.Webservice.class);
-    this.body = new Body(offset);
+    this.body = new Body(offset, language);
   }
 
   @Override public CategoriesResponse loadDataFromNetwork() throws Exception {
@@ -30,9 +30,11 @@ public class CategoriesRequest
   @Data private class Body {
 
     private final int offset;
+    private final String language;
 
-    private Body(int offset) {
+    private Body(int offset, String language) {
       this.offset = offset;
+      this.language = language;
     }
   }
 }

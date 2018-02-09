@@ -230,7 +230,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="5dp"
             android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
@@ -262,7 +262,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="5dp"
             android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"
@@ -293,7 +293,7 @@
         <TextView
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_marginLeft="0dp"
+            android:layout_marginLeft="5dp"
             android:text="@string/optional"
             android:textColor="@android:color/darker_gray"
             style="@style/TextViewCustom"

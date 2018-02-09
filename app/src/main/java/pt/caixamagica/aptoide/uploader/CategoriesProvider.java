@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.LinkedList;
 import java.util.List;
 import pt.caixamagica.aptoide.uploader.retrofit.request.CategoriesRequest;
+import pt.caixamagica.aptoide.uploader.util.Utils;
 import pt.caixamagica.aptoide.uploader.webservices.json.CategoriesResponse;
 
 /**
@@ -32,7 +33,7 @@ public class CategoriesProvider {
   private void requestCategories(final CategoriesProviderListener listener) {
     int offset = 0;
     offset += count;
-    final CategoriesRequest categoriesRequest = new CategoriesRequest(offset);
+    final CategoriesRequest categoriesRequest = new CategoriesRequest(offset, Utils.getLanguage());
 
     spiceManager.execute(categoriesRequest, new RequestListener<CategoriesResponse>() {
       @Override public void onRequestFailure(SpiceException spiceException) {
