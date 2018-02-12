@@ -317,6 +317,7 @@ public class SubmitAppFragment extends Fragment {
     validation &= !appDescriptionEditText.getText()
         .toString()
         .equals("");
+    validation &= ageRatingSpinner.getSelectedItemPosition() != 0;
     validation &= appLanguageSpinner.getSelectedItemPosition() != 0;
 
     return validation;
@@ -437,7 +438,8 @@ public class SubmitAppFragment extends Fragment {
           //// TODO: 23-11-2017 filipe handle error case.
         }
       });
-      spinnerArray.add(0, "App Category");
+      spinnerArray.add(0,
+          getResources().getString(R.string.upload_app_form_short_choose_one_option));
       prepareCategorySpinner();
     } else {
       prepareCategorySpinner();
