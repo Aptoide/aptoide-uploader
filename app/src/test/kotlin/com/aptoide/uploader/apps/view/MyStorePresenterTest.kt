@@ -13,7 +13,6 @@ import com.aptoide.uploader.security.SecurityAlgorithms
 import com.aptoide.uploader.view.View
 import com.nhaarman.mockito_kotlin.*
 import io.reactivex.Completable
-import io.reactivex.Observable
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.rxkotlin.toSingle
 import io.reactivex.schedulers.Schedulers
@@ -31,9 +30,9 @@ class MyStorePresenterTest : Spek({
 
         val storeName = "Marcelo"
         val language = "PT-BR"
-        val facebook = InstalledApp("https://myicon.com/facebook", "Facebook", false, "cm.aptoide.pt", "/Files/facebook.apk", 0)
-        val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt", "/Files/aptoide.apk", 1)
-        val aptoide2 = InstalledApp("https://myicon.com/aptoide", "Aptoide", false, "cm.aptoide.pt", "/Files/aptoide.apk", 1)
+        val facebook = InstalledApp("https://myicon.com/facebook", "Facebook", false, "cm.aptoide.pt", "/Files/facebook.apk", 0, 231)
+        val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", true, "cm.aptoide.pt", "/Files/aptoide.apk", 1, 231)
+        val aptoide2 = InstalledApp("https://myicon.com/aptoide", "Aptoide", false, "cm.aptoide.pt", "/Files/aptoide.apk", 1, 231)
 
         it("should display store name and installed apps when view is created") {
             val view = mock<MyStoreView> {}
@@ -63,14 +62,14 @@ class MyStorePresenterTest : Spek({
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
             whenever(view.submitAppEvent())
-                    .doReturn(Observable.empty())
+                    .doReturn(Any().toSingle().toObservable())
             whenever(languageManager.currentLanguageCode)
                     .doReturn(language.toSingle())
             whenever(packageProvider.installedApps)
                     .doReturn(appList.toSingle())
 
             whenever(view.selectedApps)
-                    .doReturn(listOf(aptoide).toSingle().toObservable())
+                    .doReturn(mutableListOf(aptoide).toSingle())
             whenever(uploadPermissionProvider.permissionResultExternalStorage())
                     .doReturn(permissionsAcceptedEvent)
 
@@ -113,13 +112,13 @@ class MyStorePresenterTest : Spek({
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
             whenever(view.submitAppEvent())
-                    .doReturn(submitAppEvent)
+                    .doReturn(Any().toSingle().toObservable())
 
             whenever(uploadPermissionProvider.permissionResultExternalStorage())
                     .doReturn(permissionsAcceptedEvent)
 
             whenever(view.selectedApps)
-                    .doReturn(mutableListOf(aptoide).toSingle().toObservable())
+                    .doReturn(mutableListOf(aptoide).toSingle())
 
             whenever(languageManager.currentLanguageCode)
                     .doReturn(language.toSingle())
@@ -170,12 +169,12 @@ class MyStorePresenterTest : Spek({
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
             whenever(view.submitAppEvent())
-                    .doReturn(Observable.empty())
+                    .doReturn(Any().toSingle().toObservable())
             whenever(languageManager.currentLanguageCode)
                     .doReturn(language.toSingle())
 
             whenever(view.selectedApps)
-                    .doReturn(listOf(aptoide).toSingle().toObservable())
+                    .doReturn(listOf(aptoide).toSingle())
             whenever(uploadPermissionProvider.permissionResultExternalStorage())
                     .doReturn(permissionsAcceptedEvent)
 
@@ -229,7 +228,7 @@ class MyStorePresenterTest : Spek({
             whenever(view.lifecycleEvent)
                     .doReturn(lifecycleEvent)
             whenever(view.submitAppEvent())
-                    .doReturn(Observable.empty())
+                    .doReturn(Any().toSingle().toObservable())
             whenever(languageManager.currentLanguageCode)
                     .doReturn(language.toSingle())
             whenever(packageProvider.installedApps).doReturn(unSortedAppList.toSingle())
@@ -237,7 +236,7 @@ class MyStorePresenterTest : Spek({
                     .doReturn(AptoideAccount(true, true, TestData.STORE_NAME).toSingle().toObservable())
 
             whenever(view.selectedApps)
-                    .doReturn(listOf(aptoide).toSingle().toObservable())
+                    .doReturn(listOf(aptoide).toSingle())
             whenever(uploadPermissionProvider.permissionResultExternalStorage())
                     .doReturn(permissionsAcceptedEvent)
 
@@ -275,10 +274,5 @@ class MyStorePresenterTest : Spek({
             verify(storeManager).logout()
             verify(navigator).navigateToLoginView()
         }
-
-        it("should navigate to app information form view if it is needed before upload") {
-            fail("To Do")
-        }
-
     }
 })

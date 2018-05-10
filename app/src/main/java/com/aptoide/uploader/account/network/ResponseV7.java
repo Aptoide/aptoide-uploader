@@ -29,7 +29,7 @@ public class ResponseV7 {
   }
 
   public boolean isOk() {
-    return info != null && info.getStatus() == Info.Status.OK;
+    return info != null && info.getStatus() == Status.OK;
   }
 
   public static class Info {
@@ -42,28 +42,6 @@ public class ResponseV7 {
 
     public Status getStatus() {
       return status;
-    }
-
-    public enum Status {
-      OK, QUEUED, FAIL, Processing
-    }
-  }
-
-  public static class Error {
-    private String code;
-    private String description;
-
-    public Error(String code, String description) {
-      this.code = code;
-      this.description = description;
-    }
-
-    public String getCode() {
-      return code;
-    }
-
-    public String getDescription() {
-      return description;
     }
   }
 }

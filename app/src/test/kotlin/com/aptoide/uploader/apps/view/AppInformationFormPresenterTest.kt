@@ -50,12 +50,5 @@ class AppInformationFormPresenterTest : Spek({
 
             verify(remoteAppInfoManager).uploadInfo(mockAppInfo)
         }
-
-        it("should present a pre-filled form and return all form data") {
-            val language = "PT-BR"
-            val aptoide = InstalledApp("https://myicon.com/aptoide", "Aptoide", false, "cm.aptoide.pt", "/Files/aptoide.apk", 0)
-
-            fail("to do")
-        }
     }
 })

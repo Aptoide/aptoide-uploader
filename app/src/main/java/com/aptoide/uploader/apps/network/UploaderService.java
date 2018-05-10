@@ -7,8 +7,9 @@ import io.reactivex.Single;
 
 public interface UploaderService {
 
-  Single<Upload> getAppUpload(String md5, String language, String storeName,
+  Single<Upload> getUpload(String md5, String language, String storeName,
       InstalledApp installedApp);
 
-  Observable<Void> uploadAppToRepo(Upload upload);
+  Observable<Upload> upload(String md5, String storeName, String installedAppName,
+      boolean hasProposedData, InstalledApp installedApp);
 }

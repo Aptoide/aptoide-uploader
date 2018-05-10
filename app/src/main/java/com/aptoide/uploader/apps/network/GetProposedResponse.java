@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.network;
 
+import com.aptoide.uploader.account.network.Error;
 import com.aptoide.uploader.account.network.ResponseV7;
 import java.util.List;
 

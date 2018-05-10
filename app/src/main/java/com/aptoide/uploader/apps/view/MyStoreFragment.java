@@ -33,8 +33,10 @@ import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.view.Rx.RxAlertDialog;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.view.RxMenuItem;
+import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
@@ -197,8 +199,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         .show();
   }
 
-  @Override public Observable<List<InstalledApp>> submitAppEvent() {
-    return Observable.empty();
+  @Override public Observable<Object> submitAppEvent() {
+    return RxView.clicks(submitButton);
   }
 
   @Override public Observable<SortingOrder> orderByEvent() {
@@ -266,9 +268,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         .unsubscribeOn(AndroidSchedulers.mainThread());
   }
 
-  @Override public Observable<List<InstalledApp>> getSelectedApps() {
-    //// TODO: 03-01-2018 filipe depends on how app selection will be done.
-    return Observable.empty();
+  @Override public Single<List<InstalledApp>> getSelectedApps() {
+    return Single.just(adapter.getSelected());
   }
 
   public void setUpSubmitButtonAnimation() {
