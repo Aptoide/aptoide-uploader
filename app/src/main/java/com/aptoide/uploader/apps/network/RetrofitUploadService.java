@@ -62,6 +62,11 @@ public class RetrofitUploadService implements UploaderService {
                 Upload.Status.CLIENT_ERROR, md5, storeName)));
   }
 
+  @Override public Single<Upload> hasApplicationMetaData(String md5) {
+    // TODO: 5/11/18 implement this request
+    return null;
+  }
+
   private Upload buildUploadProgressStatus(boolean proposedData, InstalledApp installedApp,
       String md5, String storeName) {
     return new Upload(false, proposedData, installedApp, Upload.Status.PROGRESS, md5, storeName);
@@ -71,13 +76,22 @@ public class RetrofitUploadService implements UploaderService {
       boolean hasProposedData, InstalledApp installedApp, String md5, String storeName) {
     if (response.body()
         .getStatus()
-        .equals(Status.FAIL) && response.body()
-        .getErrors()
-        .get(0)
-        .getCode()
-        .equals("APK-103")) {
-      return new Upload(response.isSuccessful(), hasProposedData, installedApp,
-          Upload.Status.DUPLICATE, md5, storeName);
+        .equals(Status.FAIL)) {
+      if (response.body()
+          .getErrors()
+          .get(0)
+          .getCode()
+          .equals("APK-103")) {
+        return new Upload(response.isSuccessful(), hasProposedData, installedApp,
+            Upload.Status.DUPLICATE, md5, storeName);
+      } else if (response.body()
+          .getErrors()
+          .get(0)
+          .getCode()
+          .equals("APK-5")) {
+        return new Upload(response.isSuccessful(), hasProposedData, installedApp,
+            Upload.Status.NOT_EXISTENT, md5, storeName);
+      }
     }
     return new Upload(response.isSuccessful(), hasProposedData, installedApp,
         Upload.Status.COMPLETED, md5, storeName);
@@ -106,6 +120,10 @@ public class RetrofitUploadService implements UploaderService {
   public interface ServiceV3 {
     @Multipart @POST("3/uploadAppToRepo")
     Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
+        @PartMap Map<String, okhttp3.RequestBody> params);
+
+    @Multipart @POST("3/hasApplicationMetaData")
+    Observable<Response<HasApplicationMetaDataResponse>> hasApplicationMetaData(
         @PartMap Map<String, okhttp3.RequestBody> params);
   }
 }

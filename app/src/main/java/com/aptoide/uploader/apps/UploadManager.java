@@ -46,6 +46,7 @@ public class UploadManager {
   public void start() {
     handleBackgroundService();
     dispatchUploads();
+    handleMd5NotExistent();
   }
 
   private void handleBackgroundService() {
@@ -65,6 +66,16 @@ public class UploadManager {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         });
+  }
+
+  private void handleMd5NotExistent() {
+    persistence.getUploads()
+        .distinctUntilChanged((previous, current) -> !hasChanged(previous, current))
+        .flatMapIterable(uploads -> uploads)
+        .filter(upload -> upload.getStatus()
+            .equals(Upload.Status.NOT_EXISTENT));
+    // TODO: 5/11/18 DO THE REQUEST TO THE UPLOADER SERVICE
+        //.flatMap(upload -> uploaderService.hasApplicationMetaData(upload.getMd5(), upload.))
   }
 
   private void dispatchUploads() {

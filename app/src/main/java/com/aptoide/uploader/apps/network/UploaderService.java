@@ -12,4 +12,6 @@ public interface UploaderService {
 
   Observable<Upload> upload(String md5, String storeName, String installedAppName,
       boolean hasProposedData, InstalledApp installedApp);
+
+  Single<Upload> hasApplicationMetaData(String md5);
 }
