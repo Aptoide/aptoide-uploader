@@ -5,10 +5,6 @@ import android.support.annotation.NonNull;
 import io.reactivex.Observable;
 import java.util.List;
 
-/**
- * Created by jdandrade on 28/12/2017.
- */
-
 public interface PermissionProvider {
 
   void providePermissions(final @NonNull String[] permissions,

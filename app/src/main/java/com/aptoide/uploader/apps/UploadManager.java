@@ -81,7 +81,8 @@ public class UploadManager {
                         .getName(), upload.hasProposedData(), upload.getInstalledApp()))
                 .flatMapCompletable(upload -> persistence.save(upload))
                 .toObservable();
-          } return Observable.empty();
+          }
+          return Observable.empty();
         })
         .subscribe(__ -> {
         }, throwable -> {
