@@ -12,6 +12,8 @@ import java.util.Map;
 import okhttp3.MediaType;
 import okhttp3.RequestBody;
 import retrofit2.Response;
+import retrofit2.http.Field;
+import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -20,6 +22,7 @@ import retrofit2.http.Path;
 
 public class RetrofitUploadService implements UploaderService {
 
+  private static final String RESPONSE_MODE = "json";
   private final ServiceV7 serviceV7;
   private final ServiceV3 serviceV3;
   private final AccountProvider accountProvider;
@@ -62,9 +65,11 @@ public class RetrofitUploadService implements UploaderService {
                 Upload.Status.CLIENT_ERROR, md5, storeName)));
   }
 
-  @Override public Single<Upload> hasApplicationMetaData(String md5) {
-    // TODO: 5/11/18 implement this request
-    return null;
+  @Override public Single<Boolean> hasApplicationMetaData(String packageName, int versionCode) {
+    return serviceV3.hasApplicationMetaData(packageName, versionCode, RESPONSE_MODE)
+        .map(result -> result.isSuccessful() && result.body() != null && result.body()
+            .hasMetaData())
+        .single(false);
   }
 
   private Upload buildUploadProgressStatus(boolean proposedData, InstalledApp installedApp,
@@ -122,8 +127,9 @@ public class RetrofitUploadService implements UploaderService {
     Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
         @PartMap Map<String, okhttp3.RequestBody> params);
 
-    @Multipart @POST("3/hasApplicationMetaData")
+    @POST("3/hasApplicationMetaData") @FormUrlEncoded
     Observable<Response<HasApplicationMetaDataResponse>> hasApplicationMetaData(
-        @PartMap Map<String, okhttp3.RequestBody> params);
+        @Field("package") String packageName, @Field("vercode") int versionCode,
+        @Field("mode") String responseMode);
   }
 }

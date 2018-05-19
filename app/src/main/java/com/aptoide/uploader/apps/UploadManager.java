@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps;
 
+import android.annotation.SuppressLint;
 import com.aptoide.uploader.apps.network.UploaderService;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import com.aptoide.uploader.upload.AccountProvider;
@@ -49,7 +50,7 @@ public class UploadManager {
     handleMd5NotExistent();
   }
 
-  private void handleBackgroundService() {
+  @SuppressLint("CheckResult") private void handleBackgroundService() {
     persistence.getUploads()
         .flatMapSingle(uploads -> Observable.fromIterable(uploads)
             .filter(upload -> upload.getStatus()
@@ -68,17 +69,24 @@ public class UploadManager {
         });
   }
 
-  private void handleMd5NotExistent() {
+  @SuppressLint("CheckResult") private void handleMd5NotExistent() {
     persistence.getUploads()
         .distinctUntilChanged((previous, current) -> !hasChanged(previous, current))
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
-            .equals(Upload.Status.NOT_EXISTENT));
-    // TODO: 5/11/18 DO THE REQUEST TO THE UPLOADER SERVICE
-        //.flatMap(upload -> uploaderService.hasApplicationMetaData(upload.getMd5(), upload.))
+            .equals(Upload.Status.NOT_EXISTENT))
+        .flatMapSingle(upload -> uploaderService.hasApplicationMetaData(upload.getInstalledApp()
+            .getPackageName(), upload.getInstalledApp()
+            .getVersionCode()))
+        .filter(hasMeta -> hasMeta)
+        // TODO: 19/05/2018  upload apk by file
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        });
   }
 
-  private void dispatchUploads() {
+  @SuppressLint("CheckResult") private void dispatchUploads() {
     accountProvider.getAccount()
         .switchMap(account -> {
           if (account.isLoggedIn()) {
