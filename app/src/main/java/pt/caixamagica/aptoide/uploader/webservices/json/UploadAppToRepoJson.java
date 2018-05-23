@@ -5,6 +5,7 @@
 
 package pt.caixamagica.aptoide.uploader.webservices.json;
 
+import android.text.TextUtils;
 import java.util.List;
 import lombok.Data;
 
@@ -18,6 +19,26 @@ import lombok.Data;
   private String error;
   private String error_description;
   private List<Error> errors;
+
+  public String getErrorCode() {
+    if (!TextUtils.isEmpty(error)) {
+      return error;
+    } else if (errors != null && !errors.isEmpty()) {
+      return errors.get(0)
+          .getCode();
+    }
+    return "No error";
+  }
+
+  public String getErrorDescription() {
+    if (!TextUtils.isEmpty(error_description)) {
+      return error_description;
+    } else if (errors != null && !errors.isEmpty()) {
+      return errors.get(0)
+          .getMsg();
+    }
+    return "No description";
+  }
 
   @Data public static class Info {
 
