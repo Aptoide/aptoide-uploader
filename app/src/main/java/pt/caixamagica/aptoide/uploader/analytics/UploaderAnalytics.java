@@ -30,7 +30,8 @@ public class UploaderAnalytics {
 
   public void uploadCompleteFail(Method statusMethod, String webCode, String webDescription) {
     facebook.logEvent(UPLOAD_COMPLETE_EVENT_NAME,
-        createUploadCompleteBundle(UPLOAD_COMPLETE_FAIL, statusMethod.getMethodName(), "", ""));
+        createUploadCompleteBundle(UPLOAD_COMPLETE_FAIL, statusMethod.getMethodName(), webCode,
+            webDescription));
   }
 
   private Bundle createUploadCompleteBundle(String status, String statusMethod, String webCode,
