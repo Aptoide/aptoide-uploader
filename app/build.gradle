@@ -54,7 +54,7 @@ android {
     targetSdkVersion 23
     Integer value = project.VERSION_CODE_UPLOADER.toInteger();
     versionCode value
-    versionName "2.9"
+    versionName "2.10"
 
     vectorDrawables.useSupportLibrary = true
 
