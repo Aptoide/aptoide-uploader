@@ -454,8 +454,6 @@ public class UploadService extends Service {
 
   private void setRetryNotification(String packageName, String label) {
 
-    uploaderAnalytics.uploadCompleteFail(UploaderAnalytics.Method.UPLOAD, "Notification", "Retry");
-
     NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplication());
     Bitmap b = loadIcon(packageName);
     if (b != null) mBuilder.setLargeIcon(b);
