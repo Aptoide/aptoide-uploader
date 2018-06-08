@@ -7,6 +7,7 @@ import com.aptoide.uploader.upload.AccountProvider;
 import com.aptoide.uploader.upload.BackgroundService;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
 import java.util.List;
 
@@ -77,13 +78,19 @@ public class UploadManager {
             .equals(Upload.Status.NOT_EXISTENT))
         .flatMapSingle(upload -> uploaderService.hasApplicationMetaData(upload.getInstalledApp()
             .getPackageName(), upload.getInstalledApp()
-            .getVersionCode()))
-        .filter(hasMeta -> hasMeta)
+            .getVersionCode())
+            .map(__ -> upload))
+        .flatMapCompletable(upload -> uploadApkToServer(upload))
         // TODO: 19/05/2018  upload apk by file
-        .subscribe(__ -> {
+        .subscribe(() -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         });
+  }
+
+  private Completable uploadApkToServer(Upload upload) {
+    return uploaderService.upload(upload.getInstalledApp()
+        .getApkPath());
   }
 
   @SuppressLint("CheckResult") private void dispatchUploads() {

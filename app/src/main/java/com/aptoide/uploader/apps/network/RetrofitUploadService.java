@@ -1,22 +1,30 @@
 package com.aptoide.uploader.apps.network;
 
 import android.support.annotation.NonNull;
+import android.webkit.MimeTypeMap;
 import com.aptoide.uploader.account.network.Status;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.upload.AccountProvider;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Map;
 import okhttp3.MediaType;
+import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
+import okio.BufferedSink;
 import retrofit2.Response;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
+import retrofit2.http.Part;
 import retrofit2.http.PartMap;
 import retrofit2.http.Path;
 
@@ -26,12 +34,14 @@ public class RetrofitUploadService implements UploaderService {
   private final ServiceV7 serviceV7;
   private final ServiceV3 serviceV3;
   private final AccountProvider accountProvider;
+  private final UploadType uploadType;
 
   public RetrofitUploadService(ServiceV7 serviceV7, ServiceV3 serviceV3,
-      AccountProvider accountProvider) {
+      AccountProvider accountProvider, UploadType uploadType) {
     this.serviceV7 = serviceV7;
     this.serviceV3 = serviceV3;
     this.accountProvider = accountProvider;
+    this.uploadType = uploadType;
   }
 
   @Override public Single<Upload> getUpload(String md5, String language, String storeName,
@@ -72,6 +82,72 @@ public class RetrofitUploadService implements UploaderService {
         .single(false);
   }
 
+  @Override public Completable upload(String apkPath) {
+    return accountProvider.getAccount()
+        .firstOrError()
+        .flatMapCompletable(aptoideAccount -> accountProvider.getToken()
+            .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
+                getParams(accessToken, aptoideAccount.getStoreName()),
+                MultipartBody.Part.createFormData("apk", apkPath, createApkRequestBody(apkPath))))
+            .ignoreElements());
+  }
+
+  private Map<String, RequestBody> getParams(String accessToken, String storeName) {
+    Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
+
+    //parameters.put("apk",
+    //    RequestBody.create(MediaType.parse("application/vnd.android.package-archive"),
+    //        new File(apkPath)));
+    parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), accessToken));
+    parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
+    parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), RESPONSE_MODE));
+    parameters.put("uploadType",
+        RequestBody.create(MediaType.parse("text/plain"), String.valueOf(uploadType.getType())));
+    return parameters;
+  }
+
+  @NonNull private RequestBody createApkRequestBody(String apkPath) {
+    return new RequestBody() {
+      @Override public MediaType contentType() {
+        String mimeType = MimeTypeMap.getSingleton()
+            .getMimeTypeFromExtension("apk");
+        if (mimeType == null) mimeType = "application/octet-stream";
+        return MediaType.parse(mimeType);
+      }
+
+      @Override public void writeTo(BufferedSink sink) throws IOException {
+        byte[] buffer = new byte[2048];
+        File apk = new File(apkPath);
+        FileInputStream in = new FileInputStream(apk);
+
+        long fileSize = apk.length();
+
+        long percentageTicks = fileSize / 2048 / 100;
+
+        int parts = 0;
+        int progress = 0;
+
+        try {
+          int read = in.read(buffer);
+          while (read != -1) {
+            sink.write(buffer, 0, read);
+            read = in.read(buffer);
+            parts++;
+            if (percentageTicks > 0 && parts % percentageTicks == 0) {
+              progress = (int) (parts * (double) buffer.length / fileSize * 100.0);
+              //listener.onUpdateProgress(progress, pkg);
+            }
+          }
+          if (read == -1) {
+            //listener.onUpdateProgress(100, pkg);
+          }
+        } finally {
+          in.close();
+        }
+      }
+    };
+  }
+
   private Upload buildUploadProgressStatus(boolean proposedData, InstalledApp installedApp,
       String md5, String storeName) {
     return new Upload(false, proposedData, installedApp, Upload.Status.PROGRESS, md5, storeName);
@@ -107,7 +183,6 @@ public class RetrofitUploadService implements UploaderService {
       String installedAppName) {
     Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
     parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), token));
-    parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
     parameters.put("apkname", RequestBody.create(MediaType.parse("text/plain"), installedAppName));
     parameters.put("apk_md5sum", RequestBody.create(MediaType.parse("text/plain"), md5));
     parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), "json"));
@@ -116,16 +191,35 @@ public class RetrofitUploadService implements UploaderService {
     return parameters;
   }
 
+  public enum UploadType {
+    WEBSERVICE(1), APTOIDE_UPLOADER(2), DROPBOX(3), APTOIDE_BACKUP(4);
+
+    private final int type;
+
+    UploadType(int type) {
+      this.type = type;
+    }
+
+    public int getType() {
+      return type;
+    }
+  }
+
   public interface ServiceV7 {
-    @GET("api/7/apks/package/translations/getProposed/package_name/{packageName}/language_code/{languageCode}/filter/{filter}")
-    Observable<Response<GetProposedResponse>> getProposed(@Path("packageName") String packageName,
-        @Path("languageCode") String languageCode, @Path("filter") boolean filter);
+    @GET("api/7/apks/package/translations/getProposed/package_name/{packageName}/language_code"
+        + "/{languageCode}/filter/{filter}") Observable<Response<GetProposedResponse>> getProposed(
+        @Path("packageName") String packageName, @Path("languageCode") String languageCode,
+        @Path("filter") boolean filter);
   }
 
   public interface ServiceV3 {
     @Multipart @POST("3/uploadAppToRepo")
     Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
         @PartMap Map<String, okhttp3.RequestBody> params);
+
+    @Multipart @POST("3/uploadAppToRepo")
+    Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
+        @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part apkFile);
 
     @POST("3/hasApplicationMetaData") @FormUrlEncoded
     Observable<Response<HasApplicationMetaDataResponse>> hasApplicationMetaData(

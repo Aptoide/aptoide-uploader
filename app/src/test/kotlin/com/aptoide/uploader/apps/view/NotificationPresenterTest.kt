@@ -32,7 +32,8 @@ class NotificationPresenterTest : Spek({
             val serviceV3 = mock<RetrofitUploadService.ServiceV3>()
             val serviceV7 = mock<RetrofitUploadService.ServiceV7>()
             val uploadAccountProvider = mock<AccountProvider>()
-            val uploadService = RetrofitUploadService(serviceV7, serviceV3, uploadAccountProvider)
+            val uploadService = RetrofitUploadService(serviceV7, serviceV3, uploadAccountProvider,
+                    RetrofitUploadService.UploadType.APTOIDE_UPLOADER)
             val appInfoService = mock<RemoteAppInformationService>()
             val uploaderPersistence = MemoryUploaderPersistence(HashMap(), Schedulers.trampoline())
             val md5Calculator = mock<Md5Calculator>()
