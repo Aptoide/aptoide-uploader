@@ -7,7 +7,6 @@ import com.aptoide.uploader.upload.AccountProvider;
 import com.aptoide.uploader.upload.BackgroundService;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
 import java.util.List;
 

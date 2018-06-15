@@ -98,6 +98,9 @@ public class RetrofitUploadService implements UploaderService {
     //parameters.put("apk",
     //    RequestBody.create(MediaType.parse("application/vnd.android.package-archive"),
     //        new File(apkPath)));
+    parameters.put("rating", RequestBody.create(MediaType.parse("text/plain"), "0"));
+    parameters.put("category", RequestBody.create(MediaType.parse("text/plain"), "0"));
+    parameters.put("only_user_repo", RequestBody.create(MediaType.parse("text/plain"), "false"));
     parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), accessToken));
     parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
     parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), RESPONSE_MODE));
@@ -116,13 +119,13 @@ public class RetrofitUploadService implements UploaderService {
       }
 
       @Override public void writeTo(BufferedSink sink) throws IOException {
-        byte[] buffer = new byte[2048];
+        byte[] buffer = new byte[1024];
         File apk = new File(apkPath);
         FileInputStream in = new FileInputStream(apk);
 
         long fileSize = apk.length();
 
-        long percentageTicks = fileSize / 2048 / 100;
+        long percentageTicks = fileSize / 1024 / 100;
 
         int parts = 0;
         int progress = 0;

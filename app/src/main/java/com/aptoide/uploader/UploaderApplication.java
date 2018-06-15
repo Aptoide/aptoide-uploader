@@ -58,10 +58,11 @@ public class UploaderApplication extends NotificationApplicationView {
 
       OkHttpClient.Builder okhttpBuilder =
           new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
+              .readTimeout(30, TimeUnit.SECONDS)
               .connectTimeout(30, TimeUnit.SECONDS);
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .baseUrl("http://webservices.aptoide.com/webservices/")
+          .baseUrl("http://upload.webservices.aptoide.com/webservices/")
           .addConverterFactory(MoshiConverterFactory.create())
           .client(okhttpBuilder.build())
           .build();
@@ -69,9 +70,9 @@ public class UploaderApplication extends NotificationApplicationView {
       uploadManager = new UploadManager(new RetrofitUploadService(
           retrofitV7Secondary.create(RetrofitUploadService.ServiceV7.class),
           retrofitV3.create(RetrofitUploadService.ServiceV3.class), getAccessTokenProvider(),
-          RetrofitUploadService.UploadType.APTOIDE_UPLOADER),
-          getUploadPersistence(), getMd5Calculator(),
-          new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider());
+          RetrofitUploadService.UploadType.APTOIDE_UPLOADER), getUploadPersistence(),
+          getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
+          getAccessTokenProvider());
     }
     return uploadManager;
   }
