@@ -11,4 +11,6 @@ public interface NotificationView extends View {
   void showProgressUploadNotification();
 
   void showPendingUploadNotification();
+
+  void showNoMetaDataNotification(String applicationName, String packageName);
 }

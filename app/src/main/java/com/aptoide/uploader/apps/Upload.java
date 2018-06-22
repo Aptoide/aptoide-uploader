@@ -5,9 +5,9 @@ public class Upload {
   private final boolean uploaded;
   private final boolean proposedData;
   private final InstalledApp installedApp;
-  private final Status status;
   private final String md5;
   private final String storeName;
+  private Status status;
 
   public Upload(boolean uploaded, boolean proposedData, InstalledApp installedApp, Status status,
       String md5, String storeName) {
@@ -39,6 +39,10 @@ public class Upload {
     return status;
   }
 
+  public void setStatus(Status status) {
+    this.status = status;
+  }
+
   @Override public int hashCode() {
     return installedApp.hashCode();
   }
@@ -57,6 +61,6 @@ public class Upload {
   }
 
   public enum Status {
-    PENDING, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, DUPLICATE
+    PENDING, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE
   }
 }

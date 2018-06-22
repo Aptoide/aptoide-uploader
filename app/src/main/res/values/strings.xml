@@ -164,4 +164,6 @@
   <string name="app_selected">App Selected</string>
   <string name="apps_selected">Apps Selected</string>
 
+  <string name="application_notification_message_app_no_metadata_upload">We need more info in order to upload your app, tap here in order to provide it</string>
+
 </resources>

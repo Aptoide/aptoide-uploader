@@ -30,9 +30,15 @@ public class NotificationPresenter implements Presenter {
   }
 
   private void showNotification(Upload upload) {
+    String appName = upload.getInstalledApp().getName();
+    String packageName = upload.getInstalledApp().getPackageName();
+
     switch (upload.getStatus()) {
       case PENDING:
         view.showPendingUploadNotification();
+        break;
+      case NO_META_DATA:
+        view.showNoMetaDataNotification(appName,packageName);
         break;
       case PROGRESS:
         view.showProgressUploadNotification();
@@ -41,9 +47,7 @@ public class NotificationPresenter implements Presenter {
         view.showCompletedUploadNotification();
         break;
       case DUPLICATE:
-        view.showDuplicateUploadNotification(upload.getInstalledApp()
-            .getName(), upload.getInstalledApp()
-            .getPackageName());
+        view.showDuplicateUploadNotification(appName, packageName);
         break;
     }
   }

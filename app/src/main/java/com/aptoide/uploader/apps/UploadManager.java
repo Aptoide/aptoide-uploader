@@ -75,11 +75,19 @@ public class UploadManager {
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.NOT_EXISTENT))
-        .flatMapSingle(upload -> uploaderService.hasApplicationMetaData(upload.getInstalledApp()
-            .getPackageName(), upload.getInstalledApp()
-            .getVersionCode())
-            .map(__ -> upload))
-        .flatMapCompletable(upload -> uploadApkToServer(upload))
+        .flatMapCompletable(upload -> uploaderService.hasApplicationMetaData(
+            upload.getInstalledApp()
+                .getPackageName(), upload.getInstalledApp()
+                .getVersionCode())
+            .map(hasMetaData -> {
+              if (!hasMetaData) {
+                upload.setStatus(Upload.Status.NO_META_DATA);
+                persistence.save(upload);
+              }
+              return hasMetaData;
+            })
+            .filter(hasMetaData -> hasMetaData)
+            .flatMapCompletable(hasMetaData -> uploadApkToServer(upload)))
         // TODO: 19/05/2018  upload apk by file
         .subscribe(() -> {
         }, throwable -> {
