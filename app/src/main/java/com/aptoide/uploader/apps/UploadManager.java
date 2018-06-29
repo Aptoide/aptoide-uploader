@@ -79,15 +79,14 @@ public class UploadManager {
             upload.getInstalledApp()
                 .getPackageName(), upload.getInstalledApp()
                 .getVersionCode())
-            .map(hasMetaData -> {
+            .flatMapCompletable(hasMetaData -> {
               if (!hasMetaData) {
                 upload.setStatus(Upload.Status.NO_META_DATA);
-                persistence.save(upload);
+                return persistence.save(upload);
+              } else {
+                return uploadApkToServer(upload);
               }
-              return hasMetaData;
-            })
-            .filter(hasMetaData -> hasMetaData)
-            .flatMapCompletable(hasMetaData -> uploadApkToServer(upload)))
+            }))
         // TODO: 19/05/2018  upload apk by file
         .subscribe(() -> {
         }, throwable -> {
