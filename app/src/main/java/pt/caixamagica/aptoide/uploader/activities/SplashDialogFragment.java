@@ -38,11 +38,6 @@ public class SplashDialogFragment extends DialogFragment {
     }
   }
 
-  @Override public void onCreate(Bundle savedInstanceState) {
-    super.onCreate(savedInstanceState);
-    setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_AppCompat_Light);
-  }
-
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
       Bundle savedInstanceState) {
     return inflater.inflate(R.layout.splash_screen, container, false);
@@ -82,6 +77,11 @@ public class SplashDialogFragment extends DialogFragment {
 
   @Override public void onDestroy() {
     super.onDestroy();
+  }
+
+  @Override public void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setStyle(DialogFragment.STYLE_NO_TITLE, R.style.Theme_AppCompat_Light);
   }
 
   private void dismissSplashScreen() {

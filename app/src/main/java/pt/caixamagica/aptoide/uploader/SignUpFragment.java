@@ -95,6 +95,10 @@ public class SignUpFragment extends Fragment {
     spiceManager.start(getActivity());
   }
 
+  @Override public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+  }
+
   @Override public void onStop() {
     super.onStop();
     spiceManager.shouldStop();
@@ -278,9 +282,5 @@ public class SignUpFragment extends Fragment {
         }
       }
     });
-  }
-
-  @Override public void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
   }
 }

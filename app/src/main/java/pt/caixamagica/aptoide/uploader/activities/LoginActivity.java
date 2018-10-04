@@ -142,12 +142,6 @@ public class LoginActivity extends AppCompatActivity
     }
   }
 
-  private void dismissSplashFragment() {
-    dismissSplash = false;
-    splashDialogFragment.dismiss();
-    splashDialogFragment = null;
-  }
-
   @Override protected void onStart() {
     super.onStart();
 
@@ -169,6 +163,12 @@ public class LoginActivity extends AppCompatActivity
       default:
         super.onRequestPermissionsResult(requestCode, permissions, grantResults);
     }
+  }
+
+  private void dismissSplashFragment() {
+    dismissSplash = false;
+    splashDialogFragment.dismiss();
+    splashDialogFragment = null;
   }
 
   @Override public void checkStoredCredentialsCallback() {

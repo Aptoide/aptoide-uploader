@@ -63,7 +63,7 @@ public class StoredCredentialsManager {
     SharedPreferences.Editor editor = sharedpreferences.edit();
 
     editor.putString("token", aesObfuscator.obfuscate(oAuth.getAccess_token(), "token"));
-    if (!TextUtils.isEmpty(oAuth.getRefreshToken())){
+    if (!TextUtils.isEmpty(oAuth.getRefreshToken())) {
       editor.putString("refreshToken",
           aesObfuscator.obfuscate(oAuth.getRefreshToken(), "refreshToken"));
     }

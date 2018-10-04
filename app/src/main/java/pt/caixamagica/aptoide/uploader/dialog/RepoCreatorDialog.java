@@ -31,6 +31,9 @@ import pt.caixamagica.aptoide.uploader.model.UserInfo;
  */
 public class RepoCreatorDialog extends DialogFragment {
 
+  private static final String DIALOG_TITLE_KEY = "TITLE";
+  private static final String DIALOG_MESSAGE_KEY = "MESSAGE";
+  private static final String GRANT_TYPE_CREATE_STORE_AUTHENTICATION = "GRANT_TYPE_CREATE_STORE";
   LoginActivityCallback mCallback;
   UserInfo userInfo;
   private FragmentActivity context;
@@ -40,9 +43,6 @@ public class RepoCreatorDialog extends DialogFragment {
   private EditText repoUsername;
   private EditText repoPassword;
   private boolean logoutOnDismiss = true;
-  private static final String DIALOG_TITLE_KEY = "TITLE";
-  private static final String DIALOG_MESSAGE_KEY = "MESSAGE";
-  private static final String GRANT_TYPE_CREATE_STORE_AUTHENTICATION = "GRANT_TYPE_CREATE_STORE";
   private String title;
   private String message;
   private String grantType;
@@ -75,15 +75,6 @@ public class RepoCreatorDialog extends DialogFragment {
     dialog.show(context.getSupportFragmentManager(), "RepoCreatorDialog");
   }
 
-  @Override public void onResume() {
-    super.onResume();
-
-    if (privateButton.isChecked()) {
-      repoPassword.setVisibility(View.VISIBLE);
-      repoUsername.setVisibility(View.VISIBLE);
-    }
-  }
-
   @Override public void onAttach(Activity activity) {
     super.onAttach(activity);
     this.context = (FragmentActivity) activity;
@@ -98,12 +89,13 @@ public class RepoCreatorDialog extends DialogFragment {
     }
   }
 
-  @Override public void onSaveInstanceState(Bundle outState) {
-    super.onSaveInstanceState(outState);
-    outState.putSerializable("userInfo", userInfo);
-    outState.putString(DIALOG_TITLE_KEY, title);
-    outState.putString(DIALOG_MESSAGE_KEY, message);
-    outState.putString(GRANT_TYPE_CREATE_STORE_AUTHENTICATION, grantType);
+  @Override public void onResume() {
+    super.onResume();
+
+    if (privateButton.isChecked()) {
+      repoPassword.setVisibility(View.VISIBLE);
+      repoUsername.setVisibility(View.VISIBLE);
+    }
   }
 
   @Override public Dialog onCreateDialog(Bundle savedInstanceState) {
@@ -258,6 +250,14 @@ public class RepoCreatorDialog extends DialogFragment {
         }
       });
     }
+  }
+
+  @Override public void onSaveInstanceState(Bundle outState) {
+    super.onSaveInstanceState(outState);
+    outState.putSerializable("userInfo", userInfo);
+    outState.putString(DIALOG_TITLE_KEY, title);
+    outState.putString(DIALOG_MESSAGE_KEY, message);
+    outState.putString(GRANT_TYPE_CREATE_STORE_AUTHENTICATION, grantType);
   }
 
   private boolean validateNotEmptyFields() {
