@@ -10,7 +10,8 @@ import android.content.Context;
 import android.support.multidex.MultiDex;
 import android.text.TextUtils;
 import com.crashlytics.android.Crashlytics;
-import com.facebook.AppEventsLogger;
+import com.facebook.CallbackManager;
+import com.facebook.FacebookSdk;
 import com.octo.android.robospice.SpiceManager;
 import io.fabric.sdk.android.Fabric;
 import lombok.Getter;
@@ -33,6 +34,7 @@ public class AptoideUploaderApplication extends Application {
   @Getter @Setter private String username;
   private StoredCredentialsManager storedCredentialsManager;
   private AppsInStoreController appsInStoreController;
+  private CallbackManager callbackManager;
 
   public static Context getContext() {
     return context;
@@ -42,7 +44,7 @@ public class AptoideUploaderApplication extends Application {
     super.onCreate();
     Fabric.with(this, new Crashlytics());
     context = this;
-    AppEventsLogger.activateApp(this);
+    FacebookSdk.sdkInitialize(getApplicationContext());
 
     if (BuildConfig.DEBUG) {
       MultiDex.install(this);
@@ -53,6 +55,7 @@ public class AptoideUploaderApplication extends Application {
     if (hasStore()) {
       getAppsInStoreController().start();
     }
+    callbackManager = CallbackManager.Factory.create();
   }
 
   private boolean hasStore() {
@@ -74,5 +77,9 @@ public class AptoideUploaderApplication extends Application {
               new Md5AsyncUtils(this), getApplicationContext());
     }
     return appsInStoreController;
+  }
+
+  public CallbackManager getCallbackManager() {
+    return callbackManager;
   }
 }

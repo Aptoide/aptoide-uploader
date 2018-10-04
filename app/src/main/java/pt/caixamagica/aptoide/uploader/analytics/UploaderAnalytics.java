@@ -1,7 +1,7 @@
 package pt.caixamagica.aptoide.uploader.analytics;
 
 import android.os.Bundle;
-import com.facebook.AppEventsLogger;
+import com.facebook.appevents.AppEventsLogger;
 
 /**
  * Created by pedroribeiro on 20/06/17.

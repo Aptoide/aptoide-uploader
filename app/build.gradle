@@ -50,11 +50,11 @@ android {
 
   defaultConfig {
     applicationId "pt.caixamagica.aptoide.uploader"
-    minSdkVersion 9
+    minSdkVersion 15
     targetSdkVersion 23
     Integer value = project.VERSION_CODE_UPLOADER.toInteger();
     versionCode value
-    versionName "2.10"
+    versionName "2.11"
 
     vectorDrawables.useSupportLibrary = true
 
@@ -139,7 +139,7 @@ dependencies {
 
   compile 'com.github.manuelpeinado.multichoiceadapter:multichoiceadapter:3.1.0'
 
-  compile 'com.facebook.android:facebook-android-sdk:3.23.1'
+  compile 'com.facebook.android:facebook-android-sdk:4.16.0'
   compile 'com.google.android.gms:play-services-basement:9.8.0'
   compile 'com.google.android.gms:play-services-auth:9.8.0'
   compile 'com.google.android.gms:play-services-plus:9.8.0'

@@ -32,15 +32,16 @@ import android.widget.EditText;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
+import com.facebook.AccessToken;
+import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
-import com.facebook.Request;
-import com.facebook.Response;
-import com.facebook.Session;
-import com.facebook.SessionState;
-import com.facebook.UiLifecycleHelper;
-import com.facebook.model.GraphUser;
-import com.facebook.widget.LoginButton;
+import com.facebook.GraphRequest;
+import com.facebook.GraphResponse;
+import com.facebook.login.LoginResult;
+import com.facebook.login.widget.LoginButton;
 import java.util.Arrays;
+import org.json.JSONException;
+import org.json.JSONObject;
 import pt.caixamagica.aptoide.uploader.activities.LoginActivity;
 import pt.caixamagica.aptoide.uploader.components.callbacks.login.LoginActivityCallback;
 import pt.caixamagica.aptoide.uploader.model.UserInfo;
@@ -67,48 +68,54 @@ public class LoginFragment extends Fragment {
   private RelativeLayout contentLayout;
 
   //    private UiLifecycleHelper uiLifecycleHelper = ((MainActivity)getActivity()).uiLifecycleHelper;
-  private Session.StatusCallback statusCallback = new Session.StatusCallback() {
-    @Override public void call(final Session session, SessionState state, Exception exception) {
-      if (state.isOpened()) {
-        Request request = Request.newMeRequest(session, new Request.GraphUserCallback() {
-
-          @Override public void onCompleted(final GraphUser user, Response response) {
-
-            String username = user.getProperty("email") == null ? "" : user.getProperty("email")
-                .toString();
-
-            if (TextUtils.isEmpty(username)) {
-              session.close();
-
-              if (getActivity() != null && !getActivity().isFinishing()) {
-                getActivity().runOnUiThread(new Runnable() {
-                  public void run() {
-                    Toast.makeText(getActivity(), R.string.facebook_error, Toast.LENGTH_LONG)
-                        .show();
-                  }
-                });
-              }
-            }
-
-            if (session == Session.getActiveSession() && user != null) {
-              String authToken = session.getAccessToken();
-              OAuth2AuthenticationRequest.Mode mode =
-                  OAuth2AuthenticationRequest.Mode.facebook_uploader;
-
-              //                            mCallback.submitAuthentication(username, authToken, mode, null, null, null, null);
-              mCallback.submitAuthentication(
-                  new UserInfo(username, null, authToken, null, mode, null, null, null, null, 0),
-                  "password");
-            }
-          }
-        });
-        Bundle parameters = new Bundle();
-        parameters.putString("fields", "id,name,email");
-        request.setParameters(parameters);
-        request.executeAsync();
-      }
-    }
-  };
+  //private Session.StatusCallback statusCallback = new Session.StatusCallback() {
+  //  @Override public void call(final Session session, SessionState state, Exception exception) {
+  //    if (state.isOpened()) {
+  //      GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
+  //          new GraphRequest.GraphJSONObjectCallback() {
+  //
+  //            @Override public void onCompleted(final JSONObject user, GraphResponse response) {
+  //              String username = null;
+  //              try {
+  //                username = user.get("email") == null ? "" : user.get("email")
+  //                    .toString();
+  //              } catch (JSONException e) {
+  //                e.printStackTrace();
+  //              }
+  //
+  //              if (TextUtils.isEmpty(username)) {
+  //                //session.close();
+  //
+  //                if (getActivity() != null && !getActivity().isFinishing()) {
+  //                  getActivity().runOnUiThread(new Runnable() {
+  //                    public void run() {
+  //                      Toast.makeText(getActivity(), R.string.facebook_error, Toast.LENGTH_LONG)
+  //                          .show();
+  //                    }
+  //                  });
+  //                }
+  //              }
+  //
+  //              if (user != null) {
+  //                String authToken = AccessToken.getCurrentAccessToken()
+  //                    .getToken();
+  //                OAuth2AuthenticationRequest.Mode mode =
+  //                    OAuth2AuthenticationRequest.Mode.facebook_uploader;
+  //
+  //                //                            mCallback.submitAuthentication(username, authToken, mode, null, null, null, null);
+  //                mCallback.submitAuthentication(
+  //                    new UserInfo(username, null, authToken, null, mode, null, null, null, null,
+  //                        0), "password");
+  //              }
+  //            }
+  //          });
+  //      Bundle parameters = new Bundle();
+  //      parameters.putString("fields", "id,name,email");
+  //      request.setParameters(parameters);
+  //      request.executeAsync();
+  //    }
+  //  }
+  //};
 
   /**
    * Prepara e envia o pedido de autenticação.
@@ -121,8 +128,8 @@ public class LoginFragment extends Fragment {
 
   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
     super.onActivityResult(requestCode, resultCode, data);
-    ((LoginActivity) getActivity()).uiLifecycleHelper.onActivityResult(requestCode, resultCode,
-        data);
+    (((AptoideUploaderApplication) getActivity().getApplication()).getCallbackManager()).onActivityResult(
+        requestCode, resultCode, data);
   }
 
   @Override public void onAttach(Activity activity) {
@@ -138,10 +145,6 @@ public class LoginFragment extends Fragment {
     super.onCreate(savedInstanceState);
 
     setHasOptionsMenu(true);
-
-    ((LoginActivity) getActivity()).uiLifecycleHelper =
-        new UiLifecycleHelper(getActivity(), statusCallback);
-    ((LoginActivity) getActivity()).uiLifecycleHelper.onCreate(savedInstanceState);
   }
 
   @Override public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -175,22 +178,18 @@ public class LoginFragment extends Fragment {
 
   @Override public void onResume() {
     super.onResume();
-    ((LoginActivity) getActivity()).uiLifecycleHelper.onResume();
   }
 
   @Override public void onSaveInstanceState(Bundle outState) {
     super.onSaveInstanceState(outState);
-    ((LoginActivity) getActivity()).uiLifecycleHelper.onSaveInstanceState(outState);
   }
 
   @Override public void onPause() {
     super.onPause();
-    ((LoginActivity) getActivity()).uiLifecycleHelper.onPause();
   }
 
   @Override public void onDestroy() {
     super.onDestroy();
-    ((LoginActivity) getActivity()).uiLifecycleHelper.onDestroy();
   }
 
   /**
@@ -219,17 +218,66 @@ public class LoginFragment extends Fragment {
 
     fbButton.setReadPermissions(Arrays.asList("email", "user_friends"));
 
-    fbButton.setOnErrorListener(new LoginButton.OnErrorListener() {
-      @Override public void onError(FacebookException error) {
+    fbButton.registerCallback(
+        ((AptoideUploaderApplication) getActivity().getApplication()).getCallbackManager(),
+        new FacebookCallback<LoginResult>() {
+          @Override public void onSuccess(LoginResult loginResult) {
+            GraphRequest request = GraphRequest.newMeRequest(AccessToken.getCurrentAccessToken(),
+                new GraphRequest.GraphJSONObjectCallback() {
 
-        if (error.getMessage()
-            .equals("Log in attempt aborted.")) {
-          return;
-        }
+                  @Override public void onCompleted(final JSONObject user, GraphResponse response) {
+                    String username = null;
+                    try {
+                      username = user.get("email") == null ? "" : user.get("email")
+                          .toString();
+                    } catch (JSONException e) {
+                      e.printStackTrace();
+                    }
 
-        error.printStackTrace();
-      }
-    });
+                    if (TextUtils.isEmpty(username)) {
+                      //session.close();
+
+                      if (getActivity() != null && !getActivity().isFinishing()) {
+                        getActivity().runOnUiThread(new Runnable() {
+                          public void run() {
+                            Toast.makeText(getActivity(), R.string.facebook_error,
+                                Toast.LENGTH_LONG)
+                                .show();
+                          }
+                        });
+                      }
+                    }
+
+                    String authToken = AccessToken.getCurrentAccessToken()
+                        .getToken();
+                    OAuth2AuthenticationRequest.Mode mode =
+                        OAuth2AuthenticationRequest.Mode.facebook_uploader;
+
+                    //                            mCallback.submitAuthentication(username, authToken, mode, null, null, null, null);
+                    mCallback.submitAuthentication(
+                        new UserInfo(username, null, authToken, null, mode, null, null, null, null,
+                            0), "password");
+                  }
+                });
+            Bundle parameters = new Bundle();
+            parameters.putString("fields", "id,name,email");
+            request.setParameters(parameters);
+            request.executeAsync();
+          }
+
+          @Override public void onCancel() {
+
+          }
+
+          @Override public void onError(FacebookException error) {
+            if (error.getMessage()
+                .equals("Log in attempt aborted.")) {
+              return;
+            }
+
+            error.printStackTrace();
+          }
+        });
   }
 
   private void setUpGooglePlusButton() {

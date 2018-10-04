@@ -1,11 +1,8 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
 
     android:animateLayoutChanges="true"
-    tools:context=".MainActivity$PlaceholderFragment"
     >
 
   <ScrollView
@@ -74,15 +71,15 @@
           style="@style/Buttonuploader_button_theme"
           />
 
-      <com.facebook.widget.LoginButton
+      <com.facebook.login.widget.LoginButton
           android:id="@+id/fb_login_button"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_below="@+id/app_view_fragment"
           android:layout_margin="4dp"
-          app:confirm_logout="false"
-          app:fetch_user_info="true"
           />
+      <!--app:confirm_logout="false"-->
+      <!--app:fetch_user_info="true"-->
 
       <com.google.android.gms.common.SignInButton
           android:id="@+id/sign_in_button"

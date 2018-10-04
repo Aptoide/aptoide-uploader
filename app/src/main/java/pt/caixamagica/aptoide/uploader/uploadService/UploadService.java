@@ -21,7 +21,7 @@ import android.provider.Settings;
 import android.support.annotation.NonNull;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
-import com.facebook.AppEventsLogger;
+import com.facebook.appevents.AppEventsLogger;
 import com.google.android.vending.licensing.AESObfuscator;
 import com.google.android.vending.licensing.ValidationException;
 import com.octo.android.robospice.SpiceManager;

@@ -12,7 +12,7 @@ import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBarActivity;
 import android.support.v7.widget.Toolbar;
-import com.facebook.Session;
+import com.facebook.login.LoginManager;
 import pt.caixamagica.aptoide.uploader.AptoideUploaderApplication;
 import pt.caixamagica.aptoide.uploader.FragmentAppView;
 import pt.caixamagica.aptoide.uploader.LoginFragment;
@@ -80,20 +80,8 @@ public class AppsListActivity extends ActionBarActivity
   private void clearSessionInformation() {
     //Stop the activity
     AptoideUploaderApplication.setForcedLogout(true);
-    if (Session.getActiveSession() == null) {
-      if (Session.openActiveSessionFromCache(getApplicationContext()) != null) {
-        Session.getActiveSession()
-            .closeAndClearTokenInformation();
-        Session.getActiveSession()
-            .close();
-      }
-    } else if (Session.getActiveSession() != null) {
-      Session.getActiveSession()
-          .closeAndClearTokenInformation();
-      Session.getActiveSession()
-          .close();
-    }
-    Session.setActiveSession(null);
+    LoginManager.getInstance()
+        .logOut();
   }
 
   public void switchToLoginFragment() {

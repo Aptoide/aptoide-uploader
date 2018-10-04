@@ -22,7 +22,6 @@ import android.view.KeyEvent;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
-import com.facebook.UiLifecycleHelper;
 import com.google.android.gms.auth.GoogleAuthException;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.UserRecoverableAuthException;
@@ -68,7 +67,6 @@ public class LoginActivity extends AppCompatActivity
   private static final int MY_PERMISSIONS_REQUEST = 1;
   private static final int REQUEST_CODE_RESOLVE_ERR = 9000;
   final long DEFAULT_CACHE_TIME = DurationInMillis.ONE_SECOND * 5;
-  public UiLifecycleHelper uiLifecycleHelper;
 
   SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
 
