@@ -1,164 +1,161 @@
 apply plugin: 'com.android.application'
 
-buildscript {
-  repositories {
-    maven { url 'https://maven.fabric.io/public' }
-  }
-
-  dependencies {
-    classpath 'io.fabric.tools:gradle:1.+'
-  }
-}
-
 def fabricApiKey = project.FABRIC_API_KEY
 def fabricConfigured = fabricApiKey != null
 if (fabricConfigured) {
-  task fabricGenerateProperties {
-    doFirst {
-      def fabricProperties = project.file("fabric.properties")
-      fabricProperties.delete()
-      fabricProperties.append("# Do not modify this file -- YOUR CHANGES WILL BE ERASED!\n")
-      fabricProperties.append("apiKey=" + fabricApiKey)
+    task fabricGenerateProperties {
+        doFirst {
+            def fabricProperties = project.file("fabric.properties")
+            fabricProperties.delete()
+            fabricProperties.append("# Do not modify this file -- YOUR CHANGES WILL BE ERASED!\n")
+            fabricProperties.append("apiKey=" + fabricApiKey)
+        }
     }
-  }
-  preBuild.dependsOn(fabricGenerateProperties)
-  apply plugin: 'io.fabric'
+    preBuild.dependsOn(fabricGenerateProperties)
+    apply plugin: 'io.fabric'
 }
-
-repositories {
-  maven { url 'https://maven.fabric.io/public' }
-}
-
 
 android {
+    compileSdkVersion 23
+    buildToolsVersion '28.0.3'
 
-  lintOptions {
-    disable 'MissingTranslation'
-    abortOnError false
-  }
+    defaultConfig {
+        applicationId "pt.caixamagica.aptoide.uploader"
+        minSdkVersion 15
+        targetSdkVersion 23
+        Integer value = project.VERSION_CODE_UPLOADER.toInteger()
+        versionCode value
+        versionName "2.12"
 
-  signingConfigs {
-    release {
-      storeFile = file(project.STORE_FILE_BACKUP_UPLOADER)
-      storePassword = project.STORE_PASSWORD_BACKUP_UPLOADER
-      keyAlias = project.KEY_ALIAS_UPLOADER
-      keyPassword = project.KEY_PASSWORD_UPLOADER
-      //            v2SigningEnabled = false
+        vectorDrawables.useSupportLibrary = true
+
+        manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
+
+        buildConfigField "String", "GMS_SERVER_ID", "\"" + project.GMS_SERVER_ID + "\""
+
+        resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
     }
-  }
 
-  compileSdkVersion 23
-  buildToolsVersion "23.0.3"
+    lintOptions {
+        disable 'MissingTranslation'
+        abortOnError false
+    }
 
-  defaultConfig {
-    applicationId "pt.caixamagica.aptoide.uploader"
-    minSdkVersion 15
-    targetSdkVersion 23
-    Integer value = project.VERSION_CODE_UPLOADER.toInteger();
-    versionCode value
-    versionName "2.12"
+    compileOptions {
+        encoding = 'UTF-8'
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
 
-    vectorDrawables.useSupportLibrary = true
-
-    manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
-
-    buildConfigField "String", "GMS_SERVER_ID", "\"" + project.GMS_SERVER_ID + "\""
-
-    resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
-  }
-
-  buildTypes {
-    release {
-      multiDexEnabled false
-      minifyEnabled true
-      shrinkResources true
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
-      signingConfig signingConfigs.release
-
-      applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-          project.ext { appName = 'aptoide-uploader' }
-          def newName = output.outputFile.name
-          newName = newName.replace("app-", "$project.ext.appName-")
-          //"MyAppName" -> I set my app variables in the root project
-          newName = newName.replace("-release", "-" + versionName)
-          //noinspection GroovyAssignabilityCheck
-          output.outputFile = new File(output.outputFile.parent, newName)
+    signingConfigs {
+        release {
+            storeFile = file(project.STORE_FILE_BACKUP_UPLOADER)
+            storePassword = project.STORE_PASSWORD_BACKUP_UPLOADER
+            keyAlias = project.KEY_ALIAS_UPLOADER
+            keyPassword = project.KEY_PASSWORD_UPLOADER
+            // v2SigningEnabled = false
         }
-      }
     }
 
-    debug {
-      signingConfig signingConfigs.release
-      applicationIdSuffix ".debug"
-      multiDexEnabled true
-      minifyEnabled false
-      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+    buildTypes {
+        release {
+            multiDexEnabled false
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.release
+
+            applicationVariants.all { variant ->
+                variant.outputs.each { output ->
+                    project.ext { appName = 'aptoide-uploader' }
+                    def newName = output.outputFile.name
+                    newName = newName.replace("app-", "$project.ext.appName-")
+                    //"MyAppName" -> I set my app variables in the root project
+                    newName = newName.replace("-release", "-" + versionName)
+                    //noinspection GroovyAssignabilityCheck
+                    output.outputFile = new File(output.outputFile.parent, newName)
+                }
+            }
+
+        }
+
+        debug {
+            signingConfig signingConfigs.release
+            applicationIdSuffix ".debug"
+            multiDexEnabled true
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
     }
-  }
 
+    applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+            def project = "uploader"
+            def SEP = "_"
+            def buildType = variant.variantData.variantConfiguration.buildType.name
+            def versionName = variant.versionName
+            def versionCode = variant.versionCode
 
-  applicationVariants.all { variant ->
-    variant.outputs.each { output ->
-      def project = "uploader"
-      def SEP = "_"
-      def buildType = variant.variantData.variantConfiguration.buildType.name
-      def versionName = variant.versionName
-      def versionCode = variant.versionCode
+            def newApkName = project + SEP + buildType + SEP + versionName + SEP + versionCode + ".apk"
 
-      def newApkName = project + SEP + buildType + SEP + versionName + SEP + versionCode + ".apk"
-
-      output.outputFile = new File(output.outputFile.parent, newApkName)
+            output.outputFile = new File(output.outputFile.parent, newApkName)
+        }
     }
-  }
 
-  packagingOptions {
-    exclude 'META-INF/notice.txt'
-    exclude 'META-INF/NOTICE.txt'
-    exclude 'META-INF/NOTICE'
-    exclude 'META-INF/license.txt'
-    exclude 'META-INF/LICENSE.txt'
-    exclude 'META-INF/LICENSE'
-    exclude 'META-INF/ASL2.0'
-  }
-  useLibrary 'org.apache.http.legacy'
+    packagingOptions {
+        exclude 'META-INF/notice.txt'
+        exclude 'META-INF/NOTICE.txt'
+        exclude 'META-INF/NOTICE'
+        exclude 'META-INF/license.txt'
+        exclude 'META-INF/LICENSE.txt'
+        exclude 'META-INF/LICENSE'
+        exclude 'META-INF/ASL2.0'
+    }
+
+    useLibrary 'org.apache.http.legacy'
 }
 
 dependencies {
-  compile fileTree(dir: 'libs', include: ['*.jar'])
+    compile fileTree(dir: 'libs', include: ['*.jar'])
 
-  compile 'com.android.support:appcompat-v7:23.2.1'
-  compile 'com.android.support:recyclerview-v7:23.2.1'
-  compile 'com.android.support:multidex:1.0.1'
+    testCompile 'junit:junit:4.12'
+    androidTestCompile 'com.android.support.test:runner:1.0.2'
 
-  compile 'com.google.android.gms:play-services-basement:9.8.0'
-  compile 'com.google.android.gms:play-services-auth:9.8.0'
-  compile 'com.google.android.gms:play-services-plus:9.8.0'
+    compile 'com.android.support:support-v4:23.4.0'
+    compile 'com.android.support:appcompat-v7:23.4.0'
+    compile 'com.android.support:cardview-v7:23.4.0'
+    compile 'com.android.support:recyclerview-v7:23.4.0'
+    compile 'com.android.support:customtabs:23.4.0'
+    compile 'com.android.support:multidex:1.0.3'
 
-  compile 'com.facebook.android:facebook-android-sdk:4.16.1'
+    compile 'com.google.android.gms:play-services-basement:10.0.1'
+    compile 'com.google.android.gms:play-services-auth:10.0.1'
+    compile 'com.google.android.gms:play-services-plus:10.0.1'
 
-  compile 'com.octo.android.robospice:robospice:1.4.14'
-  compile 'com.octo.android.robospice:robospice-retrofit:1.4.14'
+    compile 'com.facebook.android:facebook-android-sdk:4.16.1' //4.38.1
 
-  compile 'com.fasterxml.jackson.core:jackson-databind:2.5.4'
+    compile 'com.octo.android.robospice:robospice:1.4.14'
+    compile 'com.octo.android.robospice:robospice-retrofit:1.4.14'
 
-  compile 'com.squareup.retrofit:converter-jackson:1.3.0'
-  compile 'com.squareup.picasso:picasso:2.4.0'
+    compile 'com.fasterxml.jackson.core:jackson-databind:2.5.5'
 
+    compile 'com.squareup.retrofit:converter-jackson:1.3.0'
+    //1.4.0, 1.4.1, 1.5.0, 1.5.1, 1.6.0, 1.6.1, 1.7.0, 1.7.1, 1.8.0, 1.9.0, 2.0.0-beta1, 2.0.0-beta2
+    // implementation 'com.squareup.retrofit2:converter-jackson:2.0.0-beta3'
+    //2.0.0-beta4, 2.0.0, 2.0.1, 2.0.2, 2.1.0, 2.2.0, 2.3.0, 2.4.0
+    compile 'com.squareup.picasso:picasso:2.5.2' //2.71828
 
-  compile 'com.github.manuelpeinado.multichoiceadapter:multichoiceadapter:3.1.0'
+    compile 'com.github.manuelpeinado.multichoiceadapter:multichoiceadapter:3.1.0'
 
+    provided 'org.projectlombok:lombok:1.16.0'
 
-  provided 'org.projectlombok:lombok:1.16.0'
+    compile('com.crashlytics.sdk.android:crashlytics:2.6.3@aar', {
+        transitive = true
+    })
 
-  compile('com.crashlytics.sdk.android:crashlytics:2.5.5@aar') {
-    transitive = true
-  }
-
-
-  configurations.all {
-    resolutionStrategy.dependencySubstitution {
-      substitute module('org.apache.commons:commons-io:1.3.2') with module('commons-io:commons-io:1.3.2')
+    configurations.all {
+        resolutionStrategy.dependencySubstitution {
+            substitute module('org.apache.commons:commons-io:1.3.2') with module('commons-io:commons-io:1.3.2')
+        }
     }
-  }
 }
