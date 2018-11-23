@@ -216,7 +216,7 @@ public class LoginFragment extends Fragment {
     LoginButton fbButton = (LoginButton) rootView.findViewById(R.id.fb_login_button);
     fbButton.setFragment(this);
 
-    fbButton.setReadPermissions(Arrays.asList("email", "user_friends"));
+    fbButton.setReadPermissions(Arrays.asList("email"));
 
     fbButton.registerCallback(
         ((AptoideUploaderApplication) getActivity().getApplication()).getCallbackManager(),
