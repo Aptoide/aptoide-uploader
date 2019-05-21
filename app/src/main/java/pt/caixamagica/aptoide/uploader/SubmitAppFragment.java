@@ -32,6 +32,7 @@ import java.util.LinkedList;
 import java.util.List;
 import pt.caixamagica.aptoide.uploader.liquid.Event;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploader;
+import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderPrimary;
 import pt.caixamagica.aptoide.uploader.retrofit.RetrofitSpiceServiceUploaderSecondary;
 import pt.caixamagica.aptoide.uploader.retrofit.request.GetApkInfoRequest;
 import pt.caixamagica.aptoide.uploader.uploadService.MyBinder;
@@ -47,6 +48,7 @@ public class SubmitAppFragment extends Fragment {
 
   protected SpiceManager spiceManager = new SpiceManager(RetrofitSpiceServiceUploader.class);
   protected SpiceManager secondarySpiceManager;
+  protected SpiceManager primarySpiceManager;
   protected View rootView;
   UploadService mService;
   boolean mBound = false;
@@ -103,7 +105,7 @@ public class SubmitAppFragment extends Fragment {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    secondarySpiceManager = new SpiceManager(RetrofitSpiceServiceUploaderSecondary.class);
+    primarySpiceManager = new SpiceManager(RetrofitSpiceServiceUploaderPrimary.class);
     if (!getArguments().isEmpty()) {
       proposedTitle = getArguments().getString("title");
       proposedDescription = getArguments().getString("description");
@@ -115,7 +117,7 @@ public class SubmitAppFragment extends Fragment {
       @Nullable Bundle savedInstanceState) {
 
     rootView = inflater.inflate(R.layout.submit_app_fragment, container, false);
-    categoriesProvider = new CategoriesProvider(secondarySpiceManager);
+    categoriesProvider = new CategoriesProvider(primarySpiceManager);
 
     rootView.setFocusableInTouchMode(true);
     rootView.requestFocus();
@@ -171,7 +173,8 @@ public class SubmitAppFragment extends Fragment {
   @Override public void onStart() {
     super.onStart();
     spiceManager.start(getActivity());
-    secondarySpiceManager.start(getActivity());
+    //secondarySpiceManager.start(getActivity());
+    primarySpiceManager.start(getActivity());
 
     Intent intent = new Intent(getActivity(), UploadService.class);
 
@@ -190,7 +193,8 @@ public class SubmitAppFragment extends Fragment {
   @Override public void onStop() {
     super.onStop();
     spiceManager.shouldStop();
-    secondarySpiceManager.shouldStop();
+    //secondarySpiceManager.shouldStop();
+    primarySpiceManager.shouldStop();
     if (mBound) {
       getActivity().unbindService(mConnection);
       mBound = false;

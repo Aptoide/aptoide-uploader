@@ -39,6 +39,7 @@
     <service android:name=".retrofit.RetrofitSpiceServiceUploader"/>
     <service android:name=".retrofit.RetrofitSpiceServiceUploadService"/>
     <service android:name=".retrofit.RetrofitSpiceServiceUploaderSecondary"/>
+    <service android:name=".retrofit.RetrofitSpiceServiceUploaderPrimary"/>
 
     <service android:name=".uploadService.UploadService"/>
 
