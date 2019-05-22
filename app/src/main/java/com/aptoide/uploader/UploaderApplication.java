@@ -52,7 +52,7 @@ public class UploaderApplication extends NotificationApplicationView {
       final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
           .client(new OkHttpClient())
-          .baseUrl("http://ws75.aptoide.com/")
+          .baseUrl("http://ws75-secondary.aptoide.com/")
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
 
