@@ -1,10 +1,11 @@
 package com.aptoide.uploader;
 
 import android.app.Application;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Build;
 import android.support.v4.app.NotificationCompat;
 import com.aptoide.uploader.apps.UploadManager;
@@ -60,13 +61,22 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   @Override public void showNoMetaDataNotification(String applicationName, String packageName) {
+
+    final Intent intent = new Intent(this, MainActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    intent.setAction("navigateToSubmitAppFragment");
+    final PendingIntent contentIntent =
+        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(getString(R.string.app_name))
             .setOngoing(false)
             .setSubText(getString(R.string.application_notification_message_app_no_metadata_upload))
-            .setContentText(applicationName);
+            .setContentText(applicationName)
+            .setContentIntent(contentIntent)
+            .setAutoCancel(true);
 
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }

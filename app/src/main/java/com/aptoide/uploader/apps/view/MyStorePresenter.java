@@ -147,4 +147,7 @@ public class MyStorePresenter implements Presenter {
     }
     return Single.just(apps);
   }
+
+
+
 }

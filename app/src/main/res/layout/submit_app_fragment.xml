@@ -270,7 +270,7 @@
       </LinearLayout>
 
       <EditText
-          android:id="@+id/website"
+          android:id="@+id/email"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginLeft="10dp"
@@ -301,6 +301,7 @@
       </LinearLayout>
 
       <EditText
+          android:id="@+id/website"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_marginLeft="10dp"
