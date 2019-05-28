@@ -26,7 +26,11 @@
 -dontwarn com.octo.android.robospice.persistence.**
 
 ### Retrofit
--keep class com.octo.android.robospice.retrofit.** { *; }
+-keep class retrofit.** { *; }
+-keepclasseswithmembers class * {
+   @retrofit.http.* <methods>;
+}
+-keepattributes Signature
 
 ### Jackson SERIALIZER SETTINGS
 -keepclassmembers,allowobfuscation class * {
