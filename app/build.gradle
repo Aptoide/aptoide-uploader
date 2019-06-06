@@ -61,7 +61,7 @@ android {
 
     manifestPlaceholders = [fabricApiKey: project.FABRIC_API_KEY]
 
-    buildConfigField "String", "GMS_SERVER_ID", "\"" + project.GMS_SERVER_ID + "\""
+    buildConfigField "String", "GMS_SERVER_ID", "\"" + project.GMS_SERVER_ID_VANILLA + "\""
 
     resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
   }
