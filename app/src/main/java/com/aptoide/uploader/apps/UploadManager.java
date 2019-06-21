@@ -87,12 +87,13 @@ public class UploadManager {
                 return uploadApkToServer(upload);
               }
             }))
-        // TODO: 19/05/2018  upload apk by file
         .subscribe(() -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         });
   }
+
+  // TODO: 2019-06-18 new chain to handle the new status of added meta data from form
 
   private Completable uploadApkToServer(Upload upload) {
     return uploaderService.upload(upload.getInstalledApp()

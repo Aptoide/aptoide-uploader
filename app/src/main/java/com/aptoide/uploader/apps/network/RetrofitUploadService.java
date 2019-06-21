@@ -3,6 +3,7 @@ package com.aptoide.uploader.apps.network;
 import android.support.annotation.NonNull;
 import android.webkit.MimeTypeMap;
 import com.aptoide.uploader.account.network.Status;
+import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.upload.AccountProvider;
@@ -90,6 +91,10 @@ public class RetrofitUploadService implements UploaderService {
                 getParams(accessToken, aptoideAccount.getStoreName()),
                 MultipartBody.Part.createFormData("apk", apkPath, createApkRequestBody(apkPath))))
             .ignoreElements());
+  }
+
+  @Override public Single<Upload> upload(String apkPath, Metadata metadata) {
+    return null;
   }
 
   private Map<String, RequestBody> getParams(String accessToken, String storeName) {

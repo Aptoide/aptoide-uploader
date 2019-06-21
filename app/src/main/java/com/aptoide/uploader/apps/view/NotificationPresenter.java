@@ -32,13 +32,14 @@ public class NotificationPresenter implements Presenter {
   private void showNotification(Upload upload) {
     String appName = upload.getInstalledApp().getName();
     String packageName = upload.getInstalledApp().getPackageName();
+    String md5 = upload.getMd5();
 
     switch (upload.getStatus()) {
       case PENDING:
         view.showPendingUploadNotification();
         break;
       case NO_META_DATA:
-        view.showNoMetaDataNotification(appName,packageName);
+        view.showNoMetaDataNotification(appName,packageName, md5);
         break;
       case PROGRESS:
         view.showProgressUploadNotification();

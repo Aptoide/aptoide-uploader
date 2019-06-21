@@ -12,5 +12,5 @@ public interface NotificationView extends View {
 
   void showPendingUploadNotification();
 
-  void showNoMetaDataNotification(String applicationName, String packageName);
+  void showNoMetaDataNotification(String applicationName, String packageName, String md5);
 }

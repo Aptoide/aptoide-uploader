@@ -60,11 +60,13 @@ public abstract class NotificationApplicationView extends Application implements
 
   }
 
-  @Override public void showNoMetaDataNotification(String applicationName, String packageName) {
+  @Override
+  public void showNoMetaDataNotification(String applicationName, String packageName, String md5) {
 
     final Intent intent = new Intent(this, MainActivity.class);
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
     intent.setAction("navigateToSubmitAppFragment");
+    intent.putExtra("md5", md5);
     final PendingIntent contentIntent =
         PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

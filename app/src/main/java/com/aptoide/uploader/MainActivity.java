@@ -30,7 +30,8 @@ public class MainActivity extends PermissionProviderActivity {
   public void parseIntent(Intent intent) {
     if (intent.getAction()
         .equals("navigateToSubmitAppFragment")) {
-      mainActivityNavigator.navigateToSubmitAppView();
+      String md5 = intent.getStringExtra("md5");
+      mainActivityNavigator.navigateToSubmitAppView(md5);
     }
   }
 }

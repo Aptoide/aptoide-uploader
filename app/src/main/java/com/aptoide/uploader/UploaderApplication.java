@@ -8,12 +8,14 @@ import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
+import com.aptoide.uploader.apps.CategoriesManager;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
 import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
+import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
@@ -39,6 +41,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private UploadManager uploadManager;
   private LanguageManager languageManager;
   private AuthenticationProvider authenticationProvider;
+  private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
   private UploaderPersistence uploadPersistence;
 
@@ -121,6 +124,22 @@ public class UploaderApplication extends NotificationApplicationView {
           retrofitV3.create(AptoideAccessTokenProvider.ServiceV3.class));
     }
     return authenticationProvider;
+  }
+
+  public CategoriesManager getCategoriesManager() {
+    if (categoriesManager == null) {
+      final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
+          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+          .client(new OkHttpClient())
+          .baseUrl("https://ws75.aptoide.com/api/7/")
+          .addConverterFactory(MoshiConverterFactory.create())
+          .build();
+
+    categoriesManager = new CategoriesManager(
+        new RetrofitCategoriesService(retrofitV3.create(RetrofitCategoriesService.ServiceV7.class)));
+    }
+
+    return categoriesManager;
   }
 
   public StoreManager getAppsManager() {

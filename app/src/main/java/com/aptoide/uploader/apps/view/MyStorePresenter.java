@@ -119,7 +119,6 @@ public class MyStorePresenter implements Presenter {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
-    ;
   }
 
   private void showStoreAndApps() {

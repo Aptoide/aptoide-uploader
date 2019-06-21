@@ -3,7 +3,7 @@ package com.aptoide.uploader;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
-import com.aptoide.uploader.apps.SubmitAppFragment;
+import com.aptoide.uploader.apps.view.AppFormFragment;
 
 class MainActivityNavigator {
 
@@ -13,8 +13,8 @@ class MainActivityNavigator {
     this.fragmentManager = fragmentManager;
   }
 
-  public void navigateToSubmitAppView() {
-    navigateToWithoutBackSave(R.id.activity_main_container, SubmitAppFragment.newInstance(), true);
+  public void navigateToSubmitAppView(String md5) {
+    navigateToWithoutBackSave(R.id.activity_main_container, AppFormFragment.newInstance(md5), true);
   }
 
   private void navigateToWithoutBackSave(int containerId, Fragment fragment, boolean replace) {
