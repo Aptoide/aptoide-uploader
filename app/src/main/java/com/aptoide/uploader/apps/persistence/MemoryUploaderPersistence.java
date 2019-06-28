@@ -34,5 +34,13 @@ public class MemoryUploaderPersistence implements UploaderPersistence {
         .doOnError(throwable -> throwable.printStackTrace());
   }
 
+  @Override public Completable remove(Upload upload) {
+    return Completable.fromAction(() -> {
+      uploadsMap.remove(upload.hashCode());
+      uploadsListSubject.onNext(new ArrayList<>(uploadsMap.values()));
+    })
+        .subscribeOn(scheduler)
+        .doOnError(throwable -> throwable.printStackTrace());
+  }
 
 }

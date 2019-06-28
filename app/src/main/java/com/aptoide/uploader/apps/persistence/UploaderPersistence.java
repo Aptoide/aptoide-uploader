@@ -9,4 +9,6 @@ public interface UploaderPersistence {
   Observable<List<Upload>> getUploads();
 
   Completable save(Upload upload);
+
+  Completable remove(Upload upload);
 }

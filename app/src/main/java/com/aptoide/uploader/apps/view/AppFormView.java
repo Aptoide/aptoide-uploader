@@ -19,5 +19,5 @@ public interface AppFormView extends View {
 
   Metadata getMetadata();
 
-  Observable<Object> submitAppEvent();
+  Observable<Metadata> submitAppEvent();
 }

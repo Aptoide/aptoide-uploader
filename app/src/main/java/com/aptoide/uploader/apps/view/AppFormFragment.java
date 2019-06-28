@@ -79,7 +79,8 @@ public class AppFormFragment extends FragmentView implements AppFormView {
         ((UploaderApplication) getContext().getApplicationContext()).getCategoriesManager(),
         AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(),
-        ((UploaderApplication) getContext().getApplicationContext()).getUploadPersistence(), md5).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getUploadPersistence(),
+        md5).present();
 
     return rootView;
   }
@@ -160,8 +161,9 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     return metadata;
   }
 
-  @Override public Observable<Object> submitAppEvent() {
-    return RxView.clicks(submitFormButton);
+  @Override public Observable<Metadata> submitAppEvent() {
+    return RxView.clicks(submitFormButton)
+        .map(__ -> getMetadata());
   }
 
   @Override public void onStart() {

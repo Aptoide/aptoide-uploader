@@ -1,10 +1,13 @@
 package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.apps.CategoriesManager;
+import com.aptoide.uploader.apps.MetadataUpload;
+import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 
 public class AppFormPresenter implements Presenter {
@@ -37,6 +40,20 @@ public class AppFormPresenter implements Presenter {
     view.getLifecycleEvent()
         .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.submitAppEvent())
+        .flatMap(metadata -> persistence.getUploads()
+            .flatMapIterable(upload -> upload)
+            .filter(upload -> upload.getStatus()
+                .equals(Upload.Status.NO_META_DATA) && upload.getMd5()
+                .equals(md5))
+            .flatMap(upload -> Observable.just(
+                new MetadataUpload(upload.isUploaded(), upload.hasProposedData(),
+                    upload.getInstalledApp(), upload.getStatus(), upload.getMd5(),
+                    upload.getStoreName(), metadata))
+                .doOnNext(metadataUpload -> persistence.remove(upload)))
+            .doOnNext(metadataUpload -> {
+              metadataUpload.setStatus(Upload.Status.META_DATA_ADDED);
+              persistence.save(metadataUpload);
+            }))
         .subscribe();
   }
 

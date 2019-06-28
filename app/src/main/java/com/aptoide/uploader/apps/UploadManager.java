@@ -48,6 +48,17 @@ public class UploadManager {
     handleBackgroundService();
     dispatchUploads();
     handleMd5NotExistent();
+    handleMetadataAdded();
+  }
+
+  private void handleMetadataAdded() {
+    persistence.getUploads()
+        .distinctUntilChanged((previous, current) -> !hasChanged(previous, current))
+        .flatMapIterable(uploads -> uploads)
+        .filter(upload -> upload.getStatus()
+            .equals(Upload.Status.META_DATA_ADDED))
+        .doOnNext(upload -> uploaderService.upload(upload.getInstalledApp().getApkPath()))
+        .subscribe();
   }
 
   @SuppressLint("CheckResult") private void handleBackgroundService() {
@@ -92,8 +103,6 @@ public class UploadManager {
           throw new OnErrorNotImplementedException(throwable);
         });
   }
-
-  // TODO: 2019-06-18 new chain to handle the new status of added meta data from form
 
   private Completable uploadApkToServer(Upload upload) {
     return uploaderService.upload(upload.getInstalledApp()
