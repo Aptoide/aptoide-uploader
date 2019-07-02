@@ -19,6 +19,5 @@ public interface UploaderService {
 
   Completable upload(String apkPath);
 
-  //TODO:
-  Single<Upload> upload(String apkPath, Metadata metadata);
+  Completable upload(String apkPath, Metadata metadata);
 }

@@ -64,23 +64,15 @@ public class AppFormFragment extends FragmentView implements AppFormView {
 
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    md5 = getArguments().getString("md5", "");
   }
 
   @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
 
-    md5 = getArguments().getString("md5");
     rootView = inflater.inflate(R.layout.submit_app_fragment, container, false);
-
     rootView.setFocusableInTouchMode(true);
     rootView.requestFocus();
-
-    new AppFormPresenter(this,
-        ((UploaderApplication) getContext().getApplicationContext()).getCategoriesManager(),
-        AndroidSchedulers.mainThread(),
-        ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(),
-        ((UploaderApplication) getContext().getApplicationContext()).getUploadPersistence(),
-        md5).present();
 
     return rootView;
   }
@@ -97,6 +89,13 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     emailEditText = view.findViewById(R.id.email);
     websiteEditText = view.findViewById(R.id.website);
     submitFormButton = view.findViewById(R.id.submit_app_button);
+
+    new AppFormPresenter(this,
+        ((UploaderApplication) getContext().getApplicationContext()).getCategoriesManager(),
+        AndroidSchedulers.mainThread(),
+        ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(),
+        ((UploaderApplication) getContext().getApplicationContext()).getUploadPersistence(),
+        md5).present();
   }
 
   public void showAgeRatingSpinner() {
@@ -145,7 +144,8 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     Metadata metadata = new Metadata();
     metadata.setName(applicationNameEditText.getText()
         .toString());
-    metadata.setAgeRating((int) ageRatingSpinner.getSelectedItem());
+    metadata.setAgeRating(ageRatingSpinner.getSelectedItem()
+        .toString());
     metadata.setCategory(appCategorySpinner.getSelectedItem()
         .toString());
     metadata.setDescription(appDescriptionEditText.getText()

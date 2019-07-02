@@ -3,8 +3,8 @@ package com.aptoide.uploader.apps.network;
 import android.support.annotation.NonNull;
 import android.webkit.MimeTypeMap;
 import com.aptoide.uploader.account.network.Status;
-import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.apps.InstalledApp;
+import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.upload.AccountProvider;
 import io.reactivex.Completable;
@@ -93,8 +93,14 @@ public class RetrofitUploadService implements UploaderService {
             .ignoreElements());
   }
 
-  @Override public Single<Upload> upload(String apkPath, Metadata metadata) {
-    return null;
+  @Override public Completable upload(String apkPath, Metadata metadata) {
+    return accountProvider.getAccount()
+        .firstOrError()
+        .flatMapCompletable(aptoideAccount -> accountProvider.getToken()
+            .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
+                getParams(accessToken, aptoideAccount.getStoreName(), metadata),
+                MultipartBody.Part.createFormData("apk", apkPath, createApkRequestBody(apkPath))))
+            .ignoreElements());
   }
 
   private Map<String, RequestBody> getParams(String accessToken, String storeName) {
@@ -111,6 +117,51 @@ public class RetrofitUploadService implements UploaderService {
     parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), RESPONSE_MODE));
     parameters.put("uploadType",
         RequestBody.create(MediaType.parse("text/plain"), String.valueOf(uploadType.getType())));
+    return parameters;
+  }
+
+  private Map<String, RequestBody> getParams(String accessToken, String storeName,
+      Metadata metadata) {
+    Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
+
+    //parameters.put("apk",
+    //    RequestBody.create(MediaType.parse("application/vnd.android.package-archive"),
+    //        new File(apkPath)));
+    //if (metadata.getAgeRating() != 0) {
+    //  parameters.put("age_rating",
+    //      RequestBody.create(MediaType.parse("text/plain"), String.valueOf(metadata.getAgeRating())));
+    //}
+    parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), accessToken));
+    parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
+    parameters.put("only_user_repo", RequestBody.create(MediaType.parse("text/plain"), "false"));
+    parameters.put("uploadType",
+        RequestBody.create(MediaType.parse("text/plain"), String.valueOf(uploadType.getType())));
+    parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), RESPONSE_MODE));
+    parameters.put("apkname",
+        RequestBody.create(MediaType.parse("text/plain"), metadata.getName()));
+    parameters.put("description",
+        RequestBody.create(MediaType.parse("text/plain"), metadata.getDescription()));
+    parameters.put("category",
+        RequestBody.create(MediaType.parse("text/plain"), metadata.getCategory()));
+    parameters.put("rating",
+        RequestBody.create(MediaType.parse("text/plain"), metadata.getAgeRating()));
+    parameters.put("lang", RequestBody.create(MediaType.parse("text/plain"), metadata.getLang()));
+
+    if (metadata.getPhoneNumber() != null) {
+      parameters.put("apk_phone",
+          RequestBody.create(MediaType.parse("text/plain"), metadata.getPhoneNumber()));
+    }
+
+    if (metadata.getEmail() != null) {
+      parameters.put("apk_email",
+          RequestBody.create(MediaType.parse("text/plain"), metadata.getEmail()));
+    }
+
+    if (metadata.getWebsite() != null) {
+      parameters.put("apk_website",
+          RequestBody.create(MediaType.parse("text/plain"), metadata.getWebsite()));
+    }
+
     return parameters;
   }
 

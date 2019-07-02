@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.persistence;
 
+import android.util.Log;
 import com.aptoide.uploader.apps.Upload;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -31,16 +32,12 @@ public class MemoryUploaderPersistence implements UploaderPersistence {
       uploadsListSubject.onNext(new ArrayList<>(uploadsMap.values()));
     })
         .subscribeOn(scheduler)
-        .doOnError(throwable -> throwable.printStackTrace());
+        .doOnError(throwable -> Log.e("ERROR Save", throwable.getMessage()));
   }
 
   @Override public Completable remove(Upload upload) {
-    return Completable.fromAction(() -> {
-      uploadsMap.remove(upload.hashCode());
-      uploadsListSubject.onNext(new ArrayList<>(uploadsMap.values()));
-    })
+    return Completable.fromAction(() -> uploadsMap.remove(upload.hashCode()))
         .subscribeOn(scheduler)
-        .doOnError(throwable -> throwable.printStackTrace());
+        .doOnError(throwable -> Log.e("ERROR Remove", throwable.getMessage()));
   }
-
 }

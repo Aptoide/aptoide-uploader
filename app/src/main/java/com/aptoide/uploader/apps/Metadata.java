@@ -3,7 +3,7 @@ package com.aptoide.uploader.apps;
 public class Metadata {
 
   private String name;
-  private int ageRating;
+  private String ageRating;
   private String category;
   private String description;
   private String phoneNumber;
@@ -24,11 +24,11 @@ public class Metadata {
     this.name = name;
   }
 
-  public int getAgeRating() {
+  public String getAgeRating() {
     return ageRating;
   }
 
-  public void setAgeRating(int ageRating) {
+  public void setAgeRating(String ageRating) {
     this.ageRating = ageRating;
   }
 

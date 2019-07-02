@@ -47,17 +47,19 @@ public class UploadManager {
   public void start() {
     handleBackgroundService();
     dispatchUploads();
-    handleMd5NotExistent();
     handleMetadataAdded();
+    handleMd5NotExistent();
   }
 
-  private void handleMetadataAdded() {
+  @SuppressLint("CheckResult") private void handleMetadataAdded() {
     persistence.getUploads()
         .distinctUntilChanged((previous, current) -> !hasChanged(previous, current))
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.META_DATA_ADDED))
-        .doOnNext(upload -> uploaderService.upload(upload.getInstalledApp().getApkPath()))
+        .cast(MetadataUpload.class)
+        .flatMapCompletable(upload -> uploaderService.upload(upload.getInstalledApp()
+            .getApkPath(), upload.getMetadata()))
         .subscribe();
   }
 
@@ -137,7 +139,7 @@ public class UploadManager {
       return true;
     }
     for (Upload previous : previousList) {
-      Upload current = currentList.get(currentList.indexOf(previous));
+      Upload current = currentList.get(previousList.indexOf(previous));
       if (!previous.getStatus()
           .equals(current.getStatus())) {
         return true;
