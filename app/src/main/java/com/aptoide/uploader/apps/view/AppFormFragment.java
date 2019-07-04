@@ -95,8 +95,8 @@ public class AppFormFragment extends FragmentView implements AppFormView {
         ((UploaderApplication) getContext().getApplicationContext()).getCategoriesManager(),
         AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(),
-        ((UploaderApplication) getContext().getApplicationContext()).getUploadPersistence(),
-        md5).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getUploadPersistence(), md5,
+        new AppFormNavigator(getFragmentManager(), getContext())).present();
   }
 
   public void showAgeRatingSpinner() {

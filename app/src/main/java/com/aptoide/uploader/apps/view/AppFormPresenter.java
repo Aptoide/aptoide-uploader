@@ -18,16 +18,18 @@ public class AppFormPresenter implements Presenter {
   private final UploadManager uploadManager;
   private final UploaderPersistence persistence;
   private final String md5;
+  private final AppFormNavigator appFormNavigator;
 
   public AppFormPresenter(AppFormView view, CategoriesManager categoriesManager,
-      Scheduler scheduler, UploadManager uploadManager, UploaderPersistence persistence,
-      String md5) {
+      Scheduler scheduler, UploadManager uploadManager, UploaderPersistence persistence, String md5,
+      AppFormNavigator appFormNavigator) {
     this.view = view;
     this.categoriesManager = categoriesManager;
     this.scheduler = scheduler;
     this.uploadManager = uploadManager;
     this.persistence = persistence;
     this.md5 = md5;
+    this.appFormNavigator = appFormNavigator;
   }
 
   @Override public void present() {
@@ -45,15 +47,15 @@ public class AppFormPresenter implements Presenter {
             .filter(upload -> upload.getStatus()
                 .equals(Upload.Status.NO_META_DATA) && upload.getMd5()
                 .equals(md5))
-            .flatMapCompletable(
-                upload -> Observable.just(new MetadataUpload(false, upload.hasProposedData(),
-                    upload.getInstalledApp(), upload.getStatus(), upload.getMd5(),
-                    upload.getStoreName(), metadata))
-                    .flatMapCompletable(metadataUpload -> persistence.remove(upload)
-                        .doOnComplete(() -> metadataUpload.setStatus(Upload.Status.META_DATA_ADDED))
-                        .toSingleDefault(metadataUpload)
-                        .toObservable()
-                        .flatMapCompletable(aa -> persistence.save(aa)))))
+            .flatMapCompletable(upload -> Observable.just(
+                new MetadataUpload(false, upload.hasProposedData(), upload.getInstalledApp(),
+                    upload.getStatus(), upload.getMd5(), upload.getStoreName(), metadata))
+                .flatMapCompletable(metadataUpload -> persistence.remove(upload)
+                    .doOnComplete(() -> metadataUpload.setStatus(Upload.Status.META_DATA_ADDED))
+                    .toSingleDefault(metadataUpload)
+                    .toObservable()
+                    .flatMapCompletable(aa -> persistence.save(aa)))
+                .doOnComplete(() -> appFormNavigator.navigateToMyAppsView())))
         .subscribe();
   }
 
