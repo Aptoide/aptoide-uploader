@@ -14,6 +14,7 @@ import android.widget.EditText;
 import android.widget.Spinner;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
+import com.aptoide.uploader.apps.Category;
 import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -131,9 +132,9 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     showLanguageSpinner();
   }
 
-  @Override public void showCategories(List<String> categoriesList) {
+  @Override public void showCategories(List<Category> categoriesList) {
     Spinner spinner = rootView.findViewById(R.id.app_category_spinner);
-    ArrayAdapter<String> spinnerArrayAdapter =
+    ArrayAdapter<Category> spinnerArrayAdapter =
         new ArrayAdapter<>(getActivity(), android.R.layout.simple_spinner_item, categoriesList);
     spinnerArrayAdapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spinner.setAdapter(spinnerArrayAdapter);
@@ -146,8 +147,9 @@ public class AppFormFragment extends FragmentView implements AppFormView {
         .toString());
     metadata.setAgeRating(ageRatingSpinner.getSelectedItem()
         .toString());
-    metadata.setCategory(appCategorySpinner.getSelectedItem()
-        .toString());
+    Category category = (Category) appCategorySpinner.getSelectedItem();
+    String categoryId = String.valueOf(category.getId());
+    metadata.setCategory(categoryId);
     metadata.setDescription(appDescriptionEditText.getText()
         .toString());
     metadata.setEmail(emailEditText.getText()

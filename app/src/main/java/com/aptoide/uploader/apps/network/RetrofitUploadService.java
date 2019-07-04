@@ -146,22 +146,18 @@ public class RetrofitUploadService implements UploaderService {
     parameters.put("rating",
         RequestBody.create(MediaType.parse("text/plain"), metadata.getAgeRating()));
     parameters.put("lang", RequestBody.create(MediaType.parse("text/plain"), metadata.getLang()));
-
     if (metadata.getPhoneNumber() != null) {
       parameters.put("apk_phone",
           RequestBody.create(MediaType.parse("text/plain"), metadata.getPhoneNumber()));
     }
-
     if (metadata.getEmail() != null) {
       parameters.put("apk_email",
           RequestBody.create(MediaType.parse("text/plain"), metadata.getEmail()));
     }
-
     if (metadata.getWebsite() != null) {
       parameters.put("apk_website",
           RequestBody.create(MediaType.parse("text/plain"), metadata.getWebsite()));
     }
-
     return parameters;
   }
 

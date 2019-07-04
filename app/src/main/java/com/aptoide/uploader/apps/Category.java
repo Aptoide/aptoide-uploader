@@ -147,6 +147,10 @@ public class Category {
     }
   }
 
+  @Override public String toString() {
+    return title;
+  }
+
   public static class Stats {
     private int groups;
     private int items;

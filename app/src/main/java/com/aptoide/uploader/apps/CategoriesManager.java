@@ -14,16 +14,12 @@ public class CategoriesManager {
     this.retrofitCategoriesService = retrofitCategoriesService;
   }
 
-  public Single<List<String>> getCategories() {
+  public Single<List<Category>> getCategories() {
     return retrofitCategoriesService.getCategories()
         .map(getCategoriesResponse -> mapToCategoriesName(getCategoriesResponse));
   }
 
-  private List<String> mapToCategoriesName(CategoriesResponse categoriesResponse) {
-    List<String> categoriesNamesList = new ArrayList<>();
-    for (Category category : categoriesResponse.getList()) {
-      categoriesNamesList.add(category.getTitle());
-    }
-    return categoriesNamesList;
+  private List<Category> mapToCategoriesName(CategoriesResponse categoriesResponse) {
+    return categoriesResponse.getList();
   }
 }

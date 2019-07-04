@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import com.aptoide.uploader.apps.Category;
 import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
@@ -15,7 +16,7 @@ public interface AppFormView extends View {
 
   void showForm();
 
-  void showCategories(List<String> categoriesList);
+  void showCategories(List<Category> categoriesList);
 
   Metadata getMetadata();
 
