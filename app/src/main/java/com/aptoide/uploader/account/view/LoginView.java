@@ -17,6 +17,8 @@ public interface LoginView extends View {
 
   void showNetworkError();
 
+  void hideKeyboard();
+
   class CredentialsViewModel {
 
     private final String username;

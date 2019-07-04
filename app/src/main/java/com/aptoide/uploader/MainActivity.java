@@ -31,7 +31,8 @@ public class MainActivity extends PermissionProviderActivity {
     if (intent.getAction()
         .equals("navigateToSubmitAppFragment")) {
       String md5 = intent.getStringExtra("md5");
-      mainActivityNavigator.navigateToSubmitAppView(md5);
+      String appName = intent.getStringExtra("appName");
+      mainActivityNavigator.navigateToSubmitAppView(md5, appName);
     }
   }
 }

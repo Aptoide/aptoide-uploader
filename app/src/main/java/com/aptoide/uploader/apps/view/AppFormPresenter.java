@@ -15,18 +15,16 @@ public class AppFormPresenter implements Presenter {
   private final AppFormView view;
   private final CategoriesManager categoriesManager;
   private final Scheduler scheduler;
-  private final UploadManager uploadManager;
   private final UploaderPersistence persistence;
   private final String md5;
   private final AppFormNavigator appFormNavigator;
 
   public AppFormPresenter(AppFormView view, CategoriesManager categoriesManager,
-      Scheduler scheduler, UploadManager uploadManager, UploaderPersistence persistence, String md5,
+      Scheduler scheduler, UploaderPersistence persistence, String md5,
       AppFormNavigator appFormNavigator) {
     this.view = view;
     this.categoriesManager = categoriesManager;
     this.scheduler = scheduler;
-    this.uploadManager = uploadManager;
     this.persistence = persistence;
     this.md5 = md5;
     this.appFormNavigator = appFormNavigator;
@@ -42,6 +40,7 @@ public class AppFormPresenter implements Presenter {
     view.getLifecycleEvent()
         .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.submitAppEvent())
+        .doOnNext(__ -> view.hideKeyboard())
         .flatMapCompletable(metadata -> persistence.getUploads()
             .flatMapIterable(upload -> upload)
             .filter(upload -> upload.getStatus()

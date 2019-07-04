@@ -67,6 +67,7 @@ public abstract class NotificationApplicationView extends Application implements
     intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
     intent.setAction("navigateToSubmitAppFragment");
     intent.putExtra("md5", md5);
+    intent.putExtra("appName", applicationName);
     final PendingIntent contentIntent =
         PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

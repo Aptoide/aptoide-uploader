@@ -49,7 +49,10 @@ public class LoginPresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMapCompletable(__ -> view.getLoginEvent()
-            .doOnNext(credentials -> view.showLoading(credentials.getUsername()))
+            .doOnNext(credentials -> {
+              view.hideKeyboard();
+              view.showLoading(credentials.getUsername());
+            })
             .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
                 credentials.getPassword()))
             .observeOn(viewScheduler)

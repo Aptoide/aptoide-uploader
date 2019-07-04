@@ -4,7 +4,6 @@ import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import com.aptoide.uploader.apps.view.AppFormFragment;
-import com.aptoide.uploader.apps.view.MyStoreFragment;
 
 class MainActivityNavigator {
 
@@ -14,12 +13,9 @@ class MainActivityNavigator {
     this.fragmentManager = fragmentManager;
   }
 
-  public void navigateToSubmitAppView(String md5) {
-    navigateToWithoutBackSave(R.id.activity_main_container, AppFormFragment.newInstance(md5), true);
-  }
-
-  public void navigateToMyStoreView() {
-    navigateToWithoutBackSave(R.id.activity_main_container, MyStoreFragment.newInstance(), true);
+  public void navigateToSubmitAppView(String md5, String appName) {
+    navigateToWithoutBackSave(R.id.activity_main_container,
+        AppFormFragment.newInstance(md5, appName), true);
   }
 
   private void navigateToWithoutBackSave(int containerId, Fragment fragment, boolean replace) {

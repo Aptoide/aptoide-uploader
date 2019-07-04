@@ -1,9 +1,12 @@
 package com.aptoide.uploader.apps.view;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
 import android.support.v4.app.FragmentManager;
+import android.view.View;
+import android.view.inputmethod.InputMethodManager;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.account.view.LoginFragment;
 import com.aptoide.uploader.apps.view.MyStoreFragment;

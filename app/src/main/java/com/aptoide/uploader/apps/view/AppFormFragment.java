@@ -1,13 +1,12 @@
 package com.aptoide.uploader.apps.view;
 
-import android.content.ComponentName;
-import android.content.ServiceConnection;
+import android.app.Activity;
 import android.os.Bundle;
-import android.os.IBinder;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
@@ -22,24 +21,11 @@ import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import java.util.List;
 
+import static android.util.TypedValue.TYPE_NULL;
+
 public class AppFormFragment extends FragmentView implements AppFormView {
 
   protected View rootView;
-  boolean mBound = false;
-  /**
-   * Defines callbacks for service binding, passed to bindService()
-   */
-  private ServiceConnection mConnection = new ServiceConnection() {
-
-    @Override public void onServiceConnected(ComponentName className, IBinder service) {
-      // We've bound to LocalService, cast the IBinder and get LocalService instance
-      mBound = true;
-    }
-
-    @Override public void onServiceDisconnected(ComponentName arg0) {
-      mBound = false;
-    }
-  };
 
   // Campos editáveis:
   private EditText applicationNameEditText;
@@ -54,11 +40,13 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   private String language;
   private Button submitFormButton;
   private String md5;
+  private String appName;
 
-  public static AppFormFragment newInstance(String md5) {
+  public static AppFormFragment newInstance(String md5, String appName) {
     AppFormFragment appFormFragment = new AppFormFragment();
     Bundle args = new Bundle();
     args.putString("md5", md5);
+    args.putString("appName", appName);
     appFormFragment.setArguments(args);
     return appFormFragment;
   }
@@ -66,6 +54,7 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   @Override public void onCreate(Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     md5 = getArguments().getString("md5", "");
+    appName = getArguments().getString("appName", "");
   }
 
   @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
@@ -94,7 +83,6 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     new AppFormPresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getCategoriesManager(),
         AndroidSchedulers.mainThread(),
-        ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploadPersistence(), md5,
         new AppFormNavigator(getFragmentManager(), getContext())).present();
   }
@@ -115,8 +103,11 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     spinner.setAdapter(adapter);
   }
 
-  @Override public void setAppName() {
-
+  public void setAppName() {
+    applicationNameEditText.setText(appName);
+    applicationNameEditText.setFocusable(true);
+    applicationNameEditText.setFocusableInTouchMode(true);
+    applicationNameEditText.setInputType(TYPE_NULL);
   }
 
   @Override public void showMandatoryFieldError() {
@@ -130,6 +121,7 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   @Override public void showForm() {
     showAgeRatingSpinner();
     showLanguageSpinner();
+    setAppName();
   }
 
   @Override public void showCategories(List<Category> categoriesList) {
@@ -166,6 +158,16 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   @Override public Observable<Metadata> submitAppEvent() {
     return RxView.clicks(submitFormButton)
         .map(__ -> getMetadata());
+  }
+
+  @Override public void hideKeyboard() {
+    InputMethodManager imm =
+        (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+    View view = getActivity().getCurrentFocus();
+    if (view == null) {
+      view = new View(getActivity());
+    }
+    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
   }
 
   @Override public void onStart() {

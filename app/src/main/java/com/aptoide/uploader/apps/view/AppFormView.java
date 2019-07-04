@@ -21,4 +21,6 @@ public interface AppFormView extends View {
   Metadata getMetadata();
 
   Observable<Metadata> submitAppEvent();
+
+  void hideKeyboard();
 }

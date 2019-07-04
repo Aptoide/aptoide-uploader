@@ -1,11 +1,13 @@
 package com.aptoide.uploader.account.view;
 
+import android.app.Activity;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -106,5 +108,15 @@ public class LoginFragment extends FragmentView implements LoginView {
     return new CredentialsViewModel(usernameEditText.getText()
         .toString(), passwordEditText.getText()
         .toString());
+  }
+
+  @Override public void hideKeyboard() {
+    InputMethodManager imm =
+        (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
+    View view = getActivity().getCurrentFocus();
+    if (view == null) {
+      view = new View(getActivity());
+    }
+    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
   }
 }
