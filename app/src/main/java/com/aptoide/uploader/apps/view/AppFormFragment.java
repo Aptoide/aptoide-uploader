@@ -11,6 +11,7 @@ import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Spinner;
+import android.widget.Toast;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.Category;
@@ -111,7 +112,8 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   }
 
   @Override public void showMandatoryFieldError() {
-
+    Toast.makeText(getActivity(), R.string.missing_fields, Toast.LENGTH_LONG)
+        .show();
   }
 
   @Override public void showGeneralError() {
@@ -168,6 +170,20 @@ public class AppFormFragment extends FragmentView implements AppFormView {
       view = new View(getActivity());
     }
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+  }
+
+  @Override public boolean isValidForm() {
+
+    boolean validation = true;
+    validation &= !applicationNameEditText.getText()
+        .toString()
+        .equals("");
+    validation &= !appDescriptionEditText.getText()
+        .toString()
+        .equals("");
+    validation &= ageRatingSpinner.getSelectedItemPosition() != 0;
+    validation &= appLanguageSpinner.getSelectedItemPosition() != 0;
+    return validation;
   }
 
   @Override public void onStart() {

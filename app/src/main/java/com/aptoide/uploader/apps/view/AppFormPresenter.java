@@ -3,7 +3,6 @@ package com.aptoide.uploader.apps.view;
 import com.aptoide.uploader.apps.CategoriesManager;
 import com.aptoide.uploader.apps.MetadataUpload;
 import com.aptoide.uploader.apps.Upload;
-import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
@@ -40,7 +39,13 @@ public class AppFormPresenter implements Presenter {
     view.getLifecycleEvent()
         .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.submitAppEvent())
-        .doOnNext(__ -> view.hideKeyboard())
+        .doOnNext(__ -> {
+          view.hideKeyboard();
+          if (!view.isValidForm()) {
+            view.showMandatoryFieldError();
+          }
+        })
+        .filter(__ -> view.isValidForm())
         .flatMapCompletable(metadata -> persistence.getUploads()
             .flatMapIterable(upload -> upload)
             .filter(upload -> upload.getStatus()

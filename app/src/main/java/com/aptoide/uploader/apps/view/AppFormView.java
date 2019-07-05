@@ -23,4 +23,6 @@ public interface AppFormView extends View {
   Observable<Metadata> submitAppEvent();
 
   void hideKeyboard();
+
+  boolean isValidForm();
 }
