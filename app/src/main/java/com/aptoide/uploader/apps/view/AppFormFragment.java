@@ -28,7 +28,6 @@ public class AppFormFragment extends FragmentView implements AppFormView {
 
   protected View rootView;
 
-  // Campos editáveis:
   private EditText applicationNameEditText;
   private Spinner ageRatingSpinner;
   private Spinner appCategorySpinner;
@@ -37,8 +36,6 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   private EditText phoneNumberEditText;
   private EditText emailEditText;
   private EditText websiteEditText;
-  private String languageCode;
-  private String language;
   private Button submitFormButton;
   private String md5;
   private String appName;
@@ -60,11 +57,9 @@ public class AppFormFragment extends FragmentView implements AppFormView {
 
   @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
-
     rootView = inflater.inflate(R.layout.submit_app_fragment, container, false);
     rootView.setFocusableInTouchMode(true);
     rootView.requestFocus();
-
     return rootView;
   }
 
@@ -163,26 +158,26 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   }
 
   @Override public void hideKeyboard() {
-    InputMethodManager imm =
+    InputMethodManager manager =
         (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
     View view = getActivity().getCurrentFocus();
     if (view == null) {
       view = new View(getActivity());
     }
-    imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+    manager.hideSoftInputFromWindow(view.getWindowToken(), 0);
   }
 
   @Override public boolean isValidForm() {
 
     boolean validation = true;
+    validation &= ageRatingSpinner.getSelectedItemPosition() != 0;
+    validation &= appLanguageSpinner.getSelectedItemPosition() != 0;
     validation &= !applicationNameEditText.getText()
         .toString()
         .equals("");
     validation &= !appDescriptionEditText.getText()
         .toString()
         .equals("");
-    validation &= ageRatingSpinner.getSelectedItemPosition() != 0;
-    validation &= appLanguageSpinner.getSelectedItemPosition() != 0;
     return validation;
   }
 

@@ -41,9 +41,7 @@ public class AppFormPresenter implements Presenter {
         .flatMap(created -> view.submitAppEvent())
         .doOnNext(__ -> {
           view.hideKeyboard();
-          if (!view.isValidForm()) {
-            view.showMandatoryFieldError();
-          }
+          if (!view.isValidForm()) view.showMandatoryFieldError();
         })
         .filter(__ -> view.isValidForm())
         .flatMapCompletable(metadata -> persistence.getUploads()
