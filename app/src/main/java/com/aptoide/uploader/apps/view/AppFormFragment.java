@@ -20,6 +20,7 @@ import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import java.util.LinkedHashMap;
 import java.util.List;
 
 import static android.util.TypedValue.TYPE_NULL;
@@ -39,6 +40,7 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   private Button submitFormButton;
   private String md5;
   private String appName;
+  LinkedHashMap<String, String> map;
 
   public static AppFormFragment newInstance(String md5, String appName) {
     AppFormFragment appFormFragment = new AppFormFragment();
@@ -88,6 +90,14 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   }
 
   public void showLanguageSpinner() {
+    String[] languages = this.getResources()
+        .getStringArray(R.array.language_array);
+    String[] languageCodes = this.getResources()
+        .getStringArray(R.array.language_codes);
+    map = new LinkedHashMap<>();
+    for (int i = 0; i < Math.min(languages.length, languageCodes.length); ++i) {
+      map.put(languages[i], languageCodes[i]);
+    }
     setSpinnerData(R.id.app_language, R.array.language_array);
   }
 
@@ -134,8 +144,7 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     Metadata metadata = new Metadata();
     metadata.setName(applicationNameEditText.getText()
         .toString());
-    metadata.setAgeRating(ageRatingSpinner.getSelectedItem()
-        .toString());
+    metadata.setAgeRating(String.valueOf(ageRatingSpinner.getSelectedItemPosition()));
     Category category = (Category) appCategorySpinner.getSelectedItem();
     String categoryId = String.valueOf(category.getId());
     metadata.setCategory(categoryId);
@@ -143,8 +152,9 @@ public class AppFormFragment extends FragmentView implements AppFormView {
         .toString());
     metadata.setEmail(emailEditText.getText()
         .toString());
-    metadata.setLang(appLanguageSpinner.getSelectedItem()
+    String languageCode = map.get(appLanguageSpinner.getSelectedItem()
         .toString());
+    metadata.setLang(languageCode);
     metadata.setPhoneNumber(phoneNumberEditText.getText()
         .toString());
     metadata.setWebsite(websiteEditText.getText()
@@ -168,7 +178,6 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   }
 
   @Override public boolean isValidForm() {
-
     boolean validation = true;
     validation &= ageRatingSpinner.getSelectedItemPosition() != 0;
     validation &= appLanguageSpinner.getSelectedItemPosition() != 0;
