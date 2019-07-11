@@ -3,16 +3,14 @@ package com.aptoide.uploader.apps;
 public class Upload {
 
   private final boolean uploaded;
-  private final boolean proposedData;
   private final InstalledApp installedApp;
   private final String md5;
   private final String storeName;
   private Status status;
 
-  public Upload(boolean uploaded, boolean proposedData, InstalledApp installedApp, Status status,
+  public Upload(boolean uploaded, InstalledApp installedApp, Status status,
       String md5, String storeName) {
     this.uploaded = uploaded;
-    this.proposedData = proposedData;
     this.installedApp = installedApp;
     this.status = status;
     this.md5 = md5;
@@ -27,9 +25,6 @@ public class Upload {
     return uploaded;
   }
 
-  public boolean hasProposedData() {
-    return proposedData;
-  }
 
   public InstalledApp getInstalledApp() {
     return installedApp;
@@ -61,6 +56,6 @@ public class Upload {
   }
 
   public enum Status {
-    PENDING, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, META_DATA_ADDED
+    PENDING, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, META_DATA_ADDED, RETRY
   }
 }

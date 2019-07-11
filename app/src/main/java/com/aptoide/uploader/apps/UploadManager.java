@@ -31,11 +31,6 @@ public class UploadManager {
     return md5Calculator.calculate(app)
         .flatMapCompletable((md5 -> uploaderService.getUpload(md5, language, storeName, app)
             .flatMapCompletable(upload -> {
-              if (upload.isUploaded()) {
-                if (!upload.hasProposedData()) {
-                  return persistence.save(upload);
-                }
-              }
               return persistence.save(upload);
             })));
   }
@@ -58,8 +53,9 @@ public class UploadManager {
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.META_DATA_ADDED))
         .cast(MetadataUpload.class)
-        .flatMapCompletable(upload -> uploaderService.upload(upload.getInstalledApp()
-            .getApkPath(), upload.getMetadata()))
+        .flatMapCompletable(upload -> uploaderService.upload(upload.getMd5(), upload.getStoreName(),
+            upload.getInstalledApp()
+                .getName(), upload.getInstalledApp(), upload.getMetadata()))
         .subscribe();
   }
 
@@ -122,7 +118,7 @@ public class UploadManager {
                     .equals(Upload.Status.PENDING))
                 .flatMap(upload -> uploaderService.upload(upload.getMd5(), account.getStoreName(),
                     upload.getInstalledApp()
-                        .getName(), upload.hasProposedData(), upload.getInstalledApp()))
+                        .getName(), upload.getInstalledApp()))
                 .flatMapCompletable(upload -> persistence.save(upload))
                 .toObservable();
           }

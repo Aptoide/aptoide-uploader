@@ -50,7 +50,7 @@ public class AppFormPresenter implements Presenter {
                 .equals(Upload.Status.NO_META_DATA) && upload.getMd5()
                 .equals(md5))
             .flatMapCompletable(upload -> Observable.just(
-                new MetadataUpload(false, upload.hasProposedData(), upload.getInstalledApp(),
+                new MetadataUpload(false, upload.getInstalledApp(),
                     upload.getStatus(), upload.getMd5(), upload.getStoreName(), metadata))
                 .flatMapCompletable(metadataUpload -> persistence.remove(upload)
                     .doOnComplete(() -> metadataUpload.setStatus(Upload.Status.META_DATA_ADDED))

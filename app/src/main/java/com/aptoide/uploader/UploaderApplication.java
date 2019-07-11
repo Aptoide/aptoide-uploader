@@ -71,7 +71,6 @@ public class UploaderApplication extends NotificationApplicationView {
           .build();
 
       uploadManager = new UploadManager(new RetrofitUploadService(
-          retrofitV7Secondary.create(RetrofitUploadService.ServiceV7.class),
           retrofitV3.create(RetrofitUploadService.ServiceV3.class), getAccessTokenProvider(),
           RetrofitUploadService.UploadType.APTOIDE_UPLOADER), getUploadPersistence(),
           getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
@@ -135,8 +134,8 @@ public class UploaderApplication extends NotificationApplicationView {
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
 
-    categoriesManager = new CategoriesManager(
-        new RetrofitCategoriesService(retrofitV3.create(RetrofitCategoriesService.ServiceV7.class)));
+      categoriesManager = new CategoriesManager(new RetrofitCategoriesService(
+          retrofitV3.create(RetrofitCategoriesService.ServiceV7.class)));
     }
 
     return categoriesManager;

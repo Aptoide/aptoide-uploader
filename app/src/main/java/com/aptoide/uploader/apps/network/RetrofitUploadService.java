@@ -5,6 +5,7 @@ import android.webkit.MimeTypeMap;
 import com.aptoide.uploader.account.network.Status;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Metadata;
+import com.aptoide.uploader.apps.MetadataUpload;
 import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.upload.AccountProvider;
 import io.reactivex.Completable;
@@ -22,24 +23,20 @@ import okio.BufferedSink;
 import retrofit2.Response;
 import retrofit2.http.Field;
 import retrofit2.http.FormUrlEncoded;
-import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.PartMap;
-import retrofit2.http.Path;
 
 public class RetrofitUploadService implements UploaderService {
 
   private static final String RESPONSE_MODE = "json";
-  private final ServiceV7 serviceV7;
   private final ServiceV3 serviceV3;
   private final AccountProvider accountProvider;
   private final UploadType uploadType;
 
-  public RetrofitUploadService(ServiceV7 serviceV7, ServiceV3 serviceV3,
-      AccountProvider accountProvider, UploadType uploadType) {
-    this.serviceV7 = serviceV7;
+  public RetrofitUploadService(ServiceV3 serviceV3, AccountProvider accountProvider,
+      UploadType uploadType) {
     this.serviceV3 = serviceV3;
     this.accountProvider = accountProvider;
     this.uploadType = uploadType;
@@ -47,33 +44,20 @@ public class RetrofitUploadService implements UploaderService {
 
   @Override public Single<Upload> getUpload(String md5, String language, String storeName,
       InstalledApp installedApp) {
-    return serviceV7.getProposed(installedApp.getPackageName(), language, false)
-        .singleOrError()
-        .flatMap(response -> {
-          final GetProposedResponse proposedBody = response.body();
-
-          if ((response.isSuccessful() && proposedBody != null) && (proposedBody.getInfo()
-              .getStatus()
-              .equals(Status.FAIL) || proposedBody.getData()
-              .isEmpty())) {
-            return Single.just(
-                new Upload(false, false, installedApp, Upload.Status.PENDING, md5, storeName));
-          }
-          return Single.error(new IllegalStateException(response.message()));
-        });
+    return Single.just(new Upload(false, installedApp, Upload.Status.PENDING, md5, storeName));
   }
 
   @Override public Observable<Upload> upload(String md5, String storeName, String installedAppName,
-      boolean hasProposedData, InstalledApp installedApp) {
+      InstalledApp installedApp) {
     return accountProvider.getToken()
         .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
             getParams(accessToken, md5, storeName, installedAppName))
-            .map(response -> buildUploadFinishStatus(response, hasProposedData, installedApp, md5,
-                storeName))
-            .startWith(buildUploadProgressStatus(hasProposedData, installedApp, md5, storeName))
+            .map(response -> buildUploadFinishStatus(response, installedApp, md5, storeName))
+            .startWith(buildUploadProgressStatus(installedApp, md5, storeName))
             .doOnError(throwable -> throwable.printStackTrace())
-            .onErrorReturn(throwable -> new Upload(false, hasProposedData, installedApp,
-                Upload.Status.CLIENT_ERROR, md5, storeName)));
+            .onErrorReturn(
+                throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
+                    storeName)));
   }
 
   @Override public Single<Boolean> hasApplicationMetaData(String packageName, int versionCode) {
@@ -93,13 +77,18 @@ public class RetrofitUploadService implements UploaderService {
             .ignoreElements());
   }
 
-  @Override public Completable upload(String apkPath, Metadata metadata) {
+  @Override
+  public Completable upload(String md5, String storeName, String appName, InstalledApp installedApp,
+      Metadata metadata) {
     return accountProvider.getAccount()
         .firstOrError()
         .flatMapCompletable(aptoideAccount -> accountProvider.getToken()
             .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
                 getParams(accessToken, aptoideAccount.getStoreName(), metadata),
-                MultipartBody.Part.createFormData("apk", apkPath, createApkRequestBody(apkPath))))
+                MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
+                    createApkRequestBody(installedApp.getApkPath())))
+                .map(response -> buildUploadFinishStatus(response, installedApp, md5, storeName,
+                    metadata)))
             .ignoreElements());
   }
 
@@ -191,13 +180,13 @@ public class RetrofitUploadService implements UploaderService {
     };
   }
 
-  private Upload buildUploadProgressStatus(boolean proposedData, InstalledApp installedApp,
-      String md5, String storeName) {
-    return new Upload(false, proposedData, installedApp, Upload.Status.PROGRESS, md5, storeName);
+  private Upload buildUploadProgressStatus(InstalledApp installedApp, String md5,
+      String storeName) {
+    return new Upload(false, installedApp, Upload.Status.PROGRESS, md5, storeName);
   }
 
   @NonNull private Upload buildUploadFinishStatus(Response<UploadAppToRepoResponse> response,
-      boolean hasProposedData, InstalledApp installedApp, String md5, String storeName) {
+      InstalledApp installedApp, String md5, String storeName) {
     if (response.body()
         .getStatus()
         .equals(Status.FAIL)) {
@@ -206,19 +195,31 @@ public class RetrofitUploadService implements UploaderService {
           .get(0)
           .getCode()
           .equals("APK-103")) {
-        return new Upload(response.isSuccessful(), hasProposedData, installedApp,
-            Upload.Status.DUPLICATE, md5, storeName);
+        return new Upload(response.isSuccessful(), installedApp, Upload.Status.DUPLICATE, md5,
+            storeName);
       } else if (response.body()
           .getErrors()
           .get(0)
           .getCode()
           .equals("APK-5")) {
-        return new Upload(response.isSuccessful(), hasProposedData, installedApp,
-            Upload.Status.NOT_EXISTENT, md5, storeName);
+        return new Upload(response.isSuccessful(), installedApp, Upload.Status.NOT_EXISTENT, md5,
+            storeName);
       }
     }
-    return new Upload(response.isSuccessful(), hasProposedData, installedApp,
-        Upload.Status.COMPLETED, md5, storeName);
+    return new Upload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,
+        storeName);
+  }
+
+  @NonNull private Upload buildUploadFinishStatus(Response<UploadAppToRepoResponse> response,
+      InstalledApp installedApp, String md5, String storeName, Metadata metadata) {
+    if (response.body()
+        .getStatus()
+        .equals(Status.FAIL)) {
+      return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.RETRY, md5,
+          storeName, metadata);
+    }
+    return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,
+        storeName, metadata);
   }
 
   @NonNull
@@ -246,13 +247,6 @@ public class RetrofitUploadService implements UploaderService {
     public int getType() {
       return type;
     }
-  }
-
-  public interface ServiceV7 {
-    @GET("api/7/apks/package/translations/getProposed/package_name/{packageName}/language_code"
-        + "/{languageCode}/filter/{filter}") Observable<Response<GetProposedResponse>> getProposed(
-        @Path("packageName") String packageName, @Path("languageCode") String languageCode,
-        @Path("filter") boolean filter);
   }
 
   public interface ServiceV3 {
