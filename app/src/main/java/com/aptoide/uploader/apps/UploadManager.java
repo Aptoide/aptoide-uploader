@@ -16,23 +16,23 @@ public class UploadManager {
   private final Md5Calculator md5Calculator;
   private final BackgroundService backgroundService;
   private final AccountProvider accountProvider;
+  private final CheckAppsManager checkAppsManager;
 
   public UploadManager(UploaderService uploaderService, UploaderPersistence persistence,
       Md5Calculator md5Calculator, BackgroundService backgroundService,
-      AccountProvider accountProvider) {
+      AccountProvider accountProvider, CheckAppsManager checkAppsManager) {
     this.uploaderService = uploaderService;
     this.persistence = persistence;
     this.md5Calculator = md5Calculator;
     this.backgroundService = backgroundService;
     this.accountProvider = accountProvider;
+    this.checkAppsManager = checkAppsManager;
   }
 
   public Completable upload(String storeName, String language, InstalledApp app) {
     return md5Calculator.calculate(app)
         .flatMapCompletable((md5 -> uploaderService.getUpload(md5, language, storeName, app)
-            .flatMapCompletable(upload -> {
-              return persistence.save(upload);
-            })));
+            .flatMapCompletable(upload -> persistence.save(upload))));
   }
 
   public Observable<List<Upload>> getUploads() {
@@ -44,6 +44,7 @@ public class UploadManager {
     dispatchUploads();
     handleMetadataAdded();
     handleMd5NotExistent();
+    handleRetryStatus();
   }
 
   @SuppressLint("CheckResult") private void handleMetadataAdded() {
@@ -53,9 +54,20 @@ public class UploadManager {
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.META_DATA_ADDED))
         .cast(MetadataUpload.class)
-        .flatMapCompletable(upload -> uploaderService.upload(upload.getMd5(), upload.getStoreName(),
+        .flatMap(upload -> uploaderService.upload(upload.getMd5(), upload.getStoreName(),
             upload.getInstalledApp()
                 .getName(), upload.getInstalledApp(), upload.getMetadata()))
+        .flatMapCompletable(upload -> persistence.save(upload))
+        .subscribe();
+  }
+
+  @SuppressLint("CheckResult") private void handleRetryStatus() {
+    persistence.getUploads()
+        .distinctUntilChanged((previous, current) -> !hasChanged(previous, current))
+        .flatMapIterable(uploads -> uploads)
+        .filter(upload -> upload.getStatus()
+            .equals(Upload.Status.RETRY))
+        .flatMap(upload -> checkAppsManager.checkUploadStatus(upload.getMd5()))
         .subscribe();
   }
 

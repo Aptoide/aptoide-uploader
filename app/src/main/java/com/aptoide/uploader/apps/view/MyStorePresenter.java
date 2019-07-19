@@ -35,6 +35,8 @@ public class MyStorePresenter implements Presenter {
   @Override public void present() {
     showStoreAndApps();
 
+    //handleCheckAppsInStore();
+
     handleSubmitAppEvent();
 
     handleOrderByEvent();
@@ -147,6 +149,17 @@ public class MyStorePresenter implements Presenter {
     return Single.just(apps);
   }
 
-
-
+  //private void handleCheckAppsInStore() {
+  //  compositeDisposable.add(view.getLifecycleEvent()
+  //      .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+  //      .flatMapSingle(__ -> storeManager.getStore())
+  //      .flatMapIterable(store -> store.getApps())
+  //      .map(app -> md5Calculator.calculate(app))
+  //      .toList()
+  //      .flatMap()
+  //      .subscribe(__ -> {
+  //      }, throwable -> {
+  //        throw new OnErrorNotImplementedException(throwable);
+  //      }));
+  //}
 }

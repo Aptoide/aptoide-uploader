@@ -9,6 +9,7 @@ import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersiste
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
 import com.aptoide.uploader.apps.CategoriesManager;
+import com.aptoide.uploader.apps.CheckAppsManager;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
@@ -16,6 +17,7 @@ import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
+import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
@@ -44,6 +46,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
   private UploaderPersistence uploadPersistence;
+  private CheckAppsManager checkAppsManager;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -70,11 +73,12 @@ public class UploaderApplication extends NotificationApplicationView {
           .client(okhttpBuilder.build())
           .build();
 
-      uploadManager = new UploadManager(new RetrofitUploadService(
-          retrofitV3.create(RetrofitUploadService.ServiceV3.class), getAccessTokenProvider(),
-          RetrofitUploadService.UploadType.APTOIDE_UPLOADER), getUploadPersistence(),
-          getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
-          getAccessTokenProvider());
+      uploadManager = new UploadManager(
+          new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
+              getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER),
+          getUploadPersistence(), getMd5Calculator(),
+          new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
+          getCheckAppsManager());
     }
     return uploadManager;
   }
@@ -143,11 +147,29 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public StoreManager getAppsManager() {
     if (storeManager == null) {
+
       storeManager = new StoreManager(new PackageManagerInstalledAppsProvider(getPackageManager()),
           new AccountStoreNameProvider(getAccountManager()), getUploadManager(),
           getLanguageManager(), getAccountManager());
     }
     return storeManager;
+  }
+
+  public CheckAppsManager getCheckAppsManager() {
+    if (checkAppsManager == null) {
+
+      final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
+          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+          .client(new OkHttpClient())
+          .baseUrl("http://ws75-secondary.aptoide.com/")
+          .addConverterFactory(MoshiConverterFactory.create())
+          .build();
+
+      checkAppsManager = new CheckAppsManager(new AccountStoreNameProvider(getAccountManager()),
+          new RetrofitStoreService(retrofitV7Secondary.create(RetrofitStoreService.ServiceV7.class),
+              getAccessTokenProvider()));
+    }
+    return checkAppsManager;
   }
 
   private AptoideAccountProvider getAccessTokenProvider() {

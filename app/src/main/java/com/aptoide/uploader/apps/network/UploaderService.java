@@ -19,6 +19,6 @@ public interface UploaderService {
 
   Completable upload(String apkPath);
 
-  Completable upload(String md5, String storeName, String appName, InstalledApp installedApp,
+  Observable<Upload> upload(String md5, String storeName, String appName, InstalledApp installedApp,
       Metadata metadata);
 }

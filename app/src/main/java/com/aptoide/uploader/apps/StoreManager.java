@@ -14,9 +14,9 @@ public class StoreManager {
   private final LanguageManager languageManager;
   private final AptoideAccountManager accountManager;
 
-  public StoreManager(InstalledAppsProvider installedAppsProvider, StoreNameProvider storeNameProvider,
-      UploadManager uploadManager, LanguageManager languageManager,
-      AptoideAccountManager accountManager) {
+  public StoreManager(InstalledAppsProvider installedAppsProvider,
+      StoreNameProvider storeNameProvider, UploadManager uploadManager,
+      LanguageManager languageManager, AptoideAccountManager accountManager) {
     this.installedAppsProvider = installedAppsProvider;
     this.storeNameProvider = storeNameProvider;
     this.uploadManager = uploadManager;
@@ -36,7 +36,7 @@ public class StoreManager {
                 .flatMapCompletable(app -> uploadManager.upload(storeName, languageCode, app))));
   }
 
-  public Completable logout(){
+  public Completable logout() {
     return accountManager.logout();
   }
 
