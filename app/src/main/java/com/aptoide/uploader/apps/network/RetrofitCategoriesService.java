@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.List;
 import retrofit2.Response;
 import retrofit2.http.GET;
-import retrofit2.http.POST;
 
 public class RetrofitCategoriesService {
 
@@ -46,14 +45,4 @@ public class RetrofitCategoriesService {
     @GET("apks/groups/get/groups_depth=1") Single<Response<GetCategoriesResponse>> getCategories();
   }
 
-  //private class Body {
-//
-  //  private final int offset;
-  //  private final String language;
-//
-  //  private Body(int offset, String language) {
-  //    this.offset = offset;
-  //    this.language = language;
-  //  }
-  //}
 }
