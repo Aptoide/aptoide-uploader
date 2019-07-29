@@ -23,4 +23,12 @@ public class AptoideAccountProvider implements AccountProvider {
   @Override public Single<String> getToken() {
     return authenticationProvider.getAccessToken();
   }
+
+  @Override public Single<String> revalidateAccessToken() {
+    return authenticationProvider.getNewAccessToken();
+  }
+
+  @Override public Single<String> getRefreshToken() {
+    return authenticationProvider.getRefreshToken();
+  }
 }

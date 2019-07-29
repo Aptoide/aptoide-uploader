@@ -8,6 +8,8 @@ public interface AuthenticationPersistance {
 
   void saveAuthentication(String accessToken, String refreshToken);
 
+  void saveNewAccessToken(String accessToken);
+
   String getRefreshToken();
 
   String getAccessToken();

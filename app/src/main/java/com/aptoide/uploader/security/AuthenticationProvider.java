@@ -8,5 +8,9 @@ public interface AuthenticationProvider {
 
   Single<String> getAccessToken();
 
+  Single<String> getNewAccessToken();
+
+  Single<String> getRefreshToken();
+
   void saveAuthentication(String accessToken, String refreshToken);
 }

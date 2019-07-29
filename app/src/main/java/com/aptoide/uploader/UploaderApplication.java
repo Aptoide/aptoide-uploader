@@ -19,6 +19,8 @@ import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
 import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
+import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV3;
+import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV7;
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
@@ -55,17 +57,14 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public UploadManager getUploadManager() {
     if (uploadManager == null) {
-      final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
-          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(new OkHttpClient())
-          .baseUrl("http://ws75-secondary.aptoide.com/")
-          .addConverterFactory(MoshiConverterFactory.create())
-          .build();
-
+      TokenRevalidationInterceptorV3 tokenRevalidationInterceptor =
+          new TokenRevalidationInterceptorV3(getAccessTokenProvider());
       OkHttpClient.Builder okhttpBuilder =
           new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
               .readTimeout(30, TimeUnit.SECONDS)
-              .connectTimeout(30, TimeUnit.SECONDS);
+              .connectTimeout(30, TimeUnit.SECONDS)
+              .addInterceptor(tokenRevalidationInterceptor);
+
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
           .baseUrl("http://upload.webservices.aptoide.com/webservices/")
@@ -131,17 +130,22 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public CategoriesManager getCategoriesManager() {
     if (categoriesManager == null) {
-      final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
+
+      TokenRevalidationInterceptorV7 tokenRevalidationInterceptor =
+          new TokenRevalidationInterceptorV7(getAccessTokenProvider());
+      OkHttpClient.Builder okhttpBuilder =
+          new OkHttpClient.Builder().addInterceptor(tokenRevalidationInterceptor);
+
+      final Retrofit retrofitV7 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(new OkHttpClient())
+          .client(okhttpBuilder.build())
           .baseUrl("https://ws75.aptoide.com/api/7/")
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
 
       categoriesManager = new CategoriesManager(new RetrofitCategoriesService(
-          retrofitV3.create(RetrofitCategoriesService.ServiceV7.class)));
+          retrofitV7.create(RetrofitCategoriesService.ServiceV7.class)));
     }
-
     return categoriesManager;
   }
 

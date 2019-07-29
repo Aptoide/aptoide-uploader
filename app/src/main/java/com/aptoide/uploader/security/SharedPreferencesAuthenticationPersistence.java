@@ -22,6 +22,12 @@ public class SharedPreferencesAuthenticationPersistence implements Authenticatio
         .apply();
   }
 
+  @Override public void saveNewAccessToken(String accessToken) {
+    preferences.edit()
+        .putString(ACCESS_TOKEN, accessToken)
+        .apply();
+  }
+
   @Override public String getRefreshToken() {
     return preferences.getString(REFRESH_TOKEN, null);
   }

@@ -8,4 +8,8 @@ public interface AccountProvider {
   Observable<AptoideAccount> getAccount();
 
   Single<String> getToken();
+
+  Single<String> revalidateAccessToken();
+
+  Single<String> getRefreshToken();
 }
