@@ -8,19 +8,22 @@ import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
+import com.aptoide.uploader.apps.AppUploadStatusManager;
 import com.aptoide.uploader.apps.CategoriesManager;
-import com.aptoide.uploader.apps.CheckAppsManager;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
 import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
+import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
 import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV3;
 import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV7;
+import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
+import com.aptoide.uploader.apps.persistence.MemoryAppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
@@ -48,7 +51,8 @@ public class UploaderApplication extends NotificationApplicationView {
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
   private UploaderPersistence uploadPersistence;
-  private CheckAppsManager checkAppsManager;
+  private AppUploadStatusPersistence appUploadStatusPersistence;
+  private AppUploadStatusManager appUploadStatusManager;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -77,7 +81,7 @@ public class UploaderApplication extends NotificationApplicationView {
               getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER),
           getUploadPersistence(), getMd5Calculator(),
           new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
-          getCheckAppsManager());
+          getAppUploadStatusManager(), getAppUploadStatusPersistence());
     }
     return uploadManager;
   }
@@ -159,8 +163,8 @@ public class UploaderApplication extends NotificationApplicationView {
     return storeManager;
   }
 
-  public CheckAppsManager getCheckAppsManager() {
-    if (checkAppsManager == null) {
+  public AppUploadStatusManager getAppUploadStatusManager() {
+    if (appUploadStatusManager == null) {
 
       final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
@@ -169,11 +173,16 @@ public class UploaderApplication extends NotificationApplicationView {
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
 
-      checkAppsManager = new CheckAppsManager(new AccountStoreNameProvider(getAccountManager()),
-          new RetrofitStoreService(retrofitV7Secondary.create(RetrofitStoreService.ServiceV7.class),
-              getAccessTokenProvider()));
+      appUploadStatusManager =
+          new AppUploadStatusManager(new AccountStoreNameProvider(getAccountManager()),
+              new RetrofitStoreService(
+                  retrofitV7Secondary.create(RetrofitStoreService.ServiceV7.class),
+                  getAccessTokenProvider()), new RetrofitAppsUploadStatusService(
+              retrofitV7Secondary.create(RetrofitAppsUploadStatusService.ServiceV7.class),
+              getAccessTokenProvider()),
+              new PackageManagerInstalledAppsProvider(getPackageManager()));
     }
-    return checkAppsManager;
+    return appUploadStatusManager;
   }
 
   private AptoideAccountProvider getAccessTokenProvider() {
@@ -199,5 +208,13 @@ public class UploaderApplication extends NotificationApplicationView {
       uploadPersistence = new MemoryUploaderPersistence(new HashMap<>(), Schedulers.trampoline());
     }
     return uploadPersistence;
+  }
+
+  public AppUploadStatusPersistence getAppUploadStatusPersistence() {
+    if (appUploadStatusPersistence == null) {
+      appUploadStatusPersistence =
+          new MemoryAppUploadStatusPersistence(new HashMap<>(), Schedulers.trampoline());
+    }
+    return appUploadStatusPersistence;
   }
 }

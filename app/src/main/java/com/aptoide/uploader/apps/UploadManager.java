@@ -2,6 +2,7 @@ package com.aptoide.uploader.apps;
 
 import android.annotation.SuppressLint;
 import com.aptoide.uploader.apps.network.UploaderService;
+import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import com.aptoide.uploader.upload.AccountProvider;
 import com.aptoide.uploader.upload.BackgroundService;
@@ -16,17 +17,20 @@ public class UploadManager {
   private final Md5Calculator md5Calculator;
   private final BackgroundService backgroundService;
   private final AccountProvider accountProvider;
-  private final CheckAppsManager checkAppsManager;
+  private final AppUploadStatusManager appUploadStatusManager;
+  private final AppUploadStatusPersistence appUploadStatusPersistence;
 
   public UploadManager(UploaderService uploaderService, UploaderPersistence persistence,
       Md5Calculator md5Calculator, BackgroundService backgroundService,
-      AccountProvider accountProvider, CheckAppsManager checkAppsManager) {
+      AccountProvider accountProvider, AppUploadStatusManager appUploadStatusManager,
+      AppUploadStatusPersistence appUploadStatusPersistence) {
     this.uploaderService = uploaderService;
     this.persistence = persistence;
     this.md5Calculator = md5Calculator;
     this.backgroundService = backgroundService;
     this.accountProvider = accountProvider;
-    this.checkAppsManager = checkAppsManager;
+    this.appUploadStatusManager = appUploadStatusManager;
+    this.appUploadStatusPersistence = appUploadStatusPersistence;
   }
 
   public Completable upload(String storeName, String language, InstalledApp app) {
@@ -40,16 +44,30 @@ public class UploadManager {
   }
 
   public void start() {
+    fillAppUploadStatusPersistence();
     handleBackgroundService();
     dispatchUploads();
     handleMetadataAdded();
     handleMd5NotExistent();
     handleRetryStatus();
+    checkAppUploadStatus();
+  }
+
+  @SuppressLint("CheckResult") private void fillAppUploadStatusPersistence() {
+    appUploadStatusManager.getNonSystemApps()
+        .toObservable()
+        .flatMapIterable(apps -> apps)
+        .flatMapCompletable(installedApp -> appUploadStatusPersistence.save(new AppUploadStatus(
+            md5Calculator.calculate(installedApp)
+                .blockingGet(), installedApp.getPackageName(), false,
+            String.valueOf(installedApp.getVersionCode()))))
+        .subscribe();
   }
 
   @SuppressLint("CheckResult") private void handleMetadataAdded() {
     persistence.getUploads()
-        .distinctUntilChanged((previous, current) -> !hasChanged(previous, current))
+        .distinctUntilChanged(
+            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.META_DATA_ADDED))
@@ -63,11 +81,12 @@ public class UploadManager {
 
   @SuppressLint("CheckResult") private void handleRetryStatus() {
     persistence.getUploads()
-        .distinctUntilChanged((previous, current) -> !hasChanged(previous, current))
+        .distinctUntilChanged(
+            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.RETRY))
-        .flatMap(upload -> checkAppsManager.checkUploadStatus(upload.getMd5()))
+        .flatMap(upload -> appUploadStatusManager.checkUploadStatus(upload.getMd5()))
         .subscribe();
   }
 
@@ -92,7 +111,8 @@ public class UploadManager {
 
   @SuppressLint("CheckResult") private void handleMd5NotExistent() {
     persistence.getUploads()
-        .distinctUntilChanged((previous, current) -> !hasChanged(previous, current))
+        .distinctUntilChanged(
+            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.NOT_EXISTENT))
@@ -114,6 +134,31 @@ public class UploadManager {
         });
   }
 
+  @SuppressLint("CheckResult") private void checkAppUploadStatus() {
+    accountProvider.getAccount()
+        .switchMap(account -> {
+          if (account.isLoggedIn()) {
+            return appUploadStatusPersistence.getAppsUploadStatus()
+                .distinctUntilChanged(
+                    (previous, current) -> !appsPersistenceHasChanged(previous, current))
+                .flatMapSingle(appUploadStatuses -> Observable.fromIterable(appUploadStatuses)
+                    .map(app -> app.getMd5())
+                    .toList())
+                //.flatMapIterable(apps -> apps)
+                //.map(app -> app.getMd5())
+                //.toList()
+                .flatMap(md5List -> appUploadStatusManager.getApks(md5List))
+                .flatMapIterable(appUploadStatusList -> appUploadStatusList)
+                .doOnNext(appUploadStatus -> {
+                  appUploadStatusPersistence.remove(appUploadStatus.getMd5());
+                  appUploadStatusPersistence.save(appUploadStatus);
+                });
+          }
+          return Observable.empty();
+        })
+        .subscribe();
+  }
+
   private Completable uploadApkToServer(Upload upload) {
     return uploaderService.upload(upload.getInstalledApp()
         .getApkPath());
@@ -124,7 +169,8 @@ public class UploadManager {
         .switchMap(account -> {
           if (account.isLoggedIn()) {
             return persistence.getUploads()
-                .distinctUntilChanged((previous, current) -> !hasChanged(previous, current))
+                .distinctUntilChanged(
+                    (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
                 .flatMapIterable(uploads -> uploads)
                 .filter(upload -> upload.getStatus()
                     .equals(Upload.Status.PENDING))
@@ -142,7 +188,8 @@ public class UploadManager {
         });
   }
 
-  private boolean hasChanged(List<Upload> previousList, List<Upload> currentList) {
+  private boolean uploadsPersistenceHasChanged(List<Upload> previousList,
+      List<Upload> currentList) {
     if (previousList.size() != currentList.size()) {
       return true;
     }
@@ -150,6 +197,21 @@ public class UploadManager {
       Upload current = currentList.get(previousList.indexOf(previous));
       if (!previous.getStatus()
           .equals(current.getStatus())) {
+        return true;
+      }
+    }
+    return !previousList.equals(currentList);
+  }
+
+  private boolean appsPersistenceHasChanged(List<AppUploadStatus> previousList,
+      List<AppUploadStatus> currentList) {
+    if (previousList.size() != currentList.size()) {
+      return true;
+    }
+    for (AppUploadStatus previous : previousList) {
+      AppUploadStatus current = currentList.get(previousList.indexOf(previous));
+      if (!previous.getMd5()
+          .equals(current.getMd5())) {
         return true;
       }
     }

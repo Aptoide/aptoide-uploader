@@ -40,7 +40,7 @@ public class StoreManager {
     return accountManager.logout();
   }
 
-  private Single<List<InstalledApp>> getNonSystemApps() {
+  public Single<List<InstalledApp>> getNonSystemApps() {
     return installedAppsProvider.getInstalledApps()
         .flatMapObservable(apps -> Observable.fromIterable(apps))
         .filter(app -> !app.isSystem())
