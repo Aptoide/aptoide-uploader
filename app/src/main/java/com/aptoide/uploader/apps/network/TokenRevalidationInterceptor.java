@@ -53,6 +53,8 @@ public class TokenRevalidationInterceptor {
       return buffer.readUtf8();
     } catch (final IOException e) {
       return "did not work";
+    } catch (final IllegalStateException e) {
+      return "";
     }
   }
 }
