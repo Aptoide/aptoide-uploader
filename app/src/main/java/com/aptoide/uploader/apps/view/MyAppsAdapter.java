@@ -47,10 +47,12 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   public void setInstalledApps(List<InstalledApp> appsList) {
-    installedApps.clear();
-    installedApps.addAll(appsList);
-    clearAppsSelection(false);
-    notifyDataSetChanged();
+    if (!appsList.equals(installedApps)) {
+      installedApps.clear();
+      installedApps.addAll(appsList);
+      clearAppsSelection(false);
+      notifyDataSetChanged();
+    }
   }
 
   private void clearAppsSelection(boolean notify) {

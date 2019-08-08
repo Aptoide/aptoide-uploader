@@ -156,15 +156,19 @@ public class MyStorePresenter implements Presenter {
   }
 
   private void checkUploadedApps() {
-    persistence.getAppsUploadStatus()
+    getAppUploadStatusFromPersistence()
+        .observeOn(viewScheduler)
+        .doOnNext(packageList -> view.setCloudIcon(packageList))
+        .subscribe();
+  }
+
+  private Observable<List<String>> getAppUploadStatusFromPersistence() {
+    return persistence.getAppsUploadStatus()
         .distinctUntilChanged((previous, current) -> !appsPersistenceHasChanged(previous, current))
         .flatMapSingle(apps -> Observable.fromIterable(apps)
             .filter(app -> app.isUploaded())
             .map(appUploadStatus -> appUploadStatus.getPackageName())
-            .toList())
-        .observeOn(viewScheduler)
-        .doOnNext(packageList -> view.setCloudIcon(packageList))
-        .subscribe();
+            .toList());
   }
 
   private boolean appsPersistenceHasChanged(List<AppUploadStatus> previousList,
@@ -182,5 +186,4 @@ public class MyStorePresenter implements Presenter {
     boolean isDifferent = !previousList.equals(currentList);
     return isDifferent;
   }
-
 }

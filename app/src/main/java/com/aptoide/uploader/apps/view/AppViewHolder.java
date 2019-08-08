@@ -48,7 +48,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
     if (app.isUploaded()) {
       cloud.setVisibility(View.VISIBLE);
     } else {
-      cloud.setVisibility(View.INVISIBLE);
+      cloud.setVisibility(View.GONE);
     }
   }
 

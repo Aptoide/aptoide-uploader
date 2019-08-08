@@ -39,7 +39,7 @@
         android:paddingTop="8dp"
         android:visibility="gone"
         app:srcCompat="@drawable/ic_cloud_done"
-        tools:visibility="gone"
+        tools:visibility="visible"
 
 
         />

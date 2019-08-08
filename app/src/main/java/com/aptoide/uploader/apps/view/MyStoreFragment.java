@@ -12,7 +12,6 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
-import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -341,7 +340,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   }
 
   public void setCloudIcon(List<String> packageList) {
-    Log.d("uploaded_list", packageList.toString());
     adapter.setCloudIcon(packageList);
   }
 }
