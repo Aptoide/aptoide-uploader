@@ -91,4 +91,16 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   public void clearAppsSelection() {
     clearAppsSelection(true);
   }
+
+  public void setCloudIcon(List<String> uploadedPackageNames) {
+    for (InstalledApp app : installedApps) {
+      for (String packageName : uploadedPackageNames) {
+        if (app.getPackageName()
+            .equals(packageName)) {
+          app.setIsUploaded(true);
+        }
+      }
+    }
+    notifyDataSetChanged();
+  }
 }

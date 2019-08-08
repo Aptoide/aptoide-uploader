@@ -9,9 +9,10 @@ public class InstalledApp {
   private final String apkPath;
   private final long installedDate;
   private final int versionCode;
+  private boolean isUploaded;
 
   public InstalledApp(String icon, String name, boolean isSystem, String packageName,
-      String apkPath, long installedDate, int versionCode) {
+      String apkPath, long installedDate, int versionCode, boolean isUploaded) {
     this.icon = icon;
     this.name = name;
     this.isSystem = isSystem;
@@ -19,6 +20,7 @@ public class InstalledApp {
     this.apkPath = apkPath;
     this.installedDate = installedDate;
     this.versionCode = versionCode;
+    this.isUploaded = isUploaded;
   }
 
   public String getIcon() {
@@ -60,5 +62,13 @@ public class InstalledApp {
 
   public int getVersionCode() {
     return versionCode;
+  }
+
+  public boolean isUploaded() {
+    return isUploaded;
+  }
+
+  public void setIsUploaded(boolean value) {
+    isUploaded = value;
   }
 }

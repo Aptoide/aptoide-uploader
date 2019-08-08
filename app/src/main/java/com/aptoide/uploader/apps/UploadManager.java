@@ -51,6 +51,7 @@ public class UploadManager {
     handleMd5NotExistent();
     handleRetryStatus();
     checkAppUploadStatus();
+    handleCompletedStatus();
   }
 
   @SuppressLint("CheckResult") private void fillAppUploadStatusPersistence() {
@@ -76,6 +77,21 @@ public class UploadManager {
             upload.getInstalledApp()
                 .getName(), upload.getInstalledApp(), upload.getMetadata()))
         .flatMapCompletable(upload -> persistence.save(upload))
+        .subscribe();
+  }
+
+  @SuppressLint("CheckResult") private void handleCompletedStatus() {
+    persistence.getUploads()
+        .distinctUntilChanged(
+            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
+        .flatMapIterable(uploads -> uploads)
+        .filter(upload -> upload.getStatus()
+            .equals(Upload.Status.COMPLETED))
+        .flatMapCompletable(upload -> appUploadStatusPersistence.save(
+            new AppUploadStatus(upload.getMd5(), upload.getInstalledApp()
+                .getPackageName(), true, String.valueOf(upload.getInstalledApp()
+                .getVersionCode())))
+            .andThen(persistence.remove(upload)))
         .subscribe();
   }
 
@@ -144,15 +160,11 @@ public class UploadManager {
                 .flatMapSingle(appUploadStatuses -> Observable.fromIterable(appUploadStatuses)
                     .map(app -> app.getMd5())
                     .toList())
-                //.flatMapIterable(apps -> apps)
-                //.map(app -> app.getMd5())
-                //.toList()
                 .flatMap(md5List -> appUploadStatusManager.getApks(md5List))
-                .flatMapIterable(appUploadStatusList -> appUploadStatusList)
-                .doOnNext(appUploadStatus -> {
-                  appUploadStatusPersistence.remove(appUploadStatus.getMd5());
-                  appUploadStatusPersistence.save(appUploadStatus);
-                });
+                .flatMap(appUploadStatuses -> Observable.fromIterable(appUploadStatuses)
+                    .flatMapCompletable(
+                        appUploadStatus -> appUploadStatusPersistence.save(appUploadStatus))
+                    .toObservable());
           }
           return Observable.empty();
         })
@@ -208,13 +220,15 @@ public class UploadManager {
     if (previousList.size() != currentList.size()) {
       return true;
     }
-    for (AppUploadStatus previous : previousList) {
-      AppUploadStatus current = currentList.get(previousList.indexOf(previous));
-      if (!previous.getMd5()
-          .equals(current.getMd5())) {
-        return true;
-      }
-    }
-    return !previousList.equals(currentList);
+    boolean isEquals = previousList.containsAll(currentList);
+    return isEquals;
+    //for (AppUploadStatus previous : previousList) {
+    //  AppUploadStatus current = currentList.get(previousList.indexOf(previous));
+    //  if (!previous.getMd5()
+    //      .equals(current.getMd5()) && !previous.isUploaded() == current.isUploaded()) {
+    //    return true;
+    //  }
+    //}
+    // return !previousList.equals(currentList);
   }
 }

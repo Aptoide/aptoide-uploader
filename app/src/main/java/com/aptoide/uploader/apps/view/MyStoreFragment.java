@@ -12,6 +12,7 @@ import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
@@ -111,7 +112,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
         new CompositeDisposable(), new MyStoreNavigator(getFragmentManager()),
         AndroidSchedulers.mainThread(),
-        new UploadPermissionProvider((PermissionProvider) getContext())).present();
+        new UploadPermissionProvider((PermissionProvider) getContext()),
+        ((UploaderApplication) getContext().getApplicationContext()).getAppUploadStatusPersistence()).present();
   }
 
   @Override public void onDestroyView() {
@@ -336,5 +338,10 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       toolbar.setNavigationIcon(null);
       logoutItem.setVisible(true);
     }
+  }
+
+  public void setCloudIcon(List<String> packageList) {
+    Log.d("uploaded_list", packageList.toString());
+    adapter.setCloudIcon(packageList);
   }
 }

@@ -12,4 +12,6 @@ public interface AppUploadStatusPersistence {
   Completable save(AppUploadStatus appUploadStatus);
 
   Completable remove(String md5);
+
+  Completable update(AppUploadStatus appUploadStatus, boolean isUploaded);
 }

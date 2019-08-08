@@ -31,4 +31,6 @@ public interface MyStoreView extends View {
   Observable<Object> logoutEvent();
 
   Single<List<InstalledApp>> getSelectedApps();
+
+  void setCloudIcon(List<String> md5List);
 }

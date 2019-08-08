@@ -8,6 +8,7 @@ import okhttp3.MediaType;
 import okhttp3.Request;
 import okhttp3.Response;
 import okhttp3.ResponseBody;
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -30,8 +31,9 @@ public class TokenRevalidationInterceptorV7 extends TokenRevalidationInterceptor
     String errorCode = "";
     try {
       JSONObject responseBody = new JSONObject(responseBodyString);
-      JSONObject errors = responseBody.getJSONObject("errors");
-      errorCode = errors.getString("code");
+      JSONArray errors = responseBody.getJSONArray("errors");
+      errorCode = errors.getJSONObject(0)
+          .getString("code");
     } catch (JSONException e) {
       Log.d(TAG, "No error");
     }

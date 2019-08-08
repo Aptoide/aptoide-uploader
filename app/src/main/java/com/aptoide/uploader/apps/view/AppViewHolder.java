@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
 import android.os.Build;
+import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
 import android.view.View;
 import android.widget.ImageView;
@@ -15,12 +16,14 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
   private final TextView appName;
   private final View background;
   private final AppSelectedListener listener;
+  private final AppCompatImageView cloud;
 
   public AppViewHolder(View itemView, AppSelectedListener listener) {
     super(itemView);
     image = itemView.findViewById(R.id.item_app_icon);
     appName = itemView.findViewById(R.id.item_app_name);
     background = itemView.findViewById(R.id.item_app_layout);
+    cloud = itemView.findViewById(R.id.appInCloud);
     this.listener = listener;
     itemView.setOnClickListener(this);
   }
@@ -41,6 +44,11 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
         background.setBackgroundDrawable(itemView.getResources()
             .getDrawable(R.drawable.overlay_focused));
       }
+    }
+    if (app.isUploaded()) {
+      cloud.setVisibility(View.VISIBLE);
+    } else {
+      cloud.setVisibility(View.INVISIBLE);
     }
   }
 

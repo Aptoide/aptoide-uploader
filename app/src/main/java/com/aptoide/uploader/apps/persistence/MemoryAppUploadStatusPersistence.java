@@ -41,4 +41,11 @@ public class MemoryAppUploadStatusPersistence implements AppUploadStatusPersiste
         .subscribeOn(scheduler)
         .doOnError(throwable -> Log.e("ERROR Remove", throwable.getMessage()));
   }
+
+  @Override public Completable update(AppUploadStatus appUploadStatus, boolean isUploaded) {
+    return save(appUploadStatus)
+        //new AppUploadStatus(appUploadStatus.getMd5(), appUploadStatus.getPackageName(), isUploaded,
+        //    appUploadStatus.getVercode()))
+        .doOnError(throwable -> Log.e("ERROR Updating", throwable.getMessage()));
+  }
 }

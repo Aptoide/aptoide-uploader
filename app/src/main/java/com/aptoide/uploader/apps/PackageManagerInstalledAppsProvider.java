@@ -27,7 +27,7 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
               applicationInfo.loadLabel(packageManager)
                   .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1,
               applicationInfo.packageName, applicationInfo.sourceDir, packageInfo.firstInstallTime,
-              packageInfo.versionCode);
+              packageInfo.versionCode, false);
         })
         .toList();
   }

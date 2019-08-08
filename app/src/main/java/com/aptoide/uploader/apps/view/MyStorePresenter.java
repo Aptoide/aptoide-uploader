@@ -1,10 +1,13 @@
 package com.aptoide.uploader.apps.view;
 
+import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
+import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
@@ -20,22 +23,23 @@ public class MyStorePresenter implements Presenter {
   private final MyStoreNavigator storeNavigator;
   private final Scheduler viewScheduler;
   private final UploadPermissionProvider uploadPermissionProvider;
+  private final AppUploadStatusPersistence persistence;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, MyStoreNavigator storeNavigator,
-      Scheduler viewScheduler, UploadPermissionProvider uploadPermissionProvider) {
+      Scheduler viewScheduler, UploadPermissionProvider uploadPermissionProvider,
+      AppUploadStatusPersistence persistence) {
     this.view = view;
     this.storeManager = storeManager;
     this.compositeDisposable = compositeDisposable;
     this.storeNavigator = storeNavigator;
     this.viewScheduler = viewScheduler;
     this.uploadPermissionProvider = uploadPermissionProvider;
+    this.persistence = persistence;
   }
 
   @Override public void present() {
     showStoreAndApps();
-
-    //handleCheckAppsInStore();
 
     handleSubmitAppEvent();
 
@@ -46,6 +50,8 @@ public class MyStorePresenter implements Presenter {
     handlePositiveDialogClick();
 
     onDestroyDisposeComposite();
+
+    checkUploadedApps();
   }
 
   private void handlePositiveDialogClick() {
@@ -149,17 +155,32 @@ public class MyStorePresenter implements Presenter {
     return Single.just(apps);
   }
 
-  //private void handleCheckAppsInStore() {
-  //  compositeDisposable.add(view.getLifecycleEvent()
-  //      .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-  //      .flatMapSingle(__ -> storeManager.getStore())
-  //      .flatMapIterable(store -> store.getApps())
-  //      .map(app -> md5Calculator.calculate(app))
-  //      .toList()
-  //      .flatMap()
-  //      .subscribe(__ -> {
-  //      }, throwable -> {
-  //        throw new OnErrorNotImplementedException(throwable);
-  //      }));
-  //}
+  private void checkUploadedApps() {
+    persistence.getAppsUploadStatus()
+        .distinctUntilChanged((previous, current) -> !appsPersistenceHasChanged(previous, current))
+        .flatMapSingle(apps -> Observable.fromIterable(apps)
+            .filter(app -> app.isUploaded())
+            .map(appUploadStatus -> appUploadStatus.getPackageName())
+            .toList())
+        .observeOn(viewScheduler)
+        .doOnNext(packageList -> view.setCloudIcon(packageList))
+        .subscribe();
+  }
+
+  private boolean appsPersistenceHasChanged(List<AppUploadStatus> previousList,
+      List<AppUploadStatus> currentList) {
+    if (previousList.size() != currentList.size()) {
+      return true;
+    }
+    for (AppUploadStatus previous : previousList) {
+      AppUploadStatus current = currentList.get(previousList.indexOf(previous));
+      if (!previous.getMd5()
+          .equals(current.getMd5()) && !previous.isUploaded() == current.isUploaded()) {
+        return true;
+      }
+    }
+    boolean isDifferent = !previousList.equals(currentList);
+    return isDifferent;
+  }
+
 }

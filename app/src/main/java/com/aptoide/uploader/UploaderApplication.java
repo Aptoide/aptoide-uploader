@@ -166,9 +166,14 @@ public class UploaderApplication extends NotificationApplicationView {
   public AppUploadStatusManager getAppUploadStatusManager() {
     if (appUploadStatusManager == null) {
 
+      TokenRevalidationInterceptorV7 tokenRevalidationInterceptor =
+          new TokenRevalidationInterceptorV7(getAccessTokenProvider());
+      OkHttpClient.Builder okhttpBuilder =
+          new OkHttpClient.Builder().addInterceptor(tokenRevalidationInterceptor);
+
       final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(new OkHttpClient())
+          .client(okhttpBuilder.build())
           .baseUrl("http://ws75-secondary.aptoide.com/")
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
