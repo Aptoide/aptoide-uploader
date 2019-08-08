@@ -220,15 +220,6 @@ public class UploadManager {
     if (previousList.size() != currentList.size()) {
       return true;
     }
-    boolean isEquals = previousList.containsAll(currentList);
-    return isEquals;
-    //for (AppUploadStatus previous : previousList) {
-    //  AppUploadStatus current = currentList.get(previousList.indexOf(previous));
-    //  if (!previous.getMd5()
-    //      .equals(current.getMd5()) && !previous.isUploaded() == current.isUploaded()) {
-    //    return true;
-    //  }
-    //}
-    // return !previousList.equals(currentList);
+    return false;
   }
 }
