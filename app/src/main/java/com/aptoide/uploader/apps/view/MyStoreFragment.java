@@ -343,7 +343,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     }
   }
 
-  public void setCloudIcon(List<String> packageList) {
+  @Override public void clearSelection() {
+    adapter.clearAppsSelection();
+  }
+
+  @Override public void setCloudIcon(List<String> packageList) {
     adapter.setCloudIcon(packageList);
   }
 }

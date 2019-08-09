@@ -34,5 +34,7 @@ public interface MyStoreView extends View {
 
   Single<List<InstalledApp>> getSelectedApps();
 
+  void clearSelection();
+
   void setCloudIcon(List<String> md5List);
 }

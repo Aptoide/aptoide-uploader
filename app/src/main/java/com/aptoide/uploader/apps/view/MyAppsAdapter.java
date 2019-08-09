@@ -57,17 +57,15 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   public void setOrder(SortingOrder order) {
-
     if (order.equals(SortingOrder.NAME)) {
       Collections.sort(installedApps, (obj1, obj2) -> obj1.getName()
           .compareToIgnoreCase(obj2.getName()));
     }
-
     if (order.equals(SortingOrder.DATE)) {
       Collections.sort(installedApps,
           (obj1, obj2) -> Long.compare(obj1.getInstalledDate(), obj2.getInstalledDate()));
     }
-
+    selectedApps.clear();
     notifyDataSetChanged();
   }
 

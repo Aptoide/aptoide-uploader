@@ -112,6 +112,7 @@ public class MyStorePresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.submitAppEvent())
         .doOnNext(apps -> uploadPermissionProvider.requestExternalStoragePermission())
+        .doOnNext(__ -> view.clearSelection())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
