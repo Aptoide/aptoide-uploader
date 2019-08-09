@@ -172,8 +172,9 @@ public class UploadManager {
   }
 
   private Completable uploadApkToServer(Upload upload) {
-    return uploaderService.upload(upload.getInstalledApp()
-        .getApkPath());
+    return uploaderService.upload(upload.getInstalledApp(), upload.getMd5(), upload.getStoreName(),
+        upload.getInstalledApp()
+            .getApkPath());
   }
 
   @SuppressLint("CheckResult") private void dispatchUploads() {

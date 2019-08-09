@@ -175,6 +175,10 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     adapter.setInstalledApps(appsList);
   }
 
+  @Override public void orderApps(SortingOrder order) {
+    adapter.setOrder(order);
+  }
+
   @Override public void showStoreName(@NotNull String storeName) {
     storeNameText.setText(storeName);
   }

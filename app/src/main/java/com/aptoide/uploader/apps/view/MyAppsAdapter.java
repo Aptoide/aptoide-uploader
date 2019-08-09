@@ -9,6 +9,7 @@ import com.aptoide.uploader.apps.InstalledApp;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
@@ -53,6 +54,21 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
       clearAppsSelection(false);
       notifyDataSetChanged();
     }
+  }
+
+  public void setOrder(SortingOrder order) {
+
+    if (order.equals(SortingOrder.NAME)) {
+      Collections.sort(installedApps, (obj1, obj2) -> obj1.getName()
+          .compareToIgnoreCase(obj2.getName()));
+    }
+
+    if (order.equals(SortingOrder.DATE)) {
+      Collections.sort(installedApps,
+          (obj1, obj2) -> Long.compare(obj1.getInstalledDate(), obj2.getInstalledDate()));
+    }
+
+    notifyDataSetChanged();
   }
 
   private void clearAppsSelection(boolean notify) {

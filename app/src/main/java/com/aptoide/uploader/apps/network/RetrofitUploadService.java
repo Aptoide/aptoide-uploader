@@ -67,13 +67,16 @@ public class RetrofitUploadService implements UploaderService {
         .single(false);
   }
 
-  @Override public Completable upload(String apkPath) {
+  @Override public Completable upload(InstalledApp installedApp, String md5, String storeName,
+      String apkPath) {
     return accountProvider.getAccount()
         .firstOrError()
         .flatMapCompletable(aptoideAccount -> accountProvider.getToken()
             .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
                 getParams(accessToken, aptoideAccount.getStoreName()),
                 MultipartBody.Part.createFormData("apk", apkPath, createApkRequestBody(apkPath))))
+            .flatMap(response -> Observable.just(
+                buildUploadFinishStatus(response, installedApp, md5, storeName)))
             .ignoreElements());
   }
 

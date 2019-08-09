@@ -17,7 +17,7 @@ public interface UploaderService {
 
   Single<Boolean> hasApplicationMetaData(String packageName, int versionCode);
 
-  Completable upload(String apkPath);
+  Completable upload(InstalledApp installedApp, String md5, String storeName, String apkPath);
 
   Observable<Upload> upload(String md5, String storeName, String appName, InstalledApp installedApp,
       Metadata metadata);

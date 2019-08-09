@@ -97,11 +97,11 @@ public class MyStorePresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.orderByEvent())
+        .doOnNext(order -> view.orderApps(order))
         .flatMapSingle(sortingOrder -> storeManager.getStore()
             .flatMap(store -> sort(store.getApps(), sortingOrder)))
         .observeOn(viewScheduler)
-        .subscribe(apps -> {
-          view.showApps(apps);
+        .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
@@ -156,8 +156,7 @@ public class MyStorePresenter implements Presenter {
   }
 
   private void checkUploadedApps() {
-    getAppUploadStatusFromPersistence()
-        .observeOn(viewScheduler)
+    getAppUploadStatusFromPersistence().observeOn(viewScheduler)
         .doOnNext(packageList -> view.setCloudIcon(packageList))
         .subscribe();
   }
