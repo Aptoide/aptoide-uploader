@@ -19,11 +19,12 @@ public class UploadManager {
   private final AccountProvider accountProvider;
   private final AppUploadStatusManager appUploadStatusManager;
   private final AppUploadStatusPersistence appUploadStatusPersistence;
+  private final StoreManager storeManager;
 
   public UploadManager(UploaderService uploaderService, UploaderPersistence persistence,
       Md5Calculator md5Calculator, BackgroundService backgroundService,
       AccountProvider accountProvider, AppUploadStatusManager appUploadStatusManager,
-      AppUploadStatusPersistence appUploadStatusPersistence) {
+      AppUploadStatusPersistence appUploadStatusPersistence, StoreManager storeManager) {
     this.uploaderService = uploaderService;
     this.persistence = persistence;
     this.md5Calculator = md5Calculator;
@@ -31,6 +32,7 @@ public class UploadManager {
     this.accountProvider = accountProvider;
     this.appUploadStatusManager = appUploadStatusManager;
     this.appUploadStatusPersistence = appUploadStatusPersistence;
+    this.storeManager = storeManager;
   }
 
   public Completable upload(String storeName, String language, InstalledApp app) {
@@ -153,7 +155,7 @@ public class UploadManager {
   @SuppressLint("CheckResult") private void checkAppUploadStatus() {
     accountProvider.getAccount()
         .switchMap(account -> {
-          if (account.isLoggedIn()) {
+          if (account.isLoggedIn() && account.hasStore()) {
             return appUploadStatusPersistence.getAppsUploadStatus()
                 .distinctUntilChanged(
                     (previous, current) -> !appsPersistenceHasChanged(previous, current))

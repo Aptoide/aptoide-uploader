@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="70dp"
+    android:layout_gravity="center|top"
+    android:orientation="vertical"
+    >
+
+  <EditText
+      android:id="@+id/create_store_name"
+      android:layout_width="fill_parent"
+      android:layout_height="50dp"
+      android:layout_marginLeft="30dp"
+      android:layout_marginRight="30dp"
+      android:layout_weight="1"
+      android:hint="@string/store"
+      android:padding="5dp"
+      android:singleLine="true"
+      android:textSize="18sp"
+      />
+
+  <TextView
+      android:id="@+id/store_privacy"
+      android:layout_width="fill_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="30dp"
+      android:layout_marginRight="30dp"
+      android:layout_marginTop="25dp"
+      android:layout_weight="1"
+      android:gravity="center"
+      android:text="@string/store_privacy"
+      android:textSize="15sp"
+      />
+
+  <RadioGroup
+      android:id="@+id/create_store_privacy_radiogroup"
+      android:layout_width="wrap_content"
+      android:layout_height="40dp"
+      android:layout_gravity="center"
+      android:layout_marginLeft="10dp"
+      android:layout_weight="1"
+      android:orientation="horizontal"
+      >
+
+    <RadioButton
+        android:id="@+id/public_store"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center_horizontal"
+        android:layout_weight="1"
+        android:checked="true"
+        android:text="@string/public_key"
+        />
+
+    <RadioButton
+        android:id="@+id/private_store"
+        android:layout_width="fill_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="10dp"
+        android:layout_weight="1"
+        android:checked="false"
+        android:text="@string/private_key"
+        />
+  </RadioGroup>
+
+  <EditText
+      android:id="@+id/store_username"
+      android:layout_width="fill_parent"
+      android:layout_height="50dp"
+      android:layout_marginLeft="30dp"
+      android:layout_marginRight="30dp"
+      android:layout_weight="1"
+      android:hint="@string/store_username"
+      android:padding="5dp"
+      android:selectAllOnFocus="true"
+      android:singleLine="true"
+      android:textSize="18sp"
+      android:visibility="gone"
+      />
+
+  <EditText
+      android:id="@+id/store_password"
+      android:layout_width="fill_parent"
+      android:layout_height="50dp"
+      android:layout_marginLeft="30dp"
+      android:layout_marginRight="30dp"
+      android:layout_weight="1"
+      android:hint="@string/store_password"
+      android:padding="5dp"
+      android:singleLine="true"
+      android:textSize="18sp"
+      android:visibility="gone"
+      />
+
+  <Button
+      android:id="@+id/fragment_create_store_button"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="30dp"
+      android:layout_marginRight="30dp"
+      android:layout_marginTop="20dp"
+      android:text="@string/create_repo"
+      style="@style/Buttonuploader_button_theme"
+      />
+
+</LinearLayout>

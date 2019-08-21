@@ -31,7 +31,7 @@ public class RetrofitAppsUploadStatusService {
                 if (getApksResponse.isSuccessful()) {
                   return mapToApksList(getApksResponse.body());
                 } else {
-                  return null;
+                  return new ArrayList<AppUploadStatus>();
                 }
               })
               .subscribeOn(Schedulers.io());

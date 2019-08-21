@@ -81,13 +81,14 @@ public class UploaderApplication extends NotificationApplicationView {
               getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER),
           getUploadPersistence(), getMd5Calculator(),
           new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
-          getAppUploadStatusManager(), getAppUploadStatusPersistence());
+          getAppUploadStatusManager(), getAppUploadStatusPersistence(), storeManager);
     }
     return uploadManager;
   }
 
   public AptoideAccountManager getAccountManager() {
     if (accountManager == null) {
+
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
           .client(new OkHttpClient())

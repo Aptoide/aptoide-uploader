@@ -6,6 +6,7 @@ import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetryWithDelay;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -42,7 +43,7 @@ public class AppUploadStatusManager {
         .flatMap(apksResponse -> {
           if (apksResponse.getList()
               .isEmpty()) {
-            throw new RuntimeException();
+            throw new IOException();
           }
           return Observable.just(apksResponse);
         })

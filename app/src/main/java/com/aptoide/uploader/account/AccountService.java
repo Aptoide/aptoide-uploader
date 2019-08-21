@@ -1,5 +1,6 @@
 package com.aptoide.uploader.account;
 
+import com.aptoide.uploader.account.network.CreateStoreStatus;
 import io.reactivex.Single;
 
 /**
@@ -14,4 +15,7 @@ public interface AccountService {
 
   Single<AptoideAccount> createAccount(String email, String password, String storeName,
       String storeUser, String storePass);
+
+  Single<CreateStoreStatus> createStore(String storeName);
+
 }

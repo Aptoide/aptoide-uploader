@@ -8,6 +8,7 @@ import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import retrofit2.Response;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
@@ -59,6 +61,35 @@ public class RetrofitAccountService implements AccountService {
   @Override
   public Single<AptoideAccount> createAccount(String email, String password, String storeName) {
     return createAccount(email, password, storeName, null, null);
+  }
+
+  @Override public Single<CreateStoreStatus> createStore(String storeName) {
+    return authenticationProvider.getAccessToken()
+        .flatMap(accessToken -> serviceV3.createRepo(storeName, 1, true, accessToken, "aptoide",
+            accessToken, "json")
+            .singleOrError())
+        .flatMap(response -> mapCreateStoreResponse(response));
+  }
+
+  private Single<CreateStoreStatus> mapCreateStoreResponse(Response<CreateStoreResponse> response) {
+    if (response.isSuccessful() && response.body()
+        .getStatus()
+        .equals(Status.OK)) {
+      return Single.just(new CreateStoreStatus(response.body()
+          .getStatus(), response.body()
+          .getErrors()));
+    } else if (response.body()
+        .getStatus()
+        .equals(Status.FAIL)) {
+      if (response.body()
+          .getErrors()
+          .get(0)
+          .getCode()
+          .equals("WOP-3")) {
+        return Single.error(new DuplicatedStoreException());
+      }
+    }
+    return Single.error(new IOException());
   }
 
   @Override public Single<AptoideAccount> createAccount(String userEmail, String userPassword,
@@ -139,6 +170,12 @@ public class RetrofitAccountService implements AccountService {
   public interface ServiceV3 {
     @POST("webservices/3/createUser") @FormUrlEncoded Observable<Response<OAuth>> createAccount(
         @FieldMap Map<String, String> args);
+
+    @POST("webservices/3/checkUserCredentials") @FormUrlEncoded
+    Observable<Response<CreateStoreResponse>> createRepo(@Field("repo") String storeName,
+        @Field("createRepo") int createRepo, @Field("oauthCreateRepo") boolean oauthCreateRepo,
+        @Field("oauthToken") String oauthtoken, @Field("authMode") String authMode,
+        @Field("access_token") String accessToken, @Field("mode") String mode);
   }
 
   public interface ServiceV7 {

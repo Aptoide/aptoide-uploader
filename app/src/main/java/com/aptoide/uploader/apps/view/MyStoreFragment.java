@@ -348,6 +348,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   }
 
   @Override public void setCloudIcon(List<String> packageList) {
-    adapter.setCloudIcon(packageList);
+    if (packageList != null && adapter != null) {
+      adapter.setCloudIcon(packageList);
+    }
   }
 }

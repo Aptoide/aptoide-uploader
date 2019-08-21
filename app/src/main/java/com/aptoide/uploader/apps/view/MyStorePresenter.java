@@ -179,11 +179,10 @@ public class MyStorePresenter implements Presenter {
     for (AppUploadStatus previous : previousList) {
       AppUploadStatus current = currentList.get(previousList.indexOf(previous));
       if (!previous.getMd5()
-          .equals(current.getMd5()) && !previous.isUploaded() == current.isUploaded()) {
+          .equals(current.getMd5()) && !(previous.isUploaded() == current.isUploaded())) {
         return true;
       }
     }
-    boolean isDifferent = !previousList.equals(currentList);
-    return isDifferent;
+    return !previousList.equals(currentList);
   }
 }

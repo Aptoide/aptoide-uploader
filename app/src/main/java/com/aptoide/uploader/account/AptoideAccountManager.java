@@ -31,6 +31,13 @@ public class AptoideAccountManager {
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
+  public Completable createStore(String storeName) {
+    return accountService.createStore(storeName)
+        .flatMap(createStoreStatus -> getAccount().firstOrError())
+        .map(aptoideAccount -> new AptoideAccount(true, true, storeName))
+        .flatMapCompletable(account -> accountPersistence.save(account));
+  }
+
   public Completable logout() {
     return accountPersistence.remove();
   }
