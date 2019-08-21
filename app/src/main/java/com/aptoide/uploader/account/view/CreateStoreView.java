@@ -24,6 +24,8 @@ public interface CreateStoreView extends View {
 
   void showErrorStoreAlreadyExists();
 
+  void hideKeyboard();
+
   class CreateStoreViewModel {
     private final String storeName;
     private final String storeUser;

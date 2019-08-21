@@ -40,7 +40,10 @@ public class CreateStorePresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMapCompletable(created -> view.getStoreInfo()
-            .doOnNext(click -> view.showLoading())
+            .doOnNext(click -> {
+              view.showLoading();
+              view.hideKeyboard();
+            })
             .flatMapCompletable(data -> accountManager.createStore(data.getStoreName())
                 .observeOn(viewScheduler)
                 .doOnComplete(() -> accountNavigator.navigateToMyAppsView()))
