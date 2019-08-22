@@ -8,8 +8,8 @@ public class Upload {
   private final String storeName;
   private Status status;
 
-  public Upload(boolean uploaded, InstalledApp installedApp, Status status,
-      String md5, String storeName) {
+  public Upload(boolean uploaded, InstalledApp installedApp, Status status, String md5,
+      String storeName) {
     this.uploaded = uploaded;
     this.installedApp = installedApp;
     this.status = status;
@@ -24,7 +24,6 @@ public class Upload {
   public boolean isUploaded() {
     return uploaded;
   }
-
 
   public InstalledApp getInstalledApp() {
     return installedApp;
@@ -56,6 +55,6 @@ public class Upload {
   }
 
   public enum Status {
-    PENDING, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, META_DATA_ADDED, RETRY
+    PENDING, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, META_DATA_ADDED, RETRY, INTELLECTUAL_RIGHTS, INFECTED, INVALID_SIGNATURE, PUBLISHER_ONLY, FAILED
   }
 }

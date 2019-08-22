@@ -192,20 +192,31 @@ public class RetrofitUploadService implements UploaderService {
     if (response.body()
         .getStatus()
         .equals(Status.FAIL)) {
-      if (response.body()
+      switch (response.body()
           .getErrors()
           .get(0)
-          .getCode()
-          .equals("APK-103")) {
-        return new Upload(response.isSuccessful(), installedApp, Upload.Status.DUPLICATE, md5,
-            storeName);
-      } else if (response.body()
-          .getErrors()
-          .get(0)
-          .getCode()
-          .equals("APK-5")) {
-        return new Upload(response.isSuccessful(), installedApp, Upload.Status.NOT_EXISTENT, md5,
-            storeName);
+          .getCode()) {
+        case "APK-103":
+          return new Upload(response.isSuccessful(), installedApp, Upload.Status.DUPLICATE, md5,
+              storeName);
+        case "APK-5":
+          return new Upload(response.isSuccessful(), installedApp, Upload.Status.NOT_EXISTENT, md5,
+              storeName);
+        case "APK-101":
+          return new Upload(response.isSuccessful(), installedApp,
+              Upload.Status.INTELLECTUAL_RIGHTS, md5, storeName);
+        case "APK-102":
+          return new Upload(response.isSuccessful(), installedApp, Upload.Status.INFECTED, md5,
+              storeName);
+        case "APK-106":
+          return new Upload(response.isSuccessful(), installedApp, Upload.Status.INVALID_SIGNATURE,
+              md5, storeName);
+        case "APK-104":
+          return new Upload(response.isSuccessful(), installedApp, Upload.Status.PUBLISHER_ONLY,
+              md5, storeName);
+        default:
+          return new Upload(response.isSuccessful(), installedApp, Upload.Status.FAILED, md5,
+              storeName);
       }
     }
     return new Upload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,

@@ -48,8 +48,17 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
-  @Override public void showCompletedUploadNotification() {
+  @Override
+  public void showCompletedUploadNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(false)
+            .setSubText(getString(R.string.application_notification_short_app_success_upload))
+            .setContentText(applicationName);
 
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
   @Override public void showProgressUploadNotification() {
@@ -58,6 +67,69 @@ public abstract class NotificationApplicationView extends Application implements
 
   @Override public void showPendingUploadNotification() {
 
+  }
+
+  @Override public void showFailedUploadNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(false)
+            .setSubText(getString(R.string.application_notification_short_app_uplod_failed))
+            .setContentText(applicationName);
+
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
+  @Override public void showPublisherOnlyNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(false)
+            .setSubText(getString(R.string.application_notification_short_app_publisher_only))
+            .setContentText(applicationName);
+
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
+  @Override public void showUploadInfectionNotificaton(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(false)
+            .setSubText(getString(R.string.application_notification_short_app_infection))
+            .setContentText(applicationName);
+
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
+  @Override
+  public void showIntellectualRightsNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(false)
+            .setSubText(
+                getString(R.string.application_notification_short_app_intellectual_property))
+            .setContentText(applicationName);
+
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
+  @Override
+  public void showInvalidSignatureNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(false)
+            .setSubText(getString(R.string.application_notification_short_app_invalid_signature))
+            .setContentText(applicationName);
+
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
   @Override

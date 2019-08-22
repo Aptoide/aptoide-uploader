@@ -45,10 +45,25 @@ public class NotificationPresenter implements Presenter {
         view.showProgressUploadNotification();
         break;
       case COMPLETED:
-        view.showCompletedUploadNotification();
+        view.showCompletedUploadNotification(appName, packageName);
         break;
       case DUPLICATE:
         view.showDuplicateUploadNotification(appName, packageName);
+        break;
+      case FAILED:
+        view.showFailedUploadNotification(appName, packageName);
+        break;
+      case INFECTED:
+        view.showUploadInfectionNotificaton(appName, packageName);
+        break;
+      case PUBLISHER_ONLY:
+        view.showPublisherOnlyNotification(appName, packageName);
+        break;
+      case INVALID_SIGNATURE:
+        view.showInvalidSignatureNotification(appName, packageName);
+        break;
+      case INTELLECTUAL_RIGHTS:
+        view.showIntellectualRightsNotification(appName, packageName);
         break;
     }
   }
