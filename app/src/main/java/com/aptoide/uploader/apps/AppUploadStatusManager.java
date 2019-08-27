@@ -33,18 +33,19 @@ public class AppUploadStatusManager {
             storeName -> retrofitAppsUploadStatusService.getApks(md5List, storeName));
   }
 
-  public Observable<ApksResponse> checkUploadStatus(String md5) {
+  public Observable<ApksResponse> checkUploadStatus(Upload upload) {
     return storeNameProvider.getStoreName()
         .flatMapObservable(storeName -> {
           List<String> md5List = new ArrayList<>();
-          md5List.add(md5);
+          md5List.add(upload.getMd5());
           return retrofitStoreService.getApks(md5List, storeName);
         })
         .flatMap(apksResponse -> {
-          if (apksResponse.getList()
+          if (apksResponse != null && apksResponse.getList()
               .isEmpty()) {
             throw new IOException();
           }
+          upload.setStatus(Upload.Status.COMPLETED);
           return Observable.just(apksResponse);
         })
         .retryWhen(new RetryWithDelay(3, 2000));

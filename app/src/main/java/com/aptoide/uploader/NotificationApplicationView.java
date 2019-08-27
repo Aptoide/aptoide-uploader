@@ -61,12 +61,28 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
-  @Override public void showProgressUploadNotification() {
+  @Override public void showPendingUploadNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(false)
+            .setSubText("Pending")
+            .setContentText(applicationName);
 
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
-  @Override public void showPendingUploadNotification() {
-
+  @Override
+  public void updateUploadProgress(String applicationName, String packageName, int progress) {
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(true)
+            .setContentText(applicationName)
+            .setProgress(100, progress, false);
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
   @Override public void showFailedUploadNotification(String applicationName, String packageName) {

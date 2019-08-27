@@ -8,9 +8,7 @@ public interface NotificationView extends View {
 
   void showCompletedUploadNotification(String applicationName, String packageName);
 
-  void showProgressUploadNotification();
-
-  void showPendingUploadNotification();
+  void showPendingUploadNotification(String applicationName, String packageName);
 
   void showNoMetaDataNotification(String applicationName, String packageName, String md5);
 
@@ -23,4 +21,7 @@ public interface NotificationView extends View {
   void showIntellectualRightsNotification(String applicationName, String packageName);
 
   void showInvalidSignatureNotification(String applicationName, String packageName);
+
+  void updateUploadProgress(String name, String packageName, int progress);
 }
+

@@ -12,6 +12,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
+import java.net.SocketTimeoutException;
 import java.util.Collections;
 import java.util.List;
 
@@ -124,6 +125,12 @@ public class MyStorePresenter implements Presenter {
         .filter(granted -> granted)
         .flatMapSingle(__ -> view.getSelectedApps())
         .flatMapCompletable(apps -> storeManager.upload(apps))
+        .doOnError(throwable -> {
+          if (throwable instanceof SocketTimeoutException) {
+            view.showError();
+          }
+        })
+        .retry()
         .subscribe(() -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);

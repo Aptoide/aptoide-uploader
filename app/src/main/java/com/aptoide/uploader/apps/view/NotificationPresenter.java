@@ -4,7 +4,7 @@ import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
-import io.reactivex.exceptions.OnErrorNotImplementedException;
+import io.reactivex.Observable;
 
 public class NotificationPresenter implements Presenter {
   private final NotificationView view;
@@ -24,25 +24,37 @@ public class NotificationPresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadManager.getUploads())
         .flatMapIterable(uploads -> uploads)
-        .subscribe(upload -> showNotification(upload), throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
-        });
+        .flatMap(upload -> {
+          if (upload.getStatus()
+              .equals(Upload.Status.PROGRESS)) {
+            return updateProgress(upload);
+          } else {
+            return Observable.just(upload);
+          }
+        })
+        .doOnNext(upload -> showNotification(upload))
+        .subscribe();
   }
 
   private void showNotification(Upload upload) {
-    String appName = upload.getInstalledApp().getName();
-    String packageName = upload.getInstalledApp().getPackageName();
+    String appName = upload.getInstalledApp()
+        .getName();
+    String packageName = upload.getInstalledApp()
+        .getPackageName();
     String md5 = upload.getMd5();
 
     switch (upload.getStatus()) {
       case PENDING:
-        view.showPendingUploadNotification();
+        view.showPendingUploadNotification(appName, packageName);
+        break;
+      case CLIENT_ERROR:
+        break;
+      case NOT_EXISTENT:
         break;
       case NO_META_DATA:
-        view.showNoMetaDataNotification(appName,packageName, md5);
+        view.showNoMetaDataNotification(appName, packageName, md5);
         break;
       case PROGRESS:
-        view.showProgressUploadNotification();
         break;
       case COMPLETED:
         view.showCompletedUploadNotification(appName, packageName);
@@ -62,9 +74,24 @@ public class NotificationPresenter implements Presenter {
       case INVALID_SIGNATURE:
         view.showInvalidSignatureNotification(appName, packageName);
         break;
+      case META_DATA_ADDED:
+        break;
+      case RETRY:
+        break;
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
         break;
     }
   }
+
+  private Observable<Upload> updateProgress(Upload upload) {
+    return uploadManager.getProgress(upload.getInstalledApp()
+        .getPackageName())
+        .doOnNext(uploadProgress -> view.updateUploadProgress(upload.getInstalledApp()
+            .getName(), upload.getInstalledApp()
+            .getPackageName(), uploadProgress.getProgress()))
+        .map(__ -> upload)
+        .doOnError(throwable -> throwable.printStackTrace());
+  }
 }
+

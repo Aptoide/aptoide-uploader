@@ -16,6 +16,7 @@ import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
 import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
+import com.aptoide.uploader.apps.UploadProgressManager;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
 import com.aptoide.uploader.apps.network.RetrofitStoreService;
@@ -66,7 +67,7 @@ public class UploaderApplication extends NotificationApplicationView {
       OkHttpClient.Builder okhttpBuilder =
           new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
               .readTimeout(30, TimeUnit.SECONDS)
-              .connectTimeout(30, TimeUnit.SECONDS)
+              .connectTimeout(60, TimeUnit.SECONDS)
               .addInterceptor(tokenRevalidationInterceptor);
 
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
@@ -76,12 +77,15 @@ public class UploaderApplication extends NotificationApplicationView {
           .client(okhttpBuilder.build())
           .build();
 
+      UploadProgressManager uploadProgressManager = new UploadProgressManager();
+
       uploadManager = new UploadManager(
           new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
-              getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER),
+              getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER,
+              uploadProgressManager),
           getUploadPersistence(), getMd5Calculator(),
           new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
-          getAppUploadStatusManager(), getAppUploadStatusPersistence(), storeManager);
+          getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager);
     }
     return uploadManager;
   }

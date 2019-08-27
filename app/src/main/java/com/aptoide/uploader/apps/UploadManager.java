@@ -19,12 +19,13 @@ public class UploadManager {
   private final AccountProvider accountProvider;
   private final AppUploadStatusManager appUploadStatusManager;
   private final AppUploadStatusPersistence appUploadStatusPersistence;
-  private final StoreManager storeManager;
+  private UploadProgressManager uploadProgressManager;
 
   public UploadManager(UploaderService uploaderService, UploaderPersistence persistence,
       Md5Calculator md5Calculator, BackgroundService backgroundService,
       AccountProvider accountProvider, AppUploadStatusManager appUploadStatusManager,
-      AppUploadStatusPersistence appUploadStatusPersistence, StoreManager storeManager) {
+      AppUploadStatusPersistence appUploadStatusPersistence,
+      UploadProgressManager uploadProgressManager) {
     this.uploaderService = uploaderService;
     this.persistence = persistence;
     this.md5Calculator = md5Calculator;
@@ -32,7 +33,7 @@ public class UploadManager {
     this.accountProvider = accountProvider;
     this.appUploadStatusManager = appUploadStatusManager;
     this.appUploadStatusPersistence = appUploadStatusPersistence;
-    this.storeManager = storeManager;
+    this.uploadProgressManager = uploadProgressManager;
   }
 
   public Completable upload(String storeName, String language, InstalledApp app) {
@@ -56,6 +57,10 @@ public class UploadManager {
     handleCompletedStatus();
   }
 
+  public Observable<UploadProgress> getProgress(String packageName) {
+    return uploadProgressManager.getProgress(packageName);
+  }
+
   @SuppressLint("CheckResult") private void fillAppUploadStatusPersistence() {
     appUploadStatusManager.getNonSystemApps()
         .toObservable()
@@ -75,9 +80,12 @@ public class UploadManager {
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.META_DATA_ADDED))
         .cast(MetadataUpload.class)
-        .flatMap(upload -> uploaderService.upload(upload.getMd5(), upload.getStoreName(),
-            upload.getInstalledApp()
-                .getName(), upload.getInstalledApp(), upload.getMetadata()))
+        .flatMap(upload -> {
+          upload.setStatus(Upload.Status.PROGRESS);
+          return uploaderService.upload(upload.getMd5(), upload.getStoreName(),
+              upload.getInstalledApp()
+                  .getName(), upload.getInstalledApp(), upload.getMetadata());
+        })
         .flatMapCompletable(upload -> persistence.save(upload))
         .subscribe();
   }
@@ -104,7 +112,7 @@ public class UploadManager {
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.RETRY))
-        .flatMap(upload -> appUploadStatusManager.checkUploadStatus(upload.getMd5()))
+        .flatMap(upload -> appUploadStatusManager.checkUploadStatus(upload))
         .subscribe();
   }
 
@@ -143,12 +151,13 @@ public class UploadManager {
                 upload.setStatus(Upload.Status.NO_META_DATA);
                 return persistence.save(upload);
               } else {
+                upload.setStatus(Upload.Status.PROGRESS);
                 return uploadApkToServer(upload);
               }
             }))
         .subscribe(() -> {
         }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
+          throwable.printStackTrace();
         });
   }
 

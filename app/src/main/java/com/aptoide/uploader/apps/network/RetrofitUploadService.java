@@ -7,6 +7,7 @@ import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.apps.MetadataUpload;
 import com.aptoide.uploader.apps.Upload;
+import com.aptoide.uploader.apps.UploadProgressListener;
 import com.aptoide.uploader.upload.AccountProvider;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
@@ -34,12 +35,14 @@ public class RetrofitUploadService implements UploaderService {
   private final ServiceV3 serviceV3;
   private final AccountProvider accountProvider;
   private final UploadType uploadType;
+  private UploadProgressListener uploadProgressListener;
 
   public RetrofitUploadService(ServiceV3 serviceV3, AccountProvider accountProvider,
-      UploadType uploadType) {
+      UploadType uploadType, UploadProgressListener uploadProgressListener) {
     this.serviceV3 = serviceV3;
     this.accountProvider = accountProvider;
     this.uploadType = uploadType;
+    this.uploadProgressListener = uploadProgressListener;
   }
 
   @Override public Single<Upload> getUpload(String md5, String language, String storeName,
@@ -74,7 +77,8 @@ public class RetrofitUploadService implements UploaderService {
         .flatMapCompletable(aptoideAccount -> accountProvider.getToken()
             .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
                 getParams(accessToken, aptoideAccount.getStoreName()),
-                MultipartBody.Part.createFormData("apk", apkPath, createApkRequestBody(apkPath))))
+                MultipartBody.Part.createFormData("apk", apkPath,
+                    createApkRequestBody(apkPath, installedApp.getPackageName()))))
             .flatMap(response -> Observable.just(
                 buildUploadFinishStatus(response, installedApp, md5, storeName)))
             .ignoreElements());
@@ -89,7 +93,7 @@ public class RetrofitUploadService implements UploaderService {
             .flatMap(accessToken -> serviceV3.uploadAppToRepo(
                 getParams(accessToken, aptoideAccount.getStoreName(), metadata),
                 MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
-                    createApkRequestBody(installedApp.getApkPath())))
+                    createApkRequestBody(installedApp.getApkPath(), installedApp.getPackageName())))
                 .flatMap(response -> Observable.just(
                     buildUploadFinishStatus(response, installedApp, md5, storeName, metadata)))));
   }
@@ -140,7 +144,7 @@ public class RetrofitUploadService implements UploaderService {
     return parameters;
   }
 
-  @NonNull private RequestBody createApkRequestBody(String apkPath) {
+  @NonNull private RequestBody createApkRequestBody(String apkPath, String packageName) {
     return new RequestBody() {
       @Override public MediaType contentType() {
         String mimeType = MimeTypeMap.getSingleton()
@@ -169,11 +173,11 @@ public class RetrofitUploadService implements UploaderService {
             parts++;
             if (percentageTicks > 0 && parts % percentageTicks == 0) {
               progress = (int) (parts * (double) buffer.length / fileSize * 100.0);
-              //listener.onUpdateProgress(progress, pkg);
+              uploadProgressListener.updateProgress(progress, packageName);
             }
           }
           if (read == -1) {
-            //listener.onUpdateProgress(100, pkg);
+            uploadProgressListener.updateProgress(100, packageName);
           }
         } finally {
           in.close();
