@@ -81,6 +81,9 @@ public class NotificationPresenter implements Presenter {
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
         break;
+      default:
+        view.showErrorNotification(appName, packageName);
+        break;
     }
   }
 

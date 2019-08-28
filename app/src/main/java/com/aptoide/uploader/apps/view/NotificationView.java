@@ -23,5 +23,7 @@ public interface NotificationView extends View {
   void showInvalidSignatureNotification(String applicationName, String packageName);
 
   void updateUploadProgress(String name, String packageName, int progress);
+
+  void showErrorNotification(String name, String packageName);
 }
 

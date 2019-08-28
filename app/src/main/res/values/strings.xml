@@ -166,6 +166,7 @@
   <string name="application_notification_short_app_invalid_signature">The app signature is not valid. Please contact us if you have the distribution rights (APK-106)</string>
   <string name="application_notification_short_app_uplod_failed">Upload failed. Please try again.</string>
   <string name="application_notification_message_app_no_metadata_upload">We need more info! Please tap here.</string>
+  <string name="application_notification_message_error">Unknown error occurred, please try again later.</string>
 
   <string name="error_user_already_exists">This user already exists</string>
   <string name="error_store_already_exists">This store already exists</string>

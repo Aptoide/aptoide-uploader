@@ -17,12 +17,14 @@ import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.UploadProgressManager;
+import com.aptoide.uploader.apps.network.IdsRepository;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
 import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV3;
 import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV7;
+import com.aptoide.uploader.apps.network.UserAgentInterceptor;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryAppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
@@ -33,6 +35,7 @@ import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence;
 import com.aptoide.uploader.upload.AptoideAccountProvider;
+import com.flurry.android.FlurryAgent;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.util.HashMap;
@@ -57,18 +60,19 @@ public class UploaderApplication extends NotificationApplicationView {
 
   @Override public void onCreate() {
     super.onCreate();
+    startFlurryAgent();
     getUploadManager().start();
   }
 
   public UploadManager getUploadManager() {
     if (uploadManager == null) {
-      TokenRevalidationInterceptorV3 tokenRevalidationInterceptor =
-          new TokenRevalidationInterceptorV3(getAccessTokenProvider());
+
       OkHttpClient.Builder okhttpBuilder =
           new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
               .readTimeout(30, TimeUnit.SECONDS)
               .connectTimeout(60, TimeUnit.SECONDS)
-              .addInterceptor(tokenRevalidationInterceptor);
+              .addInterceptor(getTokenRevalidationInterceptorV3())
+              .addInterceptor(getUserAgentInterceptor());
 
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
@@ -82,27 +86,48 @@ public class UploaderApplication extends NotificationApplicationView {
       uploadManager = new UploadManager(
           new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
               getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER,
-              uploadProgressManager),
-          getUploadPersistence(), getMd5Calculator(),
+              uploadProgressManager), getUploadPersistence(), getMd5Calculator(),
           new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
           getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager);
     }
     return uploadManager;
   }
 
+  public IdsRepository getIdsRepository() {
+    return new IdsRepository(PreferenceManager.getDefaultSharedPreferences(this));
+  }
+
+  public TokenRevalidationInterceptorV3 getTokenRevalidationInterceptorV3() {
+    return new TokenRevalidationInterceptorV3(getAccessTokenProvider());
+  }
+
+  public TokenRevalidationInterceptorV7 getTokenRevalidationInterceptorV7() {
+    return new TokenRevalidationInterceptorV7(getAccessTokenProvider());
+  }
+
+  public UserAgentInterceptor getUserAgentInterceptor() {
+    return new UserAgentInterceptor(getIdsRepository());
+  }
+
   public AptoideAccountManager getAccountManager() {
     if (accountManager == null) {
 
+      OkHttpClient.Builder okhttpBuilder =
+          new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
+              .readTimeout(30, TimeUnit.SECONDS)
+              .connectTimeout(60, TimeUnit.SECONDS)
+              .addInterceptor(getUserAgentInterceptor());
+
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(new OkHttpClient())
+          .client(okhttpBuilder.build())
           .baseUrl("http://webservices.aptoide.com/")
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
 
       final Retrofit retrofitV7 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(new OkHttpClient())
+          .client(okhttpBuilder.build())
           .baseUrl("http://ws75.aptoide.com/")
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
@@ -120,9 +145,16 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public AuthenticationProvider getAuthenticationProvider() {
     if (authenticationProvider == null) {
+
+      OkHttpClient.Builder okhttpBuilder =
+          new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
+              .readTimeout(30, TimeUnit.SECONDS)
+              .connectTimeout(60, TimeUnit.SECONDS)
+              .addInterceptor(getUserAgentInterceptor());
+
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(new OkHttpClient())
+          .client(okhttpBuilder.build())
           .baseUrl("http://webservices.aptoide.com/")
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
@@ -140,10 +172,10 @@ public class UploaderApplication extends NotificationApplicationView {
   public CategoriesManager getCategoriesManager() {
     if (categoriesManager == null) {
 
-      TokenRevalidationInterceptorV7 tokenRevalidationInterceptor =
-          new TokenRevalidationInterceptorV7(getAccessTokenProvider());
       OkHttpClient.Builder okhttpBuilder =
-          new OkHttpClient.Builder().addInterceptor(tokenRevalidationInterceptor);
+          new OkHttpClient.Builder().addInterceptor(getTokenRevalidationInterceptorV7())
+              .addInterceptor(getUserAgentInterceptor())
+              .addInterceptor(getUserAgentInterceptor());
 
       final Retrofit retrofitV7 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
@@ -171,10 +203,10 @@ public class UploaderApplication extends NotificationApplicationView {
   public AppUploadStatusManager getAppUploadStatusManager() {
     if (appUploadStatusManager == null) {
 
-      TokenRevalidationInterceptorV7 tokenRevalidationInterceptor =
-          new TokenRevalidationInterceptorV7(getAccessTokenProvider());
       OkHttpClient.Builder okhttpBuilder =
-          new OkHttpClient.Builder().addInterceptor(tokenRevalidationInterceptor);
+          new OkHttpClient.Builder().addInterceptor(getTokenRevalidationInterceptorV7())
+              .addInterceptor(getUserAgentInterceptor())
+              .addInterceptor(getUserAgentInterceptor());
 
       final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
@@ -226,5 +258,10 @@ public class UploaderApplication extends NotificationApplicationView {
           new MemoryAppUploadStatusPersistence(new HashMap<>(), Schedulers.trampoline());
     }
     return appUploadStatusPersistence;
+  }
+
+  public void startFlurryAgent() {
+    new FlurryAgent.Builder().withLogEnabled(true)
+        .build(this, BuildConfig.FLURRY_KEY_UPLOADER);
   }
 }
