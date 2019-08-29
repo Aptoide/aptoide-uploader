@@ -29,7 +29,11 @@ public class RetrofitStoreService {
               if (getApksResponse.isSuccessful()) {
                 return mapToApksList(getApksResponse.body(), ApksResponse.Status.OK);
               } else {
-                return new ApksResponse(null, ApksResponse.Status.FAIL);
+                return new ApksResponse(new ApksResponse.Errors(getApksResponse.body()
+                    .getError()
+                    .getCode(), getApksResponse.body()
+                    .getError()
+                    .getDescription()), ApksResponse.Status.FAIL);
               }
             })
             .subscribeOn(Schedulers.io()));

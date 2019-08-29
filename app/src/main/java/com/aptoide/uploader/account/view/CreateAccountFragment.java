@@ -78,7 +78,8 @@ public class CreateAccountFragment extends FragmentView implements CreateAccount
 
     new CreateAccountPresenter(this, accountManager,
         new CreateAccountNavigator(getFragmentManager(), getContext()), new CompositeDisposable(),
-        accountErrorMapper, AndroidSchedulers.mainThread()).present();
+        accountErrorMapper, AndroidSchedulers.mainThread(),
+        ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics()).present();
   }
 
   @Override public void onDestroyView() {

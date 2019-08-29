@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps;
 
+import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.network.ApksResponse;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitStoreService;
@@ -16,15 +17,17 @@ public class AppUploadStatusManager {
   private final RetrofitStoreService retrofitStoreService;
   private final RetrofitAppsUploadStatusService retrofitAppsUploadStatusService;
   private final InstalledAppsProvider installedAppsProvider;
+  private final UploaderAnalytics uploaderAnalytics;
 
   public AppUploadStatusManager(StoreNameProvider storeNameProvider,
       RetrofitStoreService retrofitStoreService,
       RetrofitAppsUploadStatusService retrofitAppsUploadStatusService,
-      InstalledAppsProvider installedAppsProvider) {
+      InstalledAppsProvider installedAppsProvider, UploaderAnalytics uploaderAnalytics) {
     this.storeNameProvider = storeNameProvider;
     this.retrofitStoreService = retrofitStoreService;
     this.retrofitAppsUploadStatusService = retrofitAppsUploadStatusService;
     this.installedAppsProvider = installedAppsProvider;
+    this.uploaderAnalytics = uploaderAnalytics;
   }
 
   public Observable<List<AppUploadStatus>> getApks(List<String> md5List) {
@@ -43,8 +46,13 @@ public class AppUploadStatusManager {
         .flatMap(apksResponse -> {
           if (apksResponse != null && apksResponse.getList()
               .isEmpty()) {
+            uploaderAnalytics.uploadCompleteEvent("fail", "Check if in Store",
+                apksResponse.getErrors()
+                    .getCode(), apksResponse.getErrors()
+                    .getDescription());
             throw new IOException();
           }
+          uploaderAnalytics.uploadCompleteEvent("success", "Check if in Store", null, null);
           upload.setStatus(Upload.Status.COMPLETED);
           return Observable.just(apksResponse);
         })

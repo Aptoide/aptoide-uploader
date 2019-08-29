@@ -112,7 +112,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         new CompositeDisposable(), new MyStoreNavigator(getFragmentManager()),
         AndroidSchedulers.mainThread(),
         new UploadPermissionProvider((PermissionProvider) getContext()),
-        ((UploaderApplication) getContext().getApplicationContext()).getAppUploadStatusPersistence()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getAppUploadStatusPersistence(),
+        ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics()).present();
   }
 
   @Override public void onDestroyView() {

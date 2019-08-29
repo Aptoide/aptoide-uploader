@@ -3,6 +3,7 @@ package com.aptoide.uploader.apps.network;
 import android.support.annotation.NonNull;
 import android.webkit.MimeTypeMap;
 import com.aptoide.uploader.account.network.Status;
+import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.apps.MetadataUpload;
@@ -36,13 +37,16 @@ public class RetrofitUploadService implements UploaderService {
   private final AccountProvider accountProvider;
   private final UploadType uploadType;
   private UploadProgressListener uploadProgressListener;
+  private UploaderAnalytics uploaderAnalytics;
 
   public RetrofitUploadService(ServiceV3 serviceV3, AccountProvider accountProvider,
-      UploadType uploadType, UploadProgressListener uploadProgressListener) {
+      UploadType uploadType, UploadProgressListener uploadProgressListener,
+      UploaderAnalytics uploaderAnalytics) {
     this.serviceV3 = serviceV3;
     this.accountProvider = accountProvider;
     this.uploadType = uploadType;
     this.uploadProgressListener = uploadProgressListener;
+    this.uploaderAnalytics = uploaderAnalytics;
   }
 
   @Override public Single<Upload> getUpload(String md5, String language, String storeName,
@@ -196,6 +200,13 @@ public class RetrofitUploadService implements UploaderService {
     if (response.body()
         .getStatus()
         .equals(Status.FAIL)) {
+      uploaderAnalytics.uploadCompleteEvent("fail", "Upload App to Repo", response.body()
+          .getErrors()
+          .get(0)
+          .getCode(), response.body()
+          .getErrors()
+          .get(0)
+          .getMsg());
       switch (response.body()
           .getErrors()
           .get(0)
@@ -223,6 +234,7 @@ public class RetrofitUploadService implements UploaderService {
               storeName);
       }
     }
+    uploaderAnalytics.uploadCompleteEvent("success", "Upload App to Repo", null, null);
     return new Upload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,
         storeName);
   }
@@ -232,9 +244,17 @@ public class RetrofitUploadService implements UploaderService {
     if (response.body()
         .getStatus()
         .equals(Status.FAIL)) {
+      uploaderAnalytics.uploadCompleteEvent("fail", "Upload App to Repo", response.body()
+          .getErrors()
+          .get(0)
+          .getCode(), response.body()
+          .getErrors()
+          .get(0)
+          .getMsg());
       return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.RETRY, md5,
           storeName, metadata);
     }
+    uploaderAnalytics.uploadCompleteEvent("success", "Upload App to Repo", null, null);
     return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,
         storeName, metadata);
   }

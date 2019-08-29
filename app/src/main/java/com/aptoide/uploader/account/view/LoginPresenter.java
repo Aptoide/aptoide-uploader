@@ -1,6 +1,7 @@
 package com.aptoide.uploader.account.view;
 
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
@@ -14,15 +15,17 @@ public class LoginPresenter implements Presenter {
   private final LoginNavigator loginNavigator;
   private final CompositeDisposable compositeDisposable;
   private final Scheduler viewScheduler;
+  private final UploaderAnalytics uploaderAnalytics;
 
   public LoginPresenter(LoginView view, AptoideAccountManager accountManager,
       LoginNavigator loginNavigator, CompositeDisposable compositeDisposable,
-      Scheduler viewScheduler) {
+      Scheduler viewScheduler, UploaderAnalytics uploaderAnalytics) {
     this.view = view;
     this.accountManager = accountManager;
     this.loginNavigator = loginNavigator;
     this.compositeDisposable = compositeDisposable;
     this.viewScheduler = viewScheduler;
+    this.uploaderAnalytics = uploaderAnalytics;
   }
 
   @Override public void present() {
@@ -54,9 +57,11 @@ public class LoginPresenter implements Presenter {
               view.showLoading(credentials.getUsername());
             })
             .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
-                credentials.getPassword()))
+                credentials.getPassword())
+                .doOnComplete(() -> uploaderAnalytics.loginEvent("email", "success")))
             .observeOn(viewScheduler)
             .doOnError(throwable -> {
+              uploaderAnalytics.loginEvent("email", "fail");
               view.hideLoading();
               if (isInternetError(throwable)) {
                 view.showNetworkError();

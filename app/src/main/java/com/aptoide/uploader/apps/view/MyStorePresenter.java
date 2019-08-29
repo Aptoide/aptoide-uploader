@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.StoreManager;
@@ -25,11 +26,12 @@ public class MyStorePresenter implements Presenter {
   private final Scheduler viewScheduler;
   private final UploadPermissionProvider uploadPermissionProvider;
   private final AppUploadStatusPersistence persistence;
+  private final UploaderAnalytics uploaderAnalytics;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, MyStoreNavigator storeNavigator,
       Scheduler viewScheduler, UploadPermissionProvider uploadPermissionProvider,
-      AppUploadStatusPersistence persistence) {
+      AppUploadStatusPersistence persistence, UploaderAnalytics uploaderAnalytics) {
     this.view = view;
     this.storeManager = storeManager;
     this.compositeDisposable = compositeDisposable;
@@ -37,6 +39,7 @@ public class MyStorePresenter implements Presenter {
     this.viewScheduler = viewScheduler;
     this.uploadPermissionProvider = uploadPermissionProvider;
     this.persistence = persistence;
+    this.uploaderAnalytics = uploaderAnalytics;
   }
 
   @Override public void present() {
@@ -124,7 +127,8 @@ public class MyStorePresenter implements Presenter {
         .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
         .filter(granted -> granted)
         .flatMapSingle(__ -> view.getSelectedApps())
-        .flatMapCompletable(apps -> storeManager.upload(apps))
+        .flatMapCompletable(apps -> storeManager.upload(apps)
+            .doOnComplete(() -> uploaderAnalytics.submitAppsEvent(apps.size())))
         .doOnError(throwable -> {
           if (throwable instanceof SocketTimeoutException) {
             view.showError();

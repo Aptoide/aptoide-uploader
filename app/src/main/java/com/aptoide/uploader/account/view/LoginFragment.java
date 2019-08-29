@@ -53,7 +53,8 @@ public class LoginFragment extends FragmentView implements LoginView {
     fragmentContainer = view.findViewById(R.id.fragment_login_content);
 
     new LoginPresenter(this, accountManager, new LoginNavigator(getContext(), getFragmentManager()),
-        new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
+        new CompositeDisposable(), AndroidSchedulers.mainThread(),
+        ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics()).present();
   }
 
   @Override public void onDestroyView() {

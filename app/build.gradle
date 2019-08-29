@@ -21,7 +21,8 @@ android {
     versionCode 1
     versionName "1.0"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
-    buildConfigField  "String", "FLURRY_KEY_UPLOADER", "\"" + project.FLURRY_KEY_UPLOADER + "\""
+    buildConfigField "String", "FLURRY_KEY_UPLOADER", "\"" + project.FLURRY_KEY_UPLOADER + "\""
+    resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
     vectorDrawables.useSupportLibrary = true
   }
   buildTypes {
@@ -80,4 +81,7 @@ dependencies {
 
   //Flurry
   implementation 'com.flurry.android:analytics:11.7.1@aar'
+
+  //Facebook
+  implementation 'com.facebook.android:facebook-android-sdk:[4,5)'
 }

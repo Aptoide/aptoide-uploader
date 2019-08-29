@@ -6,6 +6,7 @@ import com.aptoide.uploader.account.CredentialsValidator;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
+import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
 import com.aptoide.uploader.apps.AppUploadStatusManager;
@@ -35,6 +36,7 @@ import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence;
 import com.aptoide.uploader.upload.AptoideAccountProvider;
+import com.facebook.appevents.AppEventsLogger;
 import com.flurry.android.FlurryAgent;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
@@ -57,6 +59,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private UploaderPersistence uploadPersistence;
   private AppUploadStatusPersistence appUploadStatusPersistence;
   private AppUploadStatusManager appUploadStatusManager;
+  private UploaderAnalytics uploaderAnalytics;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -86,7 +89,8 @@ public class UploaderApplication extends NotificationApplicationView {
       uploadManager = new UploadManager(
           new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
               getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER,
-              uploadProgressManager), getUploadPersistence(), getMd5Calculator(),
+              uploadProgressManager, getUploaderAnalytics()), getUploadPersistence(),
+          getMd5Calculator(),
           new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
           getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager);
     }
@@ -222,7 +226,7 @@ public class UploaderApplication extends NotificationApplicationView {
                   getAccessTokenProvider()), new RetrofitAppsUploadStatusService(
               retrofitV7Secondary.create(RetrofitAppsUploadStatusService.ServiceV7.class),
               getAccessTokenProvider()),
-              new PackageManagerInstalledAppsProvider(getPackageManager()));
+              new PackageManagerInstalledAppsProvider(getPackageManager()), getUploaderAnalytics());
     }
     return appUploadStatusManager;
   }
@@ -258,6 +262,13 @@ public class UploaderApplication extends NotificationApplicationView {
           new MemoryAppUploadStatusPersistence(new HashMap<>(), Schedulers.trampoline());
     }
     return appUploadStatusPersistence;
+  }
+
+  public UploaderAnalytics getUploaderAnalytics() {
+    if (uploaderAnalytics == null) {
+      uploaderAnalytics = new UploaderAnalytics(AppEventsLogger.newLogger(this));
+    }
+    return uploaderAnalytics;
   }
 
   public void startFlurryAgent() {
