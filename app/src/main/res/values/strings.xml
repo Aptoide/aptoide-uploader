@@ -173,7 +173,7 @@
   <string name="logout_confirmation_message">You are about to sign out from Uploader, are you sure? </string>
   <string name="app_selected">App Selected</string>
   <string name="apps_selected">Apps Selected</string>
-  <string name="duplicate_store">Store name already taken, please choose another name.</string>
-  <string name="unknown_error">Unknown error, please try again later.</string>
-
+  <string name="duplicate_store_error">The store name you\'re using already exists. Be creative, dude!</string>
+  (edited)
+  <string name="connection_error_body">Oops, it seems you\'ve got connection issues. Try again later!</string>
 </resources>

@@ -145,7 +145,7 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
   }
 
   @Override public void showNetworkError() {
-    Toast.makeText(getContext(), getString(R.string.unknown_error), Toast.LENGTH_LONG)
+    Toast.makeText(getContext(), getString(R.string.connection_error_body), Toast.LENGTH_LONG)
         .show();
   }
 
@@ -154,7 +154,7 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
   }
 
   @Override public void showErrorStoreAlreadyExists() {
-    Toast.makeText(getContext(), getText(R.string.duplicate_store),
+    Toast.makeText(getContext(), getText(R.string.duplicate_store_error),
         Toast.LENGTH_LONG)
         .show();
   }
