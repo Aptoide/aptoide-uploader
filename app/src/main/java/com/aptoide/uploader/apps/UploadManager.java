@@ -8,7 +8,9 @@ import com.aptoide.uploader.upload.AccountProvider;
 import com.aptoide.uploader.upload.BackgroundService;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
+import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 
 public class UploadManager {
@@ -69,6 +71,8 @@ public class UploadManager {
             md5Calculator.calculate(installedApp)
                 .blockingGet(), installedApp.getPackageName(), false,
             String.valueOf(installedApp.getVersionCode()))))
+        .subscribeOn(Schedulers.io())
+        .observeOn(AndroidSchedulers.mainThread())
         .subscribe();
   }
 
