@@ -7,6 +7,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
@@ -30,6 +31,19 @@ public class MemoryAppUploadStatusPersistence implements AppUploadStatusPersiste
   @Override public Completable save(AppUploadStatus appUploadStatus) {
     return Completable.fromAction(() -> {
       appUploadStatusMap.put(appUploadStatus.getMd5(), appUploadStatus);
+      appUploadStatusListSubject.onNext(new ArrayList<>(appUploadStatusMap.values()));
+    })
+        .subscribeOn(scheduler)
+        .doOnError(throwable -> Log.e("ERROR Save", throwable.getMessage()));
+  }
+
+  @Override public Completable saveAll(List<AppUploadStatus> appUploadStatusList) {
+    return Completable.fromAction(() -> {
+      HashMap<String, AppUploadStatus> map = new HashMap<>();
+      for (AppUploadStatus appUploadStatus : appUploadStatusList) {
+        map.put(appUploadStatus.getMd5(), appUploadStatus);
+      }
+      appUploadStatusMap.putAll(map);
       appUploadStatusListSubject.onNext(new ArrayList<>(appUploadStatusMap.values()));
     })
         .subscribeOn(scheduler)

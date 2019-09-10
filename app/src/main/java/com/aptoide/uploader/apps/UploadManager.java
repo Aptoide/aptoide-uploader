@@ -55,8 +55,8 @@ public class UploadManager {
     handleMetadataAdded();
     handleMd5NotExistent();
     handleRetryStatus();
-    checkAppUploadStatus();
     handleCompletedStatus();
+    checkAppUploadStatus();
   }
 
   public Observable<UploadProgress> getProgress(String packageName) {
@@ -67,10 +67,11 @@ public class UploadManager {
     appUploadStatusManager.getNonSystemApps()
         .toObservable()
         .flatMapIterable(apps -> apps)
-        .flatMapCompletable(installedApp -> appUploadStatusPersistence.save(new AppUploadStatus(
-            md5Calculator.calculate(installedApp)
-                .blockingGet(), installedApp.getPackageName(), false,
-            String.valueOf(installedApp.getVersionCode()))))
+        .map(installedApp -> new AppUploadStatus(md5Calculator.calculate(installedApp)
+            .blockingGet(), installedApp.getPackageName(), false,
+            String.valueOf(installedApp.getVersionCode())))
+        .toList()
+        .flatMapCompletable(installedApps -> appUploadStatusPersistence.saveAll(installedApps))
         .subscribeOn(Schedulers.io())
         .observeOn(AndroidSchedulers.mainThread())
         .subscribe();
