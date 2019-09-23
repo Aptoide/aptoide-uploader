@@ -94,6 +94,7 @@ public abstract class NotificationApplicationView extends Application implements
             .setOngoing(true)
             .setContentText(applicationName)
             .setProgress(100, progress, false);
+
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 

@@ -3,7 +3,6 @@ package com.aptoide.uploader.apps.network;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.apps.Upload;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
@@ -17,7 +16,8 @@ public interface UploaderService {
 
   Single<Boolean> hasApplicationMetaData(String packageName, int versionCode);
 
-  Completable upload(InstalledApp installedApp, String md5, String storeName, String apkPath);
+  Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
+      String apkPath);
 
   Observable<Upload> upload(String md5, String storeName, String appName, InstalledApp installedApp,
       Metadata metadata);

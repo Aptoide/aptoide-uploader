@@ -161,9 +161,7 @@ public class UploadManager {
               }
             }))
         .subscribe(() -> {
-        }, throwable -> {
-          throwable.printStackTrace();
-        });
+        }, throwable -> throwable.printStackTrace());
   }
 
   @SuppressLint("CheckResult") private void checkAppUploadStatus() {
@@ -190,7 +188,8 @@ public class UploadManager {
   private Completable uploadApkToServer(Upload upload) {
     return uploaderService.upload(upload.getInstalledApp(), upload.getMd5(), upload.getStoreName(),
         upload.getInstalledApp()
-            .getApkPath());
+            .getApkPath())
+        .flatMapCompletable(uploadResult -> persistence.save(uploadResult));
   }
 
   @SuppressLint("CheckResult") private void dispatchUploads() {

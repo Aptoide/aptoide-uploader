@@ -10,7 +10,6 @@ import com.aptoide.uploader.apps.MetadataUpload;
 import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.apps.UploadProgressListener;
 import com.aptoide.uploader.upload.AccountProvider;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.io.File;
@@ -74,18 +73,19 @@ public class RetrofitUploadService implements UploaderService {
         .single(false);
   }
 
-  @Override public Completable upload(InstalledApp installedApp, String md5, String storeName,
+  @Override
+  public Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
       String apkPath) {
     return accountProvider.getAccount()
         .firstOrError()
-        .flatMapCompletable(aptoideAccount -> accountProvider.getToken()
-            .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
+        .flatMapObservable(aptoideAccount -> accountProvider.getToken()
+            .toObservable()
+            .flatMap(accessToken -> serviceV3.uploadAppToRepo(
                 getParams(accessToken, aptoideAccount.getStoreName()),
                 MultipartBody.Part.createFormData("apk", apkPath,
-                    createApkRequestBody(apkPath, installedApp.getPackageName()))))
-            .flatMap(response -> Observable.just(
-                buildUploadFinishStatus(response, installedApp, md5, storeName)))
-            .ignoreElements());
+                    createApkRequestBody(apkPath, installedApp.getPackageName())))
+                .flatMap(response -> Observable.just(
+                    buildUploadFinishStatus(response, installedApp, md5, storeName)))));
   }
 
   @Override public Observable<Upload> upload(String md5, String storeName, String appName,

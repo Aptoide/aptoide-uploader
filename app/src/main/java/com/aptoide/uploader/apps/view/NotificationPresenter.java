@@ -94,7 +94,9 @@ public class NotificationPresenter implements Presenter {
             .getName(), upload.getInstalledApp()
             .getPackageName(), uploadProgress.getProgress()))
         .map(__ -> upload)
-        .doOnError(throwable -> throwable.printStackTrace());
+        .doOnError(__ -> view.showErrorNotification(upload.getInstalledApp()
+            .getName(), upload.getInstalledApp()
+            .getPackageName()));
   }
 }
 
