@@ -18,6 +18,8 @@ import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.UploadProgressManager;
+import com.aptoide.uploader.apps.network.AptoideConnectivityProvider;
+import com.aptoide.uploader.apps.network.ConnectivityInterceptor;
 import com.aptoide.uploader.apps.network.IdsRepository;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
@@ -74,6 +76,7 @@ public class UploaderApplication extends NotificationApplicationView {
           new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
               .readTimeout(30, TimeUnit.SECONDS)
               .connectTimeout(60, TimeUnit.SECONDS)
+              .addInterceptor(getConnectivityInterceptor())
               .addInterceptor(getTokenRevalidationInterceptorV3())
               .addInterceptor(getUserAgentInterceptor());
 
@@ -90,9 +93,9 @@ public class UploaderApplication extends NotificationApplicationView {
           new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
               getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER,
               uploadProgressManager, getUploaderAnalytics()), getUploadPersistence(),
-          getMd5Calculator(),
-          new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
-          getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager);
+          getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
+          getAccessTokenProvider(), getAppUploadStatusManager(), getAppUploadStatusPersistence(),
+          uploadProgressManager);
     }
     return uploadManager;
   }
@@ -113,6 +116,10 @@ public class UploaderApplication extends NotificationApplicationView {
     return new UserAgentInterceptor(getIdsRepository());
   }
 
+  public ConnectivityInterceptor getConnectivityInterceptor() {
+    return new ConnectivityInterceptor(getApplicationContext());
+  }
+
   public AptoideAccountManager getAccountManager() {
     if (accountManager == null) {
 
@@ -120,6 +127,7 @@ public class UploaderApplication extends NotificationApplicationView {
           new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
               .readTimeout(30, TimeUnit.SECONDS)
               .connectTimeout(60, TimeUnit.SECONDS)
+              .addInterceptor(getConnectivityInterceptor())
               .addInterceptor(getUserAgentInterceptor());
 
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
@@ -154,6 +162,7 @@ public class UploaderApplication extends NotificationApplicationView {
           new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
               .readTimeout(30, TimeUnit.SECONDS)
               .connectTimeout(60, TimeUnit.SECONDS)
+              .addInterceptor(getConnectivityInterceptor())
               .addInterceptor(getUserAgentInterceptor());
 
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
@@ -178,7 +187,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
       OkHttpClient.Builder okhttpBuilder =
           new OkHttpClient.Builder().addInterceptor(getTokenRevalidationInterceptorV7())
-              .addInterceptor(getUserAgentInterceptor())
+              .addInterceptor(getConnectivityInterceptor())
               .addInterceptor(getUserAgentInterceptor());
 
       final Retrofit retrofitV7 = new Retrofit.Builder().addCallAdapterFactory(
@@ -209,7 +218,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
       OkHttpClient.Builder okhttpBuilder =
           new OkHttpClient.Builder().addInterceptor(getTokenRevalidationInterceptorV7())
-              .addInterceptor(getUserAgentInterceptor())
+              .addInterceptor(getConnectivityInterceptor())
               .addInterceptor(getUserAgentInterceptor());
 
       final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
@@ -233,6 +242,10 @@ public class UploaderApplication extends NotificationApplicationView {
 
   private AptoideAccountProvider getAccessTokenProvider() {
     return new AptoideAccountProvider(getAccountManager(), getAuthenticationProvider());
+  }
+
+  public AptoideConnectivityProvider getConnectivityProvider() {
+    return new AptoideConnectivityProvider(getApplicationContext());
   }
 
   public LanguageManager getLanguageManager() {

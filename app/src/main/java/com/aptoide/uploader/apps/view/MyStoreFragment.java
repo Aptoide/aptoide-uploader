@@ -113,7 +113,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         AndroidSchedulers.mainThread(),
         new UploadPermissionProvider((PermissionProvider) getContext()),
         ((UploaderApplication) getContext().getApplicationContext()).getAppUploadStatusPersistence(),
-        ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
+        ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider()).present();
   }
 
   @Override public void onDestroyView() {
@@ -202,6 +203,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void showError() {
     Toast.makeText(getContext(), R.string.error_occurred, Toast.LENGTH_SHORT)
+        .show();
+  }
+
+  @Override public void showNoConnectivityError() {
+    Toast.makeText(getContext(), R.string.no_connectivity_error, Toast.LENGTH_LONG)
         .show();
   }
 

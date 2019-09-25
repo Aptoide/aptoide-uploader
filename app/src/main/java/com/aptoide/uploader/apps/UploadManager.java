@@ -1,6 +1,8 @@
 package com.aptoide.uploader.apps;
 
 import android.annotation.SuppressLint;
+import android.util.Log;
+import com.aptoide.uploader.apps.network.NoConnectivityException;
 import com.aptoide.uploader.apps.network.UploaderService;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
@@ -9,7 +11,6 @@ import com.aptoide.uploader.upload.BackgroundService;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.exceptions.OnErrorNotImplementedException;
 import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 
@@ -136,7 +137,9 @@ public class UploadManager {
             backgroundService.disable();
           }
         }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
+          if (throwable instanceof NoConnectivityException) {
+            Log.e(getClass().getSimpleName(), "NO INTERNET AVAILABLE!");
+          }
         });
   }
 
@@ -182,7 +185,12 @@ public class UploadManager {
           }
           return Observable.empty();
         })
-        .subscribe();
+        .subscribe(__ -> {
+        }, throwable -> {
+          if (throwable instanceof NoConnectivityException) {
+            Log.e(getClass().getSimpleName(), "NO INTERNET AVAILABLE!");
+          }
+        });
   }
 
   private Completable uploadApkToServer(Upload upload) {
@@ -212,7 +220,9 @@ public class UploadManager {
         })
         .subscribe(__ -> {
         }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
+          if (throwable instanceof NoConnectivityException) {
+            Log.e(getClass().getSimpleName(), "NO INTERNET AVAILABLE!");
+          }
         });
   }
 

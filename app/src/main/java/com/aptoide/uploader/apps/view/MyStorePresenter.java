@@ -1,9 +1,12 @@
 package com.aptoide.uploader.apps.view;
 
+import android.util.Log;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.StoreManager;
+import com.aptoide.uploader.apps.network.ConnectivityProvider;
+import com.aptoide.uploader.apps.network.NoConnectivityException;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.view.Presenter;
@@ -27,11 +30,14 @@ public class MyStorePresenter implements Presenter {
   private final UploadPermissionProvider uploadPermissionProvider;
   private final AppUploadStatusPersistence persistence;
   private final UploaderAnalytics uploaderAnalytics;
+  private final ConnectivityProvider connectivityProvider;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, MyStoreNavigator storeNavigator,
       Scheduler viewScheduler, UploadPermissionProvider uploadPermissionProvider,
-      AppUploadStatusPersistence persistence, UploaderAnalytics uploaderAnalytics) {
+      AppUploadStatusPersistence persistence, UploaderAnalytics uploaderAnalytics,
+      ConnectivityProvider connectivityProvider) {
+    this.connectivityProvider = connectivityProvider;
     this.view = view;
     this.storeManager = storeManager;
     this.compositeDisposable = compositeDisposable;
@@ -115,6 +121,16 @@ public class MyStorePresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.submitAppEvent())
+        //.filter(__ -> connectivityProvider.hasConnectivity())
+        .flatMap(__ -> {
+          if (connectivityProvider.hasConnectivity()) {
+            return Observable.just(true);
+          } else {
+            view.showNoConnectivityError();
+            return Observable.just(false);
+          }
+        })
+        .filter(hasConnection -> hasConnection)
         .doOnNext(apps -> uploadPermissionProvider.requestExternalStoragePermission())
         .doOnNext(__ -> view.clearSelection())
         .subscribe(__ -> {
@@ -137,7 +153,9 @@ public class MyStorePresenter implements Presenter {
         .retry()
         .subscribe(() -> {
         }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
+          if (throwable instanceof NoConnectivityException) {
+            Log.e(getClass().getSimpleName(), "NO INTERNET AVAILABLE!");
+          }
         }));
   }
 

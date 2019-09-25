@@ -2,6 +2,7 @@ package com.aptoide.uploader.account.view;
 
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
+import com.aptoide.uploader.apps.network.NoConnectivityException;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
@@ -63,7 +64,9 @@ public class LoginPresenter implements Presenter {
             .doOnError(throwable -> {
               uploaderAnalytics.loginEvent("email", "fail");
               view.hideLoading();
-              if (isInternetError(throwable)) {
+              if (isConnectivityError(throwable)) {
+                view.showNoConnectivityError();
+              } else if (isInternetError(throwable)) {
                 view.showNetworkError();
               } else {
                 view.showCrendentialsError();
@@ -97,5 +100,12 @@ public class LoginPresenter implements Presenter {
       return false;
     }
     return true;
+  }
+
+  private boolean isConnectivityError(Throwable throwable) {
+    if (throwable instanceof NoConnectivityException) {
+      return true;
+    }
+    return false;
   }
 }

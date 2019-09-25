@@ -105,6 +105,11 @@ public class LoginFragment extends FragmentView implements LoginView {
         .show();
   }
 
+  @Override public void showNoConnectivityError() {
+    Toast.makeText(getContext(), R.string.no_connectivity_error, Toast.LENGTH_LONG)
+        .show();
+  }
+
   @NonNull private CredentialsViewModel getViewModel() {
     return new CredentialsViewModel(usernameEditText.getText()
         .toString(), passwordEditText.getText()

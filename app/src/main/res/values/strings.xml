@@ -154,6 +154,7 @@
   <string name="logging_as">Logging in as</string>
   <string name="submit_app">Submit App</string>
   <string name="title_activity_login">Login</string>
+  <string name="no_connectivity_error">Sorry, no internet connection available</string>
 
   <!-- Notifications -->
   <string name="application_notification_short_app_success_upload">App successfully uploaded</string>
