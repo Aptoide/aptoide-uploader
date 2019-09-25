@@ -4,6 +4,11 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
 
 android {
+  lintOptions {
+    checkReleaseBuilds false
+    abortOnError false
+  }
+
   compileSdkVersion 27
 
   signingConfigs {
@@ -12,7 +17,6 @@ android {
       storePassword = project.STORE_PASSWORD_BACKUP_UPLOADER
       keyAlias = project.KEY_ALIAS_UPLOADER
       keyPassword = project.KEY_PASSWORD_UPLOADER
-      //            v2SigningEnabled = false
     }
   }
 
@@ -20,7 +24,7 @@ android {
     applicationId "pt.caixamagica.aptoide.uploader"
     minSdkVersion 16
     targetSdkVersion 27
-    Integer value = project.VERSION_CODE_UPLOADER.toInteger();
+    Integer value = project.VERSION_CODE_UPLOADER.toInteger()
     versionCode value
     versionName "2.100"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
@@ -42,9 +46,7 @@ android {
           project.ext { appName = 'aptoide-uploader' }
           def newName = output.outputFile.name
           newName = newName.replace("app-", "$project.ext.appName-")
-          //"MyAppName" -> I set my app variables in the root project
           newName = newName.replace("-release", "-" + versionName)
-          //noinspection GroovyAssignabilityCheck
           output.outputFileName = newName
         }
       }
