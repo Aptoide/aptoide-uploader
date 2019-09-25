@@ -12,31 +12,66 @@ android {
       storePassword = project.STORE_PASSWORD_BACKUP_UPLOADER
       keyAlias = project.KEY_ALIAS_UPLOADER
       keyPassword = project.KEY_PASSWORD_UPLOADER
+      //            v2SigningEnabled = false
     }
   }
+
   defaultConfig {
     applicationId "pt.caixamagica.aptoide.uploader"
     minSdkVersion 16
     targetSdkVersion 27
-    versionCode 1
+    Integer value = project.VERSION_CODE_UPLOADER.toInteger();
+    versionCode value
     versionName "2.100"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     buildConfigField "String", "FLURRY_KEY_UPLOADER", "\"" + project.FLURRY_KEY_UPLOADER + "\""
     resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
     vectorDrawables.useSupportLibrary = true
   }
+
   buildTypes {
     release {
-      minifyEnabled false
-      debuggable true
+      multiDexEnabled false
+      minifyEnabled true
+      shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
+
+      applicationVariants.all { variant ->
+        variant.outputs.each { output ->
+          project.ext { appName = 'aptoide-uploader' }
+          def newName = output.outputFile.name
+          newName = newName.replace("app-", "$project.ext.appName-")
+          //"MyAppName" -> I set my app variables in the root project
+          newName = newName.replace("-release", "-" + versionName)
+          //noinspection GroovyAssignabilityCheck
+          output.outputFileName = newName
+        }
+      }
     }
     debug {
-      minifyEnabled false
+      signingConfig signingConfigs.release
       applicationIdSuffix ".debug"
+      multiDexEnabled true
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+
+  applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+      def project = "uploader"
+      def SEP = "_"
+      def buildType = variant.variantData.variantConfiguration.buildType.name
+      def versionName = variant.versionName
+      def versionCode = variant.versionCode
+
+      def newApkName = project + SEP + buildType + SEP + versionName + SEP + versionCode + ".apk"
+
+      output.outputFileName = newApkName
+    }
+  }
+
   sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
     test.java.srcDirs += 'src/test/kotlin'
