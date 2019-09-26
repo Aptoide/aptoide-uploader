@@ -109,6 +109,7 @@
           android:id="@+id/appName"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:textCursorDrawable="@null"
           android:layout_marginLeft="@dimen/sideMargin"
           android:layout_marginRight="@dimen/sideMargin"
           />
@@ -209,6 +210,7 @@
             android:background="@null"
             android:gravity="start"
             android:minHeight="200dp"
+            android:textCursorDrawable="@null"
             android:textColor="#ff818181"
             />
       </ScrollView>
@@ -242,6 +244,7 @@
           android:id="@+id/phone_number"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:textCursorDrawable="@null"
           android:layout_marginLeft="10dp"
           android:layout_marginRight="10dp"
           />
@@ -273,6 +276,7 @@
           android:id="@+id/email"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:textCursorDrawable="@null"
           android:layout_marginLeft="10dp"
           android:layout_marginRight="10dp"
           />
@@ -304,6 +308,7 @@
           android:id="@+id/website"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
+          android:textCursorDrawable="@null"
           android:layout_marginLeft="10dp"
           android:layout_marginRight="10dp"
           />

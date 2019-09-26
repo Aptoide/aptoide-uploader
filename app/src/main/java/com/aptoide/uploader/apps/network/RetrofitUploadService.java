@@ -85,7 +85,10 @@ public class RetrofitUploadService implements UploaderService {
                 MultipartBody.Part.createFormData("apk", apkPath,
                     createApkRequestBody(apkPath, installedApp.getPackageName())))
                 .flatMap(response -> Observable.just(
-                    buildUploadFinishStatus(response, installedApp, md5, storeName)))));
+                    buildUploadFinishStatus(response, installedApp, md5, storeName)))
+                .onErrorReturn(
+                    throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
+                        storeName))));
   }
 
   @Override public Observable<Upload> upload(String md5, String storeName, String appName,
@@ -99,7 +102,10 @@ public class RetrofitUploadService implements UploaderService {
                 MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
                     createApkRequestBody(installedApp.getApkPath(), installedApp.getPackageName())))
                 .flatMap(response -> Observable.just(
-                    buildUploadFinishStatus(response, installedApp, md5, storeName, metadata)))));
+                    buildUploadFinishStatus(response, installedApp, md5, storeName, metadata)))
+                .onErrorReturn(
+                    throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
+                        storeName))));
   }
 
   private Map<String, RequestBody> getParams(String accessToken, String storeName) {
