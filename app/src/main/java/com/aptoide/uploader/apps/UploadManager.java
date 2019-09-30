@@ -123,6 +123,7 @@ public class UploadManager {
         .filter(upload -> upload.getStatus()
             .equals(Upload.Status.RETRY))
         .flatMap(upload -> appUploadStatusManager.checkUploadStatus(upload))
+        .flatMapCompletable(uploadFromCheckStatus -> persistence.save(uploadFromCheckStatus))
         .subscribe();
   }
 

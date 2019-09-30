@@ -36,6 +36,9 @@ public class RetrofitStoreService {
                     .getDescription()), ApksResponse.Status.FAIL);
               }
             })
+            .onErrorReturn(
+                throwable -> new ApksResponse(new ApksResponse.Errors("error", "server error"),
+                    ApksResponse.Status.FAIL))
             .subscribeOn(Schedulers.io()));
   }
 

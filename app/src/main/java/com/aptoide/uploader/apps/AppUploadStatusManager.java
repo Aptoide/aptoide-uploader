@@ -1,7 +1,7 @@
 package com.aptoide.uploader.apps;
 
 import com.aptoide.uploader.analytics.UploaderAnalytics;
-import com.aptoide.uploader.apps.network.ApksResponse;
+import com.aptoide.uploader.apps.network.GetApksRetryException;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetryWithDelay;
@@ -36,7 +36,7 @@ public class AppUploadStatusManager {
             storeName -> retrofitAppsUploadStatusService.getApks(md5List, storeName));
   }
 
-  public Observable<ApksResponse> checkUploadStatus(Upload upload) {
+  public Observable<Upload> checkUploadStatus(Upload upload) {
     return storeNameProvider.getStoreName()
         .flatMapObservable(storeName -> {
           List<String> md5List = new ArrayList<>();
@@ -44,8 +44,7 @@ public class AppUploadStatusManager {
           return retrofitStoreService.getApks(md5List, storeName);
         })
         .flatMap(apksResponse -> {
-          if (apksResponse != null && apksResponse.getList()
-              .isEmpty()) {
+          if (apksResponse != null && apksResponse.getErrors() != null) {
             uploaderAnalytics.uploadCompleteEvent("fail", "Check if in Store",
                 apksResponse.getErrors()
                     .getCode(), apksResponse.getErrors()
@@ -54,9 +53,16 @@ public class AppUploadStatusManager {
           }
           uploaderAnalytics.uploadCompleteEvent("success", "Check if in Store", null, null);
           upload.setStatus(Upload.Status.COMPLETED);
-          return Observable.just(apksResponse);
+          return Observable.just(upload);
         })
-        .retryWhen(new RetryWithDelay(3, 2000));
+        .retryWhen(new RetryWithDelay(3, 2000))
+        .onErrorReturn(throwable -> {
+          if (throwable instanceof GetApksRetryException) {
+            upload.setStatus(Upload.Status.FAILED);
+            return upload;
+          }
+          return null;
+        });
   }
 
   public Single<List<InstalledApp>> getNonSystemApps() {

@@ -20,7 +20,7 @@ public class RetryWithDelay implements Function<Observable<? extends Throwable>,
       if (++retryCount < maxRetries) {
         return Observable.timer(retryDelayMillis, TimeUnit.MILLISECONDS);
       }
-      return Observable.error(throwable);
+      return Observable.error(new GetApksRetryException());
     });
   }
 }
