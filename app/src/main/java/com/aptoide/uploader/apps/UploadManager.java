@@ -49,6 +49,10 @@ public class UploadManager {
     return persistence.getUploads();
   }
 
+  public Completable removeUploadFromPersistence(Upload upload) {
+    return persistence.remove(upload);
+  }
+
   public void start() {
     fillAppUploadStatusPersistence();
     handleBackgroundService();

@@ -4,6 +4,7 @@ import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 
 public class NotificationPresenter implements Presenter {
@@ -32,11 +33,11 @@ public class NotificationPresenter implements Presenter {
             return Observable.just(upload);
           }
         })
-        .doOnNext(upload -> showNotification(upload))
+        .flatMapCompletable(upload -> showNotification(upload))
         .subscribe();
   }
 
-  private void showNotification(Upload upload) {
+  private Completable showNotification(Upload upload) {
     String appName = upload.getInstalledApp()
         .getName();
     String packageName = upload.getInstalledApp()
@@ -58,33 +59,34 @@ public class NotificationPresenter implements Presenter {
         break;
       case COMPLETED:
         view.showCompletedUploadNotification(appName, packageName);
-        break;
+        return uploadManager.removeUploadFromPersistence(upload);
       case DUPLICATE:
         view.showDuplicateUploadNotification(appName, packageName);
-        break;
+        return uploadManager.removeUploadFromPersistence(upload);
       case FAILED:
         view.showFailedUploadNotification(appName, packageName);
-        break;
+        return uploadManager.removeUploadFromPersistence(upload);
       case INFECTED:
         view.showUploadInfectionNotificaton(appName, packageName);
-        break;
+        return uploadManager.removeUploadFromPersistence(upload);
       case PUBLISHER_ONLY:
         view.showPublisherOnlyNotification(appName, packageName);
-        break;
+        return uploadManager.removeUploadFromPersistence(upload);
       case INVALID_SIGNATURE:
         view.showInvalidSignatureNotification(appName, packageName);
-        break;
+        return uploadManager.removeUploadFromPersistence(upload);
       case META_DATA_ADDED:
         break;
       case RETRY:
         break;
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
-        break;
+        return uploadManager.removeUploadFromPersistence(upload);
       default:
         view.showErrorNotification(appName, packageName);
-        break;
+        return uploadManager.removeUploadFromPersistence(upload);
     }
+    return Completable.complete();
   }
 
   private Observable<Upload> updateProgress(Upload upload) {

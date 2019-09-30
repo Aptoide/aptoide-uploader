@@ -92,6 +92,7 @@ public class LoginFragment extends FragmentView implements LoginView {
 
   @Override public void hideLoading() {
     progressContainer.setVisibility(View.GONE);
+    loadingTextView.setVisibility(View.GONE);
     fragmentContainer.setVisibility(View.VISIBLE);
   }
 
