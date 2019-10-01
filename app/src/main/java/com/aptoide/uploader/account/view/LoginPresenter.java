@@ -62,10 +62,11 @@ public class LoginPresenter implements Presenter {
                 .doOnComplete(() -> uploaderAnalytics.loginEvent("email", "success")))
             .observeOn(viewScheduler)
             .doOnError(throwable -> {
-              throwable.printStackTrace();
               uploaderAnalytics.loginEvent("email", "fail");
               view.hideLoading();
-              if (isInternetError(throwable)) {
+              if (isConnectivityError(throwable)) {
+                view.showNoConnectivityError();
+              } else if (isInternetError(throwable)) {
                 view.showNetworkError();
               } else {
                 view.showCrendentialsError();
