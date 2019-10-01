@@ -40,17 +40,8 @@ android {
       shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
-
-      applicationVariants.all { variant ->
-        variant.outputs.each { output ->
-          project.ext { appName = 'aptoide-uploader' }
-          def newName = output.outputFile.name
-          newName = newName.replace("app-", "$project.ext.appName-")
-          newName = newName.replace("-release", "-" + versionName)
-          output.outputFileName = newName
-        }
-      }
     }
+
     debug {
       signingConfig signingConfigs.release
       applicationIdSuffix ".debug"
