@@ -35,4 +35,12 @@ public class MainActivity extends PermissionProviderActivity {
       mainActivityNavigator.navigateToSubmitAppView(md5, appName);
     }
   }
+
+  @Override protected void onPause() {
+    super.onPause();
+  }
+
+  @Override protected void onResume() {
+    super.onResume();
+  }
 }

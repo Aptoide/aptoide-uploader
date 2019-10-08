@@ -21,7 +21,17 @@ public class AptoideAccountManager {
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
-  public Observable<AptoideAccount> getAccount() {
+  public Completable loginWithGoogle(String email, String token) {
+    return accountService.getAccountOAuth(email, token, "google")
+        .flatMapCompletable(account -> accountPersistence.save(account));
+  }
+
+  public Completable loginWithFacebook(String email, String token) {
+    return accountService.getAccountOAuth(email, token, "facebook_uploader")
+        .flatMapCompletable(account -> accountPersistence.save(account));
+  }
+
+  public Observable<Account> getAccount() {
     return accountPersistence.getAccount();
   }
 
@@ -34,7 +44,7 @@ public class AptoideAccountManager {
   public Completable createStore(String storeName) {
     return accountService.createStore(storeName)
         .flatMap(createStoreStatus -> getAccount().firstOrError())
-        .map(aptoideAccount -> new AptoideAccount(true, true, storeName))
+        .map(aptoideAccount -> new Account(true, true, storeName))
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 

@@ -9,11 +9,13 @@ import io.reactivex.Single;
 
 public interface AccountService {
 
-  Single<AptoideAccount> getAccount(String username, String password);
+  Single<Account> getAccount(String username, String password);
 
-  Single<AptoideAccount> createAccount(String email, String password, String storeName);
+  Single<Account> getAccountOAuth(String email, String token, String authMode);
 
-  Single<AptoideAccount> createAccount(String email, String password, String storeName,
+  Single<Account> createAccount(String email, String password, String storeName);
+
+  Single<Account> createAccount(String email, String password, String storeName,
       String storeUser, String storePass);
 
   Single<CreateStoreStatus> createStore(String storeName);

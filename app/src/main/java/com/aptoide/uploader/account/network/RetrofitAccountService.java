@@ -1,7 +1,7 @@
 package com.aptoide.uploader.account.network;
 
+import com.aptoide.uploader.account.Account;
 import com.aptoide.uploader.account.AccountService;
-import com.aptoide.uploader.account.AptoideAccount;
 import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
 import com.aptoide.uploader.account.network.error.DuplicatedUserException;
 import com.aptoide.uploader.security.AuthenticationProvider;
@@ -44,7 +44,7 @@ public class RetrofitAccountService implements AccountService {
     this.authenticationProvider = authenticationProvider;
   }
 
-  @Override public Single<AptoideAccount> getAccount(String username, String password) {
+  @Override public Single<Account> getAccount(String username, String password) {
     return authenticationProvider.getAccessToken(username, password)
         .flatMap(accessToken -> serviceV7.getUserInfo(
             new AccountRequestBody(Collections.singletonList("meta"), accessToken))
@@ -58,8 +58,21 @@ public class RetrofitAccountService implements AccountService {
         });
   }
 
-  @Override
-  public Single<AptoideAccount> createAccount(String email, String password, String storeName) {
+  @Override public Single<Account> getAccountOAuth(String email, String token, String authMode) {
+    return authenticationProvider.getAccessTokenOAuth(email, token, authMode)
+        .flatMap(accessToken -> serviceV7.getUserInfo(
+            new AccountRequestBody(Collections.singletonList("meta"), accessToken))
+            .singleOrError())
+        .flatMap(response -> {
+          if (response.isSuccessful() && response.body()
+              .isOk()) {
+            return Single.just(mapper.map(response.body()));
+          }
+          return Single.error(new IllegalStateException(response.message()));
+        });
+  }
+
+  @Override public Single<Account> createAccount(String email, String password, String storeName) {
     return createAccount(email, password, storeName, null, null);
   }
 
@@ -92,7 +105,7 @@ public class RetrofitAccountService implements AccountService {
     return Single.error(new IOException());
   }
 
-  @Override public Single<AptoideAccount> createAccount(String userEmail, String userPassword,
+  @Override public Single<Account> createAccount(String userEmail, String userPassword,
       String storeName, String storeUser, String storePassword) {
 
     String passwordHash;

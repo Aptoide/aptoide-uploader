@@ -92,6 +92,31 @@
           android:text="@string/new_to_aptoide_create_a_free_account"
           android:textColor="@android:color/white"
           />
+
+      <com.google.android.gms.common.SignInButton
+          android:id="@+id/google_sign_in_button"
+          android:layout_marginTop="30dp"
+          android:layout_gravity="center_horizontal"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginRight="30dp"
+          android:layout_marginLeft="30dp"
+          android:layout_marginStart="30dp"
+          android:layout_marginEnd="30dp"
+          />
+
+      <com.facebook.login.widget.LoginButton
+          android:id="@+id/facebook_login_button"
+          android:layout_width="match_parent"
+          android:layout_height="117dp"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginEnd="33dp"
+          android:layout_marginLeft="33dp"
+          android:layout_marginRight="33dp"
+          android:layout_marginStart="33dp"
+          android:layout_marginTop="20dp"
+          />
+
     </LinearLayout>
 
   </ScrollView>

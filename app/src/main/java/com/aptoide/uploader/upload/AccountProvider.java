@@ -1,11 +1,11 @@
 package com.aptoide.uploader.upload;
 
-import com.aptoide.uploader.account.AptoideAccount;
+import com.aptoide.uploader.account.Account;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface AccountProvider {
-  Observable<AptoideAccount> getAccount();
+  Observable<Account> getAccount();
 
   Single<String> getToken();
 

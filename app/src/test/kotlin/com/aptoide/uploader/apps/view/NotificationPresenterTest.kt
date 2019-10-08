@@ -1,25 +1,8 @@
 package com.aptoide.uploader.apps.view
 
-import com.aptoide.uploader.account.AptoideAccount
-import com.aptoide.uploader.account.network.Status
-import com.aptoide.uploader.apps.*
-import com.aptoide.uploader.apps.network.RetrofitUploadService
-import com.aptoide.uploader.apps.network.UploadAppToRepoResponse
-import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence
-import com.aptoide.uploader.upload.AccountProvider
-import com.aptoide.uploader.upload.BackgroundService
-import com.aptoide.uploader.view.View
-import com.nhaarman.mockito_kotlin.*
-import io.reactivex.Single
-import io.reactivex.rxkotlin.toSingle
-import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.PublishSubject
 import org.jetbrains.spek.api.Spek
-import org.jetbrains.spek.api.dsl.describe
-import org.jetbrains.spek.api.dsl.it
 import org.junit.platform.runner.JUnitPlatform
 import org.junit.runner.RunWith
-import retrofit2.Response
 
 @RunWith(JUnitPlatform::class)
 class NotificationPresenterTest : Spek({
@@ -78,7 +61,7 @@ class NotificationPresenterTest : Spek({
 //        whenever(serviceV3.uploadAppToRepo(any()))
 //            .doReturn(getUploadDuplicatedResponse.toSingle().toObservable())
 //        whenever(uploadAccountProvider.token).doReturn(accessToken.toSingle())
-//        whenever(uploadAccountProvider.account).doReturn(AptoideAccount(true, true, storeName).toSingle().toObservable())
+//        whenever(uploadAccountProvider.account).doReturn(Account(true, true, storeName).toSingle().toObservable())
 //        uploadManager.start()
 //        presenter.present()
 //        lifecycleEvent.onNext(View.LifecycleEvent.CREATE)

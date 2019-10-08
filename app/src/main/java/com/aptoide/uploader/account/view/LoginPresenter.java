@@ -93,6 +93,30 @@ public class LoginPresenter implements Presenter {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(created -> view.getGoogleLoginEvent()
+            .doOnNext(__ -> view.startGoogleActivity()))
+        .subscribe());
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMapCompletable(created -> view.googleLoginSuccessEvent()
+            .flatMapCompletable(
+                googleAccount -> accountManager.loginWithGoogle(googleAccount.getEmail(),
+                    googleAccount.getServerAuthCode())))
+        .observeOn(viewScheduler)
+        .subscribe());
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMapCompletable(created -> view.facebookLoginSucessEvent()
+            .flatMapCompletable(facebookAccount -> accountManager.loginWithFacebook(null,
+                facebookAccount.getAccessToken()
+                    .getToken())))
+        .observeOn(viewScheduler)
+        .subscribe());
   }
 
   private boolean isInternetError(Throwable throwable) {

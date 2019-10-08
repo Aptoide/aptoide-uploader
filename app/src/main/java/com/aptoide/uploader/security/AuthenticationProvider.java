@@ -6,6 +6,8 @@ public interface AuthenticationProvider {
 
   Single<String> getAccessToken(String username, String password);
 
+  Single<String> getAccessTokenOAuth(String email, String token, String authMode);
+
   Single<String> getAccessToken();
 
   Single<String> getNewAccessToken();

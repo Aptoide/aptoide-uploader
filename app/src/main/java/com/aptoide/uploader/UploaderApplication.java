@@ -38,6 +38,7 @@ import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence;
 import com.aptoide.uploader.upload.AptoideAccountProvider;
+import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.flurry.android.FlurryAgent;
 import io.reactivex.schedulers.Schedulers;
@@ -62,16 +63,17 @@ public class UploaderApplication extends NotificationApplicationView {
   private AppUploadStatusPersistence appUploadStatusPersistence;
   private AppUploadStatusManager appUploadStatusManager;
   private UploaderAnalytics uploaderAnalytics;
+  private CallbackManager callbackManager;
 
   @Override public void onCreate() {
     super.onCreate();
     startFlurryAgent();
+    callbackManager = CallbackManager.Factory.create();
     getUploadManager().start();
   }
 
   public UploadManager getUploadManager() {
     if (uploadManager == null) {
-
       OkHttpClient.Builder okhttpBuilder =
           new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
               .readTimeout(30, TimeUnit.SECONDS)
@@ -287,5 +289,9 @@ public class UploaderApplication extends NotificationApplicationView {
   public void startFlurryAgent() {
     new FlurryAgent.Builder().withLogEnabled(true)
         .build(this, BuildConfig.FLURRY_KEY_UPLOADER);
+  }
+
+  public CallbackManager getCallbackManager() {
+    return callbackManager;
   }
 }

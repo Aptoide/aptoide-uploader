@@ -48,6 +48,33 @@ public class AptoideAccessTokenProvider implements AuthenticationProvider {
     return Single.just(accessToken);
   }
 
+  @Override public Single<String> getAccessTokenOAuth(String email, String token, String authMode) {
+    String accessToken = authenticationPersistance.getAccessToken();
+    if (accessToken == null) {
+      final Map<String, String> args = new HashMap<>();
+      args.put("authMode", authMode);
+      args.put("oauthToken", token);
+      if (email != null) {
+        args.put("oauthUserName", email);
+      }
+      args.put("mode", RESPONSE_MODE);
+      args.put("client_id", ACCOUNT_CLIENT_ID);
+      args.put("grant_type", ACCOUNT_GRANT_TYPE);
+      return serviceV3.oauth2Authentication(args)
+          .singleOrError()
+          .flatMap(response -> {
+            OAuth body = response.body();
+            if (response.isSuccessful() && body != null && !body.hasErrors()) {
+              authenticationPersistance.saveAuthentication(body.getAccessToken(),
+                  body.getRefreshToken());
+              return Single.just(body.getAccessToken());
+            }
+            return Single.error(new IllegalStateException(response.message()));
+          });
+    }
+    return Single.just(accessToken);
+  }
+
   @Override public Single<String> getNewAccessToken() {
     String refreshToken = authenticationPersistance.getRefreshToken();
     final Map<String, String> args = new HashMap<>();

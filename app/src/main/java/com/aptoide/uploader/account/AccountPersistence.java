@@ -5,9 +5,9 @@ import io.reactivex.Observable;
 
 public interface AccountPersistence {
 
-  Observable<AptoideAccount> getAccount();
+  Observable<Account> getAccount();
 
-  Completable save(AptoideAccount account);
+  Completable save(Account account);
 
   Completable remove();
 }
