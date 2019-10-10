@@ -152,6 +152,7 @@
   <string name="error_marg_102" translatable="false">MARG-102</string>
   <string name="error_marg_103" translatable="false">MARG-103</string>
   <string name="logging_as">Logging in as</string>
+  <string name="logging_in">Logging in</string>
   <string name="submit_app">Submit App</string>
   <string name="title_activity_login">Login</string>
   <string name="no_connectivity_error">Sorry, no internet connection available</string>

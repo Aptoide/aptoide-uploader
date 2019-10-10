@@ -1,26 +1,12 @@
 package com.aptoide.uploader.account;
 
-public class Account {
+public interface Account {
 
-  private final boolean hasStore;
-  private final boolean loggedIn;
-  private final String storeName;
+  boolean hasStore();
 
-  public Account(boolean hasStore, boolean loggedIn, String storeName) {
-    this.hasStore = hasStore;
-    this.loggedIn = loggedIn;
-    this.storeName = storeName;
-  }
+  boolean isLoggedIn();
 
-  public boolean hasStore() {
-    return hasStore;
-  }
+  String getStoreName();
 
-  public boolean isLoggedIn() {
-    return loggedIn;
-  }
-
-  public String getStoreName() {
-    return storeName;
-  }
+  BaseAccount.LoginType getLoginType();
 }

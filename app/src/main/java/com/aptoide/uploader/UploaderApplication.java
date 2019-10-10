@@ -1,8 +1,10 @@
 package com.aptoide.uploader;
 
+import android.content.Context;
 import android.preference.PreferenceManager;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.CredentialsValidator;
+import com.aptoide.uploader.account.SocialLogoutManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
@@ -41,6 +43,7 @@ import com.aptoide.uploader.upload.AptoideAccountProvider;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.flurry.android.FlurryAgent;
+import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.util.HashMap;
@@ -152,7 +155,7 @@ public class UploaderApplication extends NotificationApplicationView {
               new AccountResponseMapper(), getAuthenticationProvider()),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),
               PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()),
-          new CredentialsValidator());
+          new CredentialsValidator(), getSocialLogoutManager());
     }
     return accountManager;
   }
@@ -293,5 +296,20 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public CallbackManager getCallbackManager() {
     return callbackManager;
+  }
+
+  public GoogleSignInOptions getGSO() {
+    return new GoogleSignInOptions.Builder(
+        GoogleSignInOptions.DEFAULT_SIGN_IN).requestServerAuthCode(getString(R.string.google_id))
+        .requestEmail()
+        .build();
+  }
+
+  public SocialLogoutManager getSocialLogoutManager() {
+    return new SocialLogoutManager(getAppContext(), getGSO());
+  }
+
+  public Context getAppContext() {
+    return getApplicationContext();
   }
 }

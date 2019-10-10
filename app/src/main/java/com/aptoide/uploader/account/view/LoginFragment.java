@@ -62,11 +62,7 @@ public class LoginFragment extends FragmentView implements LoginView {
 
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
-    gso =
-        new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestServerAuthCode(
-            getString(R.string.google_id))
-            .requestEmail()
-            .build();
+    gso = ((UploaderApplication) getContext().getApplicationContext()).getGSO();
     accountManager =
         ((UploaderApplication) getContext().getApplicationContext()).getAccountManager();
     callbackManager =
@@ -131,6 +127,12 @@ public class LoginFragment extends FragmentView implements LoginView {
 
   @Override public void showLoading(String username) {
     loadingTextView.setText(getString(R.string.logging_as).concat(" " + username));
+    fragmentContainer.setVisibility(View.GONE);
+    progressContainer.setVisibility(View.VISIBLE);
+  }
+
+  @Override public void showLoadingWithoutUserName() {
+    loadingTextView.setText(getString(R.string.logging_in));
     fragmentContainer.setVisibility(View.GONE);
     progressContainer.setVisibility(View.VISIBLE);
   }

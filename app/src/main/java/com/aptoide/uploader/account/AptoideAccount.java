@@ -1,14 +1,12 @@
 package com.aptoide.uploader.account;
 
-public class AptoideAccount extends Account {
-
-  private String storeType = "Aptoide";
+public class AptoideAccount extends BaseAccount {
 
   public AptoideAccount(boolean hasStore, boolean loggedIn, String storeName) {
     super(hasStore, loggedIn, storeName);
   }
 
-  public String getStoreType() {
-    return storeType;
+  @Override public LoginType getLoginType() {
+    return LoginType.APTOIDE;
   }
 }

@@ -8,12 +8,14 @@ public class AptoideAccountManager {
   private final AccountService accountService;
   private final AccountPersistence accountPersistence;
   private final CredentialsValidator credentialsValidator;
+  private final SocialLogoutManager socialLogoutManager;
 
   public AptoideAccountManager(AccountService accountService, AccountPersistence accountPersistence,
-      CredentialsValidator credentialsValidator) {
+      CredentialsValidator credentialsValidator, SocialLogoutManager socialLogoutManager) {
     this.accountService = accountService;
     this.accountPersistence = accountPersistence;
     this.credentialsValidator = credentialsValidator;
+    this.socialLogoutManager = socialLogoutManager;
   }
 
   public Completable login(String username, String password) {
@@ -44,11 +46,20 @@ public class AptoideAccountManager {
   public Completable createStore(String storeName) {
     return accountService.createStore(storeName)
         .flatMap(createStoreStatus -> getAccount().firstOrError())
-        .map(aptoideAccount -> new Account(true, true, storeName))
+        .map(newAccount -> AccountFactory.of(true, true, storeName, newAccount.getLoginType()))
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
   public Completable logout() {
-    return accountPersistence.remove();
+    return accountPersistence.getAccount()
+        .doOnNext(account -> {
+          if (account.getLoginType()
+              .equals(BaseAccount.LoginType.GOOGLE) || account.getLoginType()
+              .equals(BaseAccount.LoginType.FACEBOOK)) {
+            socialLogoutManager.handleSocialLogout(account.getLoginType());
+          }
+        })
+        .firstOrError()
+        .flatMapCompletable(account -> accountPersistence.remove());
   }
 }

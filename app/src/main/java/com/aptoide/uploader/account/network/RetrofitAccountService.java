@@ -2,6 +2,7 @@ package com.aptoide.uploader.account.network;
 
 import com.aptoide.uploader.account.Account;
 import com.aptoide.uploader.account.AccountService;
+import com.aptoide.uploader.account.BaseAccount;
 import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
 import com.aptoide.uploader.account.network.error.DuplicatedUserException;
 import com.aptoide.uploader.security.AuthenticationProvider;
@@ -52,7 +53,7 @@ public class RetrofitAccountService implements AccountService {
         .flatMap(response -> {
           if (response.isSuccessful() && response.body()
               .isOk()) {
-            return Single.just(mapper.map(response.body()));
+            return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
           }
           return Single.error(new IllegalStateException(response.message()));
         });
@@ -66,7 +67,13 @@ public class RetrofitAccountService implements AccountService {
         .flatMap(response -> {
           if (response.isSuccessful() && response.body()
               .isOk()) {
-            return Single.just(mapper.map(response.body()));
+            BaseAccount.LoginType loginType;
+            if (authMode.equals("facebook_uploader")) {
+              loginType = BaseAccount.LoginType.FACEBOOK;
+            } else {
+              loginType = BaseAccount.LoginType.GOOGLE;
+            }
+            return Single.just(mapper.map(response.body(), loginType));
           }
           return Single.error(new IllegalStateException(response.message()));
         });
@@ -105,8 +112,9 @@ public class RetrofitAccountService implements AccountService {
     return Single.error(new IOException());
   }
 
-  @Override public Single<Account> createAccount(String userEmail, String userPassword,
-      String storeName, String storeUser, String storePassword) {
+  @Override
+  public Single<Account> createAccount(String userEmail, String userPassword, String storeName,
+      String storeUser, String storePassword) {
 
     String passwordHash;
     try {
@@ -174,7 +182,7 @@ public class RetrofitAccountService implements AccountService {
         .flatMap(response -> {
           if (response.isSuccessful() && response.body()
               .isOk()) {
-            return Single.just(mapper.map(response.body()));
+            return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
           }
           return Single.error(new IllegalStateException(response.message()));
         });

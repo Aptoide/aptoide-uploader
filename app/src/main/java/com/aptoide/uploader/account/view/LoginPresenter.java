@@ -37,11 +37,12 @@ public class LoginPresenter implements Presenter {
         .observeOn(viewScheduler)
         .doOnNext(account -> {
           if (account.isLoggedIn()) {
-            view.hideLoading();
             if (account.hasStore()) {
               loginNavigator.navigateToMyAppsView();
+              view.hideLoading();
             } else {
               loginNavigator.navigateToCreateStoreView();
+              view.hideLoading();
             }
           }
         })
@@ -74,9 +75,7 @@ public class LoginPresenter implements Presenter {
             })
             .retry())
         .subscribe(() -> {
-        }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
-        }));
+        }, throwable -> view.showNetworkError()));
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
@@ -103,20 +102,24 @@ public class LoginPresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMapCompletable(created -> view.googleLoginSuccessEvent()
+            .doOnNext(account -> view.showLoading(account.getDisplayName()))
             .flatMapCompletable(
                 googleAccount -> accountManager.loginWithGoogle(googleAccount.getEmail(),
                     googleAccount.getServerAuthCode())))
         .observeOn(viewScheduler)
-        .subscribe());
+        .subscribe(() -> {
+        }, throwable -> view.showNetworkError()));
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMapCompletable(created -> view.facebookLoginSucessEvent()
+            .doOnNext(account -> view.showLoadingWithoutUserName())
             .flatMapCompletable(facebookAccount -> accountManager.loginWithFacebook(null,
                 facebookAccount.getAccessToken()
                     .getToken())))
         .observeOn(viewScheduler)
-        .subscribe());
+        .subscribe(() -> {
+        }, throwable -> view.showNetworkError()));
   }
 
   private boolean isInternetError(Throwable throwable) {

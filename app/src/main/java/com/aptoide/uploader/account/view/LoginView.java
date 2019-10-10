@@ -19,6 +19,8 @@ public interface LoginView extends View {
 
   void showLoading(String username);
 
+  void showLoadingWithoutUserName();
+
   void hideLoading();
 
   void showCrendentialsError();

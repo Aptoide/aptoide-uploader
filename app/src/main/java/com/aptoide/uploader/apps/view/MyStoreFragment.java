@@ -107,6 +107,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       adapter.clearAppsSelection();
     });
     storeBanner.setOnLongClickListener(click -> showVersionDialog());
+
     new MyStorePresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
         new CompositeDisposable(), new MyStoreNavigator(getFragmentManager()),
