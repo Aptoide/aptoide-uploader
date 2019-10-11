@@ -3,8 +3,9 @@ package com.aptoide.uploader.account;
 public abstract class BaseAccount implements Account {
 
   private final boolean hasStore;
-  private final boolean loggedIn;
+  private boolean loggedIn;
   private final String storeName;
+  private boolean forcedLogout;
 
   public BaseAccount(boolean hasStore, boolean loggedIn, String storeName) {
     this.hasStore = hasStore;

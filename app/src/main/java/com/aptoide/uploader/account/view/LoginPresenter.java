@@ -1,6 +1,10 @@
 package com.aptoide.uploader.account.view;
 
+import android.content.Context;
+import android.util.Log;
+import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.network.NoConnectivityException;
 import com.aptoide.uploader.view.Presenter;
@@ -17,16 +21,21 @@ public class LoginPresenter implements Presenter {
   private final CompositeDisposable compositeDisposable;
   private final Scheduler viewScheduler;
   private final UploaderAnalytics uploaderAnalytics;
+  private final AutoLoginManager autoLoginManager;
+  private final Context context;
 
   public LoginPresenter(LoginView view, AptoideAccountManager accountManager,
       LoginNavigator loginNavigator, CompositeDisposable compositeDisposable,
-      Scheduler viewScheduler, UploaderAnalytics uploaderAnalytics) {
+      Scheduler viewScheduler, UploaderAnalytics uploaderAnalytics,
+      AutoLoginManager autoLoginManager, Context context) {
     this.view = view;
     this.accountManager = accountManager;
     this.loginNavigator = loginNavigator;
     this.compositeDisposable = compositeDisposable;
     this.viewScheduler = viewScheduler;
     this.uploaderAnalytics = uploaderAnalytics;
+    this.autoLoginManager = autoLoginManager;
+    this.context = context;
   }
 
   @Override public void present() {
@@ -49,6 +58,19 @@ public class LoginPresenter implements Presenter {
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .filter(__ -> !((UploaderApplication) context.getApplicationContext()).isForcedLogout())
+        .flatMapSingle(__ -> autoLoginManager.getStoredUserCredentials()
+            .flatMap(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
+        .firstOrError()
+        .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account))
+        .observeOn(viewScheduler)
+        .subscribe(() -> {
+        }, throwable -> {
+          Log.e(getClass().getSimpleName(), throwable.getMessage());
         }));
 
     compositeDisposable.add(view.getLifecycleEvent()

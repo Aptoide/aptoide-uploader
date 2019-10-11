@@ -1,7 +1,10 @@
 package com.aptoide.uploader.account;
 
+import android.content.Context;
+import com.aptoide.uploader.UploaderApplication;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class AptoideAccountManager {
 
@@ -9,13 +12,16 @@ public class AptoideAccountManager {
   private final AccountPersistence accountPersistence;
   private final CredentialsValidator credentialsValidator;
   private final SocialLogoutManager socialLogoutManager;
+  private final Context context;
 
   public AptoideAccountManager(AccountService accountService, AccountPersistence accountPersistence,
-      CredentialsValidator credentialsValidator, SocialLogoutManager socialLogoutManager) {
+      CredentialsValidator credentialsValidator, SocialLogoutManager socialLogoutManager,
+      Context context) {
     this.accountService = accountService;
     this.accountPersistence = accountPersistence;
     this.credentialsValidator = credentialsValidator;
     this.socialLogoutManager = socialLogoutManager;
+    this.context = context;
   }
 
   public Completable login(String username, String password) {
@@ -50,6 +56,14 @@ public class AptoideAccountManager {
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
+  public Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials) {
+    return accountService.saveAutoLoginCredentials(credentials);
+  }
+
+  public Completable loginWithAutoLogin(Account account) {
+    return accountPersistence.save(account);
+  }
+
   public Completable logout() {
     return accountPersistence.getAccount()
         .doOnNext(account -> {
@@ -58,6 +72,7 @@ public class AptoideAccountManager {
               .equals(BaseAccount.LoginType.FACEBOOK)) {
             socialLogoutManager.handleSocialLogout(account.getLoginType());
           }
+          ((UploaderApplication) context.getApplicationContext()).setForcedLogout(true);
         })
         .firstOrError()
         .flatMapCompletable(account -> accountPersistence.remove());

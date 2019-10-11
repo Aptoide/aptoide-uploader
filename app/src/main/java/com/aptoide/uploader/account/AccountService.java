@@ -20,4 +20,6 @@ public interface AccountService {
 
   Single<CreateStoreStatus> createStore(String storeName);
 
+  Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials);
+
 }

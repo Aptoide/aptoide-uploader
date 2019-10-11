@@ -2,6 +2,7 @@ package com.aptoide.uploader.account.network;
 
 import com.aptoide.uploader.account.Account;
 import com.aptoide.uploader.account.AccountService;
+import com.aptoide.uploader.account.AutoLoginCredentials;
 import com.aptoide.uploader.account.BaseAccount;
 import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
 import com.aptoide.uploader.account.network.error.DuplicatedUserException;
@@ -179,6 +180,21 @@ public class RetrofitAccountService implements AccountService {
 
           return Single.error(new IllegalStateException(response.message()));
         })
+        .flatMap(response -> {
+          if (response.isSuccessful() && response.body()
+              .isOk()) {
+            return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
+          }
+          return Single.error(new IllegalStateException(response.message()));
+        });
+  }
+
+  @Override public Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials) {
+    authenticationProvider.saveAuthentication(credentials.getAccessToken(),
+        credentials.getRefreshToken());
+    return serviceV7.getUserInfo(
+        new AccountRequestBody(Collections.singletonList("meta"), credentials.getAccessToken()))
+        .singleOrError()
         .flatMap(response -> {
           if (response.isSuccessful() && response.body()
               .isOk()) {

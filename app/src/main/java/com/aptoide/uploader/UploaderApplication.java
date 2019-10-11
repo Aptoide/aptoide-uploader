@@ -3,6 +3,7 @@ package com.aptoide.uploader;
 import android.content.Context;
 import android.preference.PreferenceManager;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.account.CredentialsValidator;
 import com.aptoide.uploader.account.SocialLogoutManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
@@ -67,6 +68,8 @@ public class UploaderApplication extends NotificationApplicationView {
   private AppUploadStatusManager appUploadStatusManager;
   private UploaderAnalytics uploaderAnalytics;
   private CallbackManager callbackManager;
+  private static boolean forcedLogout = false;
+
 
   @Override public void onCreate() {
     super.onCreate();
@@ -155,7 +158,7 @@ public class UploaderApplication extends NotificationApplicationView {
               new AccountResponseMapper(), getAuthenticationProvider()),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),
               PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()),
-          new CredentialsValidator(), getSocialLogoutManager());
+          new CredentialsValidator(), getSocialLogoutManager(), getAppContext());
     }
     return accountManager;
   }
@@ -309,7 +312,19 @@ public class UploaderApplication extends NotificationApplicationView {
     return new SocialLogoutManager(getAppContext(), getGSO());
   }
 
+  public AutoLoginManager getAutoLoginManager() {
+    return new AutoLoginManager(getAppContext());
+  }
+
   public Context getAppContext() {
     return getApplicationContext();
+  }
+
+  public void setForcedLogout(boolean isForcedLogout) {
+    forcedLogout = isForcedLogout;
+  }
+
+  public boolean isForcedLogout() {
+    return forcedLogout;
   }
 }
