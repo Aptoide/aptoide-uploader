@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 
 public class PackageManagerInstalledAppsProvider implements InstalledAppsProvider {
@@ -29,6 +30,7 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
               applicationInfo.packageName, applicationInfo.sourceDir, packageInfo.firstInstallTime,
               packageInfo.versionCode, false);
         })
-        .toList();
+        .toList()
+        .observeOn(Schedulers.io());
   }
 }

@@ -204,6 +204,10 @@ public class RetrofitAccountService implements AccountService {
         });
   }
 
+  @Override public void removeAccessTokenFromPersistence() {
+    authenticationProvider.removeAuthentication();
+  }
+
   public interface ServiceV3 {
     @POST("webservices/3/createUser") @FormUrlEncoded Observable<Response<OAuth>> createAccount(
         @FieldMap Map<String, String> args);

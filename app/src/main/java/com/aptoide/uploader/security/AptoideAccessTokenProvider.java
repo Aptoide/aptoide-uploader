@@ -114,6 +114,10 @@ public class AptoideAccessTokenProvider implements AuthenticationProvider {
     authenticationPersistance.saveAuthentication(accessToken, refreshToken);
   }
 
+  @Override public void removeAuthentication() {
+    authenticationPersistance.removeAuthentication();
+  }
+
   public interface ServiceV3 {
     @POST("webservices/3/oauth2Authentication") @FormUrlEncoded
     Observable<Response<OAuth>> oauth2Authentication(@FieldMap Map<String, String> args);

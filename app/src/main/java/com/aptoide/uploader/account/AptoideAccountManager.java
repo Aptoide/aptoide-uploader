@@ -77,4 +77,8 @@ public class AptoideAccountManager {
         .firstOrError()
         .flatMapCompletable(account -> accountPersistence.remove());
   }
+
+  public void removeAccessTokenFromPersistence() {
+    accountService.removeAccessTokenFromPersistence();
+  }
 }

@@ -70,7 +70,6 @@ public class UploaderApplication extends NotificationApplicationView {
   private CallbackManager callbackManager;
   private static boolean forcedLogout = false;
 
-
   @Override public void onCreate() {
     super.onCreate();
     startFlurryAgent();
@@ -196,7 +195,8 @@ public class UploaderApplication extends NotificationApplicationView {
       OkHttpClient.Builder okhttpBuilder =
           new OkHttpClient.Builder().addInterceptor(getTokenRevalidationInterceptorV7())
               .addInterceptor(getConnectivityInterceptor())
-              .addInterceptor(getUserAgentInterceptor());
+              .addInterceptor(getUserAgentInterceptor())
+              .addInterceptor(getTokenRevalidationInterceptorV7());
 
       final Retrofit retrofitV7 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
@@ -227,7 +227,8 @@ public class UploaderApplication extends NotificationApplicationView {
       OkHttpClient.Builder okhttpBuilder =
           new OkHttpClient.Builder().addInterceptor(getTokenRevalidationInterceptorV7())
               .addInterceptor(getConnectivityInterceptor())
-              .addInterceptor(getUserAgentInterceptor());
+              .addInterceptor(getUserAgentInterceptor())
+              .addInterceptor(getTokenRevalidationInterceptorV7());
 
       final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))

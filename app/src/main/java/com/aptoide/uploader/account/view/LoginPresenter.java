@@ -79,6 +79,8 @@ public class LoginPresenter implements Presenter {
             .doOnNext(credentials -> {
               view.hideKeyboard();
               view.showLoading(credentials.getUsername());
+              accountManager.logout();
+              accountManager.removeAccessTokenFromPersistence();
             })
             .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
                 credentials.getPassword())

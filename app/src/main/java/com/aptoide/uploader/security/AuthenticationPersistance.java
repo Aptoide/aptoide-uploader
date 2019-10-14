@@ -10,6 +10,8 @@ public interface AuthenticationPersistance {
 
   void saveNewAccessToken(String accessToken);
 
+  void removeAuthentication();
+
   String getRefreshToken();
 
   String getAccessToken();

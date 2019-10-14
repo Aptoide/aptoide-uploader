@@ -15,4 +15,6 @@ public interface AuthenticationProvider {
   Single<String> getRefreshToken();
 
   void saveAuthentication(String accessToken, String refreshToken);
+
+  void removeAuthentication();
 }

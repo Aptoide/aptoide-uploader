@@ -22,4 +22,5 @@ public interface AccountService {
 
   Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials);
 
+  void removeAccessTokenFromPersistence();
 }
