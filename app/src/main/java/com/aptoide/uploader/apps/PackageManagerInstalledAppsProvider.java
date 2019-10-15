@@ -5,7 +5,6 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 
 public class PackageManagerInstalledAppsProvider implements InstalledAppsProvider {
@@ -23,14 +22,12 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
         .filter(applicationInfo -> applicationInfo.packageName != null)
         .map(applicationInfo -> {
           packageInfo = packageManager.getPackageInfo(applicationInfo.packageName, 0);
-          return new InstalledApp(
-              "android.resource://" + applicationInfo.packageName + "/" + applicationInfo.icon,
+          return new InstalledApp(applicationInfo.loadIcon(packageManager),
               applicationInfo.loadLabel(packageManager)
                   .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1,
               applicationInfo.packageName, applicationInfo.sourceDir, packageInfo.firstInstallTime,
               packageInfo.versionCode, false);
         })
-        .toList()
-        .observeOn(Schedulers.io());
+        .toList();
   }
 }
