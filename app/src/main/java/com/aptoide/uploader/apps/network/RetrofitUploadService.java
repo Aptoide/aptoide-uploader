@@ -235,6 +235,9 @@ public class RetrofitUploadService implements UploaderService {
         case "APK-104":
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.PUBLISHER_ONLY,
               md5, storeName);
+        case "FILE-112":
+          return new Upload(response.isSuccessful(), installedApp, Upload.Status.APP_BUNDLE, md5,
+              storeName);
         default:
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.FAILED, md5,
               storeName);

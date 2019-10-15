@@ -148,6 +148,18 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
+  @Override public void showAppBundleNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(getString(R.string.app_name))
+            .setOngoing(false)
+            .setSubText(getString(R.string.application_notification_short_app_bundle))
+            .setContentText(applicationName);
+
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
   @Override
   public void showInvalidSignatureNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder =

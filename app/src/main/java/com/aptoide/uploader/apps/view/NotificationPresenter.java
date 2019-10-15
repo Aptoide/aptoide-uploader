@@ -82,6 +82,9 @@ public class NotificationPresenter implements Presenter {
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(upload);
+      case APP_BUNDLE:
+        view.showAppBundleNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(upload);
       default:
         view.showErrorNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(upload);

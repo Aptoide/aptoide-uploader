@@ -20,6 +20,8 @@ public interface NotificationView extends View {
 
   void showIntellectualRightsNotification(String applicationName, String packageName);
 
+  void showAppBundleNotification(String applicationName, String packageName);
+
   void showInvalidSignatureNotification(String applicationName, String packageName);
 
   void updateUploadProgress(String name, String packageName, int progress);
