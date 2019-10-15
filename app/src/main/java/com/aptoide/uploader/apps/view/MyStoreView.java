@@ -12,6 +12,8 @@ public interface MyStoreView extends View {
 
   void showApps(@NotNull List<InstalledApp> appsList);
 
+  void refreshApps(@NotNull List<InstalledApp> appsList);
+
   void orderApps(SortingOrder order);
 
   void showStoreName(@NotNull String storeName);
@@ -39,4 +41,6 @@ public interface MyStoreView extends View {
   void clearSelection();
 
   void setCloudIcon(List<String> md5List);
+
+  Observable<Boolean> refreshEvent();
 }

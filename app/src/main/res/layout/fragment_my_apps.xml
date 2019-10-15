@@ -96,15 +96,25 @@
         </LinearLayout>
 
 
-        <android.support.v7.widget.RecyclerView
-            android:id="@+id/fragment_my_apps_list"
+        <android.support.v4.widget.SwipeRefreshLayout
+            xmlns:android="http://schemas.android.com/apk/res/android"
+            android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
-            android:padding="@dimen/apps_grid_item_margin"
-            tools:layoutManager="android.support.v7.widget.GridLayoutManager"
-            tools:listitem="@android:layout/simple_list_item_checked"
-            tools:spanCount="3"
-            />
+            >
+
+          <android.support.v7.widget.RecyclerView
+              android:id="@+id/fragment_my_apps_list"
+              android:layout_width="match_parent"
+              android:layout_height="match_parent"
+              android:padding="@dimen/apps_grid_item_margin"
+              tools:layoutManager="android.support.v7.widget.GridLayoutManager"
+              tools:listitem="@android:layout/simple_list_item_checked"
+              tools:spanCount="3"
+              />
+
+        </android.support.v4.widget.SwipeRefreshLayout>
+
       </LinearLayout>
     </LinearLayout>
 

@@ -51,6 +51,8 @@ public class MyStorePresenter implements Presenter {
   @Override public void present() {
     showStoreAndApps();
 
+    refreshStoreAndApps();
+
     handleSubmitAppEvent();
 
     handleOrderByEvent();
@@ -170,6 +172,16 @@ public class MyStorePresenter implements Presenter {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+  }
+
+  private void refreshStoreAndApps() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.refreshEvent()
+            .flatMapSingle(refreshEvent -> storeManager.getStore())
+            .observeOn(viewScheduler)
+            .doOnNext(store -> view.refreshApps(store.getApps())))
+        .subscribe());
   }
 
   private Single<List<InstalledApp>> sort(List<InstalledApp> apps, SortingOrder sortingOrder) {

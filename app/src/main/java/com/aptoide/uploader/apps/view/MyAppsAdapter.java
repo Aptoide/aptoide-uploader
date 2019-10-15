@@ -57,6 +57,14 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     }
   }
 
+  public void refreshInstalledApps(List<InstalledApp> appsList) {
+    installedApps.clear();
+    installedApps.addAll(appsList);
+    setOrder(SortingOrder.DATE);
+    clearAppsSelection(false);
+    notifyDataSetChanged();
+  }
+
   public void setOrder(SortingOrder order) {
     if (order.equals(SortingOrder.NAME)) {
       Collections.sort(installedApps, (obj1, obj2) -> obj1.getName()
