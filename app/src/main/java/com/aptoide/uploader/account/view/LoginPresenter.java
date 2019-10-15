@@ -126,7 +126,11 @@ public class LoginPresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMapCompletable(created -> view.googleLoginSuccessEvent()
-            .doOnNext(account -> view.showLoading(account.getDisplayName()))
+            .doOnNext(account -> {
+              view.showLoading(account.getDisplayName());
+              accountManager.logout();
+              accountManager.removeAccessTokenFromPersistence();
+            })
             .flatMapCompletable(
                 googleAccount -> accountManager.loginWithGoogle(googleAccount.getEmail(),
                     googleAccount.getServerAuthCode())))
@@ -137,7 +141,11 @@ public class LoginPresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMapCompletable(created -> view.facebookLoginSucessEvent()
-            .doOnNext(account -> view.showLoadingWithoutUserName())
+            .doOnNext(account -> {
+              view.showLoadingWithoutUserName();
+              accountManager.logout();
+              accountManager.removeAccessTokenFromPersistence();
+            })
             .flatMapCompletable(facebookAccount -> accountManager.loginWithFacebook(null,
                 facebookAccount.getAccessToken()
                     .getToken())))

@@ -51,6 +51,7 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     if (!appsList.equals(installedApps)) {
       installedApps.clear();
       installedApps.addAll(appsList);
+      setOrder(SortingOrder.DATE);
       clearAppsSelection(false);
       notifyDataSetChanged();
     }
@@ -63,7 +64,7 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     }
     if (order.equals(SortingOrder.DATE)) {
       Collections.sort(installedApps,
-          (obj1, obj2) -> Long.compare(obj1.getInstalledDate(), obj2.getInstalledDate()));
+          (obj1, obj2) -> Long.compare(obj2.getInstalledDate(), obj1.getInstalledDate()));
     }
     selectedApps.clear();
     notifyDataSetChanged();
