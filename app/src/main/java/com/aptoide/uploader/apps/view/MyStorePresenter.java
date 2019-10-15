@@ -180,7 +180,8 @@ public class MyStorePresenter implements Presenter {
         .flatMap(__ -> view.refreshEvent()
             .flatMapSingle(refreshEvent -> storeManager.getStore())
             .observeOn(viewScheduler)
-            .doOnNext(store -> view.refreshApps(store.getApps())))
+            .doOnNext(store -> view.refreshApps(store.getApps()))
+            .doOnNext(apps -> checkUploadedApps()))
         .subscribe());
   }
 
