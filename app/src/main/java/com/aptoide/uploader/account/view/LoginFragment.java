@@ -1,12 +1,16 @@
 package com.aptoide.uploader.account.view;
 
+import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
+import android.graphics.drawable.Drawable;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.annotation.Nullable;
+import android.text.method.PasswordTransformationMethod;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -51,6 +55,7 @@ public class LoginFragment extends FragmentView implements LoginView {
   private GoogleSignInClient mGoogleSignInClient;
   private GoogleSignInOptions gso;
   private CallbackManager callbackManager;
+  boolean showPassword = false;
   private static final int RC_SIGN_IN = 9001;
 
   PublishSubject<GoogleSignInAccount> googleLoginSubject = PublishSubject.create();
@@ -84,6 +89,7 @@ public class LoginFragment extends FragmentView implements LoginView {
     facebookLoginButton = view.findViewById(R.id.facebook_login_button);
     facebookLoginButton.setPermissions(Arrays.asList("email", "public_profile"));
     facebookLoginButton.setFragment(this);
+    setShowPasswordEye();
     setFacebookCustomListener();
 
     new LoginPresenter(this, accountManager, new LoginNavigator(getContext(), getFragmentManager()),
@@ -224,4 +230,38 @@ public class LoginFragment extends FragmentView implements LoginView {
       }
     });
   }
+
+  @SuppressLint("ClickableViewAccessibility") private void setShowPasswordEye() {
+    passwordEditText.setTransformationMethod(new PasswordTransformationMethod());
+    final Drawable hidePasswordRes = getResources().getDrawable(R.drawable.ic_show_password);
+    final Drawable showPasswordRes = getResources().getDrawable(R.drawable.ic_hide_password);
+
+    passwordEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
+    passwordEditText.setOnTouchListener((v, event) -> {
+      if (passwordEditText.getCompoundDrawables()[2] == null) {
+        return false;
+      }
+      if (event.getAction() != MotionEvent.ACTION_DOWN) {
+        return false;
+      }
+      if (event.getX()
+          > passwordEditText.getWidth()
+          - passwordEditText.getPaddingRight()
+          - hidePasswordRes.getIntrinsicWidth()) {
+        if (showPassword) {
+          showPassword = false;
+          passwordEditText.setTransformationMethod(null);
+          passwordEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, showPasswordRes,
+              null);
+        } else {
+          showPassword = true;
+          passwordEditText.setTransformationMethod(new PasswordTransformationMethod());
+          passwordEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes,
+              null);
+        }
+      }
+      return false;
+    });
+  }
+
 }
