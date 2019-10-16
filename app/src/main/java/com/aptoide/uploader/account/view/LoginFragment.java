@@ -76,7 +76,6 @@ public class LoginFragment extends FragmentView implements LoginView {
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-
     passwordEditText = view.findViewById(R.id.fragment_login_password_edit_text);
     usernameEditText = view.findViewById(R.id.fragment_login_username_edit_text);
     loginButton = view.findViewById(R.id.fragment_login_button);
@@ -263,5 +262,4 @@ public class LoginFragment extends FragmentView implements LoginView {
       return false;
     });
   }
-
 }

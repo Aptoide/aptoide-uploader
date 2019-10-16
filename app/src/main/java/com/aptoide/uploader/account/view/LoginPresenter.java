@@ -41,20 +41,21 @@ public class LoginPresenter implements Presenter {
   @Override public void present() {
 
     compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .filter(event -> event.equals(View.LifecycleEvent.START))
         .flatMap(__ -> accountManager.getAccount())
         .observeOn(viewScheduler)
         .doOnNext(account -> {
           if (account.isLoggedIn()) {
             if (account.hasStore()) {
               loginNavigator.navigateToMyAppsView();
-              view.hideLoading();
+              //view.hideLoading();
             } else {
               loginNavigator.navigateToCreateStoreView();
-              view.hideLoading();
+              //view.hideLoading();
             }
           }
         })
+        .doOnNext(__ -> view.hideLoading())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -62,7 +63,10 @@ public class LoginPresenter implements Presenter {
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .filter(__ -> !((UploaderApplication) context.getApplicationContext()).isForcedLogout())
+        .doOnNext(__ -> view.showLoadingWithoutUserName())
+        .filter(
+            __ -> !((UploaderApplication) context.getApplicationContext()).getAutoLoginPersistence()
+                .isForcedLogout())
         .flatMapSingle(__ -> autoLoginManager.getStoredUserCredentials()
             .flatMap(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
         .firstOrError()
@@ -71,6 +75,10 @@ public class LoginPresenter implements Presenter {
         .subscribe(() -> {
         }, throwable -> {
           Log.e(getClass().getSimpleName(), throwable.getMessage());
+          ((UploaderApplication) context.getApplicationContext()).getAutoLoginPersistence()
+              .setForcedLogout(true);
+          accountManager.logout();
+          accountManager.removeAccessTokenFromPersistence();
         }));
 
     compositeDisposable.add(view.getLifecycleEvent()
@@ -128,8 +136,6 @@ public class LoginPresenter implements Presenter {
         .flatMapCompletable(created -> view.googleLoginSuccessEvent()
             .doOnNext(account -> {
               view.showLoading(account.getDisplayName());
-              accountManager.logout();
-              accountManager.removeAccessTokenFromPersistence();
             })
             .flatMapCompletable(
                 googleAccount -> accountManager.loginWithGoogle(googleAccount.getEmail(),
@@ -143,8 +149,6 @@ public class LoginPresenter implements Presenter {
         .flatMapCompletable(created -> view.facebookLoginSucessEvent()
             .doOnNext(account -> {
               view.showLoadingWithoutUserName();
-              accountManager.logout();
-              accountManager.removeAccessTokenFromPersistence();
             })
             .flatMapCompletable(facebookAccount -> accountManager.loginWithFacebook(null,
                 facebookAccount.getAccessToken()

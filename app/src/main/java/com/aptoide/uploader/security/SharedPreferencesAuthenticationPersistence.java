@@ -31,7 +31,7 @@ public class SharedPreferencesAuthenticationPersistence implements Authenticatio
   @Override public void removeAuthentication() {
     preferences.edit()
         .clear()
-        .commit();
+        .apply();
   }
 
   @Override public String getRefreshToken() {

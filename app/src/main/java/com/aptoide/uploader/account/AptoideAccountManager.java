@@ -72,10 +72,13 @@ public class AptoideAccountManager {
               .equals(BaseAccount.LoginType.FACEBOOK)) {
             socialLogoutManager.handleSocialLogout(account.getLoginType());
           }
-          ((UploaderApplication) context.getApplicationContext()).setForcedLogout(true);
         })
+        .doOnError(throwable -> throwable.printStackTrace())
         .firstOrError()
-        .flatMapCompletable(account -> accountPersistence.remove());
+        .flatMapCompletable(account -> accountPersistence.remove())
+        .doOnComplete(
+            () -> ((UploaderApplication) context.getApplicationContext()).getAutoLoginPersistence()
+                .setForcedLogout(true));
   }
 
   public void removeAccessTokenFromPersistence() {

@@ -4,11 +4,13 @@ import android.content.Context;
 import android.preference.PreferenceManager;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
+import com.aptoide.uploader.account.AutoLoginPersistence;
 import com.aptoide.uploader.account.CredentialsValidator;
 import com.aptoide.uploader.account.SocialLogoutManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
+import com.aptoide.uploader.account.persistence.SharedPreferencesAutoLoginPersistence;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
@@ -64,11 +66,11 @@ public class UploaderApplication extends NotificationApplicationView {
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
   private UploaderPersistence uploadPersistence;
+  private AutoLoginPersistence autoLoginPersistence;
   private AppUploadStatusPersistence appUploadStatusPersistence;
   private AppUploadStatusManager appUploadStatusManager;
   private UploaderAnalytics uploaderAnalytics;
   private CallbackManager callbackManager;
-  private static boolean forcedLogout = false;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -112,11 +114,11 @@ public class UploaderApplication extends NotificationApplicationView {
   }
 
   public TokenRevalidationInterceptorV3 getTokenRevalidationInterceptorV3() {
-    return new TokenRevalidationInterceptorV3(getAccessTokenProvider());
+    return new TokenRevalidationInterceptorV3(getAuthenticationProvider());
   }
 
   public TokenRevalidationInterceptorV7 getTokenRevalidationInterceptorV7() {
-    return new TokenRevalidationInterceptorV7(getAccessTokenProvider());
+    return new TokenRevalidationInterceptorV7(getAuthenticationProvider());
   }
 
   public UserAgentInterceptor getUserAgentInterceptor() {
@@ -137,6 +139,14 @@ public class UploaderApplication extends NotificationApplicationView {
               .addInterceptor(getConnectivityInterceptor())
               .addInterceptor(getUserAgentInterceptor());
 
+      OkHttpClient.Builder okhttpBuilderV7 =
+          new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
+              .readTimeout(30, TimeUnit.SECONDS)
+              .connectTimeout(60, TimeUnit.SECONDS)
+              .addInterceptor(getConnectivityInterceptor())
+              .addInterceptor(getUserAgentInterceptor())
+              .addInterceptor(getTokenRevalidationInterceptorV7());
+
       final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
           .client(okhttpBuilder.build())
@@ -146,7 +156,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
       final Retrofit retrofitV7 = new Retrofit.Builder().addCallAdapterFactory(
           RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(okhttpBuilder.build())
+          .client(okhttpBuilderV7.build())
           .baseUrl("http://ws75.aptoide.com/")
           .addConverterFactory(MoshiConverterFactory.create())
           .build();
@@ -278,6 +288,14 @@ public class UploaderApplication extends NotificationApplicationView {
     return uploadPersistence;
   }
 
+  public AutoLoginPersistence getAutoLoginPersistence() {
+    if (autoLoginPersistence == null) {
+      autoLoginPersistence = new SharedPreferencesAutoLoginPersistence(
+          PreferenceManager.getDefaultSharedPreferences(this));
+    }
+    return autoLoginPersistence;
+  }
+
   public AppUploadStatusPersistence getAppUploadStatusPersistence() {
     if (appUploadStatusPersistence == null) {
       appUploadStatusPersistence =
@@ -319,13 +337,5 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public Context getAppContext() {
     return getApplicationContext();
-  }
-
-  public void setForcedLogout(boolean isForcedLogout) {
-    forcedLogout = isForcedLogout;
-  }
-
-  public boolean isForcedLogout() {
-    return forcedLogout;
   }
 }

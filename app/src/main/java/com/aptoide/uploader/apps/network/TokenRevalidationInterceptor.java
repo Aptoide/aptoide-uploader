@@ -1,7 +1,7 @@
 package com.aptoide.uploader.apps.network;
 
 import android.util.Log;
-import com.aptoide.uploader.upload.AptoideAccountProvider;
+import com.aptoide.uploader.security.AuthenticationProvider;
 import java.io.IOException;
 import okhttp3.Request;
 import okhttp3.RequestBody;
@@ -9,17 +9,17 @@ import okio.Buffer;
 
 public class TokenRevalidationInterceptor {
 
-  private final AptoideAccountProvider aptoideAccountProvider;
+  private final AuthenticationProvider authenticationProvider;
 
   private final String TAG = getClass().getSimpleName();
 
-  public TokenRevalidationInterceptor(AptoideAccountProvider aptoideAccountProvider) {
-    this.aptoideAccountProvider = aptoideAccountProvider;
+  public TokenRevalidationInterceptor(AuthenticationProvider authenticationProvider) {
+    this.authenticationProvider = authenticationProvider;
   }
 
   Request makeTokenRefreshCall(Request request) {
     Log.d(TAG, "Retrying new request");
-    String oldToken = aptoideAccountProvider.getToken()
+    String oldToken = authenticationProvider.getAccessToken()
         .blockingGet();
     String newToken = getNewAccessToken();
     RequestBody requestBody = processFormDataRequestBody(request.body(), newToken, oldToken);
@@ -30,7 +30,7 @@ public class TokenRevalidationInterceptor {
   }
 
   private String getNewAccessToken() {
-    return aptoideAccountProvider.revalidateAccessToken()
+    return authenticationProvider.getNewAccessToken()
         .blockingGet();
   }
 

@@ -1,7 +1,7 @@
 package com.aptoide.uploader.apps.network;
 
 import android.util.Log;
-import com.aptoide.uploader.upload.AptoideAccountProvider;
+import com.aptoide.uploader.security.AuthenticationProvider;
 import java.io.IOException;
 import okhttp3.Interceptor;
 import okhttp3.MediaType;
@@ -17,8 +17,8 @@ public class TokenRevalidationInterceptorV7 extends TokenRevalidationInterceptor
 
   private final String TAG = getClass().getSimpleName();
 
-  public TokenRevalidationInterceptorV7(AptoideAccountProvider aptoideAccountProvider) {
-    super(aptoideAccountProvider);
+  public TokenRevalidationInterceptorV7(AuthenticationProvider authenticationProvider) {
+    super(authenticationProvider);
   }
 
   @Override public Response intercept(Chain chain) throws IOException {
