@@ -100,6 +100,14 @@ public class UploadManager {
         .subscribe();
   }
 
+  @SuppressLint("CheckResult") private void handleObbMain() {
+
+  }
+
+  @SuppressLint("CheckResult") private void handleObbPatch() {
+
+  }
+
   @SuppressLint("CheckResult") private void handleCompletedStatus() {
     persistence.getUploads()
         .distinctUntilChanged(

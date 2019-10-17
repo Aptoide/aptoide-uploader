@@ -4,7 +4,7 @@ public class AppUploadStatus {
 
   private final String md5;
   private final String packageName;
-  private final boolean uploaded;
+  private boolean uploaded;
   private final String vercode;
 
   public AppUploadStatus(String md5, String packageName, boolean uploaded, String vercode) {
@@ -28,5 +28,9 @@ public class AppUploadStatus {
 
   public String getVercode() {
     return vercode;
+  }
+
+  public void setUploaded(boolean isUploadedStatus) {
+    uploaded = isUploadedStatus;
   }
 }

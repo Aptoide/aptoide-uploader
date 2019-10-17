@@ -11,6 +11,7 @@ import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -73,6 +74,7 @@ public class MyStorePresenter implements Presenter {
         .flatMapCompletable(click -> storeManager.logout()
             .observeOn(viewScheduler)
             .doOnComplete(() -> storeNavigator.navigateToLoginView())
+            .andThen(setPersistenceStatusOnLogout())
             .doOnError(throwable -> {
               view.dismissDialog();
               view.showError();
@@ -226,5 +228,12 @@ public class MyStorePresenter implements Presenter {
       }
     }
     return !previousList.equals(currentList);
+  }
+
+  private Completable setPersistenceStatusOnLogout() {
+    return persistence.getAppsUploadStatus()
+        .flatMap(apps -> Observable.fromIterable(apps)
+            .doOnNext(app -> app.setUploaded(false)))
+        .ignoreElements();
   }
 }

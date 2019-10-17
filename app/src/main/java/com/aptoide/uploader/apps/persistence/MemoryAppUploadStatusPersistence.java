@@ -62,4 +62,8 @@ public class MemoryAppUploadStatusPersistence implements AppUploadStatusPersiste
         //    appUploadStatus.getVercode()))
         .doOnError(throwable -> Log.e("ERROR Updating", throwable.getMessage()));
   }
+
+  @Override public void clear() {
+
+  }
 }

@@ -31,4 +31,13 @@ public class OkioMd5Calculator implements Md5Calculator {
   @NonNull private String getKey(InstalledApp app) {
     return app.getPackageName() + app.getVersionCode();
   }
+
+  @Override public Single<String> calculate(String path) {
+
+    return Single.fromCallable(() -> Okio.buffer(Okio.source(new File(path)))
+        .readByteString()
+        .md5()
+        .hex())
+        .subscribeOn(scheduler);
+  }
 }

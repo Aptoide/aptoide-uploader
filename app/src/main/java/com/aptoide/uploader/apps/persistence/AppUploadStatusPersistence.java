@@ -16,4 +16,6 @@ public interface AppUploadStatusPersistence {
   Completable remove(String md5);
 
   Completable update(AppUploadStatus appUploadStatus, boolean isUploaded);
+
+  void clear();
 }

@@ -101,10 +101,10 @@ public class UploaderApplication extends NotificationApplicationView {
       uploadManager = new UploadManager(
           new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
               getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER,
-              uploadProgressManager, getUploaderAnalytics()), getUploadPersistence(),
-          getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
-          getAccessTokenProvider(), getAppUploadStatusManager(), getAppUploadStatusPersistence(),
-          uploadProgressManager);
+              uploadProgressManager, getUploaderAnalytics(), getMd5Calculator()),
+          getUploadPersistence(), getMd5Calculator(),
+          new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
+          getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager);
     }
     return uploadManager;
   }

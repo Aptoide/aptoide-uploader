@@ -41,7 +41,7 @@ public class LoginPresenter implements Presenter {
   @Override public void present() {
 
     compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.START))
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> accountManager.getAccount())
         .observeOn(viewScheduler)
         .doOnNext(account -> {
