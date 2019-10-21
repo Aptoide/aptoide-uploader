@@ -79,32 +79,39 @@ public class UploaderApplication extends NotificationApplicationView {
     getUploadManager().start();
   }
 
+  public OkHttpClient.Builder buildOkHttpClient() {
+    return new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
+        .readTimeout(30, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .addInterceptor(getConnectivityInterceptor())
+        .addInterceptor(getUserAgentInterceptor());
+  }
+
+  public Retrofit retrofitBuilder(String baseUrl, OkHttpClient.Builder okHttpClient) {
+    return new Retrofit.Builder().addCallAdapterFactory(
+        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+        .baseUrl(baseUrl)
+        .addConverterFactory(MoshiConverterFactory.create())
+        .client(okHttpClient.build())
+        .build();
+  }
+
   public UploadManager getUploadManager() {
     if (uploadManager == null) {
-      OkHttpClient.Builder okhttpBuilder =
-          new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
-              .readTimeout(30, TimeUnit.SECONDS)
-              .connectTimeout(60, TimeUnit.SECONDS)
-              .addInterceptor(getConnectivityInterceptor())
-              .addInterceptor(getTokenRevalidationInterceptorV3())
-              .addInterceptor(getUserAgentInterceptor());
 
-      final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
-          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .baseUrl("http://upload.webservices.aptoide.com/webservices/")
-          .addConverterFactory(MoshiConverterFactory.create())
-          .client(okhttpBuilder.build())
-          .build();
+      final Retrofit retrofitV3 =
+          retrofitBuilder("http://upload.webservices.aptoide.com/webservices/",
+              buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV3()));
 
       UploadProgressManager uploadProgressManager = new UploadProgressManager();
 
       uploadManager = new UploadManager(
           new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
               getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER,
-              uploadProgressManager, getUploaderAnalytics(), getMd5Calculator()),
-          getUploadPersistence(), getMd5Calculator(),
-          new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
-          getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager);
+              uploadProgressManager, getUploaderAnalytics()), getUploadPersistence(),
+          getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
+          getAccessTokenProvider(), getAppUploadStatusManager(), getAppUploadStatusPersistence(),
+          uploadProgressManager);
     }
     return uploadManager;
   }
@@ -132,34 +139,11 @@ public class UploaderApplication extends NotificationApplicationView {
   public AptoideAccountManager getAccountManager() {
     if (accountManager == null) {
 
-      OkHttpClient.Builder okhttpBuilder =
-          new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
-              .readTimeout(30, TimeUnit.SECONDS)
-              .connectTimeout(60, TimeUnit.SECONDS)
-              .addInterceptor(getConnectivityInterceptor())
-              .addInterceptor(getUserAgentInterceptor());
+      final Retrofit retrofitV3 =
+          retrofitBuilder("http://webservices.aptoide.com/", buildOkHttpClient());
 
-      OkHttpClient.Builder okhttpBuilderV7 =
-          new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
-              .readTimeout(30, TimeUnit.SECONDS)
-              .connectTimeout(60, TimeUnit.SECONDS)
-              .addInterceptor(getConnectivityInterceptor())
-              .addInterceptor(getUserAgentInterceptor())
-              .addInterceptor(getTokenRevalidationInterceptorV7());
-
-      final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
-          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(okhttpBuilder.build())
-          .baseUrl("http://webservices.aptoide.com/")
-          .addConverterFactory(MoshiConverterFactory.create())
-          .build();
-
-      final Retrofit retrofitV7 = new Retrofit.Builder().addCallAdapterFactory(
-          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(okhttpBuilderV7.build())
-          .baseUrl("http://ws75.aptoide.com/")
-          .addConverterFactory(MoshiConverterFactory.create())
-          .build();
+      final Retrofit retrofitV7 = retrofitBuilder("http://ws75.aptoide.com/",
+          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
 
       accountManager = new AptoideAccountManager(
           new RetrofitAccountService(retrofitV3.create(RetrofitAccountService.ServiceV3.class),
@@ -175,19 +159,8 @@ public class UploaderApplication extends NotificationApplicationView {
   public AuthenticationProvider getAuthenticationProvider() {
     if (authenticationProvider == null) {
 
-      OkHttpClient.Builder okhttpBuilder =
-          new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
-              .readTimeout(30, TimeUnit.SECONDS)
-              .connectTimeout(60, TimeUnit.SECONDS)
-              .addInterceptor(getConnectivityInterceptor())
-              .addInterceptor(getUserAgentInterceptor());
-
-      final Retrofit retrofitV3 = new Retrofit.Builder().addCallAdapterFactory(
-          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(okhttpBuilder.build())
-          .baseUrl("http://webservices.aptoide.com/")
-          .addConverterFactory(MoshiConverterFactory.create())
-          .build();
+      final Retrofit retrofitV3 =
+          retrofitBuilder("http://webservices.aptoide.com/", buildOkHttpClient());
 
       final AuthenticationPersistance authenticationPersistance =
           new SharedPreferencesAuthenticationPersistence(
@@ -202,18 +175,8 @@ public class UploaderApplication extends NotificationApplicationView {
   public CategoriesManager getCategoriesManager() {
     if (categoriesManager == null) {
 
-      OkHttpClient.Builder okhttpBuilder =
-          new OkHttpClient.Builder().addInterceptor(getTokenRevalidationInterceptorV7())
-              .addInterceptor(getConnectivityInterceptor())
-              .addInterceptor(getUserAgentInterceptor())
-              .addInterceptor(getTokenRevalidationInterceptorV7());
-
-      final Retrofit retrofitV7 = new Retrofit.Builder().addCallAdapterFactory(
-          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(okhttpBuilder.build())
-          .baseUrl("https://ws75.aptoide.com/api/7/")
-          .addConverterFactory(MoshiConverterFactory.create())
-          .build();
+      final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/api/7/",
+          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
 
       categoriesManager = new CategoriesManager(new RetrofitCategoriesService(
           retrofitV7.create(RetrofitCategoriesService.ServiceV7.class)));
@@ -224,7 +187,8 @@ public class UploaderApplication extends NotificationApplicationView {
   public StoreManager getAppsManager() {
     if (storeManager == null) {
 
-      storeManager = new StoreManager(new PackageManagerInstalledAppsProvider(getPackageManager()),
+      storeManager = new StoreManager(
+          new PackageManagerInstalledAppsProvider(getPackageManager(), getMd5Calculator()),
           new AccountStoreNameProvider(getAccountManager()), getUploadManager(),
           getLanguageManager(), getAccountManager());
     }
@@ -234,18 +198,8 @@ public class UploaderApplication extends NotificationApplicationView {
   public AppUploadStatusManager getAppUploadStatusManager() {
     if (appUploadStatusManager == null) {
 
-      OkHttpClient.Builder okhttpBuilder =
-          new OkHttpClient.Builder().addInterceptor(getTokenRevalidationInterceptorV7())
-              .addInterceptor(getConnectivityInterceptor())
-              .addInterceptor(getUserAgentInterceptor())
-              .addInterceptor(getTokenRevalidationInterceptorV7());
-
-      final Retrofit retrofitV7Secondary = new Retrofit.Builder().addCallAdapterFactory(
-          RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-          .client(okhttpBuilder.build())
-          .baseUrl("http://ws75-secondary.aptoide.com/")
-          .addConverterFactory(MoshiConverterFactory.create())
-          .build();
+      final Retrofit retrofitV7Secondary = retrofitBuilder("http://ws75-secondary.aptoide.com/",
+          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
 
       appUploadStatusManager =
           new AppUploadStatusManager(new AccountStoreNameProvider(getAccountManager()),
@@ -254,7 +208,8 @@ public class UploaderApplication extends NotificationApplicationView {
                   getAccessTokenProvider()), new RetrofitAppsUploadStatusService(
               retrofitV7Secondary.create(RetrofitAppsUploadStatusService.ServiceV7.class),
               getAccessTokenProvider()),
-              new PackageManagerInstalledAppsProvider(getPackageManager()), getUploaderAnalytics());
+              new PackageManagerInstalledAppsProvider(getPackageManager(), getMd5Calculator()),
+              getUploaderAnalytics());
     }
     return appUploadStatusManager;
   }

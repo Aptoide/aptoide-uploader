@@ -24,20 +24,19 @@ android {
     applicationId "pt.caixamagica.aptoide.uploader"
     minSdkVersion 16
     targetSdkVersion 27
-    Integer value = project.VERSION_CODE_UPLOADER.toInteger()
-    versionCode value
+    versionCode project.VERSION_CODE_UPLOADER.toInteger()
     versionName "2.100"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
     buildConfigField "String", "FLURRY_KEY_UPLOADER", "\"" + project.FLURRY_KEY_UPLOADER + "\""
     resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
-    resValue "string", "fb_login_protocol_scheme", "\"" + "fb" + project.FACEBOOK_APP_ID_UPLOADER+ "\""
+    resValue "string", "fb_login_protocol_scheme",
+        "\"" + "fb" + project.FACEBOOK_APP_ID_UPLOADER + "\""
     resValue "string", "google_id", "\"" + project.GMS_SERVER_ID + "\""
     vectorDrawables.useSupportLibrary = true
   }
 
   buildTypes {
     release {
-      debuggable true
       minifyEnabled true
       shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
@@ -75,6 +74,12 @@ android {
   compileOptions {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
+  }
+
+  dexOptions {
+    javaMaxHeapSize "4g"
+    dexInProcess = false
+    preDexLibraries = false
   }
 }
 

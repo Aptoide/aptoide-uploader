@@ -3,12 +3,14 @@ package com.aptoide.uploader.apps;
 public class Obb {
 
   private String filename;
-
-  private Number filesize;
-
   private String md5sum;
-
   private String path;
+
+  public Obb(String filename, String md5sum, String path) {
+    this.filename = filename;
+    this.md5sum = md5sum;
+    this.path = path;
+  }
 
   public String getFilename() {
     return this.filename;
@@ -16,14 +18,6 @@ public class Obb {
 
   public void setFilename(String filename) {
     this.filename = filename;
-  }
-
-  public Number getFilesize() {
-    return this.filesize;
-  }
-
-  public void setFilesize(Number filesize) {
-    this.filesize = filesize;
   }
 
   public String getMd5sum() {

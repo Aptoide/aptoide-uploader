@@ -11,7 +11,7 @@ public interface AccountService {
 
   Single<Account> getAccount(String username, String password);
 
-  Single<Account> getAccountOAuth(String email, String token, String authMode);
+  Single<Account> getAccount(String email, String ServerAuthToken, String authMode);
 
   Single<Account> createAccount(String email, String password, String storeName);
 

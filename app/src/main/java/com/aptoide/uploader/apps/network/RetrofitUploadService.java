@@ -1,14 +1,13 @@
 package com.aptoide.uploader.apps.network;
 
-import android.os.Environment;
 import android.support.annotation.NonNull;
+import android.util.Log;
 import android.webkit.MimeTypeMap;
 import com.aptoide.uploader.account.network.Status;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.apps.MetadataUpload;
-import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.apps.UploadProgressListener;
 import com.aptoide.uploader.upload.AccountProvider;
@@ -39,19 +38,15 @@ public class RetrofitUploadService implements UploaderService {
   private final UploadType uploadType;
   private UploadProgressListener uploadProgressListener;
   private UploaderAnalytics uploaderAnalytics;
-  private OkioMd5Calculator md5Calculator;
-  private String obbMainPath;
-  private String obbPatchPath;
 
   public RetrofitUploadService(ServiceV3 serviceV3, AccountProvider accountProvider,
       UploadType uploadType, UploadProgressListener uploadProgressListener,
-      UploaderAnalytics uploaderAnalytics, OkioMd5Calculator md5Calculator) {
+      UploaderAnalytics uploaderAnalytics) {
     this.serviceV3 = serviceV3;
     this.accountProvider = accountProvider;
     this.uploadType = uploadType;
     this.uploadProgressListener = uploadProgressListener;
     this.uploaderAnalytics = uploaderAnalytics;
-    this.md5Calculator = md5Calculator;
   }
 
   @Override public Single<Upload> getUpload(String md5, String language, String storeName,
@@ -63,7 +58,7 @@ public class RetrofitUploadService implements UploaderService {
       InstalledApp installedApp) {
     return accountProvider.getToken()
         .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
-            getParams(accessToken, md5, storeName, installedAppName, installedApp.getPackageName()))
+            getParams(accessToken, md5, storeName, installedAppName, installedApp))
             .map(response -> buildUploadFinishStatus(response, installedApp, md5, storeName))
             .startWith(buildUploadProgressStatus(installedApp, md5, storeName))
             .doOnError(throwable -> throwable.printStackTrace())
@@ -87,10 +82,27 @@ public class RetrofitUploadService implements UploaderService {
         .flatMapObservable(aptoideAccount -> accountProvider.getToken()
             .toObservable()
             .flatMap(accessToken -> serviceV3.uploadAppToRepo(
-                getParams(accessToken, aptoideAccount.getStoreName(),
-                    installedApp.getPackageName()),
+                getParams(accessToken, aptoideAccount.getStoreName(), installedApp, false),
                 MultipartBody.Part.createFormData("apk", apkPath,
                     createFileRequestBody("apk", apkPath, installedApp.getPackageName())))
+                .flatMap(response -> Observable.just(
+                    buildUploadFinishStatus(response, installedApp, md5, storeName)))
+                .onErrorReturn(
+                    throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
+                        storeName))));
+  }
+
+  @Override
+  public Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
+      String obbPath, String obbType) {
+    return accountProvider.getAccount()
+        .firstOrError()
+        .flatMapObservable(aptoideAccount -> accountProvider.getToken()
+            .toObservable()
+            .flatMap(accessToken -> serviceV3.uploadAppToRepo(
+                getParams(accessToken, aptoideAccount.getStoreName(), installedApp, true),
+                MultipartBody.Part.createFormData(obbType, obbPath,
+                    createFileRequestBody("obb", obbPath, installedApp.getPackageName())))
                 .flatMap(response -> Observable.just(
                     buildUploadFinishStatus(response, installedApp, md5, storeName)))
                 .onErrorReturn(
@@ -105,9 +117,8 @@ public class RetrofitUploadService implements UploaderService {
         .flatMapObservable(aptoideAccount -> accountProvider.getToken()
             .toObservable()
             .flatMap(accessToken -> serviceV3.uploadAppToRepo(
-                getParams(accessToken, aptoideAccount.getStoreName(), metadata,
-                    installedApp.getPackageName()),
-                MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
+                getParams(accessToken, aptoideAccount.getStoreName(), metadata, installedApp,
+                    false), MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
                     createFileRequestBody("apk", installedApp.getApkPath(),
                         installedApp.getPackageName())))
                 .flatMap(response -> Observable.just(
@@ -117,10 +128,29 @@ public class RetrofitUploadService implements UploaderService {
                         storeName))));
   }
 
+  @Override public Observable<Upload> upload(String md5, String storeName, String appName,
+      InstalledApp installedApp, Metadata metadata, String obbMainPath) {
+    return accountProvider.getAccount()
+        .firstOrError()
+        .flatMapObservable(aptoideAccount -> accountProvider.getToken()
+            .toObservable()
+            .flatMap(accessToken -> serviceV3.uploadAppToRepo(
+                getParams(accessToken, aptoideAccount.getStoreName(), metadata, installedApp, true),
+                MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
+                    createFileRequestBody("apk", installedApp.getApkPath(),
+                        installedApp.getPackageName())),
+                MultipartBody.Part.createFormData("obb_main", obbMainPath,
+                    createFileRequestBody("obb", obbMainPath, installedApp.getPackageName())))
+                .flatMap(response -> Observable.just(
+                    buildUploadFinishStatus(response, installedApp, md5, storeName, metadata)))
+                .onErrorReturn(
+                    throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
+                        storeName))));
+  }
+
   private Map<String, RequestBody> getParams(String accessToken, String storeName,
-      String packageName) {
+      InstalledApp installedApp, boolean obbFileFlag) {
     Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
-    checkObbExistence(packageName);
     parameters.put("rating", RequestBody.create(MediaType.parse("text/plain"), "0"));
     parameters.put("category", RequestBody.create(MediaType.parse("text/plain"), "0"));
     parameters.put("only_user_repo", RequestBody.create(MediaType.parse("text/plain"), "false"));
@@ -129,29 +159,30 @@ public class RetrofitUploadService implements UploaderService {
     parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), RESPONSE_MODE));
     parameters.put("uploadType",
         RequestBody.create(MediaType.parse("text/plain"), String.valueOf(uploadType.getType())));
-    if (obbMainPath != null) {
-      parameters.put("obb_main_md5sum", RequestBody.create(MediaType.parse("text/plain"),
-          md5Calculator.calculate(obbMainPath)
-              .blockingGet()));
-      parameters.put("obb_main_filename", RequestBody.create(MediaType.parse("text/plain"),
-          obbMainPath.substring(obbMainPath.lastIndexOf("/") + 1)));
-      //parameters.put("obb_main", createFileRequestBody("obb", obbMainPath, packageName));
+
+    if (installedApp.getObbMainPath() != null) {
+      if (!obbFileFlag) {
+        parameters.put("obb_main_md5sum",
+            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
+        parameters.put("obb_main_filename",
+            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
+      }
     }
-    if (obbPatchPath != null) {
-      parameters.put("obb_patch_md5sum", RequestBody.create(MediaType.parse("text/plain"),
-          md5Calculator.calculate(obbPatchPath)
-              .blockingGet()));
-      parameters.put("obb_patch_filename", RequestBody.create(MediaType.parse("text/plain"),
-          obbPatchPath.substring(obbPatchPath.lastIndexOf("/") + 1)));
-      //parameters.put("obb_main", createFileRequestBody("obb", obbMainPath, packageName));
+    if (installedApp.getObbPatchPath() != null) {
+      if (!obbFileFlag) {
+        parameters.put("obb_patch_md5sum",
+            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
+        parameters.put("obb_patch_filename",
+            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
+      }
     }
+    Log.w(getClass().getSimpleName(), parameters.toString());
     return parameters;
   }
 
   private Map<String, RequestBody> getParams(String accessToken, String storeName,
-      Metadata metadata, String packageName) {
+      Metadata metadata, InstalledApp installedApp, boolean obbFileFlag) {
     Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
-    checkObbExistence(packageName);
     parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), accessToken));
     parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
     parameters.put("only_user_repo", RequestBody.create(MediaType.parse("text/plain"), "false"));
@@ -179,45 +210,23 @@ public class RetrofitUploadService implements UploaderService {
       parameters.put("apk_website",
           RequestBody.create(MediaType.parse("text/plain"), metadata.getWebsite()));
     }
-    if (obbMainPath != null) {
-      parameters.put("obb_main_md5sum", RequestBody.create(MediaType.parse("text/plain"),
-          md5Calculator.calculate(obbMainPath)
-              .blockingGet()));
-      parameters.put("obb_main_filename", RequestBody.create(MediaType.parse("text/plain"),
-          obbMainPath.substring(obbMainPath.lastIndexOf("/") + 1)));
-      //parameters.put("obb_main", createFileRequestBody("obb", obbMainPath, packageName));
-    }
-    if (obbPatchPath != null) {
-      parameters.put("obb_patch_md5sum", RequestBody.create(MediaType.parse("text/plain"),
-          md5Calculator.calculate(obbPatchPath)
-              .blockingGet()));
-      parameters.put("obb_patch_filename", RequestBody.create(MediaType.parse("text/plain"),
-          obbPatchPath.substring(obbPatchPath.lastIndexOf("/") + 1)));
-      //parameters.put("obb_main", createFileRequestBody("obb", obbMainPath, packageName));
-    }
-    return parameters;
-  }
-
-  private void checkObbExistence(String packageName) {
-    String sdcard = Environment.getExternalStorageDirectory()
-        .getAbsolutePath();
-    File obbDir = new File(sdcard + "/Android/obb/" + packageName + "/");
-    if (obbDir.isDirectory()) {
-      File[] files = obbDir.listFiles();
-      if (files != null) {
-        for (File file : files) {
-          if (file.getName()
-              .contains("main") && !file.getName()
-              .contains("--downloading")) {
-            obbMainPath = file.getAbsolutePath();
-          } else if (file.getName()
-              .contains("patch") && !file.getName()
-              .contains("--downloading")) {
-            obbPatchPath = file.getAbsolutePath();
-          }
-        }
+    if (installedApp.getObbMainPath() != null) {
+      if (!obbFileFlag) {
+        parameters.put("obb_main_md5sum",
+            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
+        parameters.put("obb_main_filename",
+            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
       }
     }
+    if (installedApp.getObbPatchPath() != null) {
+      if (!obbFileFlag) {
+        parameters.put("obb_patch_md5sum",
+            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
+        parameters.put("obb_patch_filename",
+            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
+      }
+    }
+    return parameters;
   }
 
   @NonNull
@@ -273,7 +282,7 @@ public class RetrofitUploadService implements UploaderService {
     if (response.body()
         .getStatus()
         .equals(Status.FAIL)) {
-      uploaderAnalytics.uploadCompleteEvent("fail", "Upload App to Repo", response.body()
+      uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App to Repo", response.body()
           .getErrors()
           .get(0)
           .getCode(), response.body()
@@ -305,18 +314,12 @@ public class RetrofitUploadService implements UploaderService {
         case "FILE-112":
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.APP_BUNDLE, md5,
               storeName);
-        case "OBB-1":
-          return new Upload(response.isSuccessful(), installedApp, Upload.Status.OBB_MAIN, md5,
-              storeName);
-        case "OBB-2":
-          return new Upload(response.isSuccessful(), installedApp, Upload.Status.OBB_PATCH, md5,
-              storeName);
         default:
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.FAILED, md5,
               storeName);
       }
     }
-    uploaderAnalytics.uploadCompleteEvent("success", "Upload App to Repo", null, null);
+    uploaderAnalytics.sendUploadCompleteEvent("success", "Upload App to Repo", null, null);
     return new Upload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,
         storeName);
   }
@@ -326,50 +329,50 @@ public class RetrofitUploadService implements UploaderService {
     if (response.body()
         .getStatus()
         .equals(Status.FAIL)) {
-      uploaderAnalytics.uploadCompleteEvent("fail", "Upload App to Repo", response.body()
+      switch (response.body()
           .getErrors()
           .get(0)
-          .getCode(), response.body()
-          .getErrors()
-          .get(0)
-          .getMsg());
-      return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.RETRY, md5,
-          storeName, metadata);
+          .getCode()) {
+        default:
+          uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App to Repo", response.body()
+              .getErrors()
+              .get(0)
+              .getCode(), response.body()
+              .getErrors()
+              .get(0)
+              .getMsg());
+          return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.RETRY, md5,
+              storeName, metadata);
+      }
     }
-    uploaderAnalytics.uploadCompleteEvent("success", "Upload App to Repo", null, null);
+    uploaderAnalytics.sendUploadCompleteEvent("success", "Upload App to Repo", null, null);
     return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,
         storeName, metadata);
   }
 
   @NonNull
   private Map<String, okhttp3.RequestBody> getParams(String token, String md5, String storeName,
-      String installedAppName, String packageName) {
+      String installedAppName, InstalledApp installedApp) {
     Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
-    checkObbExistence(packageName);
     parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), token));
     parameters.put("apkname", RequestBody.create(MediaType.parse("text/plain"), installedAppName));
     parameters.put("apk_md5sum", RequestBody.create(MediaType.parse("text/plain"), md5));
     parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), "json"));
     parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
     parameters.put("uploadType", RequestBody.create(MediaType.parse("text/plain"), "aptuploader"));
-    if (obbMainPath != null) {
-      parameters.put("obb_main_md5sum", RequestBody.create(MediaType.parse("text/plain"),
-          md5Calculator.calculate(obbMainPath)
-              .blockingGet()));
-      parameters.put("obb_main_filename", RequestBody.create(MediaType.parse("text/plain"),
-          obbMainPath.substring(obbMainPath.lastIndexOf("/") + 1)));
-
-      //parameters.put("obb_main", createFileRequestBody("obb", obbMainPath, packageName));
+    if (installedApp.getObbMainPath() != null) {
+      parameters.put("obb_main_md5sum",
+          RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
+      parameters.put("obb_main_filename",
+          RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
     }
-    if (obbPatchPath != null) {
-      parameters.put("obb_patch_md5sum", RequestBody.create(MediaType.parse("text/plain"),
-          md5Calculator.calculate(obbPatchPath)
-              .blockingGet()));
-      parameters.put("obb_patch_filename", RequestBody.create(MediaType.parse("text/plain"),
-          obbPatchPath.substring(obbPatchPath.lastIndexOf("/") + 1)));
-
-      //parameters.put("obb_main", createFileRequestBody("obb", obbMainPath, packageName));
+    if (installedApp.getObbPatchPath() != null) {
+      parameters.put("obb_patch_md5sum",
+          RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
+      parameters.put("obb_patch_filename",
+          RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
     }
+    Log.w(getClass().getSimpleName(), parameters.toString());
     return parameters;
   }
 
@@ -395,6 +398,16 @@ public class RetrofitUploadService implements UploaderService {
     @Multipart @POST("3/uploadAppToRepo")
     Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
         @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part apkFile);
+
+    @Multipart @POST("3/uploadAppToRepo")
+    Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
+        @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part apkFile,
+        @Part MultipartBody.Part obbMain, @Part MultipartBody.Part obbPatch);
+
+    @Multipart @POST("3/uploadAppToRepo")
+    Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
+        @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part apkFile,
+        @Part MultipartBody.Part obbMain);
 
     @POST("3/hasApplicationMetaData") @FormUrlEncoded
     Observable<Response<HasApplicationMetaDataResponse>> hasApplicationMetaData(

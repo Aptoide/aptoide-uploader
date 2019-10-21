@@ -72,8 +72,8 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
           }
         }));
 
-    new CreateStorePresenter(this, accountManager,
-        new LoginNavigator(getContext(), getFragmentManager()), compositeDisposable,
+    new CreateStorePresenter(this, accountManager, new LoginNavigator(getFragmentManager()),
+        compositeDisposable,
         accountErrorMapper, AndroidSchedulers.mainThread()).present();
   }
 

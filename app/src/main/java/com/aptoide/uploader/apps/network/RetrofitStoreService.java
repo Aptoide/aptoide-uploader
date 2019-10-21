@@ -1,6 +1,6 @@
 package com.aptoide.uploader.apps.network;
 
-import com.aptoide.uploader.apps.Apk;
+import com.aptoide.uploader.apps.App;
 import com.aptoide.uploader.upload.AccountProvider;
 import io.reactivex.Observable;
 import io.reactivex.schedulers.Schedulers;
@@ -43,11 +43,11 @@ public class RetrofitStoreService {
   }
 
   private ApksResponse mapToApksList(GetApksResponse getApksResponse, ApksResponse.Status status) {
-    List<Apk> list = new ArrayList<>();
+    List<App> list = new ArrayList<>();
     ApksResponse apksResponse = new ApksResponse(list, status);
     for (GetApksResponse.Data apk : getApksResponse.getDatalist()
         .getList()) {
-      list.add(new Apk(apk.getId(), apk.getName(), apk.getSize(), apk.getIcon(), apk.getGraphic(),
+      list.add(new App(apk.getId(), apk.getName(), apk.getSize(), apk.getIcon(), apk.getGraphic(),
           apk.getStatus(), apk.getMode(), apk.getAdded(), apk.getModified(), apk.getUpdated(),
           apk.getPackage(), apk.getFile()));
     }

@@ -92,10 +92,10 @@ public class LoginPresenter implements Presenter {
             })
             .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
                 credentials.getPassword())
-                .doOnComplete(() -> uploaderAnalytics.loginEvent("email", "success")))
+                .doOnComplete(() -> uploaderAnalytics.sendLoginEvent("email", "success")))
             .observeOn(viewScheduler)
             .doOnError(throwable -> {
-              uploaderAnalytics.loginEvent("email", "fail");
+              uploaderAnalytics.sendLoginEvent("email", "fail");
               view.hideLoading();
               if (isConnectivityError(throwable)) {
                 view.showNoConnectivityError();

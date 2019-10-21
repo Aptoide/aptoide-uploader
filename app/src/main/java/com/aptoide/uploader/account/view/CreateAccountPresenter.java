@@ -89,10 +89,10 @@ public class CreateAccountPresenter implements Presenter {
             .doOnNext(click -> view.showLoading())
             .flatMapCompletable(data -> accountManager.create(data.getEmail(), data.getPassword(),
                 data.getStoreName())
-                .doOnComplete(() -> uploaderAnalytics.signUpEvent("success")))
+                .doOnComplete(() -> uploaderAnalytics.sendSignUpEvent("success")))
             .observeOn(viewScheduler)
             .doOnError(throwable -> {
-              uploaderAnalytics.signUpEvent("fail");
+              uploaderAnalytics.sendSignUpEvent("fail");
               view.hideLoading();
               if (isInternetError(throwable)) {
                 view.showNetworkError();

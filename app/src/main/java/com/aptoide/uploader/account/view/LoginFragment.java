@@ -91,7 +91,7 @@ public class LoginFragment extends FragmentView implements LoginView {
     setShowPasswordEye();
     setFacebookCustomListener();
 
-    new LoginPresenter(this, accountManager, new LoginNavigator(getContext(), getFragmentManager()),
+    new LoginPresenter(this, accountManager, new LoginNavigator(getFragmentManager()),
         new CompositeDisposable(), AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
         ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager(),

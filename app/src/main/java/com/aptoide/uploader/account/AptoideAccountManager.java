@@ -29,13 +29,13 @@ public class AptoideAccountManager {
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
-  public Completable loginWithGoogle(String email, String token) {
-    return accountService.getAccountOAuth(email, token, "google")
+  public Completable loginWithGoogle(String email, String serverAuthToken) {
+    return accountService.getAccount(email, serverAuthToken, "google")
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
-  public Completable loginWithFacebook(String email, String token) {
-    return accountService.getAccountOAuth(email, token, "facebook_uploader")
+  public Completable loginWithFacebook(String email, String serverAuthToken) {
+    return accountService.getAccount(email, serverAuthToken, "facebook_uploader")
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 

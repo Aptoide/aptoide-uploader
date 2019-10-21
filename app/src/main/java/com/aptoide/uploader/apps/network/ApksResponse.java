@@ -1,15 +1,15 @@
 package com.aptoide.uploader.apps.network;
 
-import com.aptoide.uploader.apps.Apk;
+import com.aptoide.uploader.apps.App;
 import java.util.List;
 
 public class ApksResponse {
 
-  private final List<Apk> list;
+  private final List<App> list;
   private final Status status;
   private final Errors errors;
 
-  public List<Apk> getList() {
+  public List<App> getList() {
     return list;
   }
 
@@ -21,7 +21,7 @@ public class ApksResponse {
     return errors;
   }
 
-  public ApksResponse(List<Apk> list, Status status) {
+  public ApksResponse(List<App> list, Status status) {
 
     this.list = list;
     this.status = status;

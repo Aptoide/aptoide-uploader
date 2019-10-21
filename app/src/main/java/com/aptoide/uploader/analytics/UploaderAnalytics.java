@@ -15,26 +15,26 @@ public class UploaderAnalytics {
     this.facebook = facebook;
   }
 
-  public void loginEvent(String method, String status) {
+  public void sendLoginEvent(String method, String status) {
     Bundle bundle = new Bundle();
     bundle.putString("method", method);
     bundle.putString("status", status);
     facebook.logEvent(LOGIN, bundle);
   }
 
-  public void signUpEvent(String status) {
+  public void sendSignUpEvent(String status) {
     Bundle bundle = new Bundle();
     bundle.putString("status", status);
     facebook.logEvent(SIGNUP, bundle);
   }
 
-  public void submitAppsEvent(int numberOfApps) {
+  public void sendSubmitAppsEvent(int numberOfApps) {
     Bundle bundle = new Bundle();
     bundle.putInt("number_of_selected_apps", numberOfApps);
     facebook.logEvent(SUBMIT_APPS, bundle);
   }
 
-  public void uploadCompleteEvent(String status, String statusMethod, String webCode,
+  public void sendUploadCompleteEvent(String status, String statusMethod, String webCode,
       String webDescription) {
     Bundle bundle = new Bundle();
     bundle.putString("status", status);

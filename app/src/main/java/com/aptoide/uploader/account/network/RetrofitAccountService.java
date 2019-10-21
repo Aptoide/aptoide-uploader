@@ -60,7 +60,7 @@ public class RetrofitAccountService implements AccountService {
         });
   }
 
-  @Override public Single<Account> getAccountOAuth(String email, String token, String authMode) {
+  @Override public Single<Account> getAccount(String email, String token, String authMode) {
     return authenticationProvider.getAccessTokenOAuth(email, token, authMode)
         .flatMap(accessToken -> serviceV7.getUserInfo(
             new AccountRequestBody(Collections.singletonList("meta"), accessToken))
@@ -70,11 +70,12 @@ public class RetrofitAccountService implements AccountService {
               .isOk()) {
             BaseAccount.LoginType loginType;
             if (authMode.equals("facebook_uploader")) {
-              loginType = BaseAccount.LoginType.FACEBOOK;
+              return Single.just(mapper.map(response.body(), BaseAccount.LoginType.FACEBOOK));
+            } else if (authMode.equals("google")) {
+              return Single.just(mapper.map(response.body(), BaseAccount.LoginType.GOOGLE));
             } else {
-              loginType = BaseAccount.LoginType.GOOGLE;
+              return Single.error(new IllegalStateException(response.message()));
             }
-            return Single.just(mapper.map(response.body(), loginType));
           }
           return Single.error(new IllegalStateException(response.message()));
         });

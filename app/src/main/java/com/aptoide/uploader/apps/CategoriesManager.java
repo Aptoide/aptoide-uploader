@@ -1,9 +1,8 @@
 package com.aptoide.uploader.apps;
 
-import com.aptoide.uploader.apps.network.CategoriesResponse;
+import com.aptoide.uploader.apps.network.CategoriesModel;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
 import io.reactivex.Single;
-import java.util.ArrayList;
 import java.util.List;
 
 public class CategoriesManager {
@@ -16,10 +15,10 @@ public class CategoriesManager {
 
   public Single<List<Category>> getCategories() {
     return retrofitCategoriesService.getCategories()
-        .map(getCategoriesResponse -> mapToCategoriesName(getCategoriesResponse));
+        .map(getCategoriesModel -> mapToCategoriesName(getCategoriesModel));
   }
 
-  private List<Category> mapToCategoriesName(CategoriesResponse categoriesResponse) {
-    return categoriesResponse.getList();
+  private List<Category> mapToCategoriesName(CategoriesModel categoriesModel) {
+    return categoriesModel.getList();
   }
 }

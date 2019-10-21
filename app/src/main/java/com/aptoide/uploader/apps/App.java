@@ -2,7 +2,7 @@ package com.aptoide.uploader.apps;
 
 import com.aptoide.uploader.apps.network.GetApksResponse;
 
-public class Apk {
+public class App {
 
   private int id;
   private String name;
@@ -17,7 +17,7 @@ public class Apk {
   private GetApksResponse.Package aPackage;
   private GetApksResponse.File file;
 
-  public Apk(int id, String name, int size, String icon, String graphic, String status, String mode,
+  public App(int id, String name, int size, String icon, String graphic, String status, String mode,
       String added, String modified, String updated, GetApksResponse.Package aPackage,
       GetApksResponse.File file) {
     this.id = id;

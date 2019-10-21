@@ -45,13 +45,13 @@ public class AppUploadStatusManager {
         })
         .flatMap(apksResponse -> {
           if (apksResponse != null && apksResponse.getErrors() != null) {
-            uploaderAnalytics.uploadCompleteEvent("fail", "Check if in Store",
+            uploaderAnalytics.sendUploadCompleteEvent("fail", "Check if in Store",
                 apksResponse.getErrors()
                     .getCode(), apksResponse.getErrors()
                     .getDescription());
             throw new IOException();
           }
-          uploaderAnalytics.uploadCompleteEvent("success", "Check if in Store", null, null);
+          uploaderAnalytics.sendUploadCompleteEvent("success", "Check if in Store", null, null);
           upload.setStatus(Upload.Status.COMPLETED);
           return Observable.just(upload);
         })

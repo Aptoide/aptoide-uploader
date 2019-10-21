@@ -9,7 +9,6 @@ public class Metadata {
   private String phoneNumber;
   private String email;
   private String website;
-  private String inputTitle;
   private String lang;
 
   public Metadata() {
@@ -70,14 +69,6 @@ public class Metadata {
 
   public void setWebsite(String website) {
     this.website = website;
-  }
-
-  public String getInputTitle() {
-    return inputTitle;
-  }
-
-  public void setInputTitle(String inputTitle) {
-    this.inputTitle = inputTitle;
   }
 
   public String getLang() {

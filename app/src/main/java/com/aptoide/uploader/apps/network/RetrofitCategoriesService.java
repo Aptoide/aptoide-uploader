@@ -16,33 +16,30 @@ public class RetrofitCategoriesService {
     this.serviceV7 = serviceV7;
   }
 
-  public Single<CategoriesResponse> getCategories() {
+  public Single<CategoriesModel> getCategories() {
     return serviceV7.getCategories()
         .map(getCategoriesResponse -> {
           if (getCategoriesResponse.isSuccessful()) {
-            return mapToCategoriesList(getCategoriesResponse.body(), CategoriesResponse.Status.OK);
+            return mapToCategoriesList(getCategoriesResponse.body(), CategoriesModel.Status.OK);
           } else {
-            return new CategoriesResponse(null, CategoriesResponse.Status.FAIL);
+            return new CategoriesModel(null, CategoriesModel.Status.FAIL);
           }
         })
         .subscribeOn(Schedulers.io());
   }
 
-  private CategoriesResponse mapToCategoriesList(GetCategoriesResponse getCategoriesResponse,
-      CategoriesResponse.Status status) {
+  private CategoriesModel mapToCategoriesList(GetCategoriesResponse getCategoriesResponse,
+      CategoriesModel.Status status) {
     List<Category> list = new ArrayList<>();
-    CategoriesResponse categoriesResponse = new CategoriesResponse(list, status);
+    CategoriesModel categoriesModel = new CategoriesModel(list, status);
     for (GetCategoriesResponse.Data category : getCategoriesResponse.getDatalist()
         .getList()) {
-      list.add(new Category(category.getId(), category.getName(), category.getTitle(),
-          category.getIcon(), category.getGraphic(), category.getAdded(), category.getModified(),
-          category.getParent(), category.getStats()));
+      list.add(new Category(category.getId(), category.getTitle()));
     }
-    return categoriesResponse;
+    return categoriesModel;
   }
 
   public interface ServiceV7 {
     @GET("apks/groups/get/groups_depth=1") Single<Response<GetCategoriesResponse>> getCategories();
   }
-
 }

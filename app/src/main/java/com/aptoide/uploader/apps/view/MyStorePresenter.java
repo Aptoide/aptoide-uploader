@@ -148,7 +148,7 @@ public class MyStorePresenter implements Presenter {
         .filter(granted -> granted)
         .flatMapSingle(__ -> view.getSelectedApps())
         .flatMapCompletable(apps -> storeManager.upload(apps)
-            .doOnComplete(() -> uploaderAnalytics.submitAppsEvent(apps.size())))
+            .doOnComplete(() -> uploaderAnalytics.sendSubmitAppsEvent(apps.size())))
         .doOnError(throwable -> {
           if (throwable instanceof SocketTimeoutException) {
             view.showError();

@@ -3,7 +3,7 @@ package com.aptoide.uploader.apps.network;
 import com.aptoide.uploader.apps.Category;
 import java.util.List;
 
-public class CategoriesResponse {
+public class CategoriesModel {
 
   private final List<Category> list;
   private final Status status;
@@ -16,7 +16,7 @@ public class CategoriesResponse {
     return status;
   }
 
-  public CategoriesResponse(List<Category> list, Status status) {
+  public CategoriesModel(List<Category> list, Status status) {
 
     this.list = list;
     this.status = status;

@@ -62,6 +62,8 @@ public class UploadManager {
     handleRetryStatus();
     handleCompletedStatus();
     checkAppUploadStatus();
+    handleObbMain();
+    handleObbPatch();
   }
 
   public Observable<UploadProgress> getProgress(String packageName) {
@@ -92,6 +94,21 @@ public class UploadManager {
         .cast(MetadataUpload.class)
         .flatMap(upload -> {
           upload.setStatus(Upload.Status.PROGRESS);
+          // TODO: 2019-10-18 verificar obbs aqui
+          if (upload.getInstalledApp()
+              .getObbPatchPath() != null
+              && upload.getInstalledApp()
+              .getObbPatchPath() != null) {
+          }
+          if (upload.getInstalledApp()
+              .getObbMainPath() != null) {
+            return uploaderService.upload(upload.getMd5(), upload.getStoreName(),
+                upload.getInstalledApp()
+                    .getName(), upload.getInstalledApp(), upload.getMetadata(),
+                upload.getInstalledApp()
+                    .getObbMainPath());
+          }
+
           return uploaderService.upload(upload.getMd5(), upload.getStoreName(),
               upload.getInstalledApp()
                   .getName(), upload.getInstalledApp(), upload.getMetadata());
@@ -101,11 +118,31 @@ public class UploadManager {
   }
 
   @SuppressLint("CheckResult") private void handleObbMain() {
-
+    persistence.getUploads()
+        .distinctUntilChanged(
+            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
+        .flatMapIterable(uploads -> uploads)
+        .filter(upload -> upload.getStatus()
+            .equals(Upload.Status.OBB_MAIN))
+        .flatMapCompletable(upload -> {
+          upload.setStatus(Upload.Status.PROGRESS);
+          return uploadApkWithMainObbToServer(upload);
+        })
+        .subscribe();
   }
 
   @SuppressLint("CheckResult") private void handleObbPatch() {
-
+    persistence.getUploads()
+        .distinctUntilChanged(
+            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
+        .flatMapIterable(uploads -> uploads)
+        .filter(upload -> upload.getStatus()
+            .equals(Upload.Status.OBB_PATCH))
+        .flatMapCompletable(upload -> {
+          upload.setStatus(Upload.Status.PROGRESS);
+          return uploadApkWithPatchObbToServer(upload);
+        })
+        .subscribe();
   }
 
   @SuppressLint("CheckResult") private void handleCompletedStatus() {
@@ -152,6 +189,8 @@ public class UploadManager {
         }, throwable -> {
           if (throwable instanceof NoConnectivityException) {
             Log.e(getClass().getSimpleName(), "NO INTERNET AVAILABLE!");
+          } else {
+            Log.e(getClass().getSimpleName(), throwable.getMessage());
           }
         });
   }
@@ -173,6 +212,15 @@ public class UploadManager {
                 return persistence.save(upload);
               } else {
                 upload.setStatus(Upload.Status.PROGRESS);
+                /// TODO: 2019-10-18 verificar obbs aqui e enviar caso existam senao enviar so o apk
+                if (upload.getInstalledApp()
+                    .getObbMainPath() != null
+                    && upload.getInstalledApp()
+                    .getObbPatchPath() != null) {
+                }
+                if (upload.getInstalledApp()
+                    .getObbMainPath() != null) {
+                }
                 return uploadApkToServer(upload);
               }
             }))
@@ -210,6 +258,22 @@ public class UploadManager {
     return uploaderService.upload(upload.getInstalledApp(), upload.getMd5(), upload.getStoreName(),
         upload.getInstalledApp()
             .getApkPath())
+        .flatMapCompletable(uploadResult -> persistence.save(uploadResult));
+  }
+
+  private Completable uploadApkWithMainObbToServer(Upload upload) {
+    //if metadata blah blah
+    return uploaderService.upload(upload.getInstalledApp(), upload.getMd5(), upload.getStoreName(),
+        upload.getInstalledApp()
+            .getObbMainPath(), "obb_main")
+        .flatMapCompletable(uploadResult -> persistence.save(uploadResult));
+  }
+
+  private Completable uploadApkWithPatchObbToServer(Upload upload) {
+    //if metadata blah blah
+    return uploaderService.upload(upload.getInstalledApp(), upload.getMd5(), upload.getStoreName(),
+        upload.getInstalledApp()
+            .getObbMainPath(), "obb_patch")
         .flatMapCompletable(uploadResult -> persistence.save(uploadResult));
   }
 
