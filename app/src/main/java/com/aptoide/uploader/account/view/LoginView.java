@@ -1,21 +1,37 @@
 package com.aptoide.uploader.account.view;
 
 import com.aptoide.uploader.view.View;
+import com.facebook.login.LoginResult;
+import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import io.reactivex.Observable;
 
 public interface LoginView extends View {
 
   Observable<CredentialsViewModel> getLoginEvent();
 
+  Observable<Object> getGoogleLoginEvent();
+
   Observable<CredentialsViewModel> getOpenCreateAccountView();
 
+  Observable<GoogleSignInAccount> googleLoginSuccessEvent();
+
+  Observable<LoginResult> facebookLoginSucessEvent();
+
   void showLoading(String username);
+
+  void showLoadingWithoutUserName();
 
   void hideLoading();
 
   void showCrendentialsError();
 
   void showNetworkError();
+
+  void showNoConnectivityError();
+
+  void hideKeyboard();
+
+  void startGoogleActivity();
 
   class CredentialsViewModel {
 

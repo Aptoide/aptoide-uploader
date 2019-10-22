@@ -2,11 +2,14 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
-apply plugin: "de.mannodermaus.android-junit5"
 
 android {
+  lintOptions {
+    checkReleaseBuilds false
+    abortOnError false
+  }
+
   compileSdkVersion 27
-  buildToolsVersion "27.0.2"
 
   signingConfigs {
     release {
@@ -16,25 +19,53 @@ android {
       keyPassword = project.KEY_PASSWORD_UPLOADER
     }
   }
+
   defaultConfig {
     applicationId "pt.caixamagica.aptoide.uploader"
-    minSdkVersion 15
+    minSdkVersion 16
     targetSdkVersion 27
-    versionCode 1
-    versionName "1.0"
+    versionCode project.VERSION_CODE_UPLOADER.toInteger()
+    versionName "2.100"
     testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    buildConfigField "String", "FLURRY_KEY_UPLOADER", "\"" + project.FLURRY_KEY_UPLOADER + "\""
+    resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
+    resValue "string", "fb_login_protocol_scheme",
+        "\"" + "fb" + project.FACEBOOK_APP_ID_UPLOADER + "\""
+    resValue "string", "google_id", "\"" + project.GMS_SERVER_ID + "\""
+    vectorDrawables.useSupportLibrary = true
   }
+
   buildTypes {
     release {
-      minifyEnabled false
+      minifyEnabled true
+      shrinkResources true
       proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
       signingConfig signingConfigs.release
     }
+
     debug {
-      minifyEnabled false
+      signingConfig signingConfigs.release
       applicationIdSuffix ".debug"
+      multiDexEnabled true
+      minifyEnabled false
+      proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
     }
   }
+
+  applicationVariants.all { variant ->
+    variant.outputs.each { output ->
+      def project = "uploader"
+      def SEP = "_"
+      def buildType = variant.variantData.variantConfiguration.buildType.name
+      def versionName = variant.versionName
+      def versionCode = variant.versionCode
+
+      def newApkName = project + SEP + buildType + SEP + versionName + SEP + versionCode + ".apk"
+
+      output.outputFileName = newApkName
+    }
+  }
+
   sourceSets {
     main.java.srcDirs += 'src/main/kotlin'
     test.java.srcDirs += 'src/test/kotlin'
@@ -44,38 +75,51 @@ android {
     sourceCompatibility JavaVersion.VERSION_1_8
     targetCompatibility JavaVersion.VERSION_1_8
   }
+
+  dexOptions {
+    javaMaxHeapSize "4g"
+    dexInProcess = false
+    preDexLibraries = false
+  }
 }
 
 dependencies {
 
   // Support Libraries
-  compile 'com.android.support:appcompat-v7:27.0.2'
-  compile 'com.android.support:design:27.0.2'
+  implementation 'com.android.support:appcompat-v7:27.0.0'
+  implementation 'com.android.support:design:27.0.2'
 
   // Reactive Programming
-  compile "io.reactivex.rxjava2:rxjava:2.1.7"
-  compile "com.jakewharton.rxbinding2:rxbinding-support-v4:2.0.0"
-  compile 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
+  implementation "io.reactivex.rxjava2:rxjava:2.1.7"
+  implementation "com.jakewharton.rxbinding2:rxbinding-support-v4:2.0.0"
+  implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
 
   // Kotlin
-  compile "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
+  implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
   // Unit Test
-  testCompile 'org.jetbrains.spek:spek-api:1.1.5'
-  testCompile 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
-  testCompile 'org.junit.platform:junit-platform-runner:1.0.1'
-  testCompile 'org.junit.jupiter:junit-jupiter-api:5.0.1'
-  testCompile "com.nhaarman:mockito-kotlin:1.5.0"
-  testCompile 'org.mockito:mockito-core:2.11.0'
-  testCompile 'io.reactivex.rxjava2:rxkotlin:2.1.0'
-  testCompile junit5()
-  testCompileOnly junit5EmbeddedRuntime()
+  testImplementation 'org.jetbrains.spek:spek-api:1.1.5'
+  testImplementation 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
+  testImplementation 'org.junit.platform:junit-platform-runner:1.0.1'
+  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.0.1'
+  testImplementation "com.nhaarman:mockito-kotlin:1.5.0"
+  testImplementation 'org.mockito:mockito-core:2.11.0'
+  testImplementation 'io.reactivex.rxjava2:rxkotlin:2.1.0'
 
   // Networking
-  compile 'com.squareup.retrofit2:retrofit:2.3.0'
-  compile 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
-  compile 'com.squareup.retrofit2:converter-moshi:2.3.0'
+  implementation 'com.squareup.retrofit2:retrofit:2.3.0'
+  implementation 'com.squareup.retrofit2:adapter-rxjava2:2.3.0'
+  implementation 'com.squareup.retrofit2:converter-moshi:2.3.0'
 
   // Image Loading
-  compile 'com.github.bumptech.glide:glide:4.4.0'
+  implementation 'com.github.bumptech.glide:glide:4.4.0'
+
+  //Flurry
+  implementation 'com.flurry.android:analytics:11.7.1@aar'
+
+  //Facebook
+  implementation 'com.facebook.android:facebook-login:[5,6)'
+
+  //Google Sign-In
+  implementation 'com.google.android.gms:play-services-auth:16.0.0'
 }

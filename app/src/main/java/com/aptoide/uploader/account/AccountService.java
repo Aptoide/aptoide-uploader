@@ -1,5 +1,6 @@
 package com.aptoide.uploader.account;
 
+import com.aptoide.uploader.account.network.CreateStoreStatus;
 import io.reactivex.Single;
 
 /**
@@ -8,10 +9,18 @@ import io.reactivex.Single;
 
 public interface AccountService {
 
-  Single<AptoideAccount> getAccount(String username, String password);
+  Single<Account> getAccount(String username, String password);
 
-  Single<AptoideAccount> createAccount(String email, String password, String storeName);
+  Single<Account> getAccount(String email, String ServerAuthToken, String authMode);
 
-  Single<AptoideAccount> createAccount(String email, String password, String storeName,
+  Single<Account> createAccount(String email, String password, String storeName);
+
+  Single<Account> createAccount(String email, String password, String storeName,
       String storeUser, String storePass);
+
+  Single<CreateStoreStatus> createStore(String storeName);
+
+  Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials);
+
+  void removeAccessTokenFromPersistence();
 }

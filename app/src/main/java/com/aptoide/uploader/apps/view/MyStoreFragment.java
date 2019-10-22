@@ -6,6 +6,7 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
 import android.support.v7.widget.RecyclerView;
@@ -40,6 +41,7 @@ import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.disposables.Disposable;
+import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -59,6 +61,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private Disposable selectionObservable;
   private Animation slideBottomDown;
   private Animation slideBottomUp;
+  private SwipeRefreshLayout refreshLayout;
+  private PublishSubject<Boolean> refreshEvent;
 
   public static MyStoreFragment newInstance() {
     return new MyStoreFragment();
@@ -95,7 +99,10 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
     adapter = new MyAppsAdapter(new ArrayList<>());
     setUpSelectionListener();
+    refreshEvent = PublishSubject.create();
     recyclerView.setAdapter(adapter);
+    refreshLayout = view.findViewById(R.id.swipe_refresh);
+
     logoutConfirmation = new RxAlertDialog.Builder(
         new ContextThemeWrapper(getContext(), R.style.ConfirmationDialog)).setMessage(
         R.string.logout_confirmation_message)
@@ -107,11 +114,16 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       adapter.clearAppsSelection();
     });
     storeBanner.setOnLongClickListener(click -> showVersionDialog());
+    refreshLayout.setOnRefreshListener(() -> refreshEvent.onNext(true));
+
     new MyStorePresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
         new CompositeDisposable(), new MyStoreNavigator(getFragmentManager()),
         AndroidSchedulers.mainThread(),
-        new UploadPermissionProvider((PermissionProvider) getContext())).present();
+        new UploadPermissionProvider((PermissionProvider) getContext()),
+        ((UploaderApplication) getContext().getApplicationContext()).getAppUploadStatusPersistence(),
+        ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
+        ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider()).present();
   }
 
   @Override public void onDestroyView() {
@@ -174,6 +186,15 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     adapter.setInstalledApps(appsList);
   }
 
+  @Override public void refreshApps(@NotNull List<InstalledApp> appsList) {
+    adapter.refreshInstalledApps(appsList);
+    refreshLayout.setRefreshing(false);
+  }
+
+  @Override public void orderApps(SortingOrder order) {
+    adapter.setOrder(order);
+  }
+
   @Override public void showStoreName(@NotNull String storeName) {
     storeNameText.setText(storeName);
   }
@@ -196,6 +217,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void showError() {
     Toast.makeText(getContext(), R.string.error_occurred, Toast.LENGTH_SHORT)
+        .show();
+  }
+
+  @Override public void showNoConnectivityError() {
+    Toast.makeText(getContext(), R.string.no_connectivity_error, Toast.LENGTH_LONG)
         .show();
   }
 
@@ -336,5 +362,19 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       toolbar.setNavigationIcon(null);
       logoutItem.setVisible(true);
     }
+  }
+
+  @Override public void clearSelection() {
+    adapter.clearAppsSelection();
+  }
+
+  @Override public void setCloudIcon(List<String> packageList) {
+    if (packageList != null && adapter != null) {
+      adapter.setCloudIcon(packageList);
+    }
+  }
+
+  @Override public Observable<Boolean> refreshEvent() {
+    return refreshEvent;
   }
 }

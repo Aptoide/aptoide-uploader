@@ -6,11 +6,26 @@ public interface NotificationView extends View {
 
   void showDuplicateUploadNotification(String applicationName, String packageName);
 
-  void showCompletedUploadNotification();
+  void showCompletedUploadNotification(String applicationName, String packageName);
 
-  void showProgressUploadNotification();
+  void showPendingUploadNotification(String applicationName, String packageName);
 
-  void showPendingUploadNotification();
+  void showNoMetaDataNotification(String applicationName, String packageName, String md5);
 
-  void showNoMetaDataNotification(String applicationName, String packageName);
+  void showFailedUploadNotification(String applicationName, String packageName);
+
+  void showPublisherOnlyNotification(String applicationName, String packageName);
+
+  void showUploadInfectionNotificaton(String applicationName, String packageName);
+
+  void showIntellectualRightsNotification(String applicationName, String packageName);
+
+  void showAppBundleNotification(String applicationName, String packageName);
+
+  void showInvalidSignatureNotification(String applicationName, String packageName);
+
+  void updateUploadProgress(String name, String packageName, int progress);
+
+  void showErrorNotification(String name, String packageName);
 }
+

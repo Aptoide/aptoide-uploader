@@ -12,6 +12,10 @@ public interface MyStoreView extends View {
 
   void showApps(@NotNull List<InstalledApp> appsList);
 
+  void refreshApps(@NotNull List<InstalledApp> appsList);
+
+  void orderApps(SortingOrder order);
+
   void showStoreName(@NotNull String storeName);
 
   void showDialog();
@@ -22,6 +26,8 @@ public interface MyStoreView extends View {
 
   void showError();
 
+  void showNoConnectivityError();
+
   Observable<Object> submitAppEvent();
 
   Observable<SortingOrder> orderByEvent();
@@ -31,4 +37,10 @@ public interface MyStoreView extends View {
   Observable<Object> logoutEvent();
 
   Single<List<InstalledApp>> getSelectedApps();
+
+  void clearSelection();
+
+  void setCloudIcon(List<String> md5List);
+
+  Observable<Boolean> refreshEvent();
 }

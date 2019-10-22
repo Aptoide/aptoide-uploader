@@ -1,6 +1,12 @@
 package com.aptoide.uploader.account.view;
 
+import android.content.Context;
+import android.util.Log;
+import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.AutoLoginManager;
+import com.aptoide.uploader.analytics.UploaderAnalytics;
+import com.aptoide.uploader.apps.network.NoConnectivityException;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
@@ -14,15 +20,22 @@ public class LoginPresenter implements Presenter {
   private final LoginNavigator loginNavigator;
   private final CompositeDisposable compositeDisposable;
   private final Scheduler viewScheduler;
+  private final UploaderAnalytics uploaderAnalytics;
+  private final AutoLoginManager autoLoginManager;
+  private final Context context;
 
   public LoginPresenter(LoginView view, AptoideAccountManager accountManager,
       LoginNavigator loginNavigator, CompositeDisposable compositeDisposable,
-      Scheduler viewScheduler) {
+      Scheduler viewScheduler, UploaderAnalytics uploaderAnalytics,
+      AutoLoginManager autoLoginManager, Context context) {
     this.view = view;
     this.accountManager = accountManager;
     this.loginNavigator = loginNavigator;
     this.compositeDisposable = compositeDisposable;
     this.viewScheduler = viewScheduler;
+    this.uploaderAnalytics = uploaderAnalytics;
+    this.autoLoginManager = autoLoginManager;
+    this.context = context;
   }
 
   @Override public void present() {
@@ -33,14 +46,16 @@ public class LoginPresenter implements Presenter {
         .observeOn(viewScheduler)
         .doOnNext(account -> {
           if (account.isLoggedIn()) {
-            view.hideLoading();
             if (account.hasStore()) {
               loginNavigator.navigateToMyAppsView();
+              //view.hideLoading();
             } else {
               loginNavigator.navigateToCreateStoreView();
+              //view.hideLoading();
             }
           }
         })
+        .doOnNext(__ -> view.hideLoading())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -48,14 +63,43 @@ public class LoginPresenter implements Presenter {
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .doOnNext(__ -> view.showLoadingWithoutUserName())
+        .filter(
+            __ -> !((UploaderApplication) context.getApplicationContext()).getAutoLoginPersistence()
+                .isForcedLogout())
+        .flatMapSingle(__ -> autoLoginManager.getStoredUserCredentials()
+            .flatMap(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
+        .firstOrError()
+        .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account))
+        .observeOn(viewScheduler)
+        .subscribe(() -> {
+        }, throwable -> {
+          Log.e(getClass().getSimpleName(), throwable.getMessage());
+          ((UploaderApplication) context.getApplicationContext()).getAutoLoginPersistence()
+              .setForcedLogout(true);
+          accountManager.logout();
+          accountManager.removeAccessTokenFromPersistence();
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMapCompletable(__ -> view.getLoginEvent()
-            .doOnNext(credentials -> view.showLoading(credentials.getUsername()))
+            .doOnNext(credentials -> {
+              view.hideKeyboard();
+              view.showLoading(credentials.getUsername());
+              accountManager.logout();
+              accountManager.removeAccessTokenFromPersistence();
+            })
             .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
-                credentials.getPassword()))
+                credentials.getPassword())
+                .doOnComplete(() -> uploaderAnalytics.sendLoginEvent("email", "success")))
             .observeOn(viewScheduler)
             .doOnError(throwable -> {
+              uploaderAnalytics.sendLoginEvent("email", "fail");
               view.hideLoading();
-              if (isInternetError(throwable)) {
+              if (isConnectivityError(throwable)) {
+                view.showNoConnectivityError();
+              } else if (isInternetError(throwable)) {
                 view.showNetworkError();
               } else {
                 view.showCrendentialsError();
@@ -63,9 +107,7 @@ public class LoginPresenter implements Presenter {
             })
             .retry())
         .subscribe(() -> {
-        }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
-        }));
+        }, throwable -> view.showNetworkError()));
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
@@ -82,6 +124,38 @@ public class LoginPresenter implements Presenter {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(created -> view.getGoogleLoginEvent()
+            .doOnNext(__ -> view.startGoogleActivity()))
+        .subscribe());
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMapCompletable(created -> view.googleLoginSuccessEvent()
+            .doOnNext(account -> {
+              view.showLoading(account.getDisplayName());
+            })
+            .flatMapCompletable(
+                googleAccount -> accountManager.loginWithGoogle(googleAccount.getEmail(),
+                    googleAccount.getServerAuthCode())))
+        .observeOn(viewScheduler)
+        .subscribe(() -> {
+        }, throwable -> view.showNetworkError()));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMapCompletable(created -> view.facebookLoginSucessEvent()
+            .doOnNext(account -> {
+              view.showLoadingWithoutUserName();
+            })
+            .flatMapCompletable(facebookAccount -> accountManager.loginWithFacebook(null,
+                facebookAccount.getAccessToken()
+                    .getToken())))
+        .observeOn(viewScheduler)
+        .subscribe(() -> {
+        }, throwable -> view.showNetworkError()));
   }
 
   private boolean isInternetError(Throwable throwable) {
@@ -89,5 +163,12 @@ public class LoginPresenter implements Presenter {
       return false;
     }
     return true;
+  }
+
+  private boolean isConnectivityError(Throwable throwable) {
+    if (throwable instanceof NoConnectivityException) {
+      return true;
+    }
+    return false;
   }
 }

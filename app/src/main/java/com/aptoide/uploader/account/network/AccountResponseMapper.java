@@ -1,6 +1,8 @@
 package com.aptoide.uploader.account.network;
 
-import com.aptoide.uploader.account.AptoideAccount;
+import com.aptoide.uploader.account.Account;
+import com.aptoide.uploader.account.AccountFactory;
+import com.aptoide.uploader.account.BaseAccount;
 
 /**
  * Created by franciscoaleixo on 03/11/2017.
@@ -8,11 +10,12 @@ import com.aptoide.uploader.account.AptoideAccount;
 
 public class AccountResponseMapper {
 
-  public AptoideAccount map(AccountResponse response) {
+  public Account map(AccountResponse response, BaseAccount.LoginType loginType) {
     AccountResponse.Store store = response.getNodes()
         .getMeta()
         .getData()
         .getStore();
-    return new AptoideAccount(store != null, true, store != null ? store.getName() : null);
+    return AccountFactory.of(store != null, true, store != null ? store.getName() : null,
+        loginType);
   }
 }

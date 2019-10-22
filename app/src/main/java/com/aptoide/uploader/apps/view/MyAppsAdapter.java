@@ -9,6 +9,7 @@ import com.aptoide.uploader.apps.InstalledApp;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
@@ -47,9 +48,33 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   public void setInstalledApps(List<InstalledApp> appsList) {
+    if (!appsList.equals(installedApps)) {
+      installedApps.clear();
+      installedApps.addAll(appsList);
+      setOrder(SortingOrder.DATE);
+      clearAppsSelection(false);
+      notifyDataSetChanged();
+    }
+  }
+
+  public void refreshInstalledApps(List<InstalledApp> appsList) {
     installedApps.clear();
     installedApps.addAll(appsList);
+    setOrder(SortingOrder.DATE);
     clearAppsSelection(false);
+    notifyDataSetChanged();
+  }
+
+  public void setOrder(SortingOrder order) {
+    if (order.equals(SortingOrder.NAME)) {
+      Collections.sort(installedApps, (obj1, obj2) -> obj1.getName()
+          .compareToIgnoreCase(obj2.getName()));
+    }
+    if (order.equals(SortingOrder.DATE)) {
+      Collections.sort(installedApps,
+          (obj1, obj2) -> Long.compare(obj2.getInstalledDate(), obj1.getInstalledDate()));
+    }
+    selectedApps.clear();
     notifyDataSetChanged();
   }
 
@@ -90,5 +115,17 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
   public void clearAppsSelection() {
     clearAppsSelection(true);
+  }
+
+  public void setCloudIcon(List<String> uploadedPackageNames) {
+    for (InstalledApp app : installedApps) {
+      for (String packageName : uploadedPackageNames) {
+        if (app.getPackageName()
+            .equals(packageName)) {
+          app.setIsUploaded(true);
+        }
+      }
+    }
+    notifyDataSetChanged();
   }
 }

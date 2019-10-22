@@ -4,6 +4,7 @@ import com.aptoide.uploader.account.AccountValidationException;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
 import com.aptoide.uploader.account.network.error.DuplicatedUserException;
+import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
@@ -19,16 +20,19 @@ public class CreateAccountPresenter implements Presenter {
   private final CompositeDisposable compositeDisposable;
   private final AccountErrorMapper accountErrorMapper;
   private final Scheduler viewScheduler;
+  private final UploaderAnalytics uploaderAnalytics;
 
   public CreateAccountPresenter(CreateAccountView view, AptoideAccountManager accountManager,
       CreateAccountNavigator accountNavigator, CompositeDisposable compositeDisposable,
-      AccountErrorMapper accountErrorMapper, Scheduler viewScheduler) {
+      AccountErrorMapper accountErrorMapper, Scheduler viewScheduler,
+      UploaderAnalytics uploaderAnalytics) {
     this.view = view;
     this.accountManager = accountManager;
     this.accountNavigator = accountNavigator;
     this.compositeDisposable = compositeDisposable;
     this.accountErrorMapper = accountErrorMapper;
     this.viewScheduler = viewScheduler;
+    this.uploaderAnalytics = uploaderAnalytics;
   }
 
   @Override public void present() {
@@ -84,15 +88,15 @@ public class CreateAccountPresenter implements Presenter {
         .flatMapCompletable(created -> view.getCreateAccountEvent()
             .doOnNext(click -> view.showLoading())
             .flatMapCompletable(data -> accountManager.create(data.getEmail(), data.getPassword(),
-                data.getStoreName()))
+                data.getStoreName())
+                .doOnComplete(() -> uploaderAnalytics.sendSignUpEvent("success")))
             .observeOn(viewScheduler)
             .doOnError(throwable -> {
+              uploaderAnalytics.sendSignUpEvent("fail");
               view.hideLoading();
-
               if (isInternetError(throwable)) {
                 view.showNetworkError();
               }
-
               if (invalidFieldError(throwable)) {
                 view.showInvalidFieldError(accountErrorMapper.map(throwable));
               } else if (isStoreNameTaken(throwable)) {

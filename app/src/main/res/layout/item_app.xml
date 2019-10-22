@@ -3,6 +3,8 @@
     xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="130dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:foreground="@drawable/mca__list_item_selector2"
     android:scaleType="centerCrop"
     >
@@ -21,6 +23,25 @@
         android:layout_centerHorizontal="true"
         android:layout_gravity="center_horizontal"
         android:layout_marginTop="5dp"
+        />
+
+    <android.support.v7.widget.AppCompatImageView
+        android:id="@+id/appInCloud"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:paddingBottom="4dp"
+        android:paddingEnd="8dp"
+        android:paddingLeft="4dp"
+        android:paddingRight="8dp"
+        android:paddingStart="4dp"
+        android:paddingTop="8dp"
+        android:visibility="gone"
+        app:srcCompat="@drawable/ic_cloud_done"
+        tools:visibility="visible"
+
+
         />
 
     <TextView

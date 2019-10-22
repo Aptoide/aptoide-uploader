@@ -1,6 +1,5 @@
 package com.aptoide.uploader.apps.network;
 
-import com.aptoide.uploader.account.network.Error;
 import com.aptoide.uploader.account.network.Status;
 import java.util.List;
 
@@ -24,4 +23,23 @@ public class UploadAppToRepoResponse {
   public void setErrors(List<Error> errors) {
     this.errors = errors;
   }
+
+  public static class Error {
+    private String code;
+    private String msg;
+
+    public Error(String code, String msg) {
+      this.code = code;
+      this.msg = msg;
+    }
+
+    public String getCode() {
+      return code;
+    }
+
+    public String getMsg() {
+      return msg;
+    }
+  }
+
 }

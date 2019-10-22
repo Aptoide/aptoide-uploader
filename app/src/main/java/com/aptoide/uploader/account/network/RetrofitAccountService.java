@@ -1,13 +1,16 @@
 package com.aptoide.uploader.account.network;
 
+import com.aptoide.uploader.account.Account;
 import com.aptoide.uploader.account.AccountService;
-import com.aptoide.uploader.account.AptoideAccount;
+import com.aptoide.uploader.account.AutoLoginCredentials;
+import com.aptoide.uploader.account.BaseAccount;
 import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
 import com.aptoide.uploader.account.network.error.DuplicatedUserException;
 import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SecurityAlgorithms;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -15,6 +18,7 @@ import java.util.List;
 import java.util.Map;
 import retrofit2.Response;
 import retrofit2.http.Body;
+import retrofit2.http.Field;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.POST;
@@ -42,7 +46,7 @@ public class RetrofitAccountService implements AccountService {
     this.authenticationProvider = authenticationProvider;
   }
 
-  @Override public Single<AptoideAccount> getAccount(String username, String password) {
+  @Override public Single<Account> getAccount(String username, String password) {
     return authenticationProvider.getAccessToken(username, password)
         .flatMap(accessToken -> serviceV7.getUserInfo(
             new AccountRequestBody(Collections.singletonList("meta"), accessToken))
@@ -50,19 +54,69 @@ public class RetrofitAccountService implements AccountService {
         .flatMap(response -> {
           if (response.isSuccessful() && response.body()
               .isOk()) {
-            return Single.just(mapper.map(response.body()));
+            return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
           }
           return Single.error(new IllegalStateException(response.message()));
         });
   }
 
-  @Override
-  public Single<AptoideAccount> createAccount(String email, String password, String storeName) {
+  @Override public Single<Account> getAccount(String email, String token, String authMode) {
+    return authenticationProvider.getAccessTokenOAuth(email, token, authMode)
+        .flatMap(accessToken -> serviceV7.getUserInfo(
+            new AccountRequestBody(Collections.singletonList("meta"), accessToken))
+            .singleOrError())
+        .flatMap(response -> {
+          if (response.isSuccessful() && response.body()
+              .isOk()) {
+            BaseAccount.LoginType loginType;
+            if (authMode.equals("facebook_uploader")) {
+              return Single.just(mapper.map(response.body(), BaseAccount.LoginType.FACEBOOK));
+            } else if (authMode.equals("google")) {
+              return Single.just(mapper.map(response.body(), BaseAccount.LoginType.GOOGLE));
+            } else {
+              return Single.error(new IllegalStateException(response.message()));
+            }
+          }
+          return Single.error(new IllegalStateException(response.message()));
+        });
+  }
+
+  @Override public Single<Account> createAccount(String email, String password, String storeName) {
     return createAccount(email, password, storeName, null, null);
   }
 
-  @Override public Single<AptoideAccount> createAccount(String userEmail, String userPassword,
-      String storeName, String storeUser, String storePassword) {
+  @Override public Single<CreateStoreStatus> createStore(String storeName) {
+    return authenticationProvider.getAccessToken()
+        .flatMap(accessToken -> serviceV3.createRepo(storeName, 1, true, accessToken, "aptoide",
+            accessToken, "json")
+            .singleOrError())
+        .flatMap(response -> mapCreateStoreResponse(response));
+  }
+
+  private Single<CreateStoreStatus> mapCreateStoreResponse(Response<CreateStoreResponse> response) {
+    if (response.isSuccessful() && response.body()
+        .getStatus()
+        .equals(Status.OK)) {
+      return Single.just(new CreateStoreStatus(response.body()
+          .getStatus(), response.body()
+          .getErrors()));
+    } else if (response.body()
+        .getStatus()
+        .equals(Status.FAIL)) {
+      if (response.body()
+          .getErrors()
+          .get(0)
+          .getCode()
+          .equals("WOP-3")) {
+        return Single.error(new DuplicatedStoreException());
+      }
+    }
+    return Single.error(new IOException());
+  }
+
+  @Override
+  public Single<Account> createAccount(String userEmail, String userPassword, String storeName,
+      String storeUser, String storePassword) {
 
     String passwordHash;
     try {
@@ -130,15 +184,40 @@ public class RetrofitAccountService implements AccountService {
         .flatMap(response -> {
           if (response.isSuccessful() && response.body()
               .isOk()) {
-            return Single.just(mapper.map(response.body()));
+            return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
           }
           return Single.error(new IllegalStateException(response.message()));
         });
   }
 
+  @Override public Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials) {
+    authenticationProvider.saveAuthentication(credentials.getAccessToken(),
+        credentials.getRefreshToken());
+    return serviceV7.getUserInfo(
+        new AccountRequestBody(Collections.singletonList("meta"), credentials.getAccessToken()))
+        .singleOrError()
+        .flatMap(response -> {
+          if (response.isSuccessful() && response.body()
+              .isOk()) {
+            return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
+          }
+          return Single.error(new IllegalStateException(response.message()));
+        });
+  }
+
+  @Override public void removeAccessTokenFromPersistence() {
+    authenticationProvider.removeAuthentication();
+  }
+
   public interface ServiceV3 {
     @POST("webservices/3/createUser") @FormUrlEncoded Observable<Response<OAuth>> createAccount(
         @FieldMap Map<String, String> args);
+
+    @POST("webservices/3/checkUserCredentials") @FormUrlEncoded
+    Observable<Response<CreateStoreResponse>> createRepo(@Field("repo") String storeName,
+        @Field("createRepo") int createRepo, @Field("oauthCreateRepo") boolean oauthCreateRepo,
+        @Field("oauthToken") String oauthtoken, @Field("authMode") String authMode,
+        @Field("access_token") String accessToken, @Field("mode") String mode);
   }
 
   public interface ServiceV7 {

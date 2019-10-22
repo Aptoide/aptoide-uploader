@@ -8,12 +8,11 @@ import java.util.List;
  */
 
 public class AccountRequestBody {
-    private List<String> nodes;
-    @Json(name="access_token") private String accessToken;
+  @Json(name = "nodes") private List<String> nodes;
+  @Json(name = "access_token") private String accessToken;
 
-    public AccountRequestBody(List<String> nodes, String accessToken) {
-        this.nodes = nodes;
-        this.accessToken = accessToken;
-    }
-
+  public AccountRequestBody(List<String> nodes, String accessToken) {
+    this.nodes = nodes;
+    this.accessToken = accessToken;
+  }
 }
