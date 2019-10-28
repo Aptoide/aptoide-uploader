@@ -8,17 +8,20 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.io.File;
 import java.util.List;
+import java.util.Map;
 
 public class PackageManagerInstalledAppsProvider implements InstalledAppsProvider {
 
   private final PackageManager packageManager;
   private PackageInfo packageInfo;
   private OkioMd5Calculator md5Calculator;
+  private Map<String, String> cache;
 
   public PackageManagerInstalledAppsProvider(PackageManager packageManager,
-      OkioMd5Calculator md5Calculator) {
+      OkioMd5Calculator md5Calculator, Map<String, String> cache) {
     this.packageManager = packageManager;
     this.md5Calculator = md5Calculator;
+    this.cache = cache;
   }
 
   @Override public Single<List<InstalledApp>> getInstalledApps() {
@@ -49,9 +52,8 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
               .contains("main") && !file.getName()
               .contains("--downloading")) {
             String obbMainPath = file.getAbsolutePath();
-            return new Obb(obbMainPath.substring(obbMainPath.lastIndexOf("/") + 1),
-                md5Calculator.calculate(obbMainPath)
-                    .blockingGet(), obbMainPath);
+            return new Obb(obbMainPath.substring(obbMainPath.lastIndexOf("/") + 1), null,
+                obbMainPath);
           }
         }
       }
@@ -72,9 +74,8 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
           if (arr[0].equals("patch") && !file.getName()
               .contains("--downloading")) {
             String obbPatchPath = file.getAbsolutePath();
-            return new Obb(obbPatchPath.substring(obbPatchPath.lastIndexOf("/") + 1),
-                md5Calculator.calculate(obbPatchPath)
-                    .blockingGet(), obbPatchPath);
+            return new Obb(obbPatchPath.substring(obbPatchPath.lastIndexOf("/") + 1), null,
+                obbPatchPath);
           }
         }
       }

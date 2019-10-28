@@ -104,6 +104,7 @@ public abstract class NotificationApplicationView extends Application implements
             .setContentTitle(getString(R.string.app_name))
             .setOngoing(false)
             .setContentText(applicationName)
+            .setOnlyAlertOnce(true)
             .setProgress(100, progress, false);
 
     notificationManager.notify(packageName.hashCode(), mBuilder.build());

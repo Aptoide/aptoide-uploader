@@ -160,22 +160,22 @@ public class RetrofitUploadService implements UploaderService {
     parameters.put("uploadType",
         RequestBody.create(MediaType.parse("text/plain"), String.valueOf(uploadType.getType())));
 
-    if (installedApp.getObbMainPath() != null) {
-      if (!obbFileFlag) {
-        parameters.put("obb_main_md5sum",
-            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
-        parameters.put("obb_main_filename",
-            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
-      }
-    }
-    if (installedApp.getObbPatchPath() != null) {
-      if (!obbFileFlag) {
-        parameters.put("obb_patch_md5sum",
-            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
-        parameters.put("obb_patch_filename",
-            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
-      }
-    }
+    //if (installedApp.getObbMainPath() != null) {
+    //  if (!obbFileFlag) {
+    //    parameters.put("obb_main_md5sum",
+    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
+    //    parameters.put("obb_main_filename",
+    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
+    //  }
+    //}
+    //if (installedApp.getObbPatchPath() != null) {
+    //  if (!obbFileFlag) {
+    //    parameters.put("obb_patch_md5sum",
+    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
+    //    parameters.put("obb_patch_filename",
+    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
+    //  }
+    //}
     Log.w(getClass().getSimpleName(), parameters.toString());
     return parameters;
   }
@@ -210,22 +210,23 @@ public class RetrofitUploadService implements UploaderService {
       parameters.put("apk_website",
           RequestBody.create(MediaType.parse("text/plain"), metadata.getWebsite()));
     }
-    if (installedApp.getObbMainPath() != null) {
-      if (!obbFileFlag) {
-        parameters.put("obb_main_md5sum",
-            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
-        parameters.put("obb_main_filename",
-            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
-      }
-    }
-    if (installedApp.getObbPatchPath() != null) {
-      if (!obbFileFlag) {
-        parameters.put("obb_patch_md5sum",
-            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
-        parameters.put("obb_patch_filename",
-            RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
-      }
-    }
+    //if (installedApp.getObbMainPath() != null) {
+    //  if (!obbFileFlag) {
+    //    parameters.put("obb_main_md5sum",
+    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
+    //    parameters.put("obb_main_filename",
+    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
+    //  }
+    //}
+    //if (installedApp.getObbPatchPath() != null) {
+    //  if (!obbFileFlag) {
+    //
+    //    parameters.put("obb_patch_md5sum",
+    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
+    //    parameters.put("obb_patch_filename",
+    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
+    //  }
+    //}
     return parameters;
   }
 
@@ -360,18 +361,18 @@ public class RetrofitUploadService implements UploaderService {
     parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), "json"));
     parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
     parameters.put("uploadType", RequestBody.create(MediaType.parse("text/plain"), "aptuploader"));
-    if (installedApp.getObbMainPath() != null) {
-      parameters.put("obb_main_md5sum",
-          RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
-      parameters.put("obb_main_filename",
-          RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
-    }
-    if (installedApp.getObbPatchPath() != null) {
-      parameters.put("obb_patch_md5sum",
-          RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
-      parameters.put("obb_patch_filename",
-          RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
-    }
+    //if (installedApp.getObbMainPath() != null) {
+    //  parameters.put("obb_main_md5sum",
+    //      RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
+    //  parameters.put("obb_main_filename",
+    //      RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
+    //}
+    //if (installedApp.getObbPatchPath() != null) {
+    //  parameters.put("obb_patch_md5sum",
+    //      RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
+    //  parameters.put("obb_patch_filename",
+    //      RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
+    //}
     Log.w(getClass().getSimpleName(), parameters.toString());
     return parameters;
   }

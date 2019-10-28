@@ -1,5 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
+import android.graphics.Color;
+import android.graphics.drawable.ColorDrawable;
 import android.os.Build;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
@@ -18,7 +20,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
   private final AppSelectedListener listener;
   private final AppCompatImageView cloud;
 
-  public AppViewHolder(View itemView, AppSelectedListener listener) {
+  AppViewHolder(View itemView, AppSelectedListener listener) {
     super(itemView);
     image = itemView.findViewById(R.id.item_app_icon);
     appName = itemView.findViewById(R.id.item_app_name);
@@ -28,9 +30,10 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
     itemView.setOnClickListener(this);
   }
 
-  public void setApp(InstalledApp app, boolean selected) {
+  void setApp(InstalledApp app, boolean selected) {
     Glide.with(itemView)
         .load(app.getIcon())
+        .placeholder(new ColorDrawable(Color.parseColor("#EDEEF2")))
         .into(image);
     appName.setText(app.getName());
     if (!selected) {

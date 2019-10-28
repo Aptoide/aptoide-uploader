@@ -10,7 +10,6 @@ import com.aptoide.uploader.upload.AccountProvider;
 import com.aptoide.uploader.upload.BackgroundService;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 
@@ -40,7 +39,7 @@ public class UploadManager {
   }
 
   public Completable upload(String storeName, String language, InstalledApp app) {
-    return md5Calculator.calculate(app)
+    return md5Calculator.calculate(app.getApkPath())
         .flatMapCompletable((md5 -> uploaderService.getUpload(md5, language, storeName, app)
             .flatMapCompletable(upload -> persistence.save(upload))));
   }
@@ -74,13 +73,12 @@ public class UploadManager {
     appUploadStatusManager.getNonSystemApps()
         .toObservable()
         .flatMapIterable(apps -> apps)
-        .map(installedApp -> new AppUploadStatus(md5Calculator.calculate(installedApp)
-            .blockingGet(), installedApp.getPackageName(), false,
-            String.valueOf(installedApp.getVersionCode())))
+        .flatMapSingle(installedApp -> md5Calculator.calculate(installedApp.getApkPath())
+            .map(md5 -> new AppUploadStatus(md5, installedApp.getPackageName(), false,
+                String.valueOf(installedApp.getVersionCode()))))
         .toList()
         .flatMapCompletable(installedApps -> appUploadStatusPersistence.saveAll(installedApps))
-        .subscribeOn(Schedulers.io())
-        .observeOn(AndroidSchedulers.mainThread())
+        .subscribeOn(Schedulers.computation())
         .subscribe();
   }
 

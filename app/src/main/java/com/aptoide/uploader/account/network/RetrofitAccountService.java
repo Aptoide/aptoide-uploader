@@ -1,6 +1,7 @@
 package com.aptoide.uploader.account.network;
 
 import com.aptoide.uploader.account.Account;
+import com.aptoide.uploader.account.AccountFactory;
 import com.aptoide.uploader.account.AccountService;
 import com.aptoide.uploader.account.AutoLoginCredentials;
 import com.aptoide.uploader.account.BaseAccount;
@@ -201,7 +202,7 @@ public class RetrofitAccountService implements AccountService {
               .isOk()) {
             return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
           }
-          return Single.error(new IllegalStateException(response.message()));
+          return Single.just(AccountFactory.of(false, false, null, BaseAccount.LoginType.APTOIDE));
         });
   }
 

@@ -1,14 +1,12 @@
 package com.aptoide.uploader.account.view;
 
-import android.content.Context;
-import android.util.Log;
-import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.network.NoConnectivityException;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
@@ -22,12 +20,11 @@ public class LoginPresenter implements Presenter {
   private final Scheduler viewScheduler;
   private final UploaderAnalytics uploaderAnalytics;
   private final AutoLoginManager autoLoginManager;
-  private final Context context;
 
   public LoginPresenter(LoginView view, AptoideAccountManager accountManager,
       LoginNavigator loginNavigator, CompositeDisposable compositeDisposable,
       Scheduler viewScheduler, UploaderAnalytics uploaderAnalytics,
-      AutoLoginManager autoLoginManager, Context context) {
+      AutoLoginManager autoLoginManager) {
     this.view = view;
     this.accountManager = accountManager;
     this.loginNavigator = loginNavigator;
@@ -35,50 +32,30 @@ public class LoginPresenter implements Presenter {
     this.viewScheduler = viewScheduler;
     this.uploaderAnalytics = uploaderAnalytics;
     this.autoLoginManager = autoLoginManager;
-    this.context = context;
   }
 
   @Override public void present() {
-
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> accountManager.getAccount())
         .observeOn(viewScheduler)
-        .doOnNext(account -> {
+        .flatMap(account -> {
           if (account.isLoggedIn()) {
+            view.showLoadingWithoutUserName();
             if (account.hasStore()) {
               loginNavigator.navigateToMyAppsView();
-              //view.hideLoading();
             } else {
               loginNavigator.navigateToCreateStoreView();
-              //view.hideLoading();
             }
+          } else {
+            view.hideLoading();
+            return tryAutoLogin();
           }
+          return Observable.empty();
         })
-        .doOnNext(__ -> view.hideLoading())
         .subscribe(__ -> {
         }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
-        }));
-
-    compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .doOnNext(__ -> view.showLoadingWithoutUserName())
-        .filter(
-            __ -> !((UploaderApplication) context.getApplicationContext()).getAutoLoginPersistence()
-                .isForcedLogout())
-        .flatMapSingle(__ -> autoLoginManager.getStoredUserCredentials()
-            .flatMap(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
-        .firstOrError()
-        .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account))
-        .observeOn(viewScheduler)
-        .subscribe(() -> {
-        }, throwable -> {
-          Log.e(getClass().getSimpleName(), throwable.getMessage());
-          ((UploaderApplication) context.getApplicationContext()).getAutoLoginPersistence()
-              .setForcedLogout(true);
-          accountManager.logout();
-          accountManager.removeAccessTokenFromPersistence();
+          throwable.printStackTrace();
         }));
 
     compositeDisposable.add(view.getLifecycleEvent()
@@ -87,8 +64,6 @@ public class LoginPresenter implements Presenter {
             .doOnNext(credentials -> {
               view.hideKeyboard();
               view.showLoading(credentials.getUsername());
-              accountManager.logout();
-              accountManager.removeAccessTokenFromPersistence();
             })
             .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
                 credentials.getPassword())
@@ -128,6 +103,10 @@ public class LoginPresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.getGoogleLoginEvent()
+            .doOnNext(__ -> {
+              accountManager.logout();
+              accountManager.removeAccessTokenFromPersistence();
+            })
             .doOnNext(__ -> view.startGoogleActivity()))
         .subscribe());
 
@@ -156,6 +135,19 @@ public class LoginPresenter implements Presenter {
         .observeOn(viewScheduler)
         .subscribe(() -> {
         }, throwable -> view.showNetworkError()));
+  }
+
+  private Observable<Object> tryAutoLogin() {
+    return Observable.just(autoLoginManager.getAutologinFlag())
+        .filter(flag -> !flag)
+        .doOnNext(__ -> view.showLoadingWithoutUserName())
+        .flatMap(__ -> autoLoginManager.getStoredUserCredentials()
+            .flatMapObservable(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
+        .observeOn(viewScheduler)
+        .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account)
+            .doOnComplete(() -> autoLoginManager.setAutoLoginFlag(true)))
+        .doOnError(__ -> accountManager.logout())
+        .andThen(Observable.empty());
   }
 
   private boolean isInternetError(Throwable throwable) {

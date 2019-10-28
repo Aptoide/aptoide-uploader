@@ -4,7 +4,5 @@ import io.reactivex.Single;
 
 public interface Md5Calculator {
 
-  Single<String> calculate(InstalledApp app);
-
   Single<String> calculate(String path);
 }

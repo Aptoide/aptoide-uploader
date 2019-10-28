@@ -1,6 +1,5 @@
 package com.aptoide.uploader.apps;
 
-import android.support.annotation.NonNull;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import java.io.File;
@@ -16,28 +15,16 @@ public class OkioMd5Calculator implements Md5Calculator {
     this.scheduler = scheduler;
   }
 
-  @Override public Single<String> calculate(InstalledApp app) {
-    if (cache.containsKey(getKey(app))) {
-      return Single.just(cache.get(getKey(app)));
-    }
-    return Single.fromCallable(() -> Okio.buffer(Okio.source(new File(app.getApkPath())))
-        .readByteString()
-        .md5()
-        .hex())
-        .doOnSuccess(md5 -> cache.put(getKey(app), md5))
-        .subscribeOn(scheduler);
-  }
-
-  @NonNull private String getKey(InstalledApp app) {
-    return app.getPackageName() + app.getVersionCode();
-  }
-
   @Override public Single<String> calculate(String path) {
+    if (cache.containsKey(path)) {
+      return Single.just(cache.get(path));
+    }
 
     return Single.fromCallable(() -> Okio.buffer(Okio.source(new File(path)))
         .readByteString()
         .md5()
         .hex())
-        .subscribeOn(scheduler);
+        .subscribeOn(scheduler)
+        .doOnSuccess(md5 -> cache.put(path, md5));
   }
 }

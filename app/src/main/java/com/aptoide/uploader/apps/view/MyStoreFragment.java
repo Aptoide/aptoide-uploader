@@ -33,6 +33,8 @@ import com.aptoide.uploader.apps.permission.PermissionProvider;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.view.Rx.RxAlertDialog;
 import com.aptoide.uploader.view.android.FragmentView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.MemoryCategory;
 import com.jakewharton.rxbinding2.view.RxMenuItem;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
@@ -71,6 +73,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   @Nullable @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
+    Glide.get(getContext())
+        .setMemoryCategory(MemoryCategory.HIGH);
     return inflater.inflate(R.layout.fragment_my_apps, container, false);
   }
 
@@ -137,6 +141,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     logoutConfirmation = null;
     logoutItem = null;
     toolbar = null;
+    Glide.get(getContext())
+        .setMemoryCategory(MemoryCategory.NORMAL);
     super.onDestroyView();
   }
 

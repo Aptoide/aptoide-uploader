@@ -94,8 +94,7 @@ public class LoginFragment extends FragmentView implements LoginView {
     new LoginPresenter(this, accountManager, new LoginNavigator(getFragmentManager()),
         new CompositeDisposable(), AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
-        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager(),
-        ((UploaderApplication) getContext().getApplicationContext()).getAppContext()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
   }
 
   @Override public void onDestroyView() {

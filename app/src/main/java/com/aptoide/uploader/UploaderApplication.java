@@ -71,6 +71,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private AppUploadStatusManager appUploadStatusManager;
   private UploaderAnalytics uploaderAnalytics;
   private CallbackManager callbackManager;
+  private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -140,9 +141,9 @@ public class UploaderApplication extends NotificationApplicationView {
     if (accountManager == null) {
 
       final Retrofit retrofitV3 =
-          retrofitBuilder("http://webservices.aptoide.com/", buildOkHttpClient());
+          retrofitBuilder("https://webservices.aptoide.com/", buildOkHttpClient());
 
-      final Retrofit retrofitV7 = retrofitBuilder("http://ws75.aptoide.com/",
+      final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/",
           buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
 
       accountManager = new AptoideAccountManager(
@@ -160,7 +161,7 @@ public class UploaderApplication extends NotificationApplicationView {
     if (authenticationProvider == null) {
 
       final Retrofit retrofitV3 =
-          retrofitBuilder("http://webservices.aptoide.com/", buildOkHttpClient());
+          retrofitBuilder("https://webservices.aptoide.com/", buildOkHttpClient());
 
       final AuthenticationPersistance authenticationPersistance =
           new SharedPreferencesAuthenticationPersistence(
@@ -187,8 +188,7 @@ public class UploaderApplication extends NotificationApplicationView {
   public StoreManager getAppsManager() {
     if (storeManager == null) {
 
-      storeManager = new StoreManager(
-          new PackageManagerInstalledAppsProvider(getPackageManager(), getMd5Calculator()),
+      storeManager = new StoreManager(getPackageManagerInstalledAppsProvider(),
           new AccountStoreNameProvider(getAccountManager()), getUploadManager(),
           getLanguageManager(), getAccountManager());
     }
@@ -198,7 +198,7 @@ public class UploaderApplication extends NotificationApplicationView {
   public AppUploadStatusManager getAppUploadStatusManager() {
     if (appUploadStatusManager == null) {
 
-      final Retrofit retrofitV7Secondary = retrofitBuilder("http://ws75-secondary.aptoide.com/",
+      final Retrofit retrofitV7Secondary = retrofitBuilder("https://ws75-secondary.aptoide.com/",
           buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
 
       appUploadStatusManager =
@@ -207,11 +207,18 @@ public class UploaderApplication extends NotificationApplicationView {
                   retrofitV7Secondary.create(RetrofitStoreService.ServiceV7.class),
                   getAccessTokenProvider()), new RetrofitAppsUploadStatusService(
               retrofitV7Secondary.create(RetrofitAppsUploadStatusService.ServiceV7.class),
-              getAccessTokenProvider()),
-              new PackageManagerInstalledAppsProvider(getPackageManager(), getMd5Calculator()),
+              getAccessTokenProvider()), getPackageManagerInstalledAppsProvider(),
               getUploaderAnalytics());
     }
     return appUploadStatusManager;
+  }
+
+  private PackageManagerInstalledAppsProvider getPackageManagerInstalledAppsProvider() {
+    if (packageManagerInstalledAppsProvider == null) {
+      return new PackageManagerInstalledAppsProvider(getPackageManager(), getMd5Calculator(),
+          new HashMap<>());
+    }
+    return packageManagerInstalledAppsProvider;
   }
 
   private AptoideAccountProvider getAccessTokenProvider() {
@@ -231,7 +238,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public OkioMd5Calculator getMd5Calculator() {
     if (md5Calculator == null) {
-      md5Calculator = new OkioMd5Calculator(new HashMap<>(), Schedulers.computation());
+      md5Calculator = new OkioMd5Calculator(new HashMap<>(), Schedulers.trampoline());
     }
     return md5Calculator;
   }
@@ -287,7 +294,7 @@ public class UploaderApplication extends NotificationApplicationView {
   }
 
   public AutoLoginManager getAutoLoginManager() {
-    return new AutoLoginManager(getAppContext());
+    return new AutoLoginManager(getAppContext(), getAutoLoginPersistence());
   }
 
   public Context getAppContext() {

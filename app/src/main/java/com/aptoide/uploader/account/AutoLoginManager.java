@@ -12,14 +12,16 @@ import io.reactivex.Single;
 
 public class AutoLoginManager {
   private Context context;
+  private AutoLoginPersistence persistence;
 
   private static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
   private static final byte[] SALT = new byte[] {
       -46, 65, 30, -128, -103, -57, 74, -64, 51, 88, -95, -21, 77, -117, -36, -113, -11, 32, -64, 89
   };
 
-  public AutoLoginManager(Context context) {
+  public AutoLoginManager(Context context, AutoLoginPersistence persistence) {
     this.context = context;
+    this.persistence = persistence;
   }
 
   public Single<AutoLoginCredentials> getStoredUserCredentials() {
@@ -88,6 +90,14 @@ public class AutoLoginManager {
         e.printStackTrace();
       }
     }
-    return null;
+    return Single.just(new AutoLoginCredentials());
+  }
+
+  public boolean getAutologinFlag() {
+    return persistence.isForcedLogout();
+  }
+
+  public void setAutoLoginFlag(boolean flag) {
+    persistence.setForcedLogout(flag);
   }
 }

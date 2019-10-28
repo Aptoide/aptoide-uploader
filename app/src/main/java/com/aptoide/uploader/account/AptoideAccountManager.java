@@ -4,7 +4,6 @@ import android.content.Context;
 import com.aptoide.uploader.UploaderApplication;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
-import io.reactivex.Single;
 
 public class AptoideAccountManager {
 
@@ -56,8 +55,9 @@ public class AptoideAccountManager {
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
-  public Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials) {
-    return accountService.saveAutoLoginCredentials(credentials);
+  public Observable<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials) {
+    return accountService.saveAutoLoginCredentials(credentials)
+        .toObservable();
   }
 
   public Completable loginWithAutoLogin(Account account) {

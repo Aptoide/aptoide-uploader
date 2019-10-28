@@ -47,7 +47,12 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
 
   @SuppressLint("ApplySharedPref") @Override public Completable remove() {
     return Completable.fromAction(() -> preferences.edit()
-        .clear()
+        .remove(IS_LOGGED_IN)
+        .remove(HAS_STORE)
+        .remove(STORE_NAME)
+        .remove(LOGIN_TYPE)
+        .remove("access_token")
+        .remove("refresh_token")
         .commit())
         .subscribeOn(scheduler);
   }
