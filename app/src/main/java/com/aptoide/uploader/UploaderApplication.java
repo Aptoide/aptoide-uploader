@@ -1,6 +1,5 @@
 package com.aptoide.uploader;
 
-import android.content.Context;
 import android.preference.PreferenceManager;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
@@ -152,7 +151,7 @@ public class UploaderApplication extends NotificationApplicationView {
               new AccountResponseMapper(), getAuthenticationProvider()),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),
               PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()),
-          new CredentialsValidator(), getSocialLogoutManager(), getAppContext());
+          new CredentialsValidator(), getSocialLogoutManager(), getAutoLoginPersistence());
     }
     return accountManager;
   }
@@ -290,14 +289,10 @@ public class UploaderApplication extends NotificationApplicationView {
   }
 
   public SocialLogoutManager getSocialLogoutManager() {
-    return new SocialLogoutManager(getAppContext(), getGSO());
+    return new SocialLogoutManager(getApplicationContext(), getGSO());
   }
 
   public AutoLoginManager getAutoLoginManager() {
-    return new AutoLoginManager(getAppContext(), getAutoLoginPersistence());
-  }
-
-  public Context getAppContext() {
-    return getApplicationContext();
+    return new AutoLoginManager(getApplicationContext(), getAutoLoginPersistence());
   }
 }

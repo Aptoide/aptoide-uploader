@@ -3,9 +3,7 @@
     package="com.aptoide.uploader">
 
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE"/>
-  <uses-permission
-      android:name="android.permission.GET_ACCOUNTS"
-      android:maxSdkVersion="22"/>
+  <uses-permission android:name="android.permission.GET_ACCOUNTS"/>
   <uses-permission android:name="android.permission.INTERNET"/>
   <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE"/>
 
@@ -43,9 +41,11 @@
       <intent-filter>
         <action android:name="android.intent.action.VIEW"/>
         <action android:name="android.intent.action.MAIN"/>
+
         <category android:name="android.intent.category.LAUNCHER"/>
       </intent-filter>
     </activity>
+
     <service android:name=".UploaderService"/>
   </application>
 

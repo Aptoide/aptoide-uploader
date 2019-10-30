@@ -1,7 +1,5 @@
 package com.aptoide.uploader.account;
 
-import android.content.Context;
-import com.aptoide.uploader.UploaderApplication;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 
@@ -11,16 +9,16 @@ public class AptoideAccountManager {
   private final AccountPersistence accountPersistence;
   private final CredentialsValidator credentialsValidator;
   private final SocialLogoutManager socialLogoutManager;
-  private final Context context;
+  private final AutoLoginPersistence autoLoginPersistence;
 
   public AptoideAccountManager(AccountService accountService, AccountPersistence accountPersistence,
       CredentialsValidator credentialsValidator, SocialLogoutManager socialLogoutManager,
-      Context context) {
+      AutoLoginPersistence autoLoginPersistence) {
     this.accountService = accountService;
     this.accountPersistence = accountPersistence;
     this.credentialsValidator = credentialsValidator;
     this.socialLogoutManager = socialLogoutManager;
-    this.context = context;
+    this.autoLoginPersistence = autoLoginPersistence;
   }
 
   public Completable login(String username, String password) {
@@ -76,9 +74,7 @@ public class AptoideAccountManager {
         .doOnError(throwable -> throwable.printStackTrace())
         .firstOrError()
         .flatMapCompletable(account -> accountPersistence.remove())
-        .doOnComplete(
-            () -> ((UploaderApplication) context.getApplicationContext()).getAutoLoginPersistence()
-                .setForcedLogout(true));
+        .doOnComplete(() -> autoLoginPersistence.setForcedLogout(true));
   }
 
   public void removeAccessTokenFromPersistence() {
