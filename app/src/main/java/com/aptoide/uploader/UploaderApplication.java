@@ -46,6 +46,8 @@ import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.common.Scopes;
+import com.google.android.gms.common.api.Scope;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.util.HashMap;
@@ -282,9 +284,10 @@ public class UploaderApplication extends NotificationApplicationView {
   }
 
   public GoogleSignInOptions getGSO() {
-    return new GoogleSignInOptions.Builder(
-        GoogleSignInOptions.DEFAULT_SIGN_IN).requestServerAuthCode(getString(R.string.google_id))
-        .requestEmail()
+    return new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail()
+        .requestScopes(new Scope("https://www.googleapis.com/auth/contacts.readonly"))
+        .requestScopes(new Scope(Scopes.PROFILE))
+        .requestServerAuthCode(getString(R.string.google_id))
         .build();
   }
 

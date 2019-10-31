@@ -283,44 +283,50 @@ public class RetrofitUploadService implements UploaderService {
     if (response.body()
         .getStatus()
         .equals(Status.FAIL)) {
-      uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App to Repo", response.body()
-          .getErrors()
-          .get(0)
-          .getCode(), response.body()
-          .getErrors()
-          .get(0)
-          .getMsg());
       switch (response.body()
           .getErrors()
           .get(0)
           .getCode()) {
         case "APK-103":
+          sendAnalytics("fail", response);
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.DUPLICATE, md5,
               storeName);
         case "APK-5":
+          sendAnalytics("fail", response);
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.NOT_EXISTENT, md5,
               storeName);
         case "APK-101":
+          sendAnalytics("fail", response);
           return new Upload(response.isSuccessful(), installedApp,
               Upload.Status.INTELLECTUAL_RIGHTS, md5, storeName);
         case "APK-102":
+          sendAnalytics("fail", response);
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.INFECTED, md5,
               storeName);
         case "APK-106":
+          sendAnalytics("fail", response);
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.INVALID_SIGNATURE,
               md5, storeName);
         case "APK-104":
+          sendAnalytics("fail", response);
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.PUBLISHER_ONLY,
               md5, storeName);
         case "FILE-112":
+          sendAnalytics("fail", response);
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.APP_BUNDLE, md5,
               storeName);
         default:
+          if (!response.body()
+              .getErrors()
+              .get(0)
+              .equals("APK-5")) {
+            sendAnalytics("fail", response);
+          }
           return new Upload(response.isSuccessful(), installedApp, Upload.Status.FAILED, md5,
               storeName);
       }
     }
-    uploaderAnalytics.sendUploadCompleteEvent("success", "Upload App to Repo", null, null);
+    uploaderAnalytics.sendUploadCompleteEvent("success", "Upload App to Repo", "0", "0");
     return new Upload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,
         storeName);
   }
@@ -335,13 +341,7 @@ public class RetrofitUploadService implements UploaderService {
           .get(0)
           .getCode()) {
         default:
-          uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App to Repo", response.body()
-              .getErrors()
-              .get(0)
-              .getCode(), response.body()
-              .getErrors()
-              .get(0)
-              .getMsg());
+          sendAnalytics("fail", response);
           return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.RETRY, md5,
               storeName, metadata);
       }
@@ -375,6 +375,16 @@ public class RetrofitUploadService implements UploaderService {
     //}
     Log.w(getClass().getSimpleName(), parameters.toString());
     return parameters;
+  }
+
+  private void sendAnalytics(String status, Response<UploadAppToRepoResponse> response) {
+    uploaderAnalytics.sendUploadCompleteEvent(status, "Upload App to Repo", response.body()
+        .getErrors()
+        .get(0)
+        .getCode(), response.body()
+        .getErrors()
+        .get(0)
+        .getMsg());
   }
 
   public enum UploadType {

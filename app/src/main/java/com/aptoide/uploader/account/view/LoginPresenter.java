@@ -118,10 +118,14 @@ public class LoginPresenter implements Presenter {
             })
             .flatMapCompletable(
                 googleAccount -> accountManager.loginWithGoogle(googleAccount.getEmail(),
-                    googleAccount.getServerAuthCode())))
+                    googleAccount.getServerAuthCode())
+                    .doOnComplete(() -> uploaderAnalytics.sendLoginEvent("google", "success"))))
         .observeOn(viewScheduler)
         .subscribe(() -> {
-        }, throwable -> view.showNetworkError()));
+        }, throwable -> {
+          uploaderAnalytics.sendLoginEvent("google", "fail");
+          view.showNetworkError();
+        }));
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
@@ -131,10 +135,14 @@ public class LoginPresenter implements Presenter {
             })
             .flatMapCompletable(facebookAccount -> accountManager.loginWithFacebook(null,
                 facebookAccount.getAccessToken()
-                    .getToken())))
+                    .getToken())
+                .doOnComplete(() -> uploaderAnalytics.sendLoginEvent("facebook", "success"))))
         .observeOn(viewScheduler)
         .subscribe(() -> {
-        }, throwable -> view.showNetworkError()));
+        }, throwable -> {
+          view.showNetworkError();
+          uploaderAnalytics.sendLoginEvent("facebook", "fail");
+        }));
   }
 
   private Observable<Object> tryAutoLogin() {
@@ -145,8 +153,14 @@ public class LoginPresenter implements Presenter {
             .flatMapObservable(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
         .observeOn(viewScheduler)
         .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account)
-            .doOnComplete(() -> autoLoginManager.setAutoLoginFlag(true)))
-        .doOnError(__ -> accountManager.logout())
+            .doOnComplete(() -> {
+              autoLoginManager.setAutoLoginFlag(true);
+              uploaderAnalytics.sendLoginEvent("auto-login", "success");
+            }))
+        .doOnError(__ -> {
+          uploaderAnalytics.sendLoginEvent("auto-login", "fail");
+          accountManager.logout();
+        })
         .andThen(Observable.empty());
   }
 

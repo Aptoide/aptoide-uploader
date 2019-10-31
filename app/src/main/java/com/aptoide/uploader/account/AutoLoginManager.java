@@ -13,6 +13,7 @@ import io.reactivex.Single;
 public class AutoLoginManager {
   private Context context;
   private AutoLoginPersistence persistence;
+  private static final int REQUEST_CODE_ACCOUNT_PERMISSION = 42;
 
   private static final String SHARED_PREFERENCES_FILE = "UploaderPrefs2";
   private static final byte[] SALT = new byte[] {
@@ -55,40 +56,38 @@ public class AutoLoginManager {
         e.printStackTrace();
       }
     }
-    if (accountManager.getAccountsByType("cm.aptoide.pt").length != 0) {
 
-      try {
-        String URL = "content://cm.aptoide.pt.StubProvider";
-        Uri token_uri = Uri.parse(URL + "/token");
-        Uri refresh_token_uri = Uri.parse(URL + "/refreshToken");
-        Uri repo_uri = Uri.parse(URL + "/repo");
+    try {
+      String URL = "content://cm.aptoide.pt.StubProvider";
+      Uri token_uri = Uri.parse(URL + "/token");
+      Uri refresh_token_uri = Uri.parse(URL + "/refreshToken");
+      Uri repo_uri = Uri.parse(URL + "/repo");
 
-        Cursor c1 = context.getContentResolver()
-            .query(token_uri, null, null, null, null);
-        Cursor c2 = context.getContentResolver()
-            .query(refresh_token_uri, null, null, null, null);
-        Cursor c3 = context.getContentResolver()
-            .query(repo_uri, null, null, null, null);
+      Cursor c1 = context.getContentResolver()
+          .query(token_uri, null, null, null, null);
+      Cursor c2 = context.getContentResolver()
+          .query(refresh_token_uri, null, null, null, null);
+      Cursor c3 = context.getContentResolver()
+          .query(repo_uri, null, null, null, null);
 
-        if (c1 != null && c2 != null && c3 != null) {
+      if (c1 != null && c2 != null && c3 != null) {
 
-          c1.moveToFirst();
-          c2.moveToFirst();
-          c3.moveToFirst();
+        c1.moveToFirst();
+        c2.moveToFirst();
+        c3.moveToFirst();
 
-          AutoLoginCredentials autoLoginCredentials = new AutoLoginCredentials();
-          autoLoginCredentials.setAccessToken(c1.getString(c1.getColumnIndex("userToken")));
-          autoLoginCredentials.setRefreshToken(c2.getString(c2.getColumnIndex("userRefreshToken")));
+        AutoLoginCredentials autoLoginCredentials = new AutoLoginCredentials();
+        autoLoginCredentials.setAccessToken(c1.getString(c1.getColumnIndex("userToken")));
+        autoLoginCredentials.setRefreshToken(c2.getString(c2.getColumnIndex("userRefreshToken")));
 
-          c1.close();
-          c2.close();
-          c3.close();
+        c1.close();
+        c2.close();
+        c3.close();
 
-          return Single.just(autoLoginCredentials);
-        }
-      } catch (Exception e) {
-        e.printStackTrace();
+        return Single.just(autoLoginCredentials);
       }
+    } catch (Exception e) {
+      e.printStackTrace();
     }
     return Single.just(new AutoLoginCredentials());
   }
