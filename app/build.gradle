@@ -31,7 +31,7 @@ android {
     resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
     resValue "string", "fb_login_protocol_scheme",
         "\"" + "fb" + project.FACEBOOK_APP_ID_UPLOADER + "\""
-    resValue "string", "google_id", "\"" + project.GMS_SERVER_ID + "\""
+    resValue "string", "google_id", "\"" + project.GMS_SERVER_ID_VANILLA + "\""
     vectorDrawables.useSupportLibrary = true
   }
 
