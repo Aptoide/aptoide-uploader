@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import android.content.pm.PackageManager;
 import android.support.annotation.NonNull;
 import android.support.v7.widget.RecyclerView;
 import android.view.LayoutInflater;
@@ -15,12 +16,14 @@ import java.util.List;
 public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
   private final List<InstalledApp> installedApps;
+  private PackageManager packageManager;
   private final List<Integer> selectedApps;
   private final AppSelectedListener selectedAppListener;
   private final PublishSubject<Boolean> selectedPublisher;
 
-  public MyAppsAdapter(@NonNull List<InstalledApp> list) {
+  public MyAppsAdapter(@NonNull List<InstalledApp> list, PackageManager packageManager) {
     this.installedApps = list;
+    this.packageManager = packageManager;
     this.selectedApps = new ArrayList<>();
     this.selectedAppListener = (view, position) -> setSelected(position);
     this.selectedPublisher = PublishSubject.create();
@@ -28,7 +31,7 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
   @Override public AppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     return new AppViewHolder(LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.item_app, parent, false), selectedAppListener);
+        .inflate(R.layout.item_app, parent, false), selectedAppListener, packageManager);
   }
 
   @Override public void onBindViewHolder(AppViewHolder holder, int position) {
@@ -51,18 +54,16 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     if (!appsList.equals(installedApps)) {
       installedApps.clear();
       installedApps.addAll(appsList);
-      setOrder(SortingOrder.DATE);
       clearAppsSelection(false);
-      notifyDataSetChanged();
+      setOrder(SortingOrder.DATE);
     }
   }
 
   public void refreshInstalledApps(List<InstalledApp> appsList) {
     installedApps.clear();
     installedApps.addAll(appsList);
-    setOrder(SortingOrder.DATE);
     clearAppsSelection(false);
-    notifyDataSetChanged();
+    setOrder(SortingOrder.DATE);
   }
 
   public void setOrder(SortingOrder order) {
@@ -118,14 +119,15 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   public void setCloudIcon(List<String> uploadedPackageNames) {
-    for (InstalledApp app : installedApps) {
+    for (int i = 0; i < installedApps.size(); i++) {
+      InstalledApp app = installedApps.get(i);
       for (String packageName : uploadedPackageNames) {
         if (app.getPackageName()
             .equals(packageName)) {
           app.setIsUploaded(true);
+          notifyItemChanged(i);
         }
       }
     }
-    notifyDataSetChanged();
   }
 }

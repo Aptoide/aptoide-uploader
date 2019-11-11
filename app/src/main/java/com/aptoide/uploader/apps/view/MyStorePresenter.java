@@ -149,6 +149,7 @@ public class MyStorePresenter implements Presenter {
         .flatMapSingle(__ -> view.getSelectedApps())
         .flatMapCompletable(apps -> storeManager.upload(apps)
             .doOnComplete(() -> uploaderAnalytics.sendSubmitAppsEvent(apps.size())))
+        .observeOn(viewScheduler)
         .doOnError(throwable -> {
           if (throwable instanceof SocketTimeoutException) {
             view.showError();
@@ -170,6 +171,7 @@ public class MyStorePresenter implements Presenter {
         .observeOn(viewScheduler)
         .doOnNext(store -> view.showStoreName(store.getName()))
         .doOnNext(store -> view.showApps(store.getApps()))
+        .flatMap(__ -> checkUploadedApps())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -183,7 +185,7 @@ public class MyStorePresenter implements Presenter {
             .flatMapSingle(refreshEvent -> storeManager.getStore())
             .observeOn(viewScheduler)
             .doOnNext(store -> view.refreshApps(store.getApps()))
-            .doOnNext(apps -> checkUploadedApps()))
+            .flatMap(apps -> checkUploadedApps()))
         .subscribe());
   }
 
@@ -200,10 +202,9 @@ public class MyStorePresenter implements Presenter {
     return Single.just(apps);
   }
 
-  private void checkUploadedApps() {
-    getAppUploadStatusFromPersistence().observeOn(viewScheduler)
-        .doOnNext(packageList -> view.setCloudIcon(packageList))
-        .subscribe();
+  private Observable<List<String>> checkUploadedApps() {
+    return getAppUploadStatusFromPersistence().observeOn(viewScheduler)
+        .doOnNext(packageList -> view.setCloudIcon(packageList));
   }
 
   private Observable<List<String>> getAppUploadStatusFromPersistence() {

@@ -9,7 +9,6 @@ import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
@@ -23,9 +22,11 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import cm.aptoide.aptoideviews.recyclerview.GridRecyclerView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.InstalledApp;
@@ -50,7 +51,7 @@ import org.jetbrains.annotations.NotNull;
 
 public class MyStoreFragment extends FragmentView implements MyStoreView {
 
-  private RecyclerView recyclerView;
+  private GridRecyclerView recyclerView;
   private MyAppsAdapter adapter;
   private TextView storeNameText;
   private Spinner spinner;
@@ -65,6 +66,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private Animation slideBottomUp;
   private SwipeRefreshLayout refreshLayout;
   private PublishSubject<Boolean> refreshEvent;
+  private ProgressBar loadingSpinner;
 
   public static MyStoreFragment newInstance() {
     return new MyStoreFragment();
@@ -80,6 +82,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    loadingSpinner = view.findViewById(R.id.loadingSPinner);
     toolbar = view.findViewById(R.id.fragment_my_apps_toolbar);
     toolbar.inflateMenu(R.menu.app_grid_menu);
     logoutItem = toolbar.getMenu()
@@ -101,7 +104,9 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
     recyclerView.addItemDecoration(new GridDividerItemDecoration(
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
-    adapter = new MyAppsAdapter(new ArrayList<>());
+    recyclerView.setAdaptiveLayout(110, 126,
+        GridRecyclerView.AdaptStrategy.SCALE_KEEP_ASPECT_RATIO);
+    adapter = new MyAppsAdapter(new ArrayList<>(), getActivity().getPackageManager());
     setUpSelectionListener();
     refreshEvent = PublishSubject.create();
     recyclerView.setAdapter(adapter);
@@ -190,11 +195,14 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void showApps(@NotNull List<InstalledApp> appsList) {
     adapter.setInstalledApps(appsList);
+    loadingSpinner.setVisibility(View.GONE);
+    recyclerView.scheduleLayoutAnimation();
   }
 
   @Override public void refreshApps(@NotNull List<InstalledApp> appsList) {
     adapter.refreshInstalledApps(appsList);
     refreshLayout.setRefreshing(false);
+    recyclerView.scheduleLayoutAnimation();
   }
 
   @Override public void orderApps(SortingOrder order) {

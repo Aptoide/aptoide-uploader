@@ -1,10 +1,9 @@
 package com.aptoide.uploader.apps;
 
-import android.graphics.drawable.Drawable;
+import android.content.pm.ApplicationInfo;
 
 public class InstalledApp {
 
-  private final Drawable icon;
   private final String name;
   private final boolean isSystem;
   private final String packageName;
@@ -14,11 +13,12 @@ public class InstalledApp {
   private boolean isUploaded;
   private final Obb obbMain;
   private final Obb obbPatch;
+  private ApplicationInfo appInfo;
 
-  public InstalledApp(Drawable icon, String name, boolean isSystem, String packageName,
+  public InstalledApp(ApplicationInfo appInfo, String name, boolean isSystem, String packageName,
       String apkPath, long installedDate, int versionCode, boolean isUploaded, Obb obbMain,
       Obb obbPatch) {
-    this.icon = icon;
+    this.appInfo = appInfo;
     this.name = name;
     this.isSystem = isSystem;
     this.packageName = packageName;
@@ -72,9 +72,6 @@ public class InstalledApp {
     return null;
   }
 
-  public Drawable getIcon() {
-    return icon;
-  }
 
   public String getName() {
     return name;
@@ -119,5 +116,9 @@ public class InstalledApp {
 
   public void setIsUploaded(boolean value) {
     isUploaded = value;
+  }
+
+  public ApplicationInfo getAppInfo() {
+    return appInfo;
   }
 }

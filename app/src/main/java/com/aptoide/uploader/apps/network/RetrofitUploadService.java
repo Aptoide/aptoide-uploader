@@ -61,7 +61,6 @@ public class RetrofitUploadService implements UploaderService {
             getParams(accessToken, md5, storeName, installedAppName, installedApp))
             .map(response -> buildUploadFinishStatus(response, installedApp, md5, storeName))
             .startWith(buildUploadProgressStatus(installedApp, md5, storeName))
-            .doOnError(throwable -> throwable.printStackTrace())
             .onErrorReturn(
                 throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
                     storeName)));
@@ -92,23 +91,23 @@ public class RetrofitUploadService implements UploaderService {
                         storeName))));
   }
 
-  @Override
-  public Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
-      String obbPath, String obbType) {
-    return accountProvider.getAccount()
-        .firstOrError()
-        .flatMapObservable(aptoideAccount -> accountProvider.getToken()
-            .toObservable()
-            .flatMap(accessToken -> serviceV3.uploadAppToRepo(
-                getParams(accessToken, aptoideAccount.getStoreName(), installedApp, true),
-                MultipartBody.Part.createFormData(obbType, obbPath,
-                    createFileRequestBody("obb", obbPath, installedApp.getPackageName())))
-                .flatMap(response -> Observable.just(
-                    buildUploadFinishStatus(response, installedApp, md5, storeName)))
-                .onErrorReturn(
-                    throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
-                        storeName))));
-  }
+  //@Override
+  //public Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
+  //    String obbPath, String obbType) {
+  //  return accountProvider.getAccount()
+  //      .firstOrError()
+  //      .flatMapObservable(aptoideAccount -> accountProvider.getToken()
+  //          .toObservable()
+  //          .flatMap(accessToken -> serviceV3.uploadAppToRepo(
+  //              getParams(accessToken, aptoideAccount.getStoreName(), installedApp, true),
+  //              MultipartBody.Part.createFormData(obbType, obbPath,
+  //                  createFileRequestBody("obb", obbPath, installedApp.getPackageName())))
+  //              .flatMap(response -> Observable.just(
+  //                  buildUploadFinishStatus(response, installedApp, md5, storeName)))
+  //              .onErrorReturn(
+  //                  throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
+  //                      storeName))));
+  //}
 
   @Override public Observable<Upload> upload(String md5, String storeName, String appName,
       InstalledApp installedApp, Metadata metadata) {
@@ -124,8 +123,8 @@ public class RetrofitUploadService implements UploaderService {
                 .flatMap(response -> Observable.just(
                     buildUploadFinishStatus(response, installedApp, md5, storeName, metadata)))
                 .onErrorReturn(
-                    throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
-                        storeName))));
+                    throwable -> new MetadataUpload(false, installedApp, Upload.Status.CLIENT_ERROR,
+                        md5, storeName, metadata))));
   }
 
   @Override public Observable<Upload> upload(String md5, String storeName, String appName,
@@ -241,13 +240,13 @@ public class RetrofitUploadService implements UploaderService {
       }
 
       @Override public void writeTo(BufferedSink sink) throws IOException {
-        byte[] buffer = new byte[1024];
+        byte[] buffer = new byte[4096];
         File apk = new File(apkPath);
         FileInputStream in = new FileInputStream(apk);
 
         long fileSize = apk.length();
 
-        long percentageTicks = fileSize / 1024 / 100;
+        long percentageTicks = fileSize / 4096 / 100;
 
         int parts = 0;
         int progress = 0;
@@ -340,6 +339,34 @@ public class RetrofitUploadService implements UploaderService {
           .getErrors()
           .get(0)
           .getCode()) {
+        case "APK-103":
+          sendAnalytics("fail", response);
+          return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.DUPLICATE,
+              md5, storeName, metadata);
+        case "APK-5":
+          sendAnalytics("fail", response);
+          return new MetadataUpload(response.isSuccessful(), installedApp,
+              Upload.Status.NOT_EXISTENT, md5, storeName, metadata);
+        case "APK-101":
+          sendAnalytics("fail", response);
+          return new MetadataUpload(response.isSuccessful(), installedApp,
+              Upload.Status.INTELLECTUAL_RIGHTS, md5, storeName, metadata);
+        case "APK-102":
+          sendAnalytics("fail", response);
+          return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.INFECTED,
+              md5, storeName, metadata);
+        case "APK-106":
+          sendAnalytics("fail", response);
+          return new MetadataUpload(response.isSuccessful(), installedApp,
+              Upload.Status.INVALID_SIGNATURE, md5, storeName, metadata);
+        case "APK-104":
+          sendAnalytics("fail", response);
+          return new MetadataUpload(response.isSuccessful(), installedApp,
+              Upload.Status.PUBLISHER_ONLY, md5, storeName, metadata);
+        case "FILE-112":
+          sendAnalytics("fail", response);
+          return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.APP_BUNDLE,
+              md5, storeName, metadata);
         default:
           sendAnalytics("fail", response);
           return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.RETRY, md5,

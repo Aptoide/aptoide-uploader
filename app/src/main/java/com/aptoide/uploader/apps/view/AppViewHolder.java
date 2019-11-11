@@ -1,7 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
-import android.graphics.Color;
-import android.graphics.drawable.ColorDrawable;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.support.v7.widget.AppCompatImageView;
 import android.support.v7.widget.RecyclerView;
@@ -10,7 +9,8 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.InstalledApp;
-import com.bumptech.glide.Glide;
+import com.aptoide.uploader.glide.GlideApp;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
 
@@ -18,23 +18,28 @@ public class AppViewHolder extends RecyclerView.ViewHolder implements View.OnCli
   private final TextView appName;
   private final View background;
   private final AppSelectedListener listener;
+  private PackageManager packageManager;
   private final AppCompatImageView cloud;
 
-  AppViewHolder(View itemView, AppSelectedListener listener) {
+  AppViewHolder(View itemView, AppSelectedListener listener, PackageManager packageManager) {
     super(itemView);
     image = itemView.findViewById(R.id.item_app_icon);
     appName = itemView.findViewById(R.id.item_app_name);
     background = itemView.findViewById(R.id.item_app_layout);
     cloud = itemView.findViewById(R.id.appInCloud);
     this.listener = listener;
+    this.packageManager = packageManager;
     itemView.setOnClickListener(this);
   }
 
   void setApp(InstalledApp app, boolean selected) {
-    Glide.with(itemView)
-        .load(app.getIcon())
-        .placeholder(new ColorDrawable(Color.parseColor("#EDEEF2")))
+
+    GlideApp.with(itemView)
+        .load(app.getAppInfo())
+        .transition(DrawableTransitionOptions.withCrossFade())
+        //.placeholder(new ColorDrawable(Color.parseColor("#EDEEF2")))
         .into(image);
+
     appName.setText(app.getName());
     if (!selected) {
       background.setBackgroundColor(itemView.getResources()

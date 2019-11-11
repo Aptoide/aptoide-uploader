@@ -31,9 +31,20 @@ public class AppUploadStatusManager {
   }
 
   public Observable<List<AppUploadStatus>> getApks(List<String> md5List) {
+    List<List<String>> partitions = partitionLists(md5List);
     return storeNameProvider.getStoreName()
-        .flatMapObservable(
-            storeName -> retrofitAppsUploadStatusService.getApks(md5List, storeName));
+        .toObservable()
+        .flatMap(storeName -> Observable.fromIterable(partitions)
+            .concatMap(subList -> retrofitAppsUploadStatusService.getApks(subList, storeName)));
+  }
+
+  public List<List<String>> partitionLists(List<String> list) {
+    int partitionSize = 50;
+    List<List<String>> partitions = new ArrayList<>();
+    for (int i = 0; i < list.size(); i += partitionSize) {
+      partitions.add(list.subList(i, Math.min(i + partitionSize, list.size())));
+    }
+    return partitions;
   }
 
   public Observable<Upload> checkUploadStatus(Upload upload) {

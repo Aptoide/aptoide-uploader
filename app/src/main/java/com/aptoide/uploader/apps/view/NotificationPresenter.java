@@ -48,8 +48,6 @@ public class NotificationPresenter implements Presenter {
       case PENDING:
         view.showPendingUploadNotification(appName, packageName);
         break;
-      case CLIENT_ERROR:
-        break;
       case NOT_EXISTENT:
         break;
       case NO_META_DATA:
@@ -85,6 +83,7 @@ public class NotificationPresenter implements Presenter {
       case APP_BUNDLE:
         view.showAppBundleNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(upload);
+      case CLIENT_ERROR:
       default:
         view.showErrorNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(upload);

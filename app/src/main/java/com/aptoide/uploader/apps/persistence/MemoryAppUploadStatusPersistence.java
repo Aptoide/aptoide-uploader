@@ -25,7 +25,8 @@ public class MemoryAppUploadStatusPersistence implements AppUploadStatusPersiste
 
   @Override public Observable<List<AppUploadStatus>> getAppsUploadStatus() {
     return appUploadStatusListSubject.startWith(
-        new ArrayList<AppUploadStatus>(appUploadStatusMap.values()));
+        new ArrayList<AppUploadStatus>(appUploadStatusMap.values()))
+        .subscribeOn(scheduler);
   }
 
   @Override public Completable save(AppUploadStatus appUploadStatus) {

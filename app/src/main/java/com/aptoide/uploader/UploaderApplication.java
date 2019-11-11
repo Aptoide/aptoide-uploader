@@ -191,7 +191,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
       storeManager = new StoreManager(getPackageManagerInstalledAppsProvider(),
           new AccountStoreNameProvider(getAccountManager()), getUploadManager(),
-          getLanguageManager(), getAccountManager());
+          getLanguageManager(), getAccountManager(), Schedulers.io());
     }
     return storeManager;
   }
@@ -217,7 +217,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private PackageManagerInstalledAppsProvider getPackageManagerInstalledAppsProvider() {
     if (packageManagerInstalledAppsProvider == null) {
       return new PackageManagerInstalledAppsProvider(getPackageManager(), getMd5Calculator(),
-          new HashMap<>());
+          new HashMap<>(), Schedulers.io());
     }
     return packageManagerInstalledAppsProvider;
   }

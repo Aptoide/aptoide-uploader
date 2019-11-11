@@ -3,6 +3,7 @@ package com.aptoide.uploader.apps;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import java.util.List;
 
@@ -13,20 +14,23 @@ public class StoreManager {
   private final UploadManager uploadManager;
   private final LanguageManager languageManager;
   private final AptoideAccountManager accountManager;
+  private Scheduler scheduler;
 
   public StoreManager(InstalledAppsProvider installedAppsProvider,
       StoreNameProvider storeNameProvider, UploadManager uploadManager,
-      LanguageManager languageManager, AptoideAccountManager accountManager) {
+      LanguageManager languageManager, AptoideAccountManager accountManager, Scheduler scheduler) {
     this.installedAppsProvider = installedAppsProvider;
     this.storeNameProvider = storeNameProvider;
     this.uploadManager = uploadManager;
     this.languageManager = languageManager;
     this.accountManager = accountManager;
+    this.scheduler = scheduler;
   }
 
   public Single<Store> getStore() {
     return Single.zip(getNonSystemApps(), storeNameProvider.getStoreName(),
-        (apps, storeName) -> new Store(storeName, apps));
+        (apps, storeName) -> new Store(storeName, apps))
+        .subscribeOn(scheduler);
   }
 
   public Completable upload(List<InstalledApp> apps) {

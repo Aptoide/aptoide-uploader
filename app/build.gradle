@@ -2,6 +2,7 @@ apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlin-android-extensions'
+apply plugin: 'kotlin-kapt'
 
 android {
   lintOptions {
@@ -89,6 +90,7 @@ dependencies {
   // Support Libraries
   implementation 'com.android.support:appcompat-v7:27.1.1'
   implementation 'com.android.support:design:27.1.1'
+  implementation 'com.android.support.constraint:constraint-layout:1.1.3'
 
   // Reactive Programming
   implementation "io.reactivex.rxjava2:rxjava:2.1.7"
@@ -114,13 +116,17 @@ dependencies {
 
   // Image Loading
   implementation 'com.github.bumptech.glide:glide:4.9.0'
+  kapt 'com.github.bumptech.glide:compiler:4.9.0'
+
 
   //Flurry
-  implementation 'com.flurry.android:analytics:11.7.1@aar'
-
+  implementation 'com.flurry.android:analytics:12.0.1'
   //Facebook
   implementation 'com.facebook.android:facebook-login:[5,6)'
 
   //Google Sign-In
   implementation 'com.google.android.gms:play-services-auth:16.0.0'
+
+  //Play Services for Flurry
+  implementation 'com.google.android.gms:play-services-base:15.0.1'
 }

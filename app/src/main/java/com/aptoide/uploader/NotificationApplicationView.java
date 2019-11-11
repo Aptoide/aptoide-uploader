@@ -124,10 +124,11 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
-            .setContentTitle(getString(R.string.app_name))
+            .setSubText(getString(R.string.app_name))
             .setOngoing(false)
-            .setSubText(getString(R.string.application_notification_message_app_no_metadata_upload))
-            .setContentText(applicationName)
+            .setContentText(
+                getString(R.string.application_notification_message_app_no_metadata_upload))
+            .setContentTitle(applicationName)
             .setContentIntent(contentIntent)
             .setAutoCancel(true);
 

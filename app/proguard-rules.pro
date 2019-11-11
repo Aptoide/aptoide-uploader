@@ -32,9 +32,13 @@
     public *;
 }
 
--keepattributes Exceptions, Signature, LineNumberTable
+-keepattributes Exceptions, Signature, LineNumberTable, InnerClasses
 
 -keep class com.aptoide.uploader.** { *; }
+
+-keep class com.google.android.gms.** { *; }
+-dontwarn com.google.android.gms.**
+
 
 -keepclassmembers class * implements java.io.Serializable {
      private static final java.io.ObjectStreamField[] serialPersistentFields;
@@ -44,6 +48,30 @@
      java.lang.Object readResolve();
 }
 
+-keep class * extends java.util.ListResourceBundle {
+    protected Object[][] getContents();
+}
+
 -keep class * {
     public private *;
 }
+
+-keep class com.flurry.** { *; }
+-dontwarn com.flurry.**
+-keepattributes *Annotation*,EnclosingMethod,Signature
+-keepclasseswithmembers class * {
+   public <init>(android.content.Context, android.util.AttributeSet, int);
+ }
+
+ -keep public class com.google.android.gms.common.internal.safeparcel.SafeParcelable {
+  public static final *** NULL;
+ }
+
+ -keepnames @com.google.android.gms.common.annotation.KeepName class *
+ -keepclassmembernames class * {
+    @com.google.android.gms.common.annotation.KeepName *;
+  }
+
+ -keepnames class * implements android.os.Parcelable {
+  public static final ** CREATOR;
+ }

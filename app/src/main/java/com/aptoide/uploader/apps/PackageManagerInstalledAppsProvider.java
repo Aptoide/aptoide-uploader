@@ -5,6 +5,7 @@ import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
 import io.reactivex.Observable;
+import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import java.io.File;
 import java.util.List;
@@ -16,12 +17,14 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
   private PackageInfo packageInfo;
   private OkioMd5Calculator md5Calculator;
   private Map<String, String> cache;
+  private Scheduler scheduler;
 
   public PackageManagerInstalledAppsProvider(PackageManager packageManager,
-      OkioMd5Calculator md5Calculator, Map<String, String> cache) {
+      OkioMd5Calculator md5Calculator, Map<String, String> cache, Scheduler scheduler) {
     this.packageManager = packageManager;
     this.md5Calculator = md5Calculator;
     this.cache = cache;
+    this.scheduler = scheduler;
   }
 
   @Override public Single<List<InstalledApp>> getInstalledApps() {
@@ -30,14 +33,15 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
         .filter(applicationInfo -> applicationInfo.packageName != null)
         .map(applicationInfo -> {
           packageInfo = packageManager.getPackageInfo(applicationInfo.packageName, 0);
-          return new InstalledApp(applicationInfo.loadIcon(packageManager),
+          return new InstalledApp(packageInfo.applicationInfo,
               applicationInfo.loadLabel(packageManager)
                   .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1,
               applicationInfo.packageName, applicationInfo.sourceDir, packageInfo.firstInstallTime,
               packageInfo.versionCode, false, getMainObb(applicationInfo.packageName),
               getPatchObb(applicationInfo.packageName));
         })
-        .toList();
+        .toList()
+        .subscribeOn(scheduler);
   }
 
   private Obb getMainObb(String packageName) {
