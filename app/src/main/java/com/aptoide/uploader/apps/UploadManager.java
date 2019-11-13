@@ -203,10 +203,6 @@ public class UploadManager {
           return uploaderService.hasApplicationMetaData(upload.getInstalledApp()
               .getPackageName(), upload.getInstalledApp()
               .getVersionCode())
-              .doOnError(__ -> {
-                upload.setStatus(Upload.Status.CLIENT_ERROR);
-                persistence.save(upload);
-              })
               .flatMapCompletable(hasMetaData -> {
                 if (!hasMetaData) {
                   upload.setStatus(Upload.Status.NO_META_DATA);
@@ -224,6 +220,10 @@ public class UploadManager {
                   upload.setStatus(Upload.Status.PROGRESS);
                   return uploadApkToServer(upload);
                 }
+              })
+              .onErrorResumeNext(__ -> {
+                upload.setStatus(Upload.Status.CLIENT_ERROR);
+                return persistence.save(upload);
               });
         })
         .subscribe(() -> {

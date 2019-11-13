@@ -83,8 +83,8 @@ public class UploaderApplication extends NotificationApplicationView {
   }
 
   public OkHttpClient.Builder buildOkHttpClient() {
-    return new OkHttpClient.Builder().writeTimeout(30, TimeUnit.SECONDS)
-        .readTimeout(30, TimeUnit.SECONDS)
+    return new OkHttpClient.Builder().writeTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
         .connectTimeout(60, TimeUnit.SECONDS)
         .addInterceptor(getConnectivityInterceptor())
         .addInterceptor(getUserAgentInterceptor());
