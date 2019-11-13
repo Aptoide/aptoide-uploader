@@ -23,7 +23,8 @@ public class MemoryUploaderPersistence implements UploaderPersistence {
   }
 
   @Override public Observable<List<Upload>> getUploads() {
-    return uploadsListSubject.startWith(new ArrayList<Upload>(uploadsMap.values()));
+    return uploadsListSubject.startWith(new ArrayList<Upload>(uploadsMap.values()))
+        .subscribeOn(scheduler);
   }
 
   @Override public Completable save(Upload upload) {

@@ -39,7 +39,7 @@ public class AppUploadStatusManager {
   }
 
   public List<List<String>> partitionLists(List<String> list) {
-    int partitionSize = 50;
+    int partitionSize = 20;
     List<List<String>> partitions = new ArrayList<>();
     for (int i = 0; i < list.size(); i += partitionSize) {
       partitions.add(list.subList(i, Math.min(i + partitionSize, list.size())));

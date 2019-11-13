@@ -152,8 +152,7 @@ public class UploadManager {
         .flatMapCompletable(upload -> appUploadStatusPersistence.save(
             new AppUploadStatus(upload.getMd5(), upload.getInstalledApp()
                 .getPackageName(), true, String.valueOf(upload.getInstalledApp()
-                .getVersionCode())))
-            .andThen(persistence.remove(upload)))
+                .getVersionCode()))))
         .subscribe();
   }
 
@@ -198,29 +197,35 @@ public class UploadManager {
             (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
         .flatMapIterable(uploads -> uploads)
         .filter(upload -> upload.getStatus()
-            .equals(Upload.Status.NOT_EXISTENT))
-        .flatMapCompletable(upload -> uploaderService.hasApplicationMetaData(
-            upload.getInstalledApp()
-                .getPackageName(), upload.getInstalledApp()
-                .getVersionCode())
-            .flatMapCompletable(hasMetaData -> {
-              if (!hasMetaData) {
-                upload.setStatus(Upload.Status.NO_META_DATA);
-                return persistence.save(upload);
-              } else {
-                upload.setStatus(Upload.Status.PROGRESS);
-                /// TODO: 2019-10-18 verificar obbs aqui e enviar caso existam senao enviar so o apk
-                if (upload.getInstalledApp()
-                    .getObbMainPath() != null
-                    && upload.getInstalledApp()
-                    .getObbPatchPath() != null) {
+            .equals(Upload.Status.NOT_EXISTENT) && !upload.isProcessed())
+        .flatMapCompletable(upload -> {
+          upload.setProcessed(true);
+          return uploaderService.hasApplicationMetaData(upload.getInstalledApp()
+              .getPackageName(), upload.getInstalledApp()
+              .getVersionCode())
+              .doOnError(__ -> {
+                upload.setStatus(Upload.Status.CLIENT_ERROR);
+                persistence.save(upload);
+              })
+              .flatMapCompletable(hasMetaData -> {
+                if (!hasMetaData) {
+                  upload.setStatus(Upload.Status.NO_META_DATA);
+                  return persistence.save(upload);
+                } else {
+                  /// TODO: 2019-10-18 verificar obbs aqui e enviar caso existam senao enviar so o apk
+                  //if (upload.getInstalledApp()
+                  //    .getObbMainPath() != null
+                  //    && upload.getInstalledApp()
+                  //    .getObbPatchPath() != null) {
+                  //}
+                  //if (upload.getInstalledApp()
+                  //    .getObbMainPath() != null) {
+                  //}
+                  upload.setStatus(Upload.Status.PROGRESS);
+                  return uploadApkToServer(upload);
                 }
-                if (upload.getInstalledApp()
-                    .getObbMainPath() != null) {
-                }
-                return uploadApkToServer(upload);
-              }
-            }))
+              });
+        })
         .subscribe(() -> {
         }, throwable -> throwable.printStackTrace());
   }

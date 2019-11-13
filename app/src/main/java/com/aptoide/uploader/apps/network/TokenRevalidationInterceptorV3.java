@@ -22,6 +22,7 @@ public class TokenRevalidationInterceptorV3 extends TokenRevalidationInterceptor
 
   @Override public Response intercept(Chain chain) throws IOException {
     Request request = chain.request();
+
     Response response = chain.proceed(request);
     MediaType contentType = response.body()
         .contentType();

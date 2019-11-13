@@ -51,7 +51,8 @@ public abstract class NotificationApplicationView extends Application implements
   @Override
   public void showCompletedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
-        getString(R.string.application_notification_short_app_success_upload));
+        getString(R.string.application_notification_short_app_success_upload)).setProgress(0, 0,
+        false);
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
@@ -91,7 +92,8 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
-  @Override public void showInvalidSignatureNotification(String applicationName, String packageName) {
+  @Override
+  public void showInvalidSignatureNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_invalid_signature));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
@@ -100,7 +102,8 @@ public abstract class NotificationApplicationView extends Application implements
   @Override
   public void updateUploadProgress(String applicationName, String packageName, int progress) {
     NotificationCompat.Builder mBuilder =
-        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(R.drawable.notification_icon)
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
             .setContentTitle(getString(R.string.app_name))
             .setOngoing(false)
             .setContentText(applicationName)
@@ -141,7 +144,8 @@ public abstract class NotificationApplicationView extends Application implements
         .setContentTitle(getString(R.string.app_name))
         .setOngoing(false)
         .setSubText(subText)
-        .setContentText(applicationName);
+        .setContentText(applicationName)
+        .setAutoCancel(true);
   }
 
   public void setupChannels() {

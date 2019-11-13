@@ -77,6 +77,7 @@ public class UploaderApplication extends NotificationApplicationView {
   @Override public void onCreate() {
     super.onCreate();
     startFlurryAgent();
+
     callbackManager = CallbackManager.Factory.create();
     getUploadManager().start();
   }
@@ -103,7 +104,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
       final Retrofit retrofitV3 =
           retrofitBuilder("http://upload.webservices.aptoide.com/webservices/",
-              buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV3()));
+              buildOkHttpClient());
 
       UploadProgressManager uploadProgressManager = new UploadProgressManager();
 

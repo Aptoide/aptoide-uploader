@@ -25,6 +25,6 @@ public interface UploaderService {
   //Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName, String obbPath,
   //    String obbType);
 
-  Observable<Upload> upload(String md5, String storeName, String appName, InstalledApp installedApp,
-      Metadata metadata, String obbMainPath);
+  //Observable<Upload> upload(String md5, String storeName, String appName, InstalledApp installedApp,
+  //    Metadata metadata, String obbMainPath);
 }

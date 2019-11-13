@@ -7,6 +7,7 @@ public class Upload {
   private final String md5;
   private final String storeName;
   private Status status;
+  private boolean processed = false;
 
   public Upload(boolean uploaded, InstalledApp installedApp, Status status, String md5,
       String storeName) {
@@ -37,6 +38,10 @@ public class Upload {
     this.status = status;
   }
 
+  public void setProcessed(boolean isProcessed) {
+    processed = isProcessed;
+  }
+
   @Override public int hashCode() {
     return installedApp.hashCode();
   }
@@ -52,6 +57,10 @@ public class Upload {
 
   public String getMd5() {
     return md5;
+  }
+
+  public boolean isProcessed() {
+    return processed;
   }
 
   public enum Status {

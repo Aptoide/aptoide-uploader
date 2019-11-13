@@ -6,6 +6,7 @@ import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import java.util.concurrent.TimeUnit;
 
 public class NotificationPresenter implements Presenter {
   private final NotificationView view;
@@ -33,6 +34,8 @@ public class NotificationPresenter implements Presenter {
             return Observable.just(upload);
           }
         })
+        .concatMap(i -> Observable.just(i)
+            .delay(200, TimeUnit.MILLISECONDS))
         .flatMapCompletable(upload -> showNotification(upload))
         .subscribe();
   }
@@ -94,6 +97,7 @@ public class NotificationPresenter implements Presenter {
   private Observable<Upload> updateProgress(Upload upload) {
     return uploadManager.getProgress(upload.getInstalledApp()
         .getPackageName())
+        .sample(500, TimeUnit.MILLISECONDS)
         .doOnNext(uploadProgress -> view.updateUploadProgress(upload.getInstalledApp()
             .getName(), upload.getInstalledApp()
             .getPackageName(), uploadProgress.getProgress()))

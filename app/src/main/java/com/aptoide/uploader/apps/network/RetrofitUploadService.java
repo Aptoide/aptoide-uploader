@@ -127,25 +127,25 @@ public class RetrofitUploadService implements UploaderService {
                         md5, storeName, metadata))));
   }
 
-  @Override public Observable<Upload> upload(String md5, String storeName, String appName,
-      InstalledApp installedApp, Metadata metadata, String obbMainPath) {
-    return accountProvider.getAccount()
-        .firstOrError()
-        .flatMapObservable(aptoideAccount -> accountProvider.getToken()
-            .toObservable()
-            .flatMap(accessToken -> serviceV3.uploadAppToRepo(
-                getParams(accessToken, aptoideAccount.getStoreName(), metadata, installedApp, true),
-                MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
-                    createFileRequestBody("apk", installedApp.getApkPath(),
-                        installedApp.getPackageName())),
-                MultipartBody.Part.createFormData("obb_main", obbMainPath,
-                    createFileRequestBody("obb", obbMainPath, installedApp.getPackageName())))
-                .flatMap(response -> Observable.just(
-                    buildUploadFinishStatus(response, installedApp, md5, storeName, metadata)))
-                .onErrorReturn(
-                    throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
-                        storeName))));
-  }
+  //@Override public Observable<Upload> upload(String md5, String storeName, String appName,
+  //    InstalledApp installedApp, Metadata metadata, String obbMainPath) {
+  //  return accountProvider.getAccount()
+  //      .firstOrError()
+  //      .flatMapObservable(aptoideAccount -> accountProvider.getToken()
+  //          .toObservable()
+  //          .flatMap(accessToken -> serviceV3.uploadAppToRepo(
+  //              getParams(accessToken, aptoideAccount.getStoreName(), metadata, installedApp, true),
+  //              MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
+  //                  createFileRequestBody("apk", installedApp.getApkPath(),
+  //                      installedApp.getPackageName())),
+  //              MultipartBody.Part.createFormData("obb_main", obbMainPath,
+  //                  createFileRequestBody("obb", obbMainPath, installedApp.getPackageName())))
+  //              .flatMap(response -> Observable.just(
+  //                  buildUploadFinishStatus(response, installedApp, md5, storeName, metadata)))
+  //              .onErrorReturn(
+  //                  throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
+  //                      storeName))));
+  //}
 
   private Map<String, RequestBody> getParams(String accessToken, String storeName,
       InstalledApp installedApp, boolean obbFileFlag) {
@@ -246,7 +246,7 @@ public class RetrofitUploadService implements UploaderService {
 
         long fileSize = apk.length();
 
-        long percentageTicks = fileSize / 4096 / 100;
+        long percentageTicks = fileSize / 1024 / 100;
 
         int parts = 0;
         int progress = 0;
