@@ -104,7 +104,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
       final Retrofit retrofitV3 =
           retrofitBuilder("http://upload.webservices.aptoide.com/webservices/",
-              buildOkHttpClient());
+              buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV3()));
 
       UploadProgressManager uploadProgressManager = new UploadProgressManager();
 
