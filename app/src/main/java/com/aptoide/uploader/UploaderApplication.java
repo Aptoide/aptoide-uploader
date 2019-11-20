@@ -33,7 +33,9 @@ import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV3;
 import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV7;
 import com.aptoide.uploader.apps.network.UserAgentInterceptor;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
+import com.aptoide.uploader.apps.persistence.DraftPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryAppUploadStatusPersistence;
+import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
 import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
@@ -69,6 +71,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private UploaderPersistence uploadPersistence;
   private AutoLoginPersistence autoLoginPersistence;
   private AppUploadStatusPersistence appUploadStatusPersistence;
+  private DraftPersistence draftPersistence;
   private AppUploadStatusManager appUploadStatusManager;
   private UploaderAnalytics uploaderAnalytics;
   private CallbackManager callbackManager;
@@ -102,8 +105,7 @@ public class UploaderApplication extends NotificationApplicationView {
   public UploadManager getUploadManager() {
     if (uploadManager == null) {
 
-      final Retrofit retrofitV3 =
-          retrofitBuilder("http://upload.webservices.aptoide.com/webservices/",
+      final Retrofit retrofitV3 = retrofitBuilder("http://ws75-primary.aptoide.com/api/",
               buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV3()));
 
       UploadProgressManager uploadProgressManager = new UploadProgressManager();
@@ -114,7 +116,7 @@ public class UploaderApplication extends NotificationApplicationView {
               uploadProgressManager, getUploaderAnalytics()), getUploadPersistence(),
           getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
           getAccessTokenProvider(), getAppUploadStatusManager(), getAppUploadStatusPersistence(),
-          uploadProgressManager);
+          uploadProgressManager, getDraftPersistence());
     }
     return uploadManager;
   }
@@ -250,6 +252,13 @@ public class UploaderApplication extends NotificationApplicationView {
       uploadPersistence = new MemoryUploaderPersistence(new HashMap<>(), Schedulers.trampoline());
     }
     return uploadPersistence;
+  }
+
+  public DraftPersistence getDraftPersistence() {
+    if (draftPersistence == null) {
+      draftPersistence = new MemoryDraftPersistence(new HashMap<>(), Schedulers.trampoline());
+    }
+    return draftPersistence;
   }
 
   public AutoLoginPersistence getAutoLoginPersistence() {

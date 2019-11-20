@@ -3,18 +3,22 @@ package com.aptoide.uploader.apps.network;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.apps.Upload;
+import com.aptoide.uploader.apps.UploadDraft;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 
 public interface UploaderService {
 
-  Single<Upload> getUpload(String md5, String language, String storeName,
+  Single<UploadDraft> startUploadDraft(String md5, String language, String storeName,
       InstalledApp installedApp);
 
-  Observable<Upload> upload(String md5, String storeName, String installedAppName,
-      InstalledApp installedApp);
+  Observable<UploadDraft> createDraft(String md5, InstalledApp installedApp);
 
-  Single<Boolean> hasApplicationMetaData(String packageName, int versionCode);
+  Observable<UploadDraft> setDraftStatus(UploadDraft draft, DraftStatus draftStatus);
+
+  Observable<UploadDraft> getDraftStatus(UploadDraft draft);
+
+  Single<Boolean> hasApplicationMetaData(int draftId);
 
   Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
       String apkPath);

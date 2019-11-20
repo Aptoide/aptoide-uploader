@@ -9,7 +9,7 @@ import com.squareup.moshi.Json;
 public class HasApplicationMetaDataResponse {
 
   private String status;
-  @Json(name = "has") private boolean hasMetaData;
+  @Json(name = "exists") private boolean hasMetaData;
 
   public HasApplicationMetaDataResponse() {
   }

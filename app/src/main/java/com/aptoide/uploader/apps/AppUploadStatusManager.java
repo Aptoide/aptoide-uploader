@@ -66,7 +66,7 @@ public class AppUploadStatusManager {
           upload.setStatus(Upload.Status.COMPLETED);
           return Observable.just(upload);
         })
-        .retryWhen(new RetryWithDelay(3, 2000))
+        .retryWhen(new RetryWithDelay(3))
         .onErrorReturn(throwable -> {
           if (throwable instanceof GetApksRetryException) {
             upload.setStatus(Upload.Status.FAILED);
