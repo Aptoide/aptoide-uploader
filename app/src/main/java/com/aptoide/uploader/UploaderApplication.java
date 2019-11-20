@@ -31,6 +31,7 @@ import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV3;
 import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV7;
+import com.aptoide.uploader.apps.network.TokenRevalidatorV7Alternate;
 import com.aptoide.uploader.apps.network.UserAgentInterceptor;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.DraftPersistence;
@@ -133,6 +134,10 @@ public class UploaderApplication extends NotificationApplicationView {
     return new TokenRevalidationInterceptorV7(getAuthenticationProvider());
   }
 
+  public TokenRevalidatorV7Alternate getTokenRevalidatorV7Alternate() {
+    return new TokenRevalidatorV7Alternate(getAuthenticationProvider());
+  }
+
   public UserAgentInterceptor getUserAgentInterceptor() {
     return new UserAgentInterceptor(getIdsRepository());
   }
@@ -148,7 +153,7 @@ public class UploaderApplication extends NotificationApplicationView {
           retrofitBuilder("https://webservices.aptoide.com/", buildOkHttpClient());
 
       final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/",
-          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
+          buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       accountManager = new AptoideAccountManager(
           new RetrofitAccountService(retrofitV3.create(RetrofitAccountService.ServiceV3.class),
@@ -181,7 +186,7 @@ public class UploaderApplication extends NotificationApplicationView {
     if (categoriesManager == null) {
 
       final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/api/7/",
-          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
+          buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       categoriesManager = new CategoriesManager(new RetrofitCategoriesService(
           retrofitV7.create(RetrofitCategoriesService.ServiceV7.class)));
@@ -203,7 +208,7 @@ public class UploaderApplication extends NotificationApplicationView {
     if (appUploadStatusManager == null) {
 
       final Retrofit retrofitV7Secondary = retrofitBuilder("https://ws75-secondary.aptoide.com/",
-          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
+          buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       appUploadStatusManager =
           new AppUploadStatusManager(new AccountStoreNameProvider(getAccountManager()),
