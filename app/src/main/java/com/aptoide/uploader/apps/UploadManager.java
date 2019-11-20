@@ -48,8 +48,8 @@ public class UploadManager {
             .flatMapCompletable(draft -> draftPersistence.save(draft))));
   }
 
-  public Observable<List<Upload>> getUploads() {
-    return persistence.getUploads();
+  public Observable<List<UploadDraft>> getDrafts() {
+    return draftPersistence.getDrafts();
   }
 
   public Completable removeUploadFromPersistence(Upload upload) {
@@ -203,31 +203,30 @@ public class UploadManager {
         .flatMapIterable(drafts -> drafts)
         .filter(draft -> draft.getStatus()
             .equals(UploadDraft.Status.NOT_EXISTENT))
-        .flatMapCompletable(draft -> {
-          return uploaderService.hasApplicationMetaData(draft.getDraftId())
-              .flatMapCompletable(hasMetaData -> {
-                if (!hasMetaData) {
-                  draft.setStatus(UploadDraft.Status.NO_META_DATA);
-                  return draftPersistence.save(draft);
-                } else {
-                  /// TODO: 2019-10-18 verificar obbs aqui e enviar caso existam senao enviar so o apk
-                  //if (upload.getInstalledApp()
-                  //    .getObbMainPath() != null
-                  //    && upload.getInstalledApp()
-                  //    .getObbPatchPath() != null) {
-                  //}
-                  //if (upload.getInstalledApp()
-                  //    .getObbMainPath() != null) {
-                  //}
-                  draft.setStatus(UploadDraft.Status.PROGRESS);
-                  return null;
-                }
-              })
-              .onErrorResumeNext(__ -> {
-                draft.setStatus(UploadDraft.Status.CLIENT_ERROR);
+        .flatMapCompletable(draft -> uploaderService.hasApplicationMetaData(draft)
+            .flatMapCompletable(hasMetaData -> {
+              if (!hasMetaData) {
+                draft.setStatus(UploadDraft.Status.NO_META_DATA);
                 return draftPersistence.save(draft);
-              });
-        })
+              } else {
+                /// TODO: 2019-10-18 verificar obbs aqui e enviar caso existam senao enviar so o apk
+                //if (upload.getInstalledApp()
+                //    .getObbMainPath() != null
+                //    && upload.getInstalledApp()
+                //    .getObbPatchPath() != null) {
+                //}
+                //if (upload.getInstalledApp()
+                //    .getObbMainPath() != null) {
+                //}
+                draft.setStatus(UploadDraft.Status.PROGRESS);
+                return Completable.complete();
+              }
+            })
+            .onErrorResumeNext(throwable -> {
+              throwable.printStackTrace();
+              draft.setStatus(UploadDraft.Status.CLIENT_ERROR);
+              return draftPersistence.save(draft);
+            }))
         .subscribe(() -> {
         }, throwable -> throwable.printStackTrace());
   }

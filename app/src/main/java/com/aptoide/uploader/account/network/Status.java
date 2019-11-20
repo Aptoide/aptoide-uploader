@@ -1,5 +1,5 @@
 package com.aptoide.uploader.account.network;
 
 public enum Status {
-  OK, QUEUED, FAIL, ERROR
+  OK, QUEUED, FAIL, ERROR, PROCESSING, PENDING
 }

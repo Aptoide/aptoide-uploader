@@ -18,7 +18,7 @@ public interface UploaderService {
 
   Observable<UploadDraft> getDraftStatus(UploadDraft draft);
 
-  Single<Boolean> hasApplicationMetaData(int draftId);
+  Single<Boolean> hasApplicationMetaData(UploadDraft draft);
 
   Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
       String apkPath);

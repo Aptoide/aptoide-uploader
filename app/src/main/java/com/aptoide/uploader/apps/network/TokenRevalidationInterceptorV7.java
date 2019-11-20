@@ -33,7 +33,7 @@ public class TokenRevalidationInterceptorV7 extends TokenRevalidationInterceptor
       JSONObject responseBody = new JSONObject(responseBodyString);
       JSONArray errors = responseBody.getJSONArray("errors");
       errorCode = errors.getJSONObject(0)
-          .getString("code");
+          .getString("name");
     } catch (JSONException e) {
       Log.d(TAG, "No error");
     }

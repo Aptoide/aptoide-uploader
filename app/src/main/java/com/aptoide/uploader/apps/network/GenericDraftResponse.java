@@ -15,6 +15,7 @@ public class GenericDraftResponse extends ResponseV7 {
   public static class Data {
     @Json(name = "draft_id") private int draftId;
     @Json(name = "status") private String status;
+    @Json(name = "error") private List<Error> error;
 
     public String getStatus() {
       return status;
@@ -31,6 +32,11 @@ public class GenericDraftResponse extends ResponseV7 {
     public void setDraftId(int draftId) {
       this.draftId = draftId;
     }
+
+    public List<Error> getError() {
+      return error;
+    }
+
   }
 
   public Data getData() {

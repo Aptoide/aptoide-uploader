@@ -24,7 +24,6 @@ import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
 import retrofit2.Response;
-import retrofit2.http.FormUrlEncoded;
 import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
@@ -90,23 +89,27 @@ public class RetrofitUploadService implements UploaderService {
                   if (response != null && response.body()
                       .getData()
                       .getStatus()
+                      .equals("PENDING") || response.body()
+                      .getData()
+                      .getStatus()
                       .equals("PROCESSING")) {
                     throw new IOException();
                   }
                   uploaderAnalytics.sendUploadCompleteEvent("success", "Check if in Store", null,
                       null);
                   return Observable.just(
-                      buildUploadFinishStatus(response, draft.getInstalledApp(), draft.getMd5()));
+                      buildUploadFinishStatus(response, draft.getInstalledApp(), draft.getMd5(),
+                          draft.getDraftId()));
                 })
                 .retryWhen(new RetryWithDelay(6))
                 .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR,
                     draft.getInstalledApp(), draft.getMd5())));
   }
 
-  @Override public Single<Boolean> hasApplicationMetaData(int draftId) {
+  @Override public Single<Boolean> hasApplicationMetaData(UploadDraft draft) {
     return accountProvider.getToken()
-        .flatMap(accessToken -> serviceV3.hasApplicationMetaData(
-            getParamsMetadataExists(accessToken, draftId))
+        .flatMap(accessToken -> serviceV3.hasApplicationMetaData(accessToken,
+            getParamsMetadataExists(draft.getDraftId()))
             .map(result -> result.isSuccessful() && result.body() != null && result.body()
                 .hasMetaData())
             .single(false));
@@ -343,33 +346,36 @@ public class RetrofitUploadService implements UploaderService {
   }
 
   @NonNull private UploadDraft buildUploadFinishStatus(Response<GenericDraftResponse> response,
-      InstalledApp installedApp, String md5) {
+      InstalledApp installedApp, String md5, int draftId) {
     if (response.body()
-        .getInfo()
+        .getData()
         .getStatus()
-        .equals(Status.ERROR)) {
+        .equals("ERROR")) {
       switch (response.body()
+          .getData()
           .getError()
+          .get(0)
           .getCode()) {
         case "APK-103":
-          return new UploadDraft(UploadDraft.Status.DUPLICATE, installedApp, md5);
+          return new UploadDraft(UploadDraft.Status.DUPLICATE, installedApp, md5, draftId);
         case "APK-5":
-          return new UploadDraft(UploadDraft.Status.NOT_EXISTENT, installedApp, md5);
+          return new UploadDraft(UploadDraft.Status.NOT_EXISTENT, installedApp, md5, draftId);
         case "APK-101":
-          return new UploadDraft(UploadDraft.Status.INTELLECTUAL_RIGHTS, installedApp, md5);
+          return new UploadDraft(UploadDraft.Status.INTELLECTUAL_RIGHTS, installedApp, md5,
+              draftId);
         case "APK-102":
-          return new UploadDraft(UploadDraft.Status.INFECTED, installedApp, md5);
+          return new UploadDraft(UploadDraft.Status.INFECTED, installedApp, md5, draftId);
         case "APK-106":
-          return new UploadDraft(UploadDraft.Status.INVALID_SIGNATURE, installedApp, md5);
+          return new UploadDraft(UploadDraft.Status.INVALID_SIGNATURE, installedApp, md5, draftId);
         case "APK-104":
-          return new UploadDraft(UploadDraft.Status.PUBLISHER_ONLY, installedApp, md5);
+          return new UploadDraft(UploadDraft.Status.PUBLISHER_ONLY, installedApp, md5, draftId);
         case "FILE-112":
-          return new UploadDraft(UploadDraft.Status.APP_BUNDLE, installedApp, md5);
+          return new UploadDraft(UploadDraft.Status.APP_BUNDLE, installedApp, md5, draftId);
         default:
-          return new UploadDraft(UploadDraft.Status.FAILED, installedApp, md5);
+          return new UploadDraft(UploadDraft.Status.FAILED, installedApp, md5, draftId);
       }
     }
-    return new UploadDraft(UploadDraft.Status.COMPLETED, installedApp, md5);
+    return new UploadDraft(UploadDraft.Status.COMPLETED, installedApp, md5, draftId);
   }
 
   @NonNull private Upload buildUploadFinishStatus(Response<UploadAppToRepoResponse> response,
@@ -445,10 +451,8 @@ public class RetrofitUploadService implements UploaderService {
     return parameters;
   }
 
-  @NonNull
-  private Map<String, okhttp3.RequestBody> getParamsMetadataExists(String token, int draftId) {
+  @NonNull private Map<String, okhttp3.RequestBody> getParamsMetadataExists(int draftId) {
     Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
-    parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), token));
     parameters.put("draft_id",
         RequestBody.create(MediaType.parse("text/plain"), String.valueOf(draftId)));
     Log.w(getClass().getSimpleName(), parameters.toString());
@@ -509,8 +513,9 @@ public class RetrofitUploadService implements UploaderService {
         @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part apkFile,
         @Part MultipartBody.Part obbMain);
 
-    @POST("7/uploader/draft/metadata/exists") @FormUrlEncoded
+    @Multipart @POST("7/uploader/draft/metadata/exists")
     Observable<Response<HasApplicationMetaDataResponse>> hasApplicationMetaData(
+        @Query("access_token") String accessToken,
         @PartMap Map<String, okhttp3.RequestBody> params);
   }
 }
