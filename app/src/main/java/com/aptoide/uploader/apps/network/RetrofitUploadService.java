@@ -67,7 +67,7 @@ public class RetrofitUploadService implements UploaderService {
   }
 
   @Override public Single<Boolean> hasApplicationMetaData(String packageName, int versionCode) {
-    return serviceV3.hasApplicationMetaData(packageName, versionCode, RESPONSE_MODE)
+    return serviceV3.hasApplicationMetaData(packageName, versionCode, RESPONSE_MODE, 70)
         .map(result -> result.isSuccessful() && result.body() != null && result.body()
             .hasMetaData())
         .single(false);
@@ -450,6 +450,6 @@ public class RetrofitUploadService implements UploaderService {
     @POST("3/hasApplicationMetaData") @FormUrlEncoded
     Observable<Response<HasApplicationMetaDataResponse>> hasApplicationMetaData(
         @Field("package") String packageName, @Field("vercode") int versionCode,
-        @Field("mode") String responseMode);
+        @Field("mode") String responseMode, @Field("limit") int limit);
   }
 }
