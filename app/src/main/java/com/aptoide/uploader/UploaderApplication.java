@@ -113,8 +113,8 @@ public class UploaderApplication extends NotificationApplicationView {
 
       uploadManager = new UploadManager(
           new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
-              getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER,
-              uploadProgressManager, getUploaderAnalytics()), getUploadPersistence(),
+              getAccessTokenProvider(), uploadProgressManager, getUploaderAnalytics(),
+              getMd5Calculator()), getUploadPersistence(),
           getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
           getAccessTokenProvider(), getAppUploadStatusManager(), getAppUploadStatusPersistence(),
           uploadProgressManager, getDraftPersistence());
@@ -224,8 +224,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
   private PackageManagerInstalledAppsProvider getPackageManagerInstalledAppsProvider() {
     if (packageManagerInstalledAppsProvider == null) {
-      return new PackageManagerInstalledAppsProvider(getPackageManager(), getMd5Calculator(),
-          new HashMap<>(), Schedulers.io());
+      return new PackageManagerInstalledAppsProvider(getPackageManager(), Schedulers.io());
     }
     return packageManagerInstalledAppsProvider;
   }
@@ -247,7 +246,8 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public OkioMd5Calculator getMd5Calculator() {
     if (md5Calculator == null) {
-      md5Calculator = new OkioMd5Calculator(new HashMap<>(), Schedulers.trampoline());
+      md5Calculator =
+          new OkioMd5Calculator(new HashMap<>(), new HashMap<>(), Schedulers.trampoline());
     }
     return md5Calculator;
   }

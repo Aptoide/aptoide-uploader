@@ -12,8 +12,6 @@ public interface NotificationView extends View {
 
   void showNoMetaDataNotification(String applicationName, String packageName, String md5);
 
-  void showFailedUploadNotification(String applicationName, String packageName);
-
   void showPublisherOnlyNotification(String applicationName, String packageName);
 
   void showUploadInfectionNotificaton(String applicationName, String packageName);
@@ -26,6 +24,12 @@ public interface NotificationView extends View {
 
   void updateUploadProgress(String name, String packageName, int progress);
 
-  void showErrorNotification(String name, String packageName);
+  void showUnknownErrorRetryNotification(String name, String packageName);
+
+  void showFailedUploadWithRetryNotification(String applicationName, String packageName);
+
+  void showFailedUploadNotification(String applicationName, String packageName);
+
+  void showUnknownErrorNotification(String applicationName, String packageName);
 }
 

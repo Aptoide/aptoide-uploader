@@ -1,11 +1,10 @@
 package com.aptoide.uploader.apps.network;
 
 import com.aptoide.uploader.apps.InstalledApp;
-import com.aptoide.uploader.apps.Metadata;
-import com.aptoide.uploader.apps.Upload;
 import com.aptoide.uploader.apps.UploadDraft;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import java.util.List;
 
 public interface UploaderService {
 
@@ -20,15 +19,12 @@ public interface UploaderService {
 
   Single<Boolean> hasApplicationMetaData(UploadDraft draft);
 
-  Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
-      String apkPath);
+  Observable<UploadDraft> setDraftMetadata(UploadDraft draft);
 
-  Observable<Upload> upload(String md5, String storeName, String appName, InstalledApp installedApp,
-      Metadata metadata);
+  Observable<UploadDraft> uploadFiles(UploadDraft draft);
 
-  //Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName, String obbPath,
-  //    String obbType);
+  Observable<UploadDraft> uploadSplits(UploadDraft draft, List<String> paths);
 
-  //Observable<Upload> upload(String md5, String storeName, String appName, InstalledApp installedApp,
-  //    Metadata metadata, String obbMainPath);
+  Observable<UploadDraft> setDraftMd5s(UploadDraft draft);
+
 }

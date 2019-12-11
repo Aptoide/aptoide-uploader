@@ -60,45 +60,43 @@ public class NotificationPresenter implements Presenter {
         break;
       case COMPLETED:
         view.showCompletedUploadNotification(appName, packageName);
-        break;
-      //return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case DUPLICATE:
         view.showDuplicateUploadNotification(appName, packageName);
-        break;
-      //return uploadManager.removeUploadFromPersistence(upload);
-      case FAILED:
-        view.showFailedUploadNotification(appName, packageName);
-        break;
-      //return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case INFECTED:
         view.showUploadInfectionNotificaton(appName, packageName);
-        break;
-      //return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case PUBLISHER_ONLY:
         view.showPublisherOnlyNotification(appName, packageName);
-        break;
-      //return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case INVALID_SIGNATURE:
         view.showInvalidSignatureNotification(appName, packageName);
-        break;
-      //return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case META_DATA_ADDED:
         break;
       case RETRY:
         break;
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
-        break;
-      //return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case APP_BUNDLE:
         view.showAppBundleNotification(appName, packageName);
-        break;
-      //return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
+      case UPLOAD_FAILED_RETRY:
+        view.showFailedUploadWithRetryNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft);
+      case UPLOAD_FAILED:
+        view.showFailedUploadNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft);
+      case UNKNOWN_ERROR_RETRY:
+        view.showUnknownErrorRetryNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft);
       case CLIENT_ERROR:
+      case UNKNOWN_ERROR:
       default:
-        view.showErrorNotification(appName, packageName);
-        break;
-      //return uploadManager.removeUploadFromPersistence(upload);
+        view.showUnknownErrorNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft);
     }
     return Completable.complete();
   }
@@ -111,7 +109,7 @@ public class NotificationPresenter implements Presenter {
             .getName(), draft.getInstalledApp()
             .getPackageName(), uploadProgress.getProgress()))
         .map(__ -> draft)
-        .doOnError(__ -> view.showErrorNotification(draft.getInstalledApp()
+        .doOnError(__ -> view.showUnknownErrorRetryNotification(draft.getInstalledApp()
             .getName(), draft.getInstalledApp()
             .getPackageName()));
   }

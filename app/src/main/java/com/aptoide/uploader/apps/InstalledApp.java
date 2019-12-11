@@ -1,6 +1,10 @@
 package com.aptoide.uploader.apps;
 
 import android.content.pm.ApplicationInfo;
+import android.os.Build;
+import android.support.annotation.RequiresApi;
+import java.util.ArrayList;
+import java.util.List;
 
 public class InstalledApp {
 
@@ -72,7 +76,6 @@ public class InstalledApp {
     return null;
   }
 
-
   public String getName() {
     return name;
   }
@@ -120,5 +123,79 @@ public class InstalledApp {
 
   public ApplicationInfo getAppInfo() {
     return appInfo;
+  }
+
+  public List<String> getObbList() {
+    List<String> list = new ArrayList<>();
+    if (getObbMainPath() != null) {
+      list.add(getObbMainPath());
+    }
+    if (getObbPatchPath() != null) {
+      list.add(getObbPatchPath());
+    }
+    return list;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP) public List<FileToUpload> getSplits() {
+    List<FileToUpload> list = new ArrayList<>();
+    if (getAppInfo().splitSourceDirs != null) {
+      if (getAppInfo().splitSourceDirs.length != 0) {
+        for (int i = 0; i < getAppInfo().splitSourceDirs.length; i++) {
+          list.add(new FileToUpload(getAppInfo().splitSourceDirs[i], FileType.SPLIT));
+        }
+      }
+    }
+    return list;
+  }
+
+  public List<FileToUpload> getRegularApkFiles() {
+    List<FileToUpload> list = new ArrayList<>();
+    list.add(new FileToUpload(getApkPath(), FileType.BASE));
+    if (getObbMainPath() != null) {
+      list.add(new FileToUpload(getObbMainPath(), FileType.OBB_MAIN));
+    }
+    if (getObbPatchPath() != null) {
+      list.add(new FileToUpload(getObbPatchPath(), FileType.OBB_PATCH));
+    }
+    return list;
+  }
+
+  @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP) public List<FileToUpload> getAppBundleFiles() {
+    List<FileToUpload> list = new ArrayList<>();
+    list.add(new FileToUpload(getApkPath(), FileType.BASE));
+    if (getSplits() != null) {
+      list.addAll(getSplits());
+    }
+    return list;
+  }
+
+  public class FileToUpload {
+    private String path;
+    private FileType type;
+
+    public FileToUpload(String path, FileType type) {
+      this.path = path;
+      this.type = type;
+    }
+
+    public String getPath() {
+      return path;
+    }
+
+    public void setPath(String path) {
+      this.path = path;
+    }
+
+    public FileType getType() {
+      return type;
+    }
+
+    public void setType(FileType type) {
+      this.type = type;
+    }
+  }
+
+  public enum FileType {
+    BASE, OBB_MAIN, OBB_PATCH, SPLIT
   }
 }

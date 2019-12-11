@@ -9,21 +9,16 @@ import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 
 public class PackageManagerInstalledAppsProvider implements InstalledAppsProvider {
 
   private final PackageManager packageManager;
   private PackageInfo packageInfo;
-  private OkioMd5Calculator md5Calculator;
-  private Map<String, String> cache;
+
   private Scheduler scheduler;
 
-  public PackageManagerInstalledAppsProvider(PackageManager packageManager,
-      OkioMd5Calculator md5Calculator, Map<String, String> cache, Scheduler scheduler) {
+  public PackageManagerInstalledAppsProvider(PackageManager packageManager, Scheduler scheduler) {
     this.packageManager = packageManager;
-    this.md5Calculator = md5Calculator;
-    this.cache = cache;
     this.scheduler = scheduler;
   }
 

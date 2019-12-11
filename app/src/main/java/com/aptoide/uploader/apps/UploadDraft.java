@@ -1,11 +1,15 @@
 package com.aptoide.uploader.apps;
 
+import java.util.List;
+
 public class UploadDraft {
 
   private int draftId;
   private Status status;
   private InstalledApp installedApp;
   private String md5;
+  private List<String> splitsToBeUploaded;
+  private Metadata metadata;
 
   public UploadDraft(InstalledApp installedApp, String md5) {
     this.installedApp = installedApp;
@@ -58,6 +62,23 @@ public class UploadDraft {
   }
 
   public enum Status {
-    START, PENDING, STATUS_SET, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, OBB_MAIN, OBB_PATCH, META_DATA_ADDED, RETRY, INTELLECTUAL_RIGHTS, INFECTED, INVALID_SIGNATURE, PUBLISHER_ONLY, APP_BUNDLE, FAILED
+    START, PENDING, STATUS_SET, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, META_DATA_ADDED, RETRY, INTELLECTUAL_RIGHTS, INFECTED, INVALID_SIGNATURE, PUBLISHER_ONLY, APP_BUNDLE, UPLOAD_FAILED, WAITING_UPLOAD_CONFIRMATION, SPLITS_NOT_EXISTENT, DRAFT_CREATED, MD5S_SET, METADATA_SET, UPLOAD_FAILED_RETRY, UNKNOWN_ERROR_RETRY, UNKNOWN_ERROR
   }
+
+  public void setSplitsToBeUploaded(List<String> md5s) {
+    splitsToBeUploaded = md5s;
+  }
+
+  public List<String> getSplitsToBeUploaded() {
+    return splitsToBeUploaded;
+  }
+
+  public Metadata getMetadata() {
+    return metadata;
+  }
+
+  public void setMetadata(Metadata metadata) {
+    this.metadata = metadata;
+  }
+
 }

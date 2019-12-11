@@ -42,12 +42,6 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
-  @Override public void showErrorNotification(String applicationName, String packageName) {
-    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
-        getString(R.string.application_notification_message_error));
-    notificationManager.notify(packageName.hashCode(), mBuilder.build());
-  }
-
   @Override
   public void showCompletedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
@@ -58,12 +52,6 @@ public abstract class NotificationApplicationView extends Application implements
 
   @Override public void showPendingUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName, "Pending");
-    notificationManager.notify(packageName.hashCode(), mBuilder.build());
-  }
-
-  @Override public void showFailedUploadNotification(String applicationName, String packageName) {
-    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
-        getString(R.string.application_notification_short_app_uplod_failed));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
@@ -96,6 +84,32 @@ public abstract class NotificationApplicationView extends Application implements
   public void showInvalidSignatureNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_invalid_signature));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
+  @Override public void showUnknownErrorNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_message_error));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
+  @Override
+  public void showFailedUploadWithRetryNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_short_app_upload_failed_retry));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
+  @Override
+  public void showUnknownErrorRetryNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_message_error_retry));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
+  @Override public void showFailedUploadNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_short_app_upload_failed));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
