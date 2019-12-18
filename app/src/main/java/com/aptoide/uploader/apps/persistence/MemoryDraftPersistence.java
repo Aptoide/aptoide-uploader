@@ -39,7 +39,13 @@ public class MemoryDraftPersistence implements DraftPersistence {
   }
 
   @Override public Completable remove(UploadDraft draft) {
-    return Completable.fromAction(() -> draftsMap.remove(draft.getMd5()))
+    return Completable.fromAction(() -> {
+      Log.d("lol", "Remove do upload draft called - STATUS: " + draft.getStatus()
+          .toString() + " - " + draft.getInstalledApp()
+          .getName());
+      draftsMap.remove(draft.getMd5());
+      draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
+    })
         .subscribeOn(scheduler)
         .doOnError(throwable -> Log.e("ERROR Remove", throwable.getMessage()));
   }

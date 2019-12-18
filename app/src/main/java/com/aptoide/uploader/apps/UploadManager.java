@@ -14,6 +14,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class UploadManager {
   private final UploaderService uploaderService;
@@ -73,16 +74,41 @@ public class UploadManager {
     return draftPersistence.remove(draft);
   }
 
+  public Observable<Boolean> hasDraftsInProgress() {
+    return draftPersistence.getDrafts()
+        .flatMap(drafts -> Observable.fromIterable(drafts)
+            .filter(draft -> draft.getStatus() != UploadDraft.Status.START)
+            .toList()
+            .toObservable())
+        .throttleLast(750, TimeUnit.MILLISECONDS)
+        .map(list -> !list.isEmpty());
+  }
+
+  public Observable<List<UploadDraft>> getDraftsInStart() {
+    return draftPersistence.getDrafts()
+        .flatMapSingle(drafts -> Observable.fromIterable(drafts)
+            .filter(draft -> draft.getStatus()
+                .equals(UploadDraft.Status.START))
+            .toList());
+  }
+
   @SuppressLint("CheckResult") private void dispatchUploads() {
     accountProvider.getAccount()
         .switchMap(account -> {
           if (account.isLoggedIn()) {
-            return draftPersistence.getDrafts()
-                .distinctUntilChanged(
-                    (previous, current) -> !draftPersistenceHasChanged(previous, current))
-                .flatMapIterable(drafts -> drafts)
-                .filter(draft -> draft.getStatus()
-                    .equals(UploadDraft.Status.START))
+            return hasDraftsInProgress().doOnNext(
+                __ -> Log.d("LOL", "has drafts in progress before filter"))
+                .filter(hasDrafts -> !hasDrafts)
+                .doOnNext(__ -> Log.d("LOL", "has drafts in progress after filter"))
+                .flatMapSingle(__ -> getDraftsInStart().firstOrError())
+                .doOnNext(
+                    __ -> Log.d("LOL", "has drafts in progress before filter getDraftsInStart"))
+                .filter(list -> !list.isEmpty())
+                .doOnNext(
+                    __ -> Log.d("LOL", "has drafts in progress after filter getDraftsInStart"))
+                .map(list -> list.get(0))
+                .doOnNext(draft -> Log.d("LOL", "starting upload: " + draft.getInstalledApp()
+                    .getName()))
                 .flatMapCompletable(
                     draft -> uploaderService.createDraft(draft.getMd5(), draft.getInstalledApp())
                         .flatMapCompletable(uploadDraft -> draftPersistence.save(uploadDraft)))
@@ -95,6 +121,7 @@ public class UploadManager {
           if (throwable instanceof NoConnectivityException) {
             Log.e(getClass().getSimpleName(), "NO INTERNET AVAILABLE!");
           }
+          throwable.printStackTrace();
         });
   }
 
@@ -363,5 +390,4 @@ public class UploadManager {
     }
     return false;
   }
-
 }

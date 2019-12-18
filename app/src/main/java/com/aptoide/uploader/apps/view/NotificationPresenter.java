@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import android.util.Log;
 import com.aptoide.uploader.apps.UploadDraft;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.view.Presenter;
@@ -47,6 +48,7 @@ public class NotificationPresenter implements Presenter {
         .getPackageName();
     String md5 = draft.getMd5();
 
+    Log.d("LOL", "Parsing Notification with status: " + draft.getStatus());
     switch (draft.getStatus()) {
       case METADATA_SET:
       case DRAFT_CREATED:
@@ -57,6 +59,7 @@ public class NotificationPresenter implements Presenter {
         break;
       case NOT_EXISTENT:
       case PROGRESS:
+      case START:
         break;
       case NO_META_DATA:
         view.showNoMetaDataNotification(appName, packageName, md5);
