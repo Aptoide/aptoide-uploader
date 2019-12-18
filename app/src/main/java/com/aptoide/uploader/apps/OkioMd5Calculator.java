@@ -41,7 +41,7 @@ public class OkioMd5Calculator implements Md5Calculator {
 
   @Override public String getPathFromCache(String md5) {
     if (md5PathCache.containsKey(md5)) {
-      return pathMd5Cache.get(md5);
+      return md5PathCache.get(md5);
     }
     throw new NullPointerException();
   }

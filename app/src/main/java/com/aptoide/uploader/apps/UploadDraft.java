@@ -11,11 +11,6 @@ public class UploadDraft {
   private List<String> splitsToBeUploaded;
   private Metadata metadata;
 
-  public UploadDraft(InstalledApp installedApp, String md5) {
-    this.installedApp = installedApp;
-    this.md5 = md5;
-  }
-
   public UploadDraft(Status status, InstalledApp installedApp, String md5) {
     this.status = status;
     this.installedApp = installedApp;
@@ -62,7 +57,7 @@ public class UploadDraft {
   }
 
   public enum Status {
-    START, PENDING, STATUS_SET, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, META_DATA_ADDED, RETRY, INTELLECTUAL_RIGHTS, INFECTED, INVALID_SIGNATURE, PUBLISHER_ONLY, APP_BUNDLE, UPLOAD_FAILED, WAITING_UPLOAD_CONFIRMATION, SPLITS_NOT_EXISTENT, DRAFT_CREATED, MD5S_SET, METADATA_SET, UPLOAD_FAILED_RETRY, UNKNOWN_ERROR_RETRY, UNKNOWN_ERROR
+    START, STATUS_SET_PENDING, STATUS_SET_DRAFT, SET_STATUS_TO_DRAFT, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, META_DATA_ADDED, INTELLECTUAL_RIGHTS, INFECTED, INVALID_SIGNATURE, PUBLISHER_ONLY, APP_BUNDLE, UPLOAD_FAILED, WAITING_UPLOAD_CONFIRMATION, UPLOAD_PENDING, DRAFT_CREATED, MD5S_SET, METADATA_SET, UPLOAD_FAILED_RETRY, UNKNOWN_ERROR_RETRY, UNKNOWN_ERROR
   }
 
   public void setSplitsToBeUploaded(List<String> md5s) {
@@ -80,5 +75,4 @@ public class UploadDraft {
   public void setMetadata(Metadata metadata) {
     this.metadata = metadata;
   }
-
 }

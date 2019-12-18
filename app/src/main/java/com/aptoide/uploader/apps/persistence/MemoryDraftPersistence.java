@@ -12,11 +12,11 @@ import java.util.Map;
 
 public class MemoryDraftPersistence implements DraftPersistence {
 
-  private final Map<Integer, UploadDraft> draftsMap;
+  private final Map<String, UploadDraft> draftsMap;
   private final PublishSubject<List<UploadDraft>> draftsListSubject;
   private final Scheduler scheduler;
 
-  public MemoryDraftPersistence(Map<Integer, UploadDraft> draftsMap, Scheduler scheduler) {
+  public MemoryDraftPersistence(Map<String, UploadDraft> draftsMap, Scheduler scheduler) {
     this.draftsMap = draftsMap;
     this.scheduler = scheduler;
     draftsListSubject = PublishSubject.create();
@@ -29,7 +29,9 @@ public class MemoryDraftPersistence implements DraftPersistence {
 
   @Override public Completable save(UploadDraft draft) {
     return Completable.fromAction(() -> {
-      draftsMap.put(draft.hashCode(), draft);
+      Log.d("lol", "save do upload draft called - STATUS: " + draft.getStatus()
+          .toString());
+      draftsMap.put(draft.getMd5(), draft);
       draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
     })
         .subscribeOn(scheduler)
@@ -37,7 +39,7 @@ public class MemoryDraftPersistence implements DraftPersistence {
   }
 
   @Override public Completable remove(UploadDraft draft) {
-    return Completable.fromAction(() -> draftsMap.remove(draft.hashCode()))
+    return Completable.fromAction(() -> draftsMap.remove(draft.getMd5()))
         .subscribeOn(scheduler)
         .doOnError(throwable -> Log.e("ERROR Remove", throwable.getMessage()));
   }

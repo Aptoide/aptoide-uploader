@@ -15,7 +15,7 @@ public class GenericDraftResponse extends ResponseV7 {
   public static class Data {
     @Json(name = "draft_id") private int draftId;
     @Json(name = "status") private String status;
-    @Json(name = "error") private List<Error> error;
+    @Json(name = "errors") private List<Error> errors;
 
     public String getStatus() {
       return status;
@@ -34,7 +34,7 @@ public class GenericDraftResponse extends ResponseV7 {
     }
 
     public List<Error> getError() {
-      return error;
+      return errors;
     }
 
   }

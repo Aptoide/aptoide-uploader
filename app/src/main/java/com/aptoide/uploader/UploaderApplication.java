@@ -37,8 +37,6 @@ import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.DraftPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryAppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
-import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
-import com.aptoide.uploader.apps.persistence.UploaderPersistence;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
 import com.aptoide.uploader.security.AuthenticationPersistance;
 import com.aptoide.uploader.security.AuthenticationProvider;
@@ -69,7 +67,6 @@ public class UploaderApplication extends NotificationApplicationView {
   private AuthenticationProvider authenticationProvider;
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
-  private UploaderPersistence uploadPersistence;
   private AutoLoginPersistence autoLoginPersistence;
   private AppUploadStatusPersistence appUploadStatusPersistence;
   private DraftPersistence draftPersistence;
@@ -106,18 +103,18 @@ public class UploaderApplication extends NotificationApplicationView {
   public UploadManager getUploadManager() {
     if (uploadManager == null) {
 
-      final Retrofit retrofitV3 = retrofitBuilder("http://ws75-primary.aptoide.com/api/",
-          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
+      final Retrofit retrofitV7 = retrofitBuilder("http://ws75-primary.aptoide.com/api/",
+          buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       UploadProgressManager uploadProgressManager = new UploadProgressManager();
 
       uploadManager = new UploadManager(
-          new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
+          new RetrofitUploadService(retrofitV7.create(RetrofitUploadService.ServiceV7.class),
               getAccessTokenProvider(), uploadProgressManager, getUploaderAnalytics(),
-              getMd5Calculator()), getUploadPersistence(),
-          getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
-          getAccessTokenProvider(), getAppUploadStatusManager(), getAppUploadStatusPersistence(),
-          uploadProgressManager, getDraftPersistence());
+              getMd5Calculator()), getMd5Calculator(),
+          new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
+          getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager,
+          getDraftPersistence());
     }
     return uploadManager;
   }
@@ -250,13 +247,6 @@ public class UploaderApplication extends NotificationApplicationView {
           new OkioMd5Calculator(new HashMap<>(), new HashMap<>(), Schedulers.trampoline());
     }
     return md5Calculator;
-  }
-
-  public UploaderPersistence getUploadPersistence() {
-    if (uploadPersistence == null) {
-      uploadPersistence = new MemoryUploaderPersistence(new HashMap<>(), Schedulers.trampoline());
-    }
-    return uploadPersistence;
   }
 
   public DraftPersistence getDraftPersistence() {

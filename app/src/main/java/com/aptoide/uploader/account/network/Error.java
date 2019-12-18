@@ -1,13 +1,14 @@
 package com.aptoide.uploader.account.network;
 
+import com.squareup.moshi.Json;
 import java.util.List;
 
 public class Error {
   private String code;
   private String description;
-  private List<String> details;
+  @Json(name = "details") private Details details;
 
-  public Error(String code, String description, List<String> details) {
+  public Error(String code, String description, Details details) {
     this.code = code;
     this.description = description;
     this.details = details;
@@ -21,7 +22,15 @@ public class Error {
     return description;
   }
 
-  public List<String> getDetails() {
+  public Details getDetails() {
     return details;
+  }
+
+  public static class Details {
+    @Json(name = "splits") private List<String> splits;
+
+    public List<String> getSplits() {
+      return splits;
+    }
   }
 }

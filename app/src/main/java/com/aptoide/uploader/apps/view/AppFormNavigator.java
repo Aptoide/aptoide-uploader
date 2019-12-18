@@ -4,7 +4,7 @@ import android.content.Context;
 import android.support.v4.app.FragmentManager;
 import com.aptoide.uploader.R;
 
-class AppFormNavigator {
+public class AppFormNavigator {
 
   private final FragmentManager fragmentManager;
   private final Context context;

@@ -41,8 +41,8 @@ public class AppFormPresenter implements Presenter {
           if (!view.isValidForm()) view.showMandatoryFieldError();
         })
         .filter(__ -> view.isValidForm())
-        .flatMapCompletable(metadata -> uploadManager.addMetadataToDraft(metadata, md5)
-            .doOnComplete(() -> appFormNavigator.navigateToMyAppsView()))
+        .doOnNext(__ -> appFormNavigator.navigateToMyAppsView())
+        .flatMapCompletable(metadata -> uploadManager.handleNoMetadata(metadata, md5))
         .subscribe();
   }
 

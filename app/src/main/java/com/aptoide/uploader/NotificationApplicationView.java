@@ -51,7 +51,14 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   @Override public void showPendingUploadNotification(String applicationName, String packageName) {
-    NotificationCompat.Builder mBuilder = buildNotification(applicationName, "Pending");
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(applicationName)
+            .setOngoing(false)
+            .setOnlyAlertOnce(true)
+            .setProgress(0, 0, true);
+
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
@@ -118,9 +125,8 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
-            .setContentTitle(getString(R.string.app_name))
+            .setContentTitle(applicationName)
             .setOngoing(false)
-            .setContentText(applicationName)
             .setOnlyAlertOnce(true)
             .setProgress(100, progress, false);
 
@@ -141,7 +147,6 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
-            .setSubText(getString(R.string.app_name))
             .setOngoing(false)
             .setContentText(
                 getString(R.string.application_notification_message_app_no_metadata_upload))
@@ -155,10 +160,9 @@ public abstract class NotificationApplicationView extends Application implements
   public NotificationCompat.Builder buildNotification(String applicationName, String subText) {
     return new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
         R.drawable.notification_icon)
-        .setContentTitle(getString(R.string.app_name))
+        .setContentTitle(applicationName)
         .setOngoing(false)
-        .setSubText(subText)
-        .setContentText(applicationName)
+        .setContentText(subText)
         .setAutoCancel(true);
   }
 

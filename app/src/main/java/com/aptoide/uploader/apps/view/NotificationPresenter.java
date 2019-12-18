@@ -48,15 +48,18 @@ public class NotificationPresenter implements Presenter {
     String md5 = draft.getMd5();
 
     switch (draft.getStatus()) {
-      case PENDING:
+      case METADATA_SET:
+      case DRAFT_CREATED:
+      case MD5S_SET:
+      case STATUS_SET_DRAFT:
+      case STATUS_SET_PENDING:
         view.showPendingUploadNotification(appName, packageName);
         break;
       case NOT_EXISTENT:
+      case PROGRESS:
         break;
       case NO_META_DATA:
         view.showNoMetaDataNotification(appName, packageName, md5);
-        break;
-      case PROGRESS:
         break;
       case COMPLETED:
         view.showCompletedUploadNotification(appName, packageName);
@@ -73,10 +76,6 @@ public class NotificationPresenter implements Presenter {
       case INVALID_SIGNATURE:
         view.showInvalidSignatureNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(draft);
-      case META_DATA_ADDED:
-        break;
-      case RETRY:
-        break;
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(draft);
