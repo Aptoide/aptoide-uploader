@@ -286,14 +286,9 @@ public class UploadManager {
                 draft.setStatus(UploadDraft.Status.NO_META_DATA);
                 return draftPersistence.save(draft);
               } else {
-                draft.setStatus(UploadDraft.Status.PROGRESS);
+                draft.setStatus(UploadDraft.Status.SET_STATUS_TO_DRAFT);
                 return draftPersistence.save(draft);
               }
-            })
-            .onErrorResumeNext(throwable -> {
-              throwable.printStackTrace();
-              draft.setStatus(UploadDraft.Status.CLIENT_ERROR);
-              return draftPersistence.save(draft);
             }))
         .subscribe();
   }
@@ -383,6 +378,10 @@ public class UploadManager {
     }
     for (UploadDraft previous : previousList) {
       UploadDraft current = currentList.get(previousList.indexOf(previous));
+      Log.d("LOL: changed: ", "app: " + previous.getInstalledApp()
+          .getName() + " previous: " + previous.getStatus()
+          .toString() + ", current: " + current.getStatus()
+          .toString());
       if (!previous.getStatus()
           .equals(current.getStatus())) {
         return true;

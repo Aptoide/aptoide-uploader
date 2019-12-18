@@ -126,6 +126,7 @@ public class RetrofitUploadService implements UploaderService {
         .flatMap(accessToken -> serviceV7.hasApplicationMetaData(accessToken,
             getParamsMetadataExists(draft.getDraftId()))
             .map(result -> result.isSuccessful() && result.body() != null && result.body()
+                .getData()
                 .hasMetaData())
             .single(false));
   }
@@ -284,7 +285,8 @@ public class RetrofitUploadService implements UploaderService {
   private Map<String, RequestBody> getParamsSetDraftMd5s(String token, String md5, int draftId) {
     Map<String, RequestBody> parameters = new HashMap<>();
     parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), token));
-    parameters.put("draft_id", RequestBody.create(MediaType.parse("text/plain"), String.valueOf(draftId)));
+    parameters.put("draft_id",
+        RequestBody.create(MediaType.parse("text/plain"), String.valueOf(draftId)));
     parameters.put("apk_md5sum", RequestBody.create(MediaType.parse("text/plain"), md5));
     return parameters;
   }
