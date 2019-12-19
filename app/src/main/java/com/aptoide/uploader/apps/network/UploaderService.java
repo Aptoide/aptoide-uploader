@@ -17,7 +17,7 @@ public interface UploaderService {
 
   Observable<UploadDraft> getDraftStatus(UploadDraft draft);
 
-  Single<Boolean> hasApplicationMetaData(UploadDraft draft);
+  Observable<UploadDraft> hasApplicationMetaData(UploadDraft draft);
 
   Observable<UploadDraft> setDraftMetadata(UploadDraft draft);
 

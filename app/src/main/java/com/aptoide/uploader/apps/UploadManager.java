@@ -273,26 +273,7 @@ public class UploadManager {
         .filter(draft -> draft.getStatus()
             .equals(UploadDraft.Status.NOT_EXISTENT))
         .flatMapCompletable(draft -> uploaderService.hasApplicationMetaData(draft)
-            .flatMapCompletable(hasMetaData -> {
-              if (hasMetaData) {
-                UploadDraft uploadDraft =
-                    new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT, draft.getInstalledApp(),
-                        draft.getMd5(), draft.getDraftId());
-                return draftPersistence.save(uploadDraft);
-              } else {
-                UploadDraft uploadDraft =
-                    new UploadDraft(UploadDraft.Status.NO_META_DATA, draft.getInstalledApp(),
-                        draft.getMd5(), draft.getDraftId());
-                return draftPersistence.save(uploadDraft);
-              }
-            })
-            .onErrorResumeNext(throwable -> {
-              throwable.printStackTrace();
-              UploadDraft uploadDraft =
-                  new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
-                      draft.getMd5(), draft.getDraftId());
-              return draftPersistence.save(uploadDraft);
-            }))
+            .flatMapCompletable(newDraft -> draftPersistence.save(newDraft)))
         .subscribe();
   }
 

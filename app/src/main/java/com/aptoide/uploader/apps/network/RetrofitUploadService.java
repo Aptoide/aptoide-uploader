@@ -103,14 +103,31 @@ public class RetrofitUploadService implements UploaderService {
                 .retryWhen(new RetryWithDelay(8)));
   }
 
-  @Override public Single<Boolean> hasApplicationMetaData(UploadDraft draft) {
+  @Override public Observable<UploadDraft> hasApplicationMetaData(UploadDraft draft) {
     return accountProvider.getToken()
-        .flatMap(accessToken -> serviceV7.hasApplicationMetaData(accessToken,
+        .flatMapObservable(accessToken -> serviceV7.hasApplicationMetaData(accessToken,
             getParamsMetadataExists(draft.getDraftId()))
-            .map(result -> result.isSuccessful() && result.body() != null && result.body()
-                .getData()
-                .hasMetaData())
-            .single(false));
+            .map(result -> {
+              if (result.isSuccessful()) {
+                if (result.body() != null && result.body()
+                    .getData()
+                    .hasMetaData()) {
+                  UploadDraft uploadDraft = new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT,
+                      draft.getInstalledApp(), draft.getMd5(), draft.getDraftId());
+                  return uploadDraft;
+                } else {
+                  UploadDraft uploadDraft =
+                      new UploadDraft(UploadDraft.Status.NO_META_DATA, draft.getInstalledApp(),
+                          draft.getMd5(), draft.getDraftId());
+                  return uploadDraft;
+                }
+              } else {
+                UploadDraft uploadDraft =
+                    new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR_RETRY, draft.getInstalledApp(),
+                        draft.getMd5(), draft.getDraftId());
+                return uploadDraft;
+              }
+            }));
   }
 
   @Override public Observable<UploadDraft> setDraftMetadata(UploadDraft draft) {
