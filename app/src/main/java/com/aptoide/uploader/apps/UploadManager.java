@@ -23,8 +23,8 @@ public class UploadManager {
   private final AccountProvider accountProvider;
   private final AppUploadStatusManager appUploadStatusManager;
   private final AppUploadStatusPersistence appUploadStatusPersistence;
-  private UploadProgressManager uploadProgressManager;
   private final DraftPersistence draftPersistence;
+  private UploadProgressManager uploadProgressManager;
 
   public UploadManager(UploaderService uploaderService, Md5Calculator md5Calculator,
       BackgroundService backgroundService, AccountProvider accountProvider,
@@ -96,19 +96,10 @@ public class UploadManager {
     accountProvider.getAccount()
         .switchMap(account -> {
           if (account.isLoggedIn()) {
-            return hasDraftsInProgress().doOnNext(
-                __ -> Log.d("LOL", "has drafts in progress before filter"))
-                .filter(hasDrafts -> !hasDrafts)
-                .doOnNext(__ -> Log.d("LOL", "has drafts in progress after filter"))
+            return hasDraftsInProgress().filter(hasDrafts -> !hasDrafts)
                 .flatMapSingle(__ -> getDraftsInStart().firstOrError())
-                .doOnNext(
-                    __ -> Log.d("LOL", "has drafts in progress before filter getDraftsInStart"))
                 .filter(list -> !list.isEmpty())
-                .doOnNext(
-                    __ -> Log.d("LOL", "has drafts in progress after filter getDraftsInStart"))
                 .map(list -> list.get(0))
-                .doOnNext(draft -> Log.d("LOL", "starting upload: " + draft.getInstalledApp()
-                    .getName()))
                 .flatMapCompletable(
                     draft -> uploaderService.createDraft(draft.getMd5(), draft.getInstalledApp())
                         .flatMapCompletable(uploadDraft -> draftPersistence.save(uploadDraft)))
@@ -234,7 +225,6 @@ public class UploadManager {
         .flatMapIterable(drafts -> drafts)
         .filter(draft -> draft.getStatus()
             .equals(UploadDraft.Status.PROGRESS))
-        .doOnNext(draft -> Log.d("STATUS:", "uploading files"))
         .flatMap(draft -> uploaderService.uploadFiles(draft))
         .flatMapCompletable(draft -> draftPersistence.save(draft))
         .subscribe();
@@ -295,6 +285,13 @@ public class UploadManager {
                         draft.getMd5(), draft.getDraftId());
                 return draftPersistence.save(uploadDraft);
               }
+            })
+            .onErrorResumeNext(throwable -> {
+              throwable.printStackTrace();
+              UploadDraft uploadDraft =
+                  new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
+                      draft.getMd5(), draft.getDraftId());
+              return draftPersistence.save(uploadDraft);
             }))
         .subscribe();
   }
@@ -385,10 +382,6 @@ public class UploadManager {
 
     for (UploadDraft previous : previousList) {
       UploadDraft current = currentList.get(previousList.indexOf(previous));
-      Log.d("LOL: changed: ", "app: " + previous.getInstalledApp()
-          .getName() + " previous: " + previous.getStatus()
-          .toString() + ", current: " + current.getStatus()
-          .toString());
       if (!previous.getStatus()
           .equals(current.getStatus())) {
         return true;

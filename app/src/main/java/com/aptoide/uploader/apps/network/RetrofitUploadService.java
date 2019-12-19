@@ -70,24 +70,6 @@ public class RetrofitUploadService implements UploaderService {
                         0)));
   }
 
-  @Override public Observable<UploadDraft> setDraftMd5s(UploadDraft draft) {
-    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
-      return accountProvider.getToken()
-          .flatMapObservable(accessToken -> serviceV7.setDraftMd5sAboveLollipop(
-              new SetDraftSplitMd5sRequest(accessToken, draft.getDraftId(),
-                  getSplitsList(draft.getInstalledApp()), draft.getMd5()))
-              .map(response -> mapSetDraftMd5sResponse(response, draft))
-              .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR,
-                  draft.getInstalledApp(), draft.getMd5(), draft.getDraftId())));
-    }
-    return accountProvider.getToken()
-        .flatMapObservable(accessToken -> serviceV7.setDraftMd5sBelowLollipop(
-            getParamsSetDraftMd5s(accessToken, draft.getMd5(), draft.getDraftId()))
-            .map(response -> mapSetDraftMd5sResponse(response, draft))
-            .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR,
-                draft.getInstalledApp(), draft.getMd5(), draft.getDraftId())));
-  }
-
   @Override
   public Observable<UploadDraft> setDraftStatus(UploadDraft draft, DraftStatus draftStatus) {
     return accountProvider.getToken()
@@ -184,22 +166,6 @@ public class RetrofitUploadService implements UploaderService {
     }
   }
 
-  private Observable<Response<GenericDraftResponse>> mapTypesToAction(
-      InstalledApp.FileToUpload fileToUpload, UploadDraft draft) {
-    switch (fileToUpload.getType()) {
-      case OBB_MAIN:
-        return uploadObbMain(draft);
-      case OBB_PATCH:
-        return uploadObbPatch(draft);
-      case SPLIT:
-        return uploadSplit(fileToUpload.getPath(), draft.getDraftId(), draft.getInstalledApp()
-            .getPackageName());
-      case BASE:
-      default:
-        return uploadBaseApk(draft);
-    }
-  }
-
   public Observable<UploadDraft> uploadSplits(UploadDraft draft, List<String> paths) {
     return Observable.fromIterable(paths)
         .concatMap(split -> Observable.just(split)
@@ -217,6 +183,40 @@ public class RetrofitUploadService implements UploaderService {
         .onErrorReturn(
             throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
                 draft.getMd5(), draft.getDraftId()));
+  }
+
+  @Override public Observable<UploadDraft> setDraftMd5s(UploadDraft draft) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      return accountProvider.getToken()
+          .flatMapObservable(accessToken -> serviceV7.setDraftMd5sAboveLollipop(
+              new SetDraftSplitMd5sRequest(accessToken, draft.getDraftId(),
+                  getSplitsList(draft.getInstalledApp()), draft.getMd5()))
+              .map(response -> mapSetDraftMd5sResponse(response, draft))
+              .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR,
+                  draft.getInstalledApp(), draft.getMd5(), draft.getDraftId())));
+    }
+    return accountProvider.getToken()
+        .flatMapObservable(accessToken -> serviceV7.setDraftMd5sBelowLollipop(
+            getParamsSetDraftMd5s(accessToken, draft.getMd5(), draft.getDraftId()))
+            .map(response -> mapSetDraftMd5sResponse(response, draft))
+            .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR,
+                draft.getInstalledApp(), draft.getMd5(), draft.getDraftId())));
+  }
+
+  private Observable<Response<GenericDraftResponse>> mapTypesToAction(
+      InstalledApp.FileToUpload fileToUpload, UploadDraft draft) {
+    switch (fileToUpload.getType()) {
+      case OBB_MAIN:
+        return uploadObbMain(draft);
+      case OBB_PATCH:
+        return uploadObbPatch(draft);
+      case SPLIT:
+        return uploadSplit(fileToUpload.getPath(), draft.getDraftId(), draft.getInstalledApp()
+            .getPackageName());
+      case BASE:
+      default:
+        return uploadBaseApk(draft);
+    }
   }
 
   private Observable<Response<GenericDraftResponse>> uploadBaseApk(UploadDraft draft) {

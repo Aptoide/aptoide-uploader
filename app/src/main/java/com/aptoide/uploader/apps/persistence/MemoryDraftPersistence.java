@@ -29,8 +29,6 @@ public class MemoryDraftPersistence implements DraftPersistence {
 
   @Override public Completable save(UploadDraft draft) {
     return Completable.fromAction(() -> {
-      Log.d("lol", "save do upload draft called - STATUS: " + draft.getStatus()
-          .toString());
       draftsMap.put(draft.getMd5(), draft);
       draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
     })
@@ -40,9 +38,6 @@ public class MemoryDraftPersistence implements DraftPersistence {
 
   @Override public Completable remove(UploadDraft draft) {
     return Completable.fromAction(() -> {
-      Log.d("lol", "Remove do upload draft called - STATUS: " + draft.getStatus()
-          .toString() + " - " + draft.getInstalledApp()
-          .getName());
       draftsMap.remove(draft.getMd5());
       draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
     })
