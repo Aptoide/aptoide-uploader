@@ -244,14 +244,14 @@ public class UploaderApplication extends NotificationApplicationView {
   public OkioMd5Calculator getMd5Calculator() {
     if (md5Calculator == null) {
       md5Calculator =
-          new OkioMd5Calculator(new HashMap<>(), new HashMap<>(), Schedulers.trampoline());
+          new OkioMd5Calculator(new HashMap<>(), new HashMap<>(), Schedulers.computation());
     }
     return md5Calculator;
   }
 
   public DraftPersistence getDraftPersistence() {
     if (draftPersistence == null) {
-      draftPersistence = new MemoryDraftPersistence(new HashMap<>(), Schedulers.trampoline());
+      draftPersistence = new MemoryDraftPersistence(new HashMap<>(), Schedulers.io());
     }
     return draftPersistence;
   }
@@ -267,7 +267,7 @@ public class UploaderApplication extends NotificationApplicationView {
   public AppUploadStatusPersistence getAppUploadStatusPersistence() {
     if (appUploadStatusPersistence == null) {
       appUploadStatusPersistence =
-          new MemoryAppUploadStatusPersistence(new HashMap<>(), Schedulers.trampoline());
+          new MemoryAppUploadStatusPersistence(new HashMap<>(), Schedulers.io());
     }
     return appUploadStatusPersistence;
   }

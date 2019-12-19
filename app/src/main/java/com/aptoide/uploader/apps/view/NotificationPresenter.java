@@ -57,6 +57,10 @@ public class NotificationPresenter implements Presenter {
       case STATUS_SET_PENDING:
         view.showPendingUploadNotification(appName, packageName);
         break;
+      case WAITING_UPLOAD_CONFIRMATION:
+      case UPLOAD_PENDING:
+      case META_DATA_ADDED:
+      case SET_STATUS_TO_DRAFT:
       case NOT_EXISTENT:
       case PROGRESS:
       case START:

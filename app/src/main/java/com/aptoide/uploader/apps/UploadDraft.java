@@ -24,6 +24,15 @@ public class UploadDraft {
     this.draftId = draftId;
   }
 
+  public UploadDraft(Status status, InstalledApp installedApp, String md5, int draftId,
+      Metadata metadata) {
+    this.status = status;
+    this.installedApp = installedApp;
+    this.md5 = md5;
+    this.draftId = draftId;
+    this.metadata = metadata;
+  }
+
   public String getMd5() {
     return md5;
   }

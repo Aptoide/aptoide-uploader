@@ -206,8 +206,10 @@ public class UploadManager {
         .filter(draft -> draft.getStatus()
             .equals(UploadDraft.Status.METADATA_SET))
         .flatMapCompletable(draft -> {
-          draft.setStatus(UploadDraft.Status.SET_STATUS_TO_DRAFT);
-          return draftPersistence.save(draft);
+          UploadDraft uploadDraft =
+              new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT, draft.getInstalledApp(),
+                  draft.getMd5(), draft.getDraftId(), draft.getMetadata());
+          return draftPersistence.save(uploadDraft);
         })
         .subscribe();
   }
@@ -282,12 +284,16 @@ public class UploadManager {
             .equals(UploadDraft.Status.NOT_EXISTENT))
         .flatMapCompletable(draft -> uploaderService.hasApplicationMetaData(draft)
             .flatMapCompletable(hasMetaData -> {
-              if (!hasMetaData) {
-                draft.setStatus(UploadDraft.Status.NO_META_DATA);
-                return draftPersistence.save(draft);
+              if (hasMetaData) {
+                UploadDraft uploadDraft =
+                    new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT, draft.getInstalledApp(),
+                        draft.getMd5(), draft.getDraftId());
+                return draftPersistence.save(uploadDraft);
               } else {
-                draft.setStatus(UploadDraft.Status.SET_STATUS_TO_DRAFT);
-                return draftPersistence.save(draft);
+                UploadDraft uploadDraft =
+                    new UploadDraft(UploadDraft.Status.NO_META_DATA, draft.getInstalledApp(),
+                        draft.getMd5(), draft.getDraftId());
+                return draftPersistence.save(uploadDraft);
               }
             }))
         .subscribe();
@@ -376,6 +382,7 @@ public class UploadManager {
     if (previousList.size() != currentList.size()) {
       return true;
     }
+
     for (UploadDraft previous : previousList) {
       UploadDraft current = currentList.get(previousList.indexOf(previous));
       Log.d("LOL: changed: ", "app: " + previous.getInstalledApp()
