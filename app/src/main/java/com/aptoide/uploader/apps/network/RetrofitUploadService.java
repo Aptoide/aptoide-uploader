@@ -420,6 +420,7 @@ public class RetrofitUploadService implements UploaderService {
         .getInfo()
         .getStatus()
         .equals(Status.FAIL)) {
+      sendAnalytics("fail", response);
       return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, installedApp, md5);
     }
     return new UploadDraft(UploadDraft.Status.DRAFT_CREATED, installedApp, md5,
@@ -438,21 +439,27 @@ public class RetrofitUploadService implements UploaderService {
           .get(0)
           .getCode()) {
         case "APK-103":
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.DUPLICATE, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "APK-101":
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.INTELLECTUAL_RIGHTS, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "APK-102":
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.INFECTED, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "APK-106":
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.INVALID_SIGNATURE, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "APK-104":
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.PUBLISHER_ONLY, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "APK-5":
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.NOT_EXISTENT, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "SPLIT-1":
@@ -469,6 +476,7 @@ public class RetrofitUploadService implements UploaderService {
           return uploadDraft;
         case "SYS-1":
         case "REPO-9":
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR_RETRY, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "FILE-5":
@@ -476,6 +484,7 @@ public class RetrofitUploadService implements UploaderService {
         case "FILE-202":
         case "FILE-206":
         case "APK-109":
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.UPLOAD_FAILED_RETRY, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "MARG-5":
@@ -483,6 +492,7 @@ public class RetrofitUploadService implements UploaderService {
         case "MARG-102":
         case "MARG-205":
         case "QUOTA-1":
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.UPLOAD_FAILED, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "SPLIT-2": //AAB not supported yet.
@@ -491,10 +501,12 @@ public class RetrofitUploadService implements UploaderService {
         case "FILE-112":
         case "IARG-1":
         default:
+          sendAnalytics("fail", response);
           return new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
       }
     }
+    uploaderAnalytics.sendUploadCompleteEvent("success", "Upload App to Repo", "0", "0");
     return new UploadDraft(UploadDraft.Status.COMPLETED, draft.getInstalledApp(), draft.getMd5(),
         draft.getDraftId());
   }
@@ -505,6 +517,7 @@ public class RetrofitUploadService implements UploaderService {
         .getInfo()
         .getStatus()
         .equals(Status.FAIL)) {
+      sendAnalytics("fail", response);
       return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
           draft.getMd5(), draft.getDraftId());
     }
@@ -533,6 +546,7 @@ public class RetrofitUploadService implements UploaderService {
         .getInfo()
         .getStatus()
         .equals(Status.FAIL)) {
+      sendAnalytics("fail", response);
       return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
           draft.getMd5(), draft.getDraftId());
     }
@@ -546,6 +560,7 @@ public class RetrofitUploadService implements UploaderService {
         .getInfo()
         .getStatus()
         .equals(Status.FAIL)) {
+      sendAnalytics("fail", response);
       return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
           draft.getMd5(), draft.getDraftId());
     }
@@ -553,14 +568,14 @@ public class RetrofitUploadService implements UploaderService {
         draft.getDraftId());
   }
 
-  private void sendAnalytics(String status, Response<UploadAppToRepoResponse> response) {
+  private void sendAnalytics(String status, Response<GenericDraftResponse> response) {
     uploaderAnalytics.sendUploadCompleteEvent(status, "Upload App to Repo", response.body()
-        .getErrors()
+        .getData()
+        .getError()
         .get(0)
         .getCode(), response.body()
-        .getErrors()
-        .get(0)
-        .getMsg());
+        .getError()
+        .getDescription());
   }
 
   public interface ServiceV7 {
