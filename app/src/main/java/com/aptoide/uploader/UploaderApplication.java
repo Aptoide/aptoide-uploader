@@ -83,23 +83,6 @@ public class UploaderApplication extends NotificationApplicationView {
     getUploadManager().start();
   }
 
-  public OkHttpClient.Builder buildOkHttpClient() {
-    return new OkHttpClient.Builder().writeTimeout(60, TimeUnit.SECONDS)
-        .readTimeout(60, TimeUnit.SECONDS)
-        .connectTimeout(60, TimeUnit.SECONDS)
-        .addInterceptor(getConnectivityInterceptor())
-        .addInterceptor(getUserAgentInterceptor());
-  }
-
-  public Retrofit retrofitBuilder(String baseUrl, OkHttpClient.Builder okHttpClient) {
-    return new Retrofit.Builder().addCallAdapterFactory(
-        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
-        .baseUrl(baseUrl)
-        .addConverterFactory(MoshiConverterFactory.create())
-        .client(okHttpClient.build())
-        .build();
-  }
-
   public UploadManager getUploadManager() {
     if (uploadManager == null) {
 
@@ -117,6 +100,23 @@ public class UploaderApplication extends NotificationApplicationView {
           getDraftPersistence());
     }
     return uploadManager;
+  }
+
+  public OkHttpClient.Builder buildOkHttpClient() {
+    return new OkHttpClient.Builder().writeTimeout(60, TimeUnit.SECONDS)
+        .readTimeout(60, TimeUnit.SECONDS)
+        .connectTimeout(60, TimeUnit.SECONDS)
+        .addInterceptor(getConnectivityInterceptor())
+        .addInterceptor(getUserAgentInterceptor());
+  }
+
+  public Retrofit retrofitBuilder(String baseUrl, OkHttpClient.Builder okHttpClient) {
+    return new Retrofit.Builder().addCallAdapterFactory(
+        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+        .baseUrl(baseUrl)
+        .addConverterFactory(MoshiConverterFactory.create())
+        .client(okHttpClient.build())
+        .build();
   }
 
   public IdsRepository getIdsRepository() {
