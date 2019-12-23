@@ -14,9 +14,9 @@ public class InstalledApp {
   private final String apkPath;
   private final long installedDate;
   private final int versionCode;
-  private boolean isUploaded;
   private final Obb obbMain;
   private final Obb obbPatch;
+  private boolean isUploaded;
   private ApplicationInfo appInfo;
 
   public InstalledApp(ApplicationInfo appInfo, String name, boolean isSystem, String packageName,
@@ -88,6 +88,10 @@ public class InstalledApp {
     return packageName;
   }
 
+  @Override public int hashCode() {
+    return packageName.hashCode();
+  }
+
   @Override public boolean equals(Object o) {
     if (this == o) return true;
     if (o == null || getClass() != o.getClass()) return false;
@@ -95,10 +99,6 @@ public class InstalledApp {
     InstalledApp that = (InstalledApp) o;
 
     return packageName.equals(that.packageName);
-  }
-
-  @Override public int hashCode() {
-    return packageName.hashCode();
   }
 
   public String getApkPath() {
@@ -163,10 +163,18 @@ public class InstalledApp {
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP) public List<FileToUpload> getAppBundleFiles() {
     List<FileToUpload> list = new ArrayList<>();
     list.add(new FileToUpload(getApkPath(), FileType.BASE));
-    if (getSplits() != null) {
-      list.addAll(getSplits());
+    List<FileToUpload> splits = getSplits();
+    for (FileToUpload split : splits) {
+      if (split.getPath()
+          .contains("split_config")) {
+        list.add(split);
+      }
     }
     return list;
+  }
+
+  public enum FileType {
+    BASE, OBB_MAIN, OBB_PATCH, SPLIT
   }
 
   public class FileToUpload {
@@ -193,9 +201,5 @@ public class InstalledApp {
     public void setType(FileType type) {
       this.type = type;
     }
-  }
-
-  public enum FileType {
-    BASE, OBB_MAIN, OBB_PATCH, SPLIT
   }
 }

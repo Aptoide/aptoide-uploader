@@ -569,13 +569,15 @@ public class RetrofitUploadService implements UploaderService {
   }
 
   private void sendAnalytics(String status, Response<GenericDraftResponse> response) {
+
+    /*
     uploaderAnalytics.sendUploadCompleteEvent(status, "Upload App to Repo", response.body()
         .getData()
         .getError()
         .get(0)
         .getCode(), response.body()
         .getError()
-        .getDescription());
+        .getDescription());*/
   }
 
   public interface ServiceV7 {
