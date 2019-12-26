@@ -459,7 +459,6 @@ public class RetrofitUploadService implements UploaderService {
           return new UploadDraft(UploadDraft.Status.PUBLISHER_ONLY, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "APK-5":
-          sendUploadCompleteFailedAnalytics(response);
           return new UploadDraft(UploadDraft.Status.NOT_EXISTENT, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "SPLIT-1":
