@@ -100,7 +100,7 @@ public class RetrofitUploadService implements UploaderService {
                   }
                   return Observable.just(mapUploadDraftResponse(response, draft));
                 })
-                .retryWhen(new RetryWithDelay(8)));
+                .retryWhen(new RetryWithDelay(5)));
   }
 
   @Override public Observable<UploadDraft> hasApplicationMetaData(UploadDraft draft) {
