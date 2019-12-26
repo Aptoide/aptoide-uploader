@@ -157,9 +157,9 @@ public class LoginPresenter implements Presenter {
               autoLoginManager.setAutoLoginFlag(true);
               uploaderAnalytics.sendLoginEvent("auto-login", "success");
             }))
-        .doOnError(__ -> {
+        .onErrorResumeNext(throwable -> {
           uploaderAnalytics.sendLoginEvent("auto-login", "fail");
-          accountManager.logout();
+          return accountManager.logout();
         })
         .andThen(Observable.empty());
   }

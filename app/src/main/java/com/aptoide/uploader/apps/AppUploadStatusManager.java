@@ -1,13 +1,10 @@
 package com.aptoide.uploader.apps;
 
 import com.aptoide.uploader.analytics.UploaderAnalytics;
-import com.aptoide.uploader.apps.network.GetApksRetryException;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitStoreService;
-import com.aptoide.uploader.apps.network.RetryWithDelay;
 import io.reactivex.Observable;
 import io.reactivex.Single;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -45,35 +42,6 @@ public class AppUploadStatusManager {
       partitions.add(list.subList(i, Math.min(i + partitionSize, list.size())));
     }
     return partitions;
-  }
-
-  public Observable<Upload> checkUploadStatus(Upload upload) {
-    return storeNameProvider.getStoreName()
-        .flatMapObservable(storeName -> {
-          List<String> md5List = new ArrayList<>();
-          md5List.add(upload.getMd5());
-          return retrofitStoreService.getApks(md5List, storeName);
-        })
-        .flatMap(apksResponse -> {
-          if (apksResponse != null && apksResponse.getErrors() != null) {
-            uploaderAnalytics.sendUploadCompleteEvent("fail", "Check if in Store",
-                apksResponse.getErrors()
-                    .getCode(), apksResponse.getErrors()
-                    .getDescription());
-            throw new IOException();
-          }
-          uploaderAnalytics.sendUploadCompleteEvent("success", "Check if in Store", null, null);
-          upload.setStatus(Upload.Status.COMPLETED);
-          return Observable.just(upload);
-        })
-        .retryWhen(new RetryWithDelay(3, 2000))
-        .onErrorReturn(throwable -> {
-          if (throwable instanceof GetApksRetryException) {
-            upload.setStatus(Upload.Status.FAILED);
-            return upload;
-          }
-          return null;
-        });
   }
 
   public Single<List<InstalledApp>> getNonSystemApps() {

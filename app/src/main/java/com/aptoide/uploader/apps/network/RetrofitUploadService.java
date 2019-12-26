@@ -1,200 +1,361 @@
 package com.aptoide.uploader.apps.network;
 
+import android.accounts.NetworkErrorException;
+import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
 import com.aptoide.uploader.account.network.Status;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.InstalledApp;
+import com.aptoide.uploader.apps.Md5Calculator;
 import com.aptoide.uploader.apps.Metadata;
-import com.aptoide.uploader.apps.MetadataUpload;
-import com.aptoide.uploader.apps.Upload;
+import com.aptoide.uploader.apps.UploadDraft;
 import com.aptoide.uploader.apps.UploadProgressListener;
 import com.aptoide.uploader.upload.AccountProvider;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.functions.Function;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import okhttp3.MediaType;
 import okhttp3.MultipartBody;
 import okhttp3.RequestBody;
 import okio.BufferedSink;
 import retrofit2.Response;
-import retrofit2.http.Field;
-import retrofit2.http.FormUrlEncoded;
+import retrofit2.http.Body;
+import retrofit2.http.GET;
 import retrofit2.http.Multipart;
 import retrofit2.http.POST;
 import retrofit2.http.Part;
 import retrofit2.http.PartMap;
+import retrofit2.http.Query;
 
 public class RetrofitUploadService implements UploaderService {
 
-  private static final String RESPONSE_MODE = "json";
-  private final ServiceV3 serviceV3;
+  private final ServiceV7 serviceV7;
   private final AccountProvider accountProvider;
-  private final UploadType uploadType;
   private UploadProgressListener uploadProgressListener;
   private UploaderAnalytics uploaderAnalytics;
+  private Md5Calculator md5Calculator;
 
-  public RetrofitUploadService(ServiceV3 serviceV3, AccountProvider accountProvider,
-      UploadType uploadType, UploadProgressListener uploadProgressListener,
-      UploaderAnalytics uploaderAnalytics) {
-    this.serviceV3 = serviceV3;
+  public RetrofitUploadService(ServiceV7 serviceV7, AccountProvider accountProvider,
+      UploadProgressListener uploadProgressListener, UploaderAnalytics uploaderAnalytics,
+      Md5Calculator md5Calculator) {
+    this.serviceV7 = serviceV7;
     this.accountProvider = accountProvider;
-    this.uploadType = uploadType;
     this.uploadProgressListener = uploadProgressListener;
     this.uploaderAnalytics = uploaderAnalytics;
-  }
-
-  @Override public Single<Upload> getUpload(String md5, String language, String storeName,
-      InstalledApp installedApp) {
-    return Single.just(new Upload(false, installedApp, Upload.Status.PENDING, md5, storeName));
-  }
-
-  @Override public Observable<Upload> upload(String md5, String storeName, String installedAppName,
-      InstalledApp installedApp) {
-    return accountProvider.getToken()
-        .flatMapObservable(accessToken -> serviceV3.uploadAppToRepo(
-            getParams(accessToken, md5, storeName, installedAppName, installedApp))
-            .map(response -> buildUploadFinishStatus(response, installedApp, md5, storeName))
-            .startWith(buildUploadProgressStatus(installedApp, md5, storeName))
-            .onErrorReturn(
-                throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
-                    storeName)));
-  }
-
-  @Override public Single<Boolean> hasApplicationMetaData(String packageName, int versionCode) {
-    return serviceV3.hasApplicationMetaData(packageName, versionCode, RESPONSE_MODE, 70)
-        .map(result -> result.isSuccessful() && result.body() != null && result.body()
-            .hasMetaData())
-        .single(false);
+    this.md5Calculator = md5Calculator;
   }
 
   @Override
-  public Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
-      String apkPath) {
+  public Single<UploadDraft> startUploadDraft(String md5, String language, String storeName,
+      InstalledApp installedApp) {
+    return Single.just(new UploadDraft(UploadDraft.Status.START, installedApp, md5));
+  }
+
+  @Override public Observable<UploadDraft> createDraft(String md5, InstalledApp installedApp) {
+    return accountProvider.getToken()
+        .flatMapObservable(
+            accessToken -> serviceV7.createDraft(getParamsCreateDraft(accessToken, installedApp))
+                .map(response -> mapCreateDraftResponse(response, installedApp, md5))
+                .onErrorReturn(
+                    throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR, installedApp, md5,
+                        0)));
+  }
+
+  @Override
+  public Observable<UploadDraft> setDraftStatus(UploadDraft draft, DraftStatus draftStatus) {
+    return accountProvider.getToken()
+        .flatMapObservable(
+            accessToken -> serviceV7.setStatus(accessToken, String.valueOf(draft.getDraftId()),
+                draftStatus.toString())
+                .map(response -> mapSetDraftStatusResponse(response, draft, draftStatus))
+                .onErrorReturn(throwable -> {
+                  throwable.printStackTrace();
+                  return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
+                      draft.getMd5(), draft.getDraftId());
+                }));
+  }
+
+  @Override public Observable<UploadDraft> getDraftStatus(UploadDraft draft) {
+    return accountProvider.getToken()
+        .flatMapObservable(
+            accessToken -> serviceV7.getStatus(accessToken, String.valueOf(draft.getDraftId()))
+                .flatMap(response -> {
+                  if (response != null && ((response.body()
+                      .getData()
+                      .getStatus()
+                      .equals("PENDING") || response.body()
+                      .getData()
+                      .getStatus()
+                      .equals("PROCESSING")))) {
+                    throw new NetworkErrorException();
+                  }
+                  return Observable.just(mapUploadDraftResponse(response, draft));
+                })
+                .retryWhen(new RetryWithDelay(5)))
+        .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR_RETRY,
+            draft.getInstalledApp(), draft.getMd5(), draft.getDraftId()));
+  }
+
+  @Override public Observable<UploadDraft> hasApplicationMetaData(UploadDraft draft) {
+    return accountProvider.getToken()
+        .flatMapObservable(accessToken -> serviceV7.hasApplicationMetaData(accessToken,
+            getParamsMetadataExists(draft.getDraftId()))
+            .map(result -> {
+              if (result.isSuccessful()) {
+                if (result.body() != null && result.body()
+                    .getData()
+                    .hasMetaData()) {
+                  UploadDraft uploadDraft = new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT,
+                      draft.getInstalledApp(), draft.getMd5(), draft.getDraftId());
+                  return uploadDraft;
+                } else {
+                  UploadDraft uploadDraft =
+                      new UploadDraft(UploadDraft.Status.NO_META_DATA, draft.getInstalledApp(),
+                          draft.getMd5(), draft.getDraftId());
+                  return uploadDraft;
+                }
+              } else {
+                UploadDraft uploadDraft =
+                    new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR_RETRY, draft.getInstalledApp(),
+                        draft.getMd5(), draft.getDraftId());
+                return uploadDraft;
+              }
+            }));
+  }
+
+  @Override public Observable<UploadDraft> setDraftMetadata(UploadDraft draft) {
+    return accountProvider.getToken()
+        .flatMapObservable(accessToken -> serviceV7.setMetadata(accessToken,
+            getSetMetadataParams(draft.getDraftId(), draft.getMetadata()))
+            .map(response -> mapSetMetadataResponse(response, draft))
+            .onErrorReturn(throwable -> {
+              throwable.printStackTrace();
+              return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
+                  draft.getMd5(), draft.getDraftId());
+            }));
+  }
+
+  @Override public Observable<UploadDraft> uploadFiles(UploadDraft draft) {
+    Function<Throwable, UploadDraft> throwableUploadDraftFunction =
+        throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
+            draft.getMd5(), draft.getDraftId());
+    Function<List<Response<GenericDraftResponse>>, UploadDraft> listUploadDraftFunction =
+        __ -> new UploadDraft(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION,
+            draft.getInstalledApp(), draft.getMd5(), draft.getDraftId());
+    if (Build.VERSION.SDK_INT < 21
+        || draft.getInstalledApp()
+        .getSplits() == null
+        || draft.getInstalledApp()
+        .getSplits()
+        .isEmpty()) {
+      return Observable.fromIterable(draft.getInstalledApp()
+          .getRegularApkFiles())
+          .concatMap(fileToUpload -> mapTypesToAction(fileToUpload, draft))
+          .doOnNext(response -> {
+            if (!response.isSuccessful()) {
+              throw new NetworkErrorException();
+            }
+          })
+          .toList()
+          .toObservable()
+          .map(listUploadDraftFunction)
+          .onErrorReturn(throwableUploadDraftFunction);
+    } else {
+      return Observable.fromIterable(draft.getInstalledApp()
+          .getAppBundleFiles())
+          .concatMap(fileToUpload -> mapTypesToAction(fileToUpload, draft))
+          .doOnNext(response -> {
+            if (!response.isSuccessful()) {
+              throw new NetworkErrorException();
+            }
+          })
+          .toList()
+          .toObservable()
+          .map(listUploadDraftFunction)
+          .onErrorReturn(throwableUploadDraftFunction);
+    }
+  }
+
+  public Observable<UploadDraft> uploadSplits(UploadDraft draft, List<String> paths) {
+    return Observable.fromIterable(paths)
+        .concatMap(split -> Observable.just(split)
+            .flatMap(__ -> uploadSplit(split, draft.getDraftId(), draft.getInstalledApp()
+                .getPackageName()))
+            .doOnNext(response -> {
+              if (!response.isSuccessful()) {
+                throw new NetworkErrorException();
+              }
+            }))
+        .toList()
+        .toObservable()
+        .map(__ -> new UploadDraft(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION,
+            draft.getInstalledApp(), draft.getMd5(), draft.getDraftId()))
+        .onErrorReturn(
+            throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
+                draft.getMd5(), draft.getDraftId()));
+  }
+
+  @Override public Observable<UploadDraft> setDraftMd5s(UploadDraft draft) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      return accountProvider.getToken()
+          .flatMapObservable(accessToken -> serviceV7.setDraftMd5sAboveLollipop(
+              new SetDraftSplitMd5sRequest(accessToken, draft.getDraftId(),
+                  getSplitsList(draft.getInstalledApp()), draft.getMd5()))
+              .map(response -> mapSetDraftMd5sResponse(response, draft))
+              .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR,
+                  draft.getInstalledApp(), draft.getMd5(), draft.getDraftId())));
+    }
+    return accountProvider.getToken()
+        .flatMapObservable(accessToken -> serviceV7.setDraftMd5sBelowLollipop(
+            getParamsSetDraftMd5s(accessToken, draft.getMd5(), draft.getDraftId()))
+            .map(response -> mapSetDraftMd5sResponse(response, draft))
+            .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR,
+                draft.getInstalledApp(), draft.getMd5(), draft.getDraftId())));
+  }
+
+  private Observable<Response<GenericDraftResponse>> mapTypesToAction(
+      InstalledApp.FileToUpload fileToUpload, UploadDraft draft) {
+    switch (fileToUpload.getType()) {
+      case OBB_MAIN:
+        return uploadObbMain(draft);
+      case OBB_PATCH:
+        return uploadObbPatch(draft);
+      case SPLIT:
+        return uploadSplit(fileToUpload.getPath(), draft.getDraftId(), draft.getInstalledApp()
+            .getPackageName());
+      case BASE:
+      default:
+        return uploadBaseApk(draft);
+    }
+  }
+
+  private Observable<Response<GenericDraftResponse>> uploadBaseApk(UploadDraft draft) {
     return accountProvider.getAccount()
         .firstOrError()
         .flatMapObservable(aptoideAccount -> accountProvider.getToken()
             .toObservable()
-            .flatMap(accessToken -> serviceV3.uploadAppToRepo(
-                getParams(accessToken, aptoideAccount.getStoreName(), installedApp, false),
-                MultipartBody.Part.createFormData("apk", apkPath,
-                    createFileRequestBody("apk", apkPath, installedApp.getPackageName())))
-                .flatMap(response -> Observable.just(
-                    buildUploadFinishStatus(response, installedApp, md5, storeName)))
-                .onErrorReturn(
-                    throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
-                        storeName))));
+            .flatMap(accessToken -> serviceV7.uploadBaseApkFile(
+                getParamsSetApkFile(accessToken, draft.getDraftId()),
+                MultipartBody.Part.createFormData("apk_file", draft.getInstalledApp()
+                    .getApkPath(), createFileRequestBody("apk", draft.getInstalledApp()
+                    .getApkPath(), draft.getInstalledApp()
+                    .getPackageName())))));
   }
 
-  //@Override
-  //public Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
-  //    String obbPath, String obbType) {
-  //  return accountProvider.getAccount()
-  //      .firstOrError()
-  //      .flatMapObservable(aptoideAccount -> accountProvider.getToken()
-  //          .toObservable()
-  //          .flatMap(accessToken -> serviceV3.uploadAppToRepo(
-  //              getParams(accessToken, aptoideAccount.getStoreName(), installedApp, true),
-  //              MultipartBody.Part.createFormData(obbType, obbPath,
-  //                  createFileRequestBody("obb", obbPath, installedApp.getPackageName())))
-  //              .flatMap(response -> Observable.just(
-  //                  buildUploadFinishStatus(response, installedApp, md5, storeName)))
-  //              .onErrorReturn(
-  //                  throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
-  //                      storeName))));
-  //}
-
-  @Override public Observable<Upload> upload(String md5, String storeName, String appName,
-      InstalledApp installedApp, Metadata metadata) {
+  private Observable<Response<GenericDraftResponse>> uploadObbMain(UploadDraft draft) {
     return accountProvider.getAccount()
         .firstOrError()
         .flatMapObservable(aptoideAccount -> accountProvider.getToken()
             .toObservable()
-            .flatMap(accessToken -> serviceV3.uploadAppToRepo(
-                getParams(accessToken, aptoideAccount.getStoreName(), metadata, installedApp,
-                    false), MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
-                    createFileRequestBody("apk", installedApp.getApkPath(),
-                        installedApp.getPackageName())))
-                .flatMap(response -> Observable.just(
-                    buildUploadFinishStatus(response, installedApp, md5, storeName, metadata)))
-                .onErrorReturn(
-                    throwable -> new MetadataUpload(false, installedApp, Upload.Status.CLIENT_ERROR,
-                        md5, storeName, metadata))));
+            .flatMap(accessToken -> serviceV7.uploadObbMainFile(
+                getParamsSetApkFile(accessToken, draft.getDraftId()),
+                MultipartBody.Part.createFormData("obb_main_file", draft.getInstalledApp()
+                    .getObbMainPath(), createFileRequestBody("obb", draft.getInstalledApp()
+                    .getObbMainPath(), draft.getInstalledApp()
+                    .getPackageName())))));
   }
 
-  //@Override public Observable<Upload> upload(String md5, String storeName, String appName,
-  //    InstalledApp installedApp, Metadata metadata, String obbMainPath) {
-  //  return accountProvider.getAccount()
-  //      .firstOrError()
-  //      .flatMapObservable(aptoideAccount -> accountProvider.getToken()
-  //          .toObservable()
-  //          .flatMap(accessToken -> serviceV3.uploadAppToRepo(
-  //              getParams(accessToken, aptoideAccount.getStoreName(), metadata, installedApp, true),
-  //              MultipartBody.Part.createFormData("apk", installedApp.getApkPath(),
-  //                  createFileRequestBody("apk", installedApp.getApkPath(),
-  //                      installedApp.getPackageName())),
-  //              MultipartBody.Part.createFormData("obb_main", obbMainPath,
-  //                  createFileRequestBody("obb", obbMainPath, installedApp.getPackageName())))
-  //              .flatMap(response -> Observable.just(
-  //                  buildUploadFinishStatus(response, installedApp, md5, storeName, metadata)))
-  //              .onErrorReturn(
-  //                  throwable -> new Upload(false, installedApp, Upload.Status.CLIENT_ERROR, md5,
-  //                      storeName))));
-  //}
+  private Observable<Response<GenericDraftResponse>> uploadObbPatch(UploadDraft draft) {
+    return accountProvider.getAccount()
+        .firstOrError()
+        .flatMapObservable(aptoideAccount -> accountProvider.getToken()
+            .toObservable()
+            .flatMap(accessToken -> serviceV7.uploadObbPatchFile(
+                getParamsSetApkFile(accessToken, draft.getDraftId()),
+                MultipartBody.Part.createFormData("obb_patch_file", draft.getInstalledApp()
+                    .getObbPatchPath(), createFileRequestBody("obb", draft.getInstalledApp()
+                    .getObbPatchPath(), draft.getInstalledApp()
+                    .getPackageName())))));
+  }
 
-  private Map<String, RequestBody> getParams(String accessToken, String storeName,
-      InstalledApp installedApp, boolean obbFileFlag) {
+  private Observable<Response<GenericDraftResponse>> uploadSplit(String splitPath, int draftId,
+      String packageName) {
+    return accountProvider.getAccount()
+        .firstOrError()
+        .flatMapObservable(aptoideAccount -> accountProvider.getToken()
+            .toObservable()
+            .flatMap(
+                accessToken -> serviceV7.uploadSplitFile(getParamsSetApkFile(accessToken, draftId),
+                    MultipartBody.Part.createFormData("file", splitPath,
+                        createFileRequestBody("apk", splitPath, packageName)))));
+  }
+
+  @NonNull private Map<String, okhttp3.RequestBody> getParamsCreateDraft(String token,
+      InstalledApp installedApp) {
     Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
-    parameters.put("rating", RequestBody.create(MediaType.parse("text/plain"), "0"));
-    parameters.put("category", RequestBody.create(MediaType.parse("text/plain"), "0"));
-    parameters.put("only_user_repo", RequestBody.create(MediaType.parse("text/plain"), "false"));
-    parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), accessToken));
-    parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
-    parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), RESPONSE_MODE));
-    parameters.put("uploadType",
-        RequestBody.create(MediaType.parse("text/plain"), String.valueOf(uploadType.getType())));
+    parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), token));
+    parameters.put("package_name",
+        RequestBody.create(MediaType.parse("text/plain"), installedApp.getPackageName()));
+    parameters.put("vercode", RequestBody.create(MediaType.parse("text/plain"),
+        String.valueOf(installedApp.getVersionCode())));
+    return parameters;
+  }
 
-    //if (installedApp.getObbMainPath() != null) {
-    //  if (!obbFileFlag) {
-    //    parameters.put("obb_main_md5sum",
-    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
-    //    parameters.put("obb_main_filename",
-    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
-    //  }
-    //}
-    //if (installedApp.getObbPatchPath() != null) {
-    //  if (!obbFileFlag) {
-    //    parameters.put("obb_patch_md5sum",
-    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
-    //    parameters.put("obb_patch_filename",
-    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
-    //  }
-    //}
+  @NonNull
+  private Map<String, RequestBody> getParamsSetDraftMd5s(String token, String md5, int draftId) {
+    Map<String, RequestBody> parameters = new HashMap<>();
+    parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), token));
+    parameters.put("draft_id",
+        RequestBody.create(MediaType.parse("text/plain"), String.valueOf(draftId)));
+    parameters.put("apk_md5sum", RequestBody.create(MediaType.parse("text/plain"), md5));
+    return parameters;
+  }
+
+  private List<String> getSplitsList(InstalledApp installedApp) {
+    ArrayList<String> list = new ArrayList<>();
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
+      if (!installedApp.getSplits()
+          .isEmpty()) {
+        for (InstalledApp.FileToUpload split : installedApp.getSplits()) {
+          if (split.getPath()
+              .contains("split_config")) {
+            list.add(md5Calculator.calculate(split.getPath())
+                .blockingGet());
+          }
+        }
+      }
+    }
+    return list;
+  }
+
+  @NonNull private Map<String, okhttp3.RequestBody> getParamsMetadataExists(int draftId) {
+    Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
+    parameters.put("draft_id",
+        RequestBody.create(MediaType.parse("text/plain"), String.valueOf(draftId)));
     Log.w(getClass().getSimpleName(), parameters.toString());
     return parameters;
   }
 
-  private Map<String, RequestBody> getParams(String accessToken, String storeName,
-      Metadata metadata, InstalledApp installedApp, boolean obbFileFlag) {
+  @NonNull
+  private Map<String, okhttp3.RequestBody> getParamsSetApkFile(String accessToken, int draftId) {
     Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
     parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), accessToken));
-    parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
-    parameters.put("only_user_repo", RequestBody.create(MediaType.parse("text/plain"), "false"));
-    parameters.put("uploadType",
-        RequestBody.create(MediaType.parse("text/plain"), String.valueOf(uploadType.getType())));
-    parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), RESPONSE_MODE));
-    parameters.put("apkname",
+    parameters.put("draft_id",
+        RequestBody.create(MediaType.parse("text/plain"), String.valueOf(draftId)));
+    Log.w(getClass().getSimpleName(), parameters.toString());
+    return parameters;
+  }
+
+  private Map<String, RequestBody> getSetMetadataParams(int draftId, Metadata metadata) {
+    Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
+    parameters.put("draft_id",
+        RequestBody.create(MediaType.parse("text/plain"), String.valueOf(draftId)));
+    parameters.put("apk_name",
         RequestBody.create(MediaType.parse("text/plain"), metadata.getName()));
     parameters.put("description",
         RequestBody.create(MediaType.parse("text/plain"), metadata.getDescription()));
     parameters.put("category",
         RequestBody.create(MediaType.parse("text/plain"), metadata.getCategory()));
-    parameters.put("rating",
+    parameters.put("age_rating",
         RequestBody.create(MediaType.parse("text/plain"), metadata.getAgeRating()));
     parameters.put("lang", RequestBody.create(MediaType.parse("text/plain"), metadata.getLang()));
     if (metadata.getPhoneNumber() != null) {
@@ -209,23 +370,6 @@ public class RetrofitUploadService implements UploaderService {
       parameters.put("apk_website",
           RequestBody.create(MediaType.parse("text/plain"), metadata.getWebsite()));
     }
-    //if (installedApp.getObbMainPath() != null) {
-    //  if (!obbFileFlag) {
-    //    parameters.put("obb_main_md5sum",
-    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
-    //    parameters.put("obb_main_filename",
-    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
-    //  }
-    //}
-    //if (installedApp.getObbPatchPath() != null) {
-    //  if (!obbFileFlag) {
-    //
-    //    parameters.put("obb_patch_md5sum",
-    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
-    //    parameters.put("obb_patch_filename",
-    //        RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
-    //  }
-    //}
     return parameters;
   }
 
@@ -272,184 +416,215 @@ public class RetrofitUploadService implements UploaderService {
     };
   }
 
-  private Upload buildUploadProgressStatus(InstalledApp installedApp, String md5,
-      String storeName) {
-    return new Upload(false, installedApp, Upload.Status.PROGRESS, md5, storeName);
-  }
-
-  @NonNull private Upload buildUploadFinishStatus(Response<UploadAppToRepoResponse> response,
-      InstalledApp installedApp, String md5, String storeName) {
+  @NonNull private UploadDraft mapCreateDraftResponse(Response<GenericDraftResponse> response,
+      InstalledApp installedApp, String md5) {
     if (response.body()
+        .getInfo()
         .getStatus()
         .equals(Status.FAIL)) {
+      sendUploadCompleteFailedAnalytics(response);
+      return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, installedApp, md5);
+    }
+    return new UploadDraft(UploadDraft.Status.DRAFT_CREATED, installedApp, md5,
+        response.body().data.getDraftId());
+  }
+
+  @NonNull private UploadDraft mapUploadDraftResponse(Response<GenericDraftResponse> response,
+      UploadDraft draft) {
+    if (response.body()
+        .getData()
+        .getStatus()
+        .equals("ERROR")) {
       switch (response.body()
-          .getErrors()
+          .getData()
+          .getError()
           .get(0)
           .getCode()) {
         case "APK-103":
-          sendAnalytics("fail", response);
-          return new Upload(response.isSuccessful(), installedApp, Upload.Status.DUPLICATE, md5,
-              storeName);
-        case "APK-5":
-          sendAnalytics("fail", response);
-          return new Upload(response.isSuccessful(), installedApp, Upload.Status.NOT_EXISTENT, md5,
-              storeName);
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.DUPLICATE, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
         case "APK-101":
-          sendAnalytics("fail", response);
-          return new Upload(response.isSuccessful(), installedApp,
-              Upload.Status.INTELLECTUAL_RIGHTS, md5, storeName);
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.INTELLECTUAL_RIGHTS, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
         case "APK-102":
-          sendAnalytics("fail", response);
-          return new Upload(response.isSuccessful(), installedApp, Upload.Status.INFECTED, md5,
-              storeName);
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.INFECTED, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
         case "APK-106":
-          sendAnalytics("fail", response);
-          return new Upload(response.isSuccessful(), installedApp, Upload.Status.INVALID_SIGNATURE,
-              md5, storeName);
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.INVALID_SIGNATURE, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
         case "APK-104":
-          sendAnalytics("fail", response);
-          return new Upload(response.isSuccessful(), installedApp, Upload.Status.PUBLISHER_ONLY,
-              md5, storeName);
-        case "FILE-112":
-          sendAnalytics("fail", response);
-          return new Upload(response.isSuccessful(), installedApp, Upload.Status.APP_BUNDLE, md5,
-              storeName);
-        default:
-          if (!response.body()
-              .getErrors()
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.PUBLISHER_ONLY, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
+        case "APK-5":
+          return new UploadDraft(UploadDraft.Status.NOT_EXISTENT, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
+        case "SPLIT-1":
+          List<String> splitsMissing = response.body()
+              .getData()
+              .getError()
               .get(0)
-              .equals("APK-5")) {
-            sendAnalytics("fail", response);
-          }
-          return new Upload(response.isSuccessful(), installedApp, Upload.Status.FAILED, md5,
-              storeName);
+              .getDetails()
+              .getSplits();
+          UploadDraft uploadDraft =
+              new UploadDraft(UploadDraft.Status.UPLOAD_PENDING, draft.getInstalledApp(),
+                  draft.getMd5(), draft.getDraftId());
+          uploadDraft.setSplitsToBeUploaded(splitsMissing);
+          return uploadDraft;
+        case "SYS-1":
+        case "REPO-9":
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR_RETRY, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
+        case "FILE-5":
+        case "FILE-200":
+        case "FILE-202":
+        case "FILE-206":
+        case "APK-109":
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.UPLOAD_FAILED_RETRY, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
+        case "MARG-5":
+        case "MARG-101":
+        case "MARG-102":
+        case "MARG-205":
+        case "QUOTA-1":
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.UPLOAD_FAILED, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
+        case "SPLIT-2": //AAB not supported yet.
+        case "APK-107":
+        case "FILE-111":
+        case "FILE-112":
+        case "IARG-1":
+        default:
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
       }
     }
     uploaderAnalytics.sendUploadCompleteEvent("success", "Upload App to Repo", "0", "0");
-    return new Upload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,
-        storeName);
+    return new UploadDraft(UploadDraft.Status.COMPLETED, draft.getInstalledApp(), draft.getMd5(),
+        draft.getDraftId());
   }
 
-  @NonNull private Upload buildUploadFinishStatus(Response<UploadAppToRepoResponse> response,
-      InstalledApp installedApp, String md5, String storeName, Metadata metadata) {
+  @NonNull private UploadDraft mapSetDraftStatusResponse(Response<GenericDraftResponse> response,
+      UploadDraft draft, DraftStatus draftStatus) {
     if (response.body()
+        .getInfo()
         .getStatus()
         .equals(Status.FAIL)) {
-      switch (response.body()
-          .getErrors()
-          .get(0)
-          .getCode()) {
-        case "APK-103":
-          sendAnalytics("fail", response);
-          return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.DUPLICATE,
-              md5, storeName, metadata);
-        case "APK-5":
-          sendAnalytics("fail", response);
-          return new MetadataUpload(response.isSuccessful(), installedApp,
-              Upload.Status.NOT_EXISTENT, md5, storeName, metadata);
-        case "APK-101":
-          sendAnalytics("fail", response);
-          return new MetadataUpload(response.isSuccessful(), installedApp,
-              Upload.Status.INTELLECTUAL_RIGHTS, md5, storeName, metadata);
-        case "APK-102":
-          sendAnalytics("fail", response);
-          return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.INFECTED,
-              md5, storeName, metadata);
-        case "APK-106":
-          sendAnalytics("fail", response);
-          return new MetadataUpload(response.isSuccessful(), installedApp,
-              Upload.Status.INVALID_SIGNATURE, md5, storeName, metadata);
-        case "APK-104":
-          sendAnalytics("fail", response);
-          return new MetadataUpload(response.isSuccessful(), installedApp,
-              Upload.Status.PUBLISHER_ONLY, md5, storeName, metadata);
-        case "FILE-112":
-          sendAnalytics("fail", response);
-          return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.APP_BUNDLE,
-              md5, storeName, metadata);
-        default:
-          sendAnalytics("fail", response);
-          return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.RETRY, md5,
-              storeName, metadata);
-      }
+      sendUploadCompleteFailedAnalytics(response);
+      return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
+          draft.getMd5(), draft.getDraftId());
     }
-    uploaderAnalytics.sendUploadCompleteEvent("success", "Upload App to Repo", null, null);
-    return new MetadataUpload(response.isSuccessful(), installedApp, Upload.Status.COMPLETED, md5,
-        storeName, metadata);
+    if (draftStatus.equals(DraftStatus.DRAFT)) {
+      UploadDraft newDraft =
+          new UploadDraft(UploadDraft.Status.STATUS_SET_DRAFT, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
+      if (draft.getSplitsToBeUploaded() != null) {
+        newDraft.setSplitsToBeUploaded(draft.getSplitsToBeUploaded());
+      }
+      return newDraft;
+    } else {
+      UploadDraft newDraft =
+          new UploadDraft(UploadDraft.Status.STATUS_SET_PENDING, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
+      if (draft.getSplitsToBeUploaded() != null) {
+        newDraft.setSplitsToBeUploaded(draft.getSplitsToBeUploaded());
+      }
+      return newDraft;
+    }
   }
 
-  @NonNull
-  private Map<String, okhttp3.RequestBody> getParams(String token, String md5, String storeName,
-      String installedAppName, InstalledApp installedApp) {
-    Map<String, okhttp3.RequestBody> parameters = new HashMap<>();
-    parameters.put("access_token", RequestBody.create(MediaType.parse("text/plain"), token));
-    parameters.put("apkname", RequestBody.create(MediaType.parse("text/plain"), installedAppName));
-    parameters.put("apk_md5sum", RequestBody.create(MediaType.parse("text/plain"), md5));
-    parameters.put("mode", RequestBody.create(MediaType.parse("text/plain"), "json"));
-    parameters.put("repo", RequestBody.create(MediaType.parse("text/plain"), storeName));
-    parameters.put("uploadType", RequestBody.create(MediaType.parse("text/plain"), "aptuploader"));
-    //if (installedApp.getObbMainPath() != null) {
-    //  parameters.put("obb_main_md5sum",
-    //      RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainMd5()));
-    //  parameters.put("obb_main_filename",
-    //      RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbMainFilename()));
-    //}
-    //if (installedApp.getObbPatchPath() != null) {
-    //  parameters.put("obb_patch_md5sum",
-    //      RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchMd5()));
-    //  parameters.put("obb_patch_filename",
-    //      RequestBody.create(MediaType.parse("text/plain"), installedApp.getObbPatchFilename()));
-    //}
-    Log.w(getClass().getSimpleName(), parameters.toString());
-    return parameters;
+  @NonNull private UploadDraft mapSetDraftMd5sResponse(Response<GenericDraftResponse> response,
+      UploadDraft draft) {
+    if (response.body()
+        .getInfo()
+        .getStatus()
+        .equals(Status.FAIL)) {
+      sendUploadCompleteFailedAnalytics(response);
+      return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
+          draft.getMd5(), draft.getDraftId());
+    }
+    return new UploadDraft(UploadDraft.Status.MD5S_SET, draft.getInstalledApp(), draft.getMd5(),
+        draft.getDraftId());
   }
 
-  private void sendAnalytics(String status, Response<UploadAppToRepoResponse> response) {
-    uploaderAnalytics.sendUploadCompleteEvent(status, "Upload App to Repo", response.body()
-        .getErrors()
+  @NonNull private UploadDraft mapSetMetadataResponse(Response<GenericDraftResponse> response,
+      UploadDraft draft) {
+    if (response.body()
+        .getInfo()
+        .getStatus()
+        .equals(Status.FAIL)) {
+      sendUploadCompleteFailedAnalytics(response);
+      return new UploadDraft(UploadDraft.Status.CLIENT_ERROR, draft.getInstalledApp(),
+          draft.getMd5(), draft.getDraftId());
+    }
+    return new UploadDraft(UploadDraft.Status.METADATA_SET, draft.getInstalledApp(), draft.getMd5(),
+        draft.getDraftId());
+  }
+
+  private void sendUploadCompleteFailedAnalytics(Response<GenericDraftResponse> response) {
+    uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App to Repo", response.body()
+        .getData()
+        .getError()
         .get(0)
         .getCode(), response.body()
-        .getErrors()
+        .getData()
+        .getError()
         .get(0)
-        .getMsg());
+        .getDescription());
   }
 
-  public enum UploadType {
-    WEBSERVICE(1), APTOIDE_UPLOADER(2), DROPBOX(3), APTOIDE_BACKUP(4);
-
-    private final int type;
-
-    UploadType(int type) {
-      this.type = type;
-    }
-
-    public int getType() {
-      return type;
-    }
-  }
-
-  public interface ServiceV3 {
-    @Multipart @POST("3/uploadAppToRepo")
-    Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
+  public interface ServiceV7 {
+    @Multipart @POST("7/uploader/draft/create")
+    Observable<Response<GenericDraftResponse>> createDraft(
         @PartMap Map<String, okhttp3.RequestBody> params);
 
-    @Multipart @POST("3/uploadAppToRepo")
-    Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
+    @GET("7/uploader/draft/status/set") Observable<Response<GenericDraftResponse>> setStatus(
+        @Query("access_token") String accessToken, @Query("draft_id") String draftId,
+        @Query("status") String status);
+
+    @GET("7/uploader/draft/status/get") Observable<Response<GenericDraftResponse>> getStatus(
+        @Query("access_token") String accessToken, @Query("draft_id") String draftId);
+
+    @Multipart @POST("7/uploader/draft/apk/set")
+    Observable<Response<GenericDraftResponse>> uploadBaseApkFile(
         @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part apkFile);
 
-    @Multipart @POST("3/uploadAppToRepo")
-    Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
-        @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part apkFile,
-        @Part MultipartBody.Part obbMain, @Part MultipartBody.Part obbPatch);
+    @Multipart @POST("7/uploader/draft/apk/split/set")
+    Observable<Response<GenericDraftResponse>> uploadSplitFile(
+        @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part splitFile);
 
-    @Multipart @POST("3/uploadAppToRepo")
-    Observable<Response<UploadAppToRepoResponse>> uploadAppToRepo(
-        @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part apkFile,
-        @Part MultipartBody.Part obbMain);
+    @Multipart @POST("7/uploader/draft/apk/set")
+    Observable<Response<GenericDraftResponse>> setDraftMd5sBelowLollipop(
+        @PartMap Map<String, okhttp3.RequestBody> params);
 
-    @POST("3/hasApplicationMetaData") @FormUrlEncoded
+    @POST("7/uploader/draft/apk/set")
+    Observable<Response<GenericDraftResponse>> setDraftMd5sAboveLollipop(
+        @Body SetDraftSplitMd5sRequest request);
+
+    @Multipart @POST("7/uploader/draft/obb/set")
+    Observable<Response<GenericDraftResponse>> uploadObbMainFile(
+        @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part obbMain);
+
+    @Multipart @POST("7/uploader/draft/obb/set")
+    Observable<Response<GenericDraftResponse>> uploadObbPatchFile(
+        @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part obbPatch);
+
+    @Multipart @POST("7/uploader/draft/metadata/exists")
     Observable<Response<HasApplicationMetaDataResponse>> hasApplicationMetaData(
-        @Field("package") String packageName, @Field("vercode") int versionCode,
-        @Field("mode") String responseMode, @Field("limit") int limit);
+        @Query("access_token") String accessToken,
+        @PartMap Map<String, okhttp3.RequestBody> params);
+
+    @Multipart @POST("7/uploader/draft/metadata/set")
+    Observable<Response<GenericDraftResponse>> setMetadata(
+        @Query("access_token") String accessToken,
+        @PartMap Map<String, okhttp3.RequestBody> params);
   }
 }

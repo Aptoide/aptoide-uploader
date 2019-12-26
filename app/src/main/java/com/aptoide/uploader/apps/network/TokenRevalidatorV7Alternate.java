@@ -12,12 +12,12 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-public class TokenRevalidationInterceptorV7 extends TokenRevalidationInterceptor
+public class TokenRevalidatorV7Alternate extends TokenRevalidationInterceptor
     implements Interceptor {
 
   private final String TAG = getClass().getSimpleName();
 
-  public TokenRevalidationInterceptorV7(AuthenticationProvider authenticationProvider) {
+  public TokenRevalidatorV7Alternate(AuthenticationProvider authenticationProvider) {
     super(authenticationProvider);
   }
 
@@ -33,7 +33,7 @@ public class TokenRevalidationInterceptorV7 extends TokenRevalidationInterceptor
       JSONObject responseBody = new JSONObject(responseBodyString);
       JSONArray errors = responseBody.getJSONArray("errors");
       errorCode = errors.getJSONObject(0)
-          .getString("name");
+          .getString("code");
     } catch (JSONException e) {
       Log.d(TAG, "No error");
     }

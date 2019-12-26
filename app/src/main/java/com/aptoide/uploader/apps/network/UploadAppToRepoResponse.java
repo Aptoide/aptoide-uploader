@@ -1,18 +1,19 @@
 package com.aptoide.uploader.apps.network;
 
-import com.aptoide.uploader.account.network.Status;
+import com.squareup.moshi.Json;
 import java.util.List;
 
 public class UploadAppToRepoResponse {
 
-  private Status status;
+  @Json(name = "status") private String status;
   private List<Error> errors;
+  @Json(name = "draft_id") private int draftId;
 
-  public Status getStatus() {
+  public String getStatus() {
     return status;
   }
 
-  public void setStatus(Status status) {
+  public void setStatus(String status) {
     this.status = status;
   }
 
@@ -22,6 +23,14 @@ public class UploadAppToRepoResponse {
 
   public void setErrors(List<Error> errors) {
     this.errors = errors;
+  }
+
+  public int getDraftId() {
+    return draftId;
+  }
+
+  public void setDraftId(int draftId) {
+    this.draftId = draftId;
   }
 
   public static class Error {
@@ -41,5 +50,4 @@ public class UploadAppToRepoResponse {
       return msg;
     }
   }
-
 }

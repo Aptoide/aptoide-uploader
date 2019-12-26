@@ -81,7 +81,7 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     new AppFormPresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getCategoriesManager(),
         AndroidSchedulers.mainThread(),
-        ((UploaderApplication) getContext().getApplicationContext()).getUploadPersistence(), md5,
+        ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(), md5,
         new AppFormNavigator(getFragmentManager(), getContext())).present();
   }
 

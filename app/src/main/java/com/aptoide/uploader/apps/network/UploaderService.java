@@ -1,30 +1,30 @@
 package com.aptoide.uploader.apps.network;
 
 import com.aptoide.uploader.apps.InstalledApp;
-import com.aptoide.uploader.apps.Metadata;
-import com.aptoide.uploader.apps.Upload;
+import com.aptoide.uploader.apps.UploadDraft;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import java.util.List;
 
 public interface UploaderService {
 
-  Single<Upload> getUpload(String md5, String language, String storeName,
+  Single<UploadDraft> startUploadDraft(String md5, String language, String storeName,
       InstalledApp installedApp);
 
-  Observable<Upload> upload(String md5, String storeName, String installedAppName,
-      InstalledApp installedApp);
+  Observable<UploadDraft> createDraft(String md5, InstalledApp installedApp);
 
-  Single<Boolean> hasApplicationMetaData(String packageName, int versionCode);
+  Observable<UploadDraft> setDraftStatus(UploadDraft draft, DraftStatus draftStatus);
 
-  Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName,
-      String apkPath);
+  Observable<UploadDraft> getDraftStatus(UploadDraft draft);
 
-  Observable<Upload> upload(String md5, String storeName, String appName, InstalledApp installedApp,
-      Metadata metadata);
+  Observable<UploadDraft> hasApplicationMetaData(UploadDraft draft);
 
-  //Observable<Upload> upload(InstalledApp installedApp, String md5, String storeName, String obbPath,
-  //    String obbType);
+  Observable<UploadDraft> setDraftMetadata(UploadDraft draft);
 
-  //Observable<Upload> upload(String md5, String storeName, String appName, InstalledApp installedApp,
-  //    Metadata metadata, String obbMainPath);
+  Observable<UploadDraft> uploadFiles(UploadDraft draft);
+
+  Observable<UploadDraft> uploadSplits(UploadDraft draft, List<String> paths);
+
+  Observable<UploadDraft> setDraftMd5s(UploadDraft draft);
+
 }

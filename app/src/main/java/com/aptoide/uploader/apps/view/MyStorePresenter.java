@@ -136,7 +136,6 @@ public class MyStorePresenter implements Presenter {
         })
         .filter(hasConnection -> hasConnection)
         .doOnNext(apps -> uploadPermissionProvider.requestExternalStoragePermission())
-        .doOnNext(__ -> view.clearSelection())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -147,6 +146,7 @@ public class MyStorePresenter implements Presenter {
         .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
         .filter(granted -> granted)
         .flatMapSingle(__ -> view.getSelectedApps())
+        .doOnNext(__ -> view.clearSelection())
         .flatMapCompletable(apps -> storeManager.upload(apps)
             .doOnComplete(() -> uploaderAnalytics.sendSubmitAppsEvent(apps.size())))
         .observeOn(viewScheduler)
@@ -161,6 +161,7 @@ public class MyStorePresenter implements Presenter {
           if (throwable instanceof NoConnectivityException) {
             Log.e(getClass().getSimpleName(), "NO INTERNET AVAILABLE!");
           }
+          throwable.printStackTrace();
         }));
   }
 

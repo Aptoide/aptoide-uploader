@@ -125,9 +125,11 @@
   <string name="application_notification_short_app_infection">An infection was detected. Please contact us if you have the distribution rights. (APK-102)</string>
   <string name="application_notification_short_app_publisher_only">The publisher is the only one allowed to update this app. (APK-104)</string>
   <string name="application_notification_short_app_invalid_signature">The app signature is not valid. Please contact us if you have the distribution rights. (APK-106)</string>
-  <string name="application_notification_short_app_uplod_failed">Upload failed. Please try again.</string>
   <string name="application_notification_message_app_no_metadata_upload">We need more info! Please tap here.</string>
-  <string name="application_notification_message_error">Unknown error occurred, please try again later.</string>
+  <string name="application_notification_short_app_upload_failed_retry">Upload failed. Please try again.</string>
+  <string name="application_notification_short_app_upload_failed">Upload failed.</string>
+  <string name="application_notification_message_error_retry">Unknown error occurred, please try again later.</string>
+  <string name="application_notification_message_error">Unknown error occurred.</string>
   <string name="application_notification_short_app_bundle">This type of app is not supported... yet. But, it\'ll be supported soon!</string>
 
   <string name="error_user_already_exists">This user already exists</string>

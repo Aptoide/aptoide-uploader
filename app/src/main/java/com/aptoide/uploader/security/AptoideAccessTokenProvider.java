@@ -75,6 +75,14 @@ public class AptoideAccessTokenProvider implements AuthenticationProvider {
     return Single.just(accessToken);
   }
 
+  @Override public Single<String> getAccessToken() {
+    String accessToken = authenticationPersistance.getAccessToken();
+    if (accessToken == null) {
+      return Single.error(new IllegalStateException("There is no access token!"));
+    }
+    return Single.just(accessToken);
+  }
+
   @Override public Single<String> getNewAccessToken() {
     String refreshToken = authenticationPersistance.getRefreshToken();
     final Map<String, String> args = new HashMap<>();
@@ -92,14 +100,6 @@ public class AptoideAccessTokenProvider implements AuthenticationProvider {
           }
           return Single.error(new IllegalStateException(response.message()));
         });
-  }
-
-  @Override public Single<String> getAccessToken() {
-    String accessToken = authenticationPersistance.getAccessToken();
-    if (accessToken == null) {
-      return Single.error(new IllegalStateException("There is no access token!"));
-    }
-    return Single.just(accessToken);
   }
 
   @Override public Single<String> getRefreshToken() {

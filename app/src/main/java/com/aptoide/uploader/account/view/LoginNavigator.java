@@ -28,6 +28,6 @@ public class LoginNavigator {
   private void navigateTo(Fragment fragment) {
     fragmentManager.beginTransaction()
         .replace(R.id.activity_main_container, fragment)
-        .commit();
+        .commitAllowingStateLoss();
   }
 }

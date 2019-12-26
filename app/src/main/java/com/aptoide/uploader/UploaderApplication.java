@@ -31,11 +31,12 @@ import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV3;
 import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV7;
+import com.aptoide.uploader.apps.network.TokenRevalidatorV7Alternate;
 import com.aptoide.uploader.apps.network.UserAgentInterceptor;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
+import com.aptoide.uploader.apps.persistence.DraftPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryAppUploadStatusPersistence;
-import com.aptoide.uploader.apps.persistence.MemoryUploaderPersistence;
-import com.aptoide.uploader.apps.persistence.UploaderPersistence;
+import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
 import com.aptoide.uploader.security.AuthenticationPersistance;
 import com.aptoide.uploader.security.AuthenticationProvider;
@@ -66,9 +67,9 @@ public class UploaderApplication extends NotificationApplicationView {
   private AuthenticationProvider authenticationProvider;
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
-  private UploaderPersistence uploadPersistence;
   private AutoLoginPersistence autoLoginPersistence;
   private AppUploadStatusPersistence appUploadStatusPersistence;
+  private DraftPersistence draftPersistence;
   private AppUploadStatusManager appUploadStatusManager;
   private UploaderAnalytics uploaderAnalytics;
   private CallbackManager callbackManager;
@@ -80,6 +81,25 @@ public class UploaderApplication extends NotificationApplicationView {
 
     callbackManager = CallbackManager.Factory.create();
     getUploadManager().start();
+  }
+
+  public UploadManager getUploadManager() {
+    if (uploadManager == null) {
+
+      final Retrofit retrofitV7 = retrofitBuilder("http://ws75-primary.aptoide.com/api/",
+          buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
+
+      UploadProgressManager uploadProgressManager = new UploadProgressManager();
+
+      uploadManager = new UploadManager(
+          new RetrofitUploadService(retrofitV7.create(RetrofitUploadService.ServiceV7.class),
+              getAccessTokenProvider(), uploadProgressManager, getUploaderAnalytics(),
+              getMd5Calculator()), getMd5Calculator(),
+          new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
+          getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager,
+          getDraftPersistence());
+    }
+    return uploadManager;
   }
 
   public OkHttpClient.Builder buildOkHttpClient() {
@@ -99,26 +119,6 @@ public class UploaderApplication extends NotificationApplicationView {
         .build();
   }
 
-  public UploadManager getUploadManager() {
-    if (uploadManager == null) {
-
-      final Retrofit retrofitV3 =
-          retrofitBuilder("http://upload.webservices.aptoide.com/webservices/",
-              buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV3()));
-
-      UploadProgressManager uploadProgressManager = new UploadProgressManager();
-
-      uploadManager = new UploadManager(
-          new RetrofitUploadService(retrofitV3.create(RetrofitUploadService.ServiceV3.class),
-              getAccessTokenProvider(), RetrofitUploadService.UploadType.APTOIDE_UPLOADER,
-              uploadProgressManager, getUploaderAnalytics()), getUploadPersistence(),
-          getMd5Calculator(), new ServiceBackgroundService(this, UploaderService.class),
-          getAccessTokenProvider(), getAppUploadStatusManager(), getAppUploadStatusPersistence(),
-          uploadProgressManager);
-    }
-    return uploadManager;
-  }
-
   public IdsRepository getIdsRepository() {
     return new IdsRepository(PreferenceManager.getDefaultSharedPreferences(this));
   }
@@ -129,6 +129,10 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public TokenRevalidationInterceptorV7 getTokenRevalidationInterceptorV7() {
     return new TokenRevalidationInterceptorV7(getAuthenticationProvider());
+  }
+
+  public TokenRevalidatorV7Alternate getTokenRevalidatorV7Alternate() {
+    return new TokenRevalidatorV7Alternate(getAuthenticationProvider());
   }
 
   public UserAgentInterceptor getUserAgentInterceptor() {
@@ -146,7 +150,7 @@ public class UploaderApplication extends NotificationApplicationView {
           retrofitBuilder("https://webservices.aptoide.com/", buildOkHttpClient());
 
       final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/",
-          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
+          buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       accountManager = new AptoideAccountManager(
           new RetrofitAccountService(retrofitV3.create(RetrofitAccountService.ServiceV3.class),
@@ -179,7 +183,7 @@ public class UploaderApplication extends NotificationApplicationView {
     if (categoriesManager == null) {
 
       final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/api/7/",
-          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
+          buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       categoriesManager = new CategoriesManager(new RetrofitCategoriesService(
           retrofitV7.create(RetrofitCategoriesService.ServiceV7.class)));
@@ -201,7 +205,7 @@ public class UploaderApplication extends NotificationApplicationView {
     if (appUploadStatusManager == null) {
 
       final Retrofit retrofitV7Secondary = retrofitBuilder("https://ws75-secondary.aptoide.com/",
-          buildOkHttpClient().addInterceptor(getTokenRevalidationInterceptorV7()));
+          buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       appUploadStatusManager =
           new AppUploadStatusManager(new AccountStoreNameProvider(getAccountManager()),
@@ -217,8 +221,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
   private PackageManagerInstalledAppsProvider getPackageManagerInstalledAppsProvider() {
     if (packageManagerInstalledAppsProvider == null) {
-      return new PackageManagerInstalledAppsProvider(getPackageManager(), getMd5Calculator(),
-          new HashMap<>(), Schedulers.io());
+      return new PackageManagerInstalledAppsProvider(getPackageManager(), Schedulers.io());
     }
     return packageManagerInstalledAppsProvider;
   }
@@ -240,16 +243,17 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public OkioMd5Calculator getMd5Calculator() {
     if (md5Calculator == null) {
-      md5Calculator = new OkioMd5Calculator(new HashMap<>(), Schedulers.trampoline());
+      md5Calculator =
+          new OkioMd5Calculator(new HashMap<>(), new HashMap<>(), Schedulers.computation());
     }
     return md5Calculator;
   }
 
-  public UploaderPersistence getUploadPersistence() {
-    if (uploadPersistence == null) {
-      uploadPersistence = new MemoryUploaderPersistence(new HashMap<>(), Schedulers.trampoline());
+  public DraftPersistence getDraftPersistence() {
+    if (draftPersistence == null) {
+      draftPersistence = new MemoryDraftPersistence(new HashMap<>(), Schedulers.io());
     }
-    return uploadPersistence;
+    return draftPersistence;
   }
 
   public AutoLoginPersistence getAutoLoginPersistence() {
@@ -263,7 +267,7 @@ public class UploaderApplication extends NotificationApplicationView {
   public AppUploadStatusPersistence getAppUploadStatusPersistence() {
     if (appUploadStatusPersistence == null) {
       appUploadStatusPersistence =
-          new MemoryAppUploadStatusPersistence(new HashMap<>(), Schedulers.trampoline());
+          new MemoryAppUploadStatusPersistence(new HashMap<>(), Schedulers.io());
     }
     return appUploadStatusPersistence;
   }

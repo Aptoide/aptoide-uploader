@@ -312,6 +312,20 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     return Single.just(adapter.getSelected());
   }
 
+  @Override public void clearSelection() {
+    adapter.clearAppsSelection();
+  }
+
+  @Override public void setCloudIcon(List<String> packageList) {
+    if (packageList != null && adapter != null) {
+      adapter.setCloudIcon(packageList);
+    }
+  }
+
+  @Override public Observable<Boolean> refreshEvent() {
+    return refreshEvent;
+  }
+
   public void setUpSubmitButtonAnimation() {
 
     final Animation.AnimationListener showBottom = new Animation.AnimationListener() {
@@ -376,19 +390,5 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       toolbar.setNavigationIcon(null);
       logoutItem.setVisible(true);
     }
-  }
-
-  @Override public void clearSelection() {
-    adapter.clearAppsSelection();
-  }
-
-  @Override public void setCloudIcon(List<String> packageList) {
-    if (packageList != null && adapter != null) {
-      adapter.setCloudIcon(packageList);
-    }
-  }
-
-  @Override public Observable<Boolean> refreshEvent() {
-    return refreshEvent;
   }
 }

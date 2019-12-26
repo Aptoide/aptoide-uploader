@@ -1,6 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
-import com.aptoide.uploader.apps.Upload;
+import com.aptoide.uploader.apps.UploadDraft;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
@@ -24,86 +24,97 @@ public class NotificationPresenter implements Presenter {
   private void checkUploads() {
     view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> uploadManager.getUploads())
-        .flatMapIterable(uploads -> uploads)
-        .flatMap(upload -> {
-          if (upload.getStatus()
-              .equals(Upload.Status.PROGRESS)) {
-            return updateProgress(upload);
+        .flatMap(__ -> uploadManager.getDrafts())
+        .flatMapIterable(drafts -> drafts)
+        .flatMap(draft -> {
+          if (draft.getStatus()
+              .equals(UploadDraft.Status.PROGRESS)) {
+            return updateProgress(draft);
           } else {
-            return Observable.just(upload);
+            return Observable.just(draft);
           }
         })
         .concatMap(i -> Observable.just(i)
             .delay(200, TimeUnit.MILLISECONDS))
-        .flatMapCompletable(upload -> showNotification(upload))
+        .flatMapCompletable(draft -> showNotification(draft))
         .subscribe();
   }
 
-  private Completable showNotification(Upload upload) {
-    String appName = upload.getInstalledApp()
+  private Completable showNotification(UploadDraft draft) {
+    String appName = draft.getInstalledApp()
         .getName();
-    String packageName = upload.getInstalledApp()
+    String packageName = draft.getInstalledApp()
         .getPackageName();
-    String md5 = upload.getMd5();
+    String md5 = draft.getMd5();
 
-    switch (upload.getStatus()) {
-      case PENDING:
+    switch (draft.getStatus()) {
+      case METADATA_SET:
+      case DRAFT_CREATED:
+      case MD5S_SET:
+      case STATUS_SET_DRAFT:
+      case STATUS_SET_PENDING:
         view.showPendingUploadNotification(appName, packageName);
         break;
+      case WAITING_UPLOAD_CONFIRMATION:
+      case UPLOAD_PENDING:
+      case META_DATA_ADDED:
+      case SET_STATUS_TO_DRAFT:
       case NOT_EXISTENT:
+      case PROGRESS:
+      case START:
         break;
       case NO_META_DATA:
         view.showNoMetaDataNotification(appName, packageName, md5);
         break;
-      case PROGRESS:
-        break;
       case COMPLETED:
         view.showCompletedUploadNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case DUPLICATE:
         view.showDuplicateUploadNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(upload);
-      case FAILED:
-        view.showFailedUploadNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case INFECTED:
         view.showUploadInfectionNotificaton(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case PUBLISHER_ONLY:
         view.showPublisherOnlyNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case INVALID_SIGNATURE:
         view.showInvalidSignatureNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(upload);
-      case META_DATA_ADDED:
-        break;
-      case RETRY:
-        break;
+        return uploadManager.removeUploadFromPersistence(draft);
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
       case APP_BUNDLE:
         view.showAppBundleNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(upload);
+        return uploadManager.removeUploadFromPersistence(draft);
+      case UPLOAD_FAILED_RETRY:
+        view.showFailedUploadWithRetryNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft);
+      case UPLOAD_FAILED:
+        view.showFailedUploadNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft);
+      case UNKNOWN_ERROR_RETRY:
+        view.showUnknownErrorRetryNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft);
       case CLIENT_ERROR:
+      case UNKNOWN_ERROR:
       default:
-        view.showErrorNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(upload);
+        view.showUnknownErrorNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft);
     }
     return Completable.complete();
   }
 
-  private Observable<Upload> updateProgress(Upload upload) {
-    return uploadManager.getProgress(upload.getInstalledApp()
+  private Observable<UploadDraft> updateProgress(UploadDraft draft) {
+    return uploadManager.getProgress(draft.getInstalledApp()
         .getPackageName())
         .sample(500, TimeUnit.MILLISECONDS)
-        .doOnNext(uploadProgress -> view.updateUploadProgress(upload.getInstalledApp()
-            .getName(), upload.getInstalledApp()
+        .doOnNext(uploadProgress -> view.updateUploadProgress(draft.getInstalledApp()
+            .getName(), draft.getInstalledApp()
             .getPackageName(), uploadProgress.getProgress()))
-        .map(__ -> upload)
-        .doOnError(__ -> view.showErrorNotification(upload.getInstalledApp()
-            .getName(), upload.getInstalledApp()
+        .map(__ -> draft)
+        .doOnError(__ -> view.showUnknownErrorRetryNotification(draft.getInstalledApp()
+            .getName(), draft.getInstalledApp()
             .getPackageName()));
   }
 }

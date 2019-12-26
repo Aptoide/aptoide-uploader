@@ -2,54 +2,43 @@ package com.aptoide.uploader.apps;
 
 import android.annotation.SuppressLint;
 import android.util.Log;
+import com.aptoide.uploader.apps.network.DraftStatus;
 import com.aptoide.uploader.apps.network.NoConnectivityException;
 import com.aptoide.uploader.apps.network.UploaderService;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
-import com.aptoide.uploader.apps.persistence.UploaderPersistence;
+import com.aptoide.uploader.apps.persistence.DraftPersistence;
 import com.aptoide.uploader.upload.AccountProvider;
 import com.aptoide.uploader.upload.BackgroundService;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 public class UploadManager {
   private final UploaderService uploaderService;
-  private final UploaderPersistence persistence;
   private final Md5Calculator md5Calculator;
   private final BackgroundService backgroundService;
   private final AccountProvider accountProvider;
   private final AppUploadStatusManager appUploadStatusManager;
   private final AppUploadStatusPersistence appUploadStatusPersistence;
+  private final DraftPersistence draftPersistence;
   private UploadProgressManager uploadProgressManager;
 
-  public UploadManager(UploaderService uploaderService, UploaderPersistence persistence,
-      Md5Calculator md5Calculator, BackgroundService backgroundService,
-      AccountProvider accountProvider, AppUploadStatusManager appUploadStatusManager,
+  public UploadManager(UploaderService uploaderService, Md5Calculator md5Calculator,
+      BackgroundService backgroundService, AccountProvider accountProvider,
+      AppUploadStatusManager appUploadStatusManager,
       AppUploadStatusPersistence appUploadStatusPersistence,
-      UploadProgressManager uploadProgressManager) {
+      UploadProgressManager uploadProgressManager, DraftPersistence draftPersistence) {
     this.uploaderService = uploaderService;
-    this.persistence = persistence;
     this.md5Calculator = md5Calculator;
     this.backgroundService = backgroundService;
     this.accountProvider = accountProvider;
     this.appUploadStatusManager = appUploadStatusManager;
     this.appUploadStatusPersistence = appUploadStatusPersistence;
     this.uploadProgressManager = uploadProgressManager;
-  }
-
-  public Completable upload(String storeName, String language, InstalledApp app) {
-    return md5Calculator.calculate(app.getApkPath())
-        .flatMapCompletable((md5 -> uploaderService.getUpload(md5, language, storeName, app)
-            .flatMapCompletable(upload -> persistence.save(upload))));
-  }
-
-  public Observable<List<Upload>> getUploads() {
-    return persistence.getUploads();
-  }
-
-  public Completable removeUploadFromPersistence(Upload upload) {
-    return persistence.remove(upload);
+    this.draftPersistence = draftPersistence;
   }
 
   public void start() {
@@ -57,12 +46,107 @@ public class UploadManager {
     handleBackgroundService();
     dispatchUploads();
     handleMetadataAdded();
+    handleMetadataSet();
     handleMd5NotExistent();
-    handleRetryStatus();
     handleCompletedStatus();
+    handleMd5sSet();
+    handleStatusSetDraft();
     checkAppUploadStatus();
-    //handleObbMain();
-    //handleObbPatch();
+    handleStatusSetMd5();
+    handleProgressStatus();
+    handleAwaitingUploadConfirmation();
+    handleDraftCreatedStatus();
+    handleSplitsNotExistent();
+    handleSetStatusToDraft();
+  }
+
+  public Completable upload(String storeName, String language, InstalledApp app) {
+    return md5Calculator.calculate(app.getApkPath())
+        .flatMapCompletable((md5 -> uploaderService.startUploadDraft(md5, language, storeName, app)
+            .flatMapCompletable(draft -> draftPersistence.save(draft))));
+  }
+
+  public Observable<List<UploadDraft>> getDrafts() {
+    return draftPersistence.getDrafts();
+  }
+
+  public Completable removeUploadFromPersistence(UploadDraft draft) {
+    return draftPersistence.remove(draft);
+  }
+
+  public Observable<Boolean> hasDraftsInProgress() {
+    return draftPersistence.getDrafts()
+        .flatMap(drafts -> Observable.fromIterable(drafts)
+            .filter(draft -> draft.getStatus() != UploadDraft.Status.START)
+            .toList()
+            .toObservable())
+        .throttleLast(750, TimeUnit.MILLISECONDS)
+        .map(list -> !list.isEmpty());
+  }
+
+  public Observable<List<UploadDraft>> getDraftsInStart() {
+    return draftPersistence.getDrafts()
+        .flatMapSingle(drafts -> Observable.fromIterable(drafts)
+            .filter(draft -> draft.getStatus()
+                .equals(UploadDraft.Status.START))
+            .toList());
+  }
+
+  @SuppressLint("CheckResult") private void dispatchUploads() {
+    accountProvider.getAccount()
+        .switchMap(account -> {
+          if (account.isLoggedIn()) {
+            return hasDraftsInProgress().filter(hasDrafts -> !hasDrafts)
+                .flatMapSingle(__ -> getDraftsInStart().firstOrError())
+                .filter(list -> !list.isEmpty())
+                .map(list -> list.get(0))
+                .flatMapCompletable(
+                    draft -> uploaderService.createDraft(draft.getMd5(), draft.getInstalledApp())
+                        .flatMapCompletable(uploadDraft -> draftPersistence.save(uploadDraft)))
+                .toObservable();
+          }
+          return Observable.empty();
+        })
+        .subscribe(__ -> {
+        }, throwable -> {
+          if (throwable instanceof NoConnectivityException) {
+            Log.e(getClass().getSimpleName(), "NO INTERNET AVAILABLE!");
+          }
+          throwable.printStackTrace();
+        });
+  }
+
+  @SuppressLint("CheckResult") private void handleDraftCreatedStatus() {
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.DRAFT_CREATED))
+        .flatMapCompletable(draft -> uploaderService.setDraftMd5s(draft)
+            .flatMapCompletable(pendingDraft -> draftPersistence.save(pendingDraft)))
+        .subscribe();
+  }
+
+  @SuppressLint("CheckResult") private void handleMd5sSet() {
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.MD5S_SET))
+        .flatMapCompletable(draft -> uploaderService.setDraftStatus(draft, DraftStatus.PENDING)
+            .flatMapCompletable(pendingDraft -> draftPersistence.save(pendingDraft)))
+        .subscribe();
+  }
+
+  @SuppressLint("CheckResult") private void handleStatusSetMd5() {
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.STATUS_SET_PENDING))
+        .flatMapCompletable(draft -> uploaderService.getDraftStatus(draft)
+            .flatMapCompletable(statusSetDraft -> draftPersistence.save(statusSetDraft)))
+        .subscribe();
   }
 
   public Observable<UploadProgress> getProgress(String packageName) {
@@ -82,73 +166,76 @@ public class UploadManager {
         .subscribe();
   }
 
+  public Completable handleNoMetadata(Metadata metadata, String md5) {
+    return draftPersistence.getDrafts()
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.NO_META_DATA) && draft.getMd5()
+            .equals(md5))
+        .flatMapCompletable(draft -> Observable.just(
+            new UploadDraft(UploadDraft.Status.META_DATA_ADDED, draft.getInstalledApp(),
+                draft.getMd5(), draft.getDraftId()))
+            .doOnNext(newDraft -> newDraft.setMetadata(metadata))
+            .flatMapCompletable(aa -> draftPersistence.save(aa)));
+  }
+
   @SuppressLint("CheckResult") private void handleMetadataAdded() {
-    persistence.getUploads()
-        .distinctUntilChanged(
-            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
-        .flatMapIterable(uploads -> uploads)
-        .filter(upload -> upload.getStatus()
-            .equals(Upload.Status.META_DATA_ADDED))
-        .cast(MetadataUpload.class)
-        .flatMap(upload -> {
-          upload.setStatus(Upload.Status.PROGRESS);
-          // TODO: 2019-10-18 verificar obbs aqui
-          //if (upload.getInstalledApp()
-          //    .getObbPatchPath() != null
-          //    && upload.getInstalledApp()
-          //    .getObbPatchPath() != null) {
-          //}
-          //if (upload.getInstalledApp()
-          //    .getObbMainPath() != null) {
-          //  return uploaderService.upload(upload.getMd5(), upload.getStoreName(),
-          //      upload.getInstalledApp()
-          //          .getName(), upload.getInstalledApp(), upload.getMetadata(),
-          //      upload.getInstalledApp()
-          //          .getObbMainPath());
-          //}
-          return uploaderService.upload(upload.getMd5(), upload.getStoreName(),
-              upload.getInstalledApp()
-                  .getName(), upload.getInstalledApp(), upload.getMetadata());
-        })
-        .flatMapCompletable(upload -> persistence.save(upload))
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.META_DATA_ADDED))
+        .flatMap(draft -> uploaderService.setDraftMetadata(draft))
+        .flatMapCompletable(draft -> draftPersistence.save(draft))
         .subscribe();
   }
 
-  //@SuppressLint("CheckResult") private void handleObbMain() {
-  //  persistence.getUploads()
-  //      .distinctUntilChanged(
-  //          (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
-  //      .flatMapIterable(uploads -> uploads)
-  //      .filter(upload -> upload.getStatus()
-  //          .equals(Upload.Status.OBB_MAIN))
-  //      .flatMapCompletable(upload -> {
-  //        upload.setStatus(Upload.Status.PROGRESS);
-  //        return uploadApkWithMainObbToServer(upload);
-  //      })
-  //      .subscribe();
-  //}
+  @SuppressLint("CheckResult") private void handleMetadataSet() {
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.METADATA_SET))
+        .flatMapCompletable(draft -> {
+          UploadDraft uploadDraft =
+              new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT, draft.getInstalledApp(),
+                  draft.getMd5(), draft.getDraftId(), draft.getMetadata());
+          return draftPersistence.save(uploadDraft);
+        })
+        .subscribe();
+  }
 
-  //@SuppressLint("CheckResult") private void handleObbPatch() {
-  //  persistence.getUploads()
-  //      .distinctUntilChanged(
-  //          (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
-  //      .flatMapIterable(uploads -> uploads)
-  //      .filter(upload -> upload.getStatus()
-  //          .equals(Upload.Status.OBB_PATCH))
-  //      .flatMapCompletable(upload -> {
-  //        upload.setStatus(Upload.Status.PROGRESS);
-  //        return uploadApkWithPatchObbToServer(upload);
-  //      })
-  //      .subscribe();
-  //}
+  @SuppressLint("CheckResult") private void handleSetStatusToDraft() {
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.SET_STATUS_TO_DRAFT))
+        .flatMap(draft -> uploaderService.setDraftStatus(draft, DraftStatus.DRAFT))
+        .flatMapCompletable(draft -> {
+          draft.setStatus(UploadDraft.Status.PROGRESS);
+          return draftPersistence.save(draft);
+        })
+        .subscribe();
+  }
+
+  @SuppressLint("CheckResult") private void handleProgressStatus() {
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.PROGRESS))
+        .flatMap(draft -> uploaderService.uploadFiles(draft))
+        .flatMapCompletable(draft -> draftPersistence.save(draft))
+        .subscribe();
+  }
 
   @SuppressLint("CheckResult") private void handleCompletedStatus() {
-    persistence.getUploads()
-        .distinctUntilChanged(
-            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
         .flatMapIterable(uploads -> uploads)
-        .filter(upload -> upload.getStatus()
-            .equals(Upload.Status.COMPLETED))
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.COMPLETED))
         .flatMapCompletable(upload -> appUploadStatusPersistence.save(
             new AppUploadStatus(upload.getMd5(), upload.getInstalledApp()
                 .getPackageName(), true, String.valueOf(upload.getInstalledApp()
@@ -156,25 +243,13 @@ public class UploadManager {
         .subscribe();
   }
 
-  @SuppressLint("CheckResult") private void handleRetryStatus() {
-    persistence.getUploads()
-        .distinctUntilChanged(
-            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
-        .flatMapIterable(uploads -> uploads)
-        .filter(upload -> upload.getStatus()
-            .equals(Upload.Status.RETRY))
-        .flatMap(upload -> appUploadStatusManager.checkUploadStatus(upload))
-        .flatMapCompletable(uploadFromCheckStatus -> persistence.save(uploadFromCheckStatus))
-        .subscribe();
-  }
-
   @SuppressLint("CheckResult") private void handleBackgroundService() {
-    persistence.getUploads()
-        .flatMapSingle(uploads -> Observable.fromIterable(uploads)
-            .filter(upload -> upload.getStatus()
-                .equals(Upload.Status.COMPLETED))
+    draftPersistence.getDrafts()
+        .flatMapSingle(drafts -> Observable.fromIterable(drafts)
+            .filter(draft -> draft.getStatus()
+                .equals(UploadDraft.Status.COMPLETED))
             .toList())
-        .map(uploads -> uploads.size() > 0)
+        .map(drafts -> drafts.size() > 0)
         .distinctUntilChanged()
         .subscribe(hasUploadsRunning -> {
           if (hasUploadsRunning) {
@@ -192,42 +267,48 @@ public class UploadManager {
   }
 
   @SuppressLint("CheckResult") private void handleMd5NotExistent() {
-    persistence.getUploads()
-        .distinctUntilChanged(
-            (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
-        .flatMapIterable(uploads -> uploads)
-        .filter(upload -> upload.getStatus()
-            .equals(Upload.Status.NOT_EXISTENT) && !upload.isProcessed())
-        .flatMapCompletable(upload -> {
-          upload.setProcessed(true);
-          return uploaderService.hasApplicationMetaData(upload.getInstalledApp()
-              .getPackageName(), upload.getInstalledApp()
-              .getVersionCode())
-              .flatMapCompletable(hasMetaData -> {
-                if (!hasMetaData) {
-                  upload.setStatus(Upload.Status.NO_META_DATA);
-                  return persistence.save(upload);
-                } else {
-                  /// TODO: 2019-10-18 verificar obbs aqui e enviar caso existam senao enviar so o apk
-                  //if (upload.getInstalledApp()
-                  //    .getObbMainPath() != null
-                  //    && upload.getInstalledApp()
-                  //    .getObbPatchPath() != null) {
-                  //}
-                  //if (upload.getInstalledApp()
-                  //    .getObbMainPath() != null) {
-                  //}
-                  upload.setStatus(Upload.Status.PROGRESS);
-                  return uploadApkToServer(upload);
-                }
-              })
-              .onErrorResumeNext(__ -> {
-                upload.setStatus(Upload.Status.CLIENT_ERROR);
-                return persistence.save(upload);
-              });
-        })
-        .subscribe(() -> {
-        }, throwable -> throwable.printStackTrace());
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.NOT_EXISTENT))
+        .flatMapCompletable(draft -> uploaderService.hasApplicationMetaData(draft)
+            .flatMapCompletable(newDraft -> draftPersistence.save(newDraft)))
+        .subscribe();
+  }
+
+  @SuppressLint("CheckResult") private void handleSplitsNotExistent() {
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.UPLOAD_PENDING))
+        .flatMapCompletable(draft -> uploaderService.setDraftStatus(draft, DraftStatus.DRAFT)
+            .flatMapCompletable(pendingDraft -> draftPersistence.save(pendingDraft)))
+        .subscribe();
+  }
+
+  @SuppressLint("CheckResult") private void handleStatusSetDraft() {
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.STATUS_SET_DRAFT))
+        .flatMap(draft -> getSplitsNotExistentPaths(draft.getSplitsToBeUploaded()).toObservable()
+            .flatMap(list -> uploaderService.uploadSplits(draft, list)))
+        .flatMapCompletable(pendingDraft -> draftPersistence.save(pendingDraft))
+        .subscribe();
+  }
+
+  @SuppressLint("CheckResult") private void handleAwaitingUploadConfirmation() {
+    draftPersistence.getDrafts()
+        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+        .flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getStatus()
+            .equals(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION))
+        .flatMapCompletable(draft -> uploaderService.setDraftStatus(draft, DraftStatus.PENDING)
+            .flatMapCompletable(pendingDraft -> draftPersistence.save(pendingDraft)))
+        .subscribe();
   }
 
   @SuppressLint("CheckResult") private void checkAppUploadStatus() {
@@ -256,74 +337,36 @@ public class UploadManager {
         });
   }
 
-  private Completable uploadApkToServer(Upload upload) {
-    return uploaderService.upload(upload.getInstalledApp(), upload.getMd5(), upload.getStoreName(),
-        upload.getInstalledApp()
-            .getApkPath())
-        .flatMapCompletable(uploadResult -> persistence.save(uploadResult));
-  }
-
-  //private Completable uploadApkWithMainObbToServer(Upload upload) {
-  //  //if metadata blah blah
-  //  return uploaderService.upload(upload.getInstalledApp(), upload.getMd5(), upload.getStoreName(),
-  //      upload.getInstalledApp()
-  //          .getObbMainPath(), "obb_main")
-  //      .flatMapCompletable(uploadResult -> persistence.save(uploadResult));
-  //}
-
-  //private Completable uploadApkWithPatchObbToServer(Upload upload) {
-  //  //if metadata blah blah
-  //  return uploaderService.upload(upload.getInstalledApp(), upload.getMd5(), upload.getStoreName(),
-  //      upload.getInstalledApp()
-  //          .getObbMainPath(), "obb_patch")
-  //      .flatMapCompletable(uploadResult -> persistence.save(uploadResult));
-  //}
-
-  @SuppressLint("CheckResult") private void dispatchUploads() {
-    accountProvider.getAccount()
-        .switchMap(account -> {
-          if (account.isLoggedIn()) {
-            return persistence.getUploads()
-                .distinctUntilChanged(
-                    (previous, current) -> !uploadsPersistenceHasChanged(previous, current))
-                .flatMapIterable(uploads -> uploads)
-                .filter(upload -> upload.getStatus()
-                    .equals(Upload.Status.PENDING))
-                .flatMap(upload -> uploaderService.upload(upload.getMd5(), account.getStoreName(),
-                    upload.getInstalledApp()
-                        .getName(), upload.getInstalledApp()))
-                .flatMapCompletable(upload -> persistence.save(upload))
-                .toObservable();
-          }
-          return Observable.empty();
-        })
-        .subscribe(__ -> {
-        }, throwable -> {
-          if (throwable instanceof NoConnectivityException) {
-            Log.e(getClass().getSimpleName(), "NO INTERNET AVAILABLE!");
-          }
-        });
-  }
-
-  private boolean uploadsPersistenceHasChanged(List<Upload> previousList,
-      List<Upload> currentList) {
-    if (previousList.size() != currentList.size()) {
-      return true;
+  @SuppressLint("CheckResult")
+  private Single<List<String>> getSplitsNotExistentPaths(List<String> splitsMd5sNotExistent) {
+    if (splitsMd5sNotExistent != null) {
+      return Observable.fromIterable(splitsMd5sNotExistent)
+          .map(md5 -> md5Calculator.getPathFromCache(md5))
+          .toList();
     }
-    for (Upload previous : previousList) {
-      Upload current = currentList.get(previousList.indexOf(previous));
-      if (!previous.getStatus()
-          .equals(current.getStatus())) {
-        return true;
-      }
-    }
-    return !previousList.equals(currentList);
+    return Single.error(new IllegalStateException("md5 cannot be null"));
   }
 
   private boolean appsPersistenceHasChanged(List<AppUploadStatus> previousList,
       List<AppUploadStatus> currentList) {
     if (previousList.size() != currentList.size()) {
       return true;
+    }
+    return false;
+  }
+
+  private boolean draftPersistenceHasChanged(List<UploadDraft> previousList,
+      List<UploadDraft> currentList) {
+    if (previousList.size() != currentList.size()) {
+      return true;
+    }
+
+    for (UploadDraft previous : previousList) {
+      UploadDraft current = currentList.get(previousList.indexOf(previous));
+      if (!previous.getStatus()
+          .equals(current.getStatus())) {
+        return true;
+      }
     }
     return false;
   }
