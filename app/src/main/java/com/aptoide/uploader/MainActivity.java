@@ -3,8 +3,11 @@ package com.aptoide.uploader;
 import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
+import android.support.v4.app.Fragment;
 import com.aptoide.uploader.account.view.LoginFragment;
 import com.aptoide.uploader.apps.permission.PermissionProviderActivity;
+import com.aptoide.uploader.apps.view.AppFormFragment;
+import com.aptoide.uploader.apps.view.OnBackPressedInterface;
 
 public class MainActivity extends PermissionProviderActivity {
 
@@ -23,10 +26,6 @@ public class MainActivity extends PermissionProviderActivity {
     }
   }
 
-  @Override protected void onNewIntent(Intent intent) {
-    parseIntent(intent);
-  }
-
   public void parseIntent(Intent intent) {
     if (intent.getAction()
         .equals("navigateToSubmitAppFragment")) {
@@ -34,10 +33,32 @@ public class MainActivity extends PermissionProviderActivity {
       String appName = intent.getStringExtra("appName");
       mainActivityNavigator.navigateToSubmitAppView(md5, appName);
     }
+    if (intent.getAction()
+        .equals("dismissNotification")) {
+      String md5 = intent.getStringExtra("md5");
+      ((UploaderApplication) getApplicationContext()).getUploadManager()
+          .removeUploadFromPersistence(md5)
+          .subscribe();
+    }
+  }
+
+  @Override public void onBackPressed() {
+
+    Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.activity_main_container);
+
+    if (!(fragment instanceof AppFormFragment)) {
+      super.onBackPressed();
+    } else {
+      ((OnBackPressedInterface) fragment).onBackPressed();
+    }
   }
 
   @Override protected void onPause() {
     super.onPause();
+  }
+
+  @Override protected void onNewIntent(Intent intent) {
+    parseIntent(intent);
   }
 
   @Override protected void onResume() {

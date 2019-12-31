@@ -30,6 +30,7 @@ public class AppFormPresenter implements Presenter {
     showForm();
     handleSubmitFormClick();
     handleGetCategories();
+    handleBackPressed();
   }
 
   private void handleSubmitFormClick() {
@@ -60,6 +61,16 @@ public class AppFormPresenter implements Presenter {
         .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
         .observeOn(scheduler)
         .doOnNext(created -> view.showForm())
+        .subscribe();
+  }
+
+  private void handleBackPressed() {
+    view.getLifecycleEvent()
+        .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
+        .observeOn(scheduler)
+        .flatMap(created -> view.backPressedEvent())
+        .doOnNext(__ -> appFormNavigator.navigateToMyAppsView())
+        .flatMapCompletable(backPressed -> uploadManager.removeUploadFromPersistence(md5))
         .subscribe();
   }
 }

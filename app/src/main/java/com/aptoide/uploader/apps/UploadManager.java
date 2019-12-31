@@ -70,8 +70,8 @@ public class UploadManager {
     return draftPersistence.getDrafts();
   }
 
-  public Completable removeUploadFromPersistence(UploadDraft draft) {
-    return draftPersistence.remove(draft);
+  public Completable removeUploadFromPersistence(String md5) {
+    return draftPersistence.remove(md5);
   }
 
   public Observable<Boolean> hasDraftsInProgress() {
