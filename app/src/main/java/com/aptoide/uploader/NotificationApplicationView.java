@@ -158,12 +158,20 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   public NotificationCompat.Builder buildNotification(String applicationName, String subText) {
+
+    final Intent intent = new Intent(this, MainActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    intent.setAction("navigateToMyStoreFragment");
+    final PendingIntent contentIntent =
+        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
     return new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
         R.drawable.notification_icon)
         .setContentTitle(applicationName)
         .setOngoing(false)
         .setContentText(subText)
-        .setAutoCancel(true);
+        .setAutoCancel(true)
+        .setContentIntent(contentIntent);
   }
 
   public void setupChannels() {

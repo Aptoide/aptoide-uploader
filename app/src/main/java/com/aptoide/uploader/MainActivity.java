@@ -34,6 +34,10 @@ public class MainActivity extends PermissionProviderActivity {
       String appName = intent.getStringExtra("appName");
       mainActivityNavigator.navigateToSubmitAppView(md5, appName);
     }
+    if (intent.getAction()
+        .equals("navigateToMyStoreFragment")) {
+      mainActivityNavigator.navigateToMyAppsFragment();
+    }
   }
 
   @Override protected void onPause() {
