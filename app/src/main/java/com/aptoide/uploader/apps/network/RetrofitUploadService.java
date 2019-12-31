@@ -101,7 +101,7 @@ public class RetrofitUploadService implements UploaderService {
                   return Observable.just(mapUploadDraftResponse(response, draft));
                 })
                 .retryWhen(new RetryWithDelay(5)))
-        .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR_RETRY,
+        .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.EXCEEDED_GET_RETRIES,
             draft.getInstalledApp(), draft.getMd5(), draft.getDraftId()));
   }
 

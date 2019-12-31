@@ -120,8 +120,9 @@
   <string name="application_notification_short_app_success_upload">App successfully uploaded</string>
   <string name="application_notification_short_app_pending_upload">Preparing upload</string>
   <string name="application_notification_short_app_progress_upload">Upload in progress</string>
+  <string name="application_notification_short_get_retries_exceeded">It seems everyone is uploading apps at the same time. Please, try again later!</string>
   <string name="application_notification_short_app_duplicate_upload">This app is already in your store. (APK-103)</string>
-  <string name="application_notification_short_app_intellectual_property">Due to Intelectual Property Rights, it\'s not possible to upload this app. Please contact us if you have the distribution rights. (APK-101)</string>
+  <string name="application_notification_short_app_intellectual_property">Due to Intellectual Property Rights, it\'s not possible to upload this app. Please contact us if you have the distribution rights. (APK-101)</string>
   <string name="application_notification_short_app_infection">An infection was detected. Please contact us if you have the distribution rights. (APK-102)</string>
   <string name="application_notification_short_app_publisher_only">The publisher is the only one allowed to update this app. (APK-104)</string>
   <string name="application_notification_short_app_invalid_signature">The app signature is not valid. Please contact us if you have the distribution rights. (APK-106)</string>

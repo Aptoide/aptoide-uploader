@@ -31,5 +31,7 @@ public interface NotificationView extends View {
   void showFailedUploadNotification(String applicationName, String packageName);
 
   void showUnknownErrorNotification(String applicationName, String packageName);
+
+  void showGetRetriesExceededNotification(String applicationName, String packageName);
 }
 
