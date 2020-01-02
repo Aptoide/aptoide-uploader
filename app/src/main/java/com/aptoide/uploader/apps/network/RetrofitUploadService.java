@@ -101,8 +101,12 @@ public class RetrofitUploadService implements UploaderService {
                   return Observable.just(mapUploadDraftResponse(response, draft));
                 })
                 .retryWhen(new RetryWithDelay(5)))
-        .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.EXCEEDED_GET_RETRIES,
-            draft.getInstalledApp(), draft.getMd5(), draft.getDraftId()));
+        .onErrorReturn(throwable -> {
+          uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App To Repo", "PROCESSING",
+              "reach the limit of get status");
+          return new UploadDraft(UploadDraft.Status.EXCEEDED_GET_RETRIES, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
+        });
   }
 
   @Override public Observable<UploadDraft> hasApplicationMetaData(UploadDraft draft) {
