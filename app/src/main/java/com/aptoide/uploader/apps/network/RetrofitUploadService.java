@@ -38,8 +38,6 @@ import retrofit2.http.Query;
 
 public class RetrofitUploadService implements UploaderService {
 
-  public static final int MAX_RETRIES_FOR_GET_STATUS = 5;
-  
   private final ServiceV7 serviceV7;
   private final AccountProvider accountProvider;
   private UploadProgressListener uploadProgressListener;
@@ -102,7 +100,7 @@ public class RetrofitUploadService implements UploaderService {
                   }
                   return Observable.just(mapUploadDraftResponse(response, draft));
                 })
-                .retryWhen(new RetryWithDelay(MAX_RETRIES_FOR_GET_STATUS)))
+                .retryWhen(new RetryWithDelay()))
         .onErrorReturn(throwable -> {
           uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App To Repo", "PROCESSING",
               "reach the limit of get status");
