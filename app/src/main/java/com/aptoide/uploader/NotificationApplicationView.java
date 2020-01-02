@@ -43,6 +43,14 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   @Override
+  public void showGetRetriesExceededNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_short_get_retries_exceeded));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
+
+  @Override
   public void showCompletedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_success_upload)).setProgress(0, 0,

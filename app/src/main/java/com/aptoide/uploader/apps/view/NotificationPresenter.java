@@ -72,6 +72,9 @@ public class NotificationPresenter implements Presenter {
       case DUPLICATE:
         view.showDuplicateUploadNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(draft);
+      case EXCEEDED_GET_RETRIES:
+        view.showGetRetriesExceededNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft);
       case INFECTED:
         view.showUploadInfectionNotificaton(appName, packageName);
         return uploadManager.removeUploadFromPersistence(draft);
