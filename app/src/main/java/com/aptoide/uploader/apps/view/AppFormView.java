@@ -8,6 +8,8 @@ import java.util.List;
 
 public interface AppFormView extends View {
 
+  Observable<Boolean> backPressedEvent();
+
   void setAppName();
 
   void showMandatoryFieldError();

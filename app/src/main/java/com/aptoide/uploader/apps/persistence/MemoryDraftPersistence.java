@@ -36,9 +36,9 @@ public class MemoryDraftPersistence implements DraftPersistence {
         .doOnError(throwable -> Log.e("ERROR Save", throwable.getMessage()));
   }
 
-  @Override public Completable remove(UploadDraft draft) {
+  @Override public Completable remove(String md5) {
     return Completable.fromAction(() -> {
-      draftsMap.remove(draft.getMd5());
+      draftsMap.remove(md5);
       draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
     })
         .subscribeOn(scheduler)

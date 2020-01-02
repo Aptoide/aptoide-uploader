@@ -68,42 +68,42 @@ public class NotificationPresenter implements Presenter {
         break;
       case COMPLETED:
         view.showCompletedUploadNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case DUPLICATE:
         view.showDuplicateUploadNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case EXCEEDED_GET_RETRIES:
         view.showGetRetriesExceededNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case INFECTED:
         view.showUploadInfectionNotificaton(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case PUBLISHER_ONLY:
         view.showPublisherOnlyNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case INVALID_SIGNATURE:
         view.showInvalidSignatureNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case APP_BUNDLE:
         view.showAppBundleNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case UPLOAD_FAILED_RETRY:
         view.showFailedUploadWithRetryNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case UPLOAD_FAILED:
         view.showFailedUploadNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case UNKNOWN_ERROR_RETRY:
         view.showUnknownErrorRetryNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case CLIENT_ERROR:
       case UNKNOWN_ERROR:
       default:
         view.showUnknownErrorNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
     }
     return Completable.complete();
   }

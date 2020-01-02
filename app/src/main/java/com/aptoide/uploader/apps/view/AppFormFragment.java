@@ -20,15 +20,16 @@ import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.subjects.PublishSubject;
 import java.util.LinkedHashMap;
 import java.util.List;
 
 import static android.util.TypedValue.TYPE_NULL;
 
-public class AppFormFragment extends FragmentView implements AppFormView {
+public class AppFormFragment extends FragmentView implements AppFormView, OnBackPressedInterface {
 
   protected View rootView;
-
+  LinkedHashMap<String, String> map;
   private EditText applicationNameEditText;
   private Spinner ageRatingSpinner;
   private Spinner appCategorySpinner;
@@ -40,7 +41,7 @@ public class AppFormFragment extends FragmentView implements AppFormView {
   private Button submitFormButton;
   private String md5;
   private String appName;
-  LinkedHashMap<String, String> map;
+  private PublishSubject<Boolean> backPressedEvent;
 
   public static AppFormFragment newInstance(String md5, String appName) {
     AppFormFragment appFormFragment = new AppFormFragment();
@@ -57,14 +58,6 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     appName = getArguments().getString("appName", "");
   }
 
-  @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    rootView = inflater.inflate(R.layout.submit_app_fragment, container, false);
-    rootView.setFocusableInTouchMode(true);
-    rootView.requestFocus();
-    return rootView;
-  }
-
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
     applicationNameEditText = view.findViewById(R.id.appName);
@@ -77,6 +70,7 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     emailEditText = view.findViewById(R.id.email);
     websiteEditText = view.findViewById(R.id.website);
     submitFormButton = view.findViewById(R.id.submit_app_button);
+    backPressedEvent = PublishSubject.create();
 
     new AppFormPresenter(this,
         ((UploaderApplication) getContext().getApplicationContext()).getCategoriesManager(),
@@ -85,28 +79,32 @@ public class AppFormFragment extends FragmentView implements AppFormView {
         new AppFormNavigator(getFragmentManager(), getContext())).present();
   }
 
+  @Override public void onStart() {
+    super.onStart();
+  }
+
+  @Override public void onStop() {
+    super.onStop();
+  }
+
+  @Override public void onDestroyView() {
+    super.onDestroyView();
+  }
+
+  @Override public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    rootView = inflater.inflate(R.layout.submit_app_fragment, container, false);
+    rootView.setFocusableInTouchMode(true);
+    rootView.requestFocus();
+    return rootView;
+  }
+
   public void showAgeRatingSpinner() {
     setSpinnerData(R.id.age_rating_spinner, R.array.age_rating_array);
   }
 
-  public void showLanguageSpinner() {
-    String[] languages = this.getResources()
-        .getStringArray(R.array.language_array);
-    String[] languageCodes = this.getResources()
-        .getStringArray(R.array.language_codes);
-    map = new LinkedHashMap<>();
-    for (int i = 0; i < Math.min(languages.length, languageCodes.length); ++i) {
-      map.put(languages[i], languageCodes[i]);
-    }
-    setSpinnerData(R.id.app_language, R.array.language_array);
-  }
-
-  private void setSpinnerData(int viewId, int arrayId) {
-    Spinner spinner = rootView.findViewById(viewId);
-    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), arrayId,
-        android.R.layout.simple_spinner_item);
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    spinner.setAdapter(adapter);
+  @Override public Observable<Boolean> backPressedEvent() {
+    return backPressedEvent;
   }
 
   public void setAppName() {
@@ -190,15 +188,28 @@ public class AppFormFragment extends FragmentView implements AppFormView {
     return validation;
   }
 
-  @Override public void onStart() {
-    super.onStart();
+  public void showLanguageSpinner() {
+    String[] languages = this.getResources()
+        .getStringArray(R.array.language_array);
+    String[] languageCodes = this.getResources()
+        .getStringArray(R.array.language_codes);
+    map = new LinkedHashMap<>();
+    for (int i = 0; i < Math.min(languages.length, languageCodes.length); ++i) {
+      map.put(languages[i], languageCodes[i]);
+    }
+    setSpinnerData(R.id.app_language, R.array.language_array);
   }
 
-  @Override public void onStop() {
-    super.onStop();
+  private void setSpinnerData(int viewId, int arrayId) {
+    Spinner spinner = rootView.findViewById(viewId);
+    ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(getActivity(), arrayId,
+        android.R.layout.simple_spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spinner.setAdapter(adapter);
   }
 
-  @Override public void onDestroyView() {
-    super.onDestroyView();
+  @Override public boolean onBackPressed() {
+    backPressedEvent.onNext(true);
+    return true;
   }
 }

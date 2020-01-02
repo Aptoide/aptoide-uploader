@@ -10,5 +10,5 @@ public interface DraftPersistence {
 
   Completable save(UploadDraft draft);
 
-  Completable remove(UploadDraft draft);
+  Completable remove(String md5);
 }

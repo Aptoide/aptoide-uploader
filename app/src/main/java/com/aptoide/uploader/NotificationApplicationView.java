@@ -70,6 +70,39 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
+  @Override
+  public void showNoMetaDataNotification(String applicationName, String packageName, String md5) {
+
+    final Intent intent = new Intent(this, MainActivity.class);
+    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    intent.setAction("navigateToSubmitAppFragment");
+    intent.putExtra("md5", md5);
+    intent.putExtra("appName", applicationName);
+    final PendingIntent contentIntent =
+        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    final Intent deleteIntent = new Intent(this, MainActivity.class);
+    deleteIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+    deleteIntent.setAction("dismissNotification");
+    deleteIntent.putExtra("md5", md5);
+    deleteIntent.putExtra("appName", applicationName);
+    final PendingIntent dismissIntent =
+        PendingIntent.getActivity(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setOngoing(false)
+            .setContentText(
+                getString(R.string.application_notification_message_app_no_metadata_upload))
+            .setContentTitle(applicationName)
+            .setContentIntent(contentIntent)
+            .setDeleteIntent(dismissIntent)
+            .setAutoCancel(true);
+
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
   @Override public void showPublisherOnlyNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_publisher_only));
@@ -102,32 +135,6 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
-  @Override public void showUnknownErrorNotification(String applicationName, String packageName) {
-    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
-        getString(R.string.application_notification_message_error));
-    notificationManager.notify(packageName.hashCode(), mBuilder.build());
-  }
-
-  @Override
-  public void showFailedUploadWithRetryNotification(String applicationName, String packageName) {
-    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
-        getString(R.string.application_notification_short_app_upload_failed_retry));
-    notificationManager.notify(packageName.hashCode(), mBuilder.build());
-  }
-
-  @Override
-  public void showUnknownErrorRetryNotification(String applicationName, String packageName) {
-    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
-        getString(R.string.application_notification_message_error_retry));
-    notificationManager.notify(packageName.hashCode(), mBuilder.build());
-  }
-
-  @Override public void showFailedUploadNotification(String applicationName, String packageName) {
-    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
-        getString(R.string.application_notification_short_app_upload_failed));
-    notificationManager.notify(packageName.hashCode(), mBuilder.build());
-  }
-
   @Override
   public void updateUploadProgress(String applicationName, String packageName, int progress) {
     NotificationCompat.Builder mBuilder =
@@ -142,26 +149,28 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   @Override
-  public void showNoMetaDataNotification(String applicationName, String packageName, String md5) {
+  public void showUnknownErrorRetryNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_message_error_retry));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
 
-    final Intent intent = new Intent(this, MainActivity.class);
-    intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
-    intent.setAction("navigateToSubmitAppFragment");
-    intent.putExtra("md5", md5);
-    intent.putExtra("appName", applicationName);
-    final PendingIntent contentIntent =
-        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+  @Override
+  public void showFailedUploadWithRetryNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_short_app_upload_failed_retry));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
 
-    NotificationCompat.Builder mBuilder =
-        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
-            R.drawable.notification_icon)
-            .setOngoing(false)
-            .setContentText(
-                getString(R.string.application_notification_message_app_no_metadata_upload))
-            .setContentTitle(applicationName)
-            .setContentIntent(contentIntent)
-            .setAutoCancel(true);
+  @Override public void showFailedUploadNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_short_app_upload_failed));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
 
+  @Override public void showUnknownErrorNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_message_error));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
