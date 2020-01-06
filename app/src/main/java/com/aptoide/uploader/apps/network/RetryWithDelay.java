@@ -7,9 +7,10 @@ import java.util.concurrent.TimeUnit;
 public class RetryWithDelay implements Function<Observable<? extends Throwable>, Observable<?>> {
 
   public static final int BASE_FOR_RETRIES = 2;
+  public static final long TIME_INTERVAL_IN_SEC_FOR_RETRIES = 30L;
 
-  public static final int MIN_RETRIES_FOR_GET_STATUS = 6;
-  public static final int MAX_RETRIES_FOR_GET_STATUS = 10;
+  public static final int FIRST_MAX_RETRIES_FOR_GET_STATUS = 6;
+  public static final int SECOND_MAX_RETRIES_FOR_GET_STATUS = 10;
 
   private int retryCount;
 
@@ -19,10 +20,10 @@ public class RetryWithDelay implements Function<Observable<? extends Throwable>,
 
   @Override public Observable<?> apply(final Observable<? extends Throwable> attempts) {
     return attempts.flatMap((Function<Throwable, Observable<?>>) throwable -> {
-      if (++retryCount < MIN_RETRIES_FOR_GET_STATUS) {
+      if (++retryCount < FIRST_MAX_RETRIES_FOR_GET_STATUS) {
         return Observable.timer((long) Math.pow(BASE_FOR_RETRIES, retryCount), TimeUnit.SECONDS);
-      } else if (retryCount < MAX_RETRIES_FOR_GET_STATUS) {
-        return Observable.timer((long) 30, TimeUnit.SECONDS);
+      } else if (retryCount < SECOND_MAX_RETRIES_FOR_GET_STATUS) {
+        return Observable.timer(TIME_INTERVAL_IN_SEC_FOR_RETRIES, TimeUnit.SECONDS);
       }
       return Observable.error(new GetApksRetryException());
     });
