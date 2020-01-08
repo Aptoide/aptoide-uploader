@@ -132,6 +132,7 @@
   <string name="application_notification_message_error_retry">Unknown error occurred, please try again later.</string>
   <string name="application_notification_message_error">Unknown error occurred.</string>
   <string name="application_notification_short_app_bundle">This type of app is not supported... yet. But, it\'ll be supported soon!</string>
+  <string name="application_notification_short_anti_spam">Oops&#8230; Your app seems to be spam. Please contact support@aptoide.com.</string>
 
   <string name="error_user_already_exists">This user already exists</string>
   <string name="error_store_already_exists">This store already exists</string>
