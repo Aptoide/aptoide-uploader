@@ -20,6 +20,8 @@ public interface NotificationView extends View {
 
   void showAppBundleNotification(String applicationName, String packageName);
 
+  void showAntiSpamRuleNotification(String applicationName, String packageName);
+
   void showInvalidSignatureNotification(String applicationName, String packageName);
 
   void updateUploadProgress(String name, String packageName, int progress);
