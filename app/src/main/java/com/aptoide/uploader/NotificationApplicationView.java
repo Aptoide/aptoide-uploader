@@ -49,7 +49,6 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
-
   @Override
   public void showCompletedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
@@ -188,6 +187,7 @@ public abstract class NotificationApplicationView extends Application implements
         .setOngoing(false)
         .setContentText(subText)
         .setAutoCancel(true)
+        .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
         .setContentIntent(contentIntent);
   }
 
