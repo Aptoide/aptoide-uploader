@@ -10,7 +10,7 @@
   <string name="retry">retry</string>
   <string name="cancel">Cancel</string>
 
-  <!-- Mensagens de erro -->
+  <!-- Error Messages -->
   <string name="loginFail">Login failed. Wrong username or password.</string>
   <string name="duplicated_apk">The apk already exists in the repository. You don\'t need to do anything.</string>
   <string name="no_email_pass_and_store_error_message">Please fill all fields</string>
@@ -142,4 +142,8 @@
   <string name="duplicate_store_error">The store name you\'re using already exists. Be creative, dude!</string>
   (edited)
   <string name="connection_error_body">Oops, it seems you\'ve got connection issues. Try again later!</string>
+  
+    <!--Settings-->
+  <string name="settings_dark_them_title">Dark Theme</string>
+  <string name="settings_dark_them_body">It helps to relieve eye strain when using your device in the dark.</string>
 </resources>
