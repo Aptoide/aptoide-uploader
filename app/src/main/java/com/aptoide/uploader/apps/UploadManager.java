@@ -133,7 +133,7 @@ public class UploadManager {
         .flatMap(this::setPending)
         .flatMap(this::getDraftStatus)
         .filter(notExistent())
-        .flatMapCompletable(this::processApkNotExistent);
+        .flatMapCompletable(this::processMd5NotExistent);
   }
 
   @NotNull private Predicate<UploadDraft> notExistent() {
@@ -141,7 +141,7 @@ public class UploadManager {
         .equals(UploadDraft.Status.NOT_EXISTENT);
   }
 
-  private Completable processApkNotExistent(UploadDraft statusSetDraft) {
+  private Completable processMd5NotExistent(UploadDraft statusSetDraft) {
     return uploaderService.hasApplicationMetaData(statusSetDraft)
         .flatMapCompletable(metaDataDraft -> draftPersistence.save(metaDataDraft)
             .andThen(uploaderService.setDraftStatus(metaDataDraft, DraftStatus.DRAFT))
@@ -152,11 +152,9 @@ public class UploadManager {
                 .flatMapCompletable(uploadedDraft -> {
                   if (uploadedDraft.getStatus()
                       .equals(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION)) {
-                    return uploaderService.setDraftStatus(uploadedDraft, DraftStatus.PENDING)
-                        .flatMapCompletable(pendingDraft -> draftPersistence.save(pendingDraft)
-                            .andThen(uploaderService.getDraftStatus(pendingDraft)
-                                .flatMapCompletable(
-                                    statusSetDraft2 -> draftPersistence.save(statusSetDraft2))));
+                    return setPending(uploadedDraft)
+                        .flatMap(this::getDraftStatus)
+                        .toCompletable();
                   } else {
                     return draftPersistence.save(uploadedDraft);
                   }
