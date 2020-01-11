@@ -101,6 +101,10 @@ public class InstalledApp {
     return packageName.equals(that.packageName);
   }
 
+  @Override public String toString() {
+    return "InstalledApp{" + "packageName='" + packageName + '\'' + '}';
+  }
+
   public String getApkPath() {
     return apkPath;
   }
