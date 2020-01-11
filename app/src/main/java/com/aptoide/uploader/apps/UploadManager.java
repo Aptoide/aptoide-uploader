@@ -12,10 +12,12 @@ import com.aptoide.uploader.upload.BackgroundService;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
+import org.jetbrains.annotations.NotNull;
 
 public class UploadManager {
   private static final int UPLOADS_IN_PARALLEL = 2;
@@ -130,13 +132,13 @@ public class UploadManager {
         .flatMap(this::setMd5)
         .flatMap(this::setPending)
         .flatMap(this::getDraftStatus)
-        .flatMapCompletable(statusDraft -> {
-          if (statusDraft.getStatus()
-              .equals(UploadDraft.Status.NOT_EXISTENT)) {
-            return processApkNotExistent(statusDraft);
-          }
-          return draftPersistence.save(statusDraft);
-        });
+        .filter(notExistent())
+        .flatMapCompletable(this::processApkNotExistent);
+  }
+
+  @NotNull private Predicate<UploadDraft> notExistent() {
+    return statusDraft -> statusDraft.getStatus()
+        .equals(UploadDraft.Status.NOT_EXISTENT);
   }
 
   private Completable processApkNotExistent(UploadDraft statusSetDraft) {
@@ -151,8 +153,8 @@ public class UploadManager {
                   if (uploadedDraft.getStatus()
                       .equals(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION)) {
                     return uploaderService.setDraftStatus(uploadedDraft, DraftStatus.PENDING)
-                        .flatMapCompletable(pendingDraft2 -> draftPersistence.save(pendingDraft2)
-                            .andThen(uploaderService.getDraftStatus(pendingDraft2)
+                        .flatMapCompletable(pendingDraft -> draftPersistence.save(pendingDraft)
+                            .andThen(uploaderService.getDraftStatus(pendingDraft)
                                 .flatMapCompletable(
                                     statusSetDraft2 -> draftPersistence.save(statusSetDraft2))));
                   } else {
