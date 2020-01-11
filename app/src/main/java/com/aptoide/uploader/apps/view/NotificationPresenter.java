@@ -61,7 +61,7 @@ public class NotificationPresenter implements Presenter {
       case SET_STATUS_TO_DRAFT:
       case NOT_EXISTENT:
       case PROGRESS:
-      case START:
+      case IN_QUEUE:
         break;
       case NO_META_DATA:
         view.showNoMetaDataNotification(appName, packageName, md5);

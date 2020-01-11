@@ -5,7 +5,7 @@ import com.aptoide.uploader.apps.UploadDraft;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
-import io.reactivex.subjects.PublishSubject;
+import io.reactivex.subjects.BehaviorSubject;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -13,18 +13,17 @@ import java.util.Map;
 public class MemoryDraftPersistence implements DraftPersistence {
 
   private final Map<String, UploadDraft> draftsMap;
-  private final PublishSubject<List<UploadDraft>> draftsListSubject;
+  private final BehaviorSubject<List<UploadDraft>> draftsListSubject;
   private final Scheduler scheduler;
 
   public MemoryDraftPersistence(Map<String, UploadDraft> draftsMap, Scheduler scheduler) {
     this.draftsMap = draftsMap;
     this.scheduler = scheduler;
-    draftsListSubject = PublishSubject.create();
+    draftsListSubject = BehaviorSubject.create();
   }
 
   @Override public Observable<List<UploadDraft>> getDrafts() {
-    return draftsListSubject.startWith(new ArrayList<UploadDraft>(draftsMap.values()))
-        .subscribeOn(scheduler);
+    return draftsListSubject.subscribeOn(scheduler);
   }
 
   @Override public Completable save(UploadDraft draft) {
@@ -39,7 +38,6 @@ public class MemoryDraftPersistence implements DraftPersistence {
   @Override public Completable remove(String md5) {
     return Completable.fromAction(() -> {
       draftsMap.remove(md5);
-      draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
     })
         .subscribeOn(scheduler)
         .doOnError(throwable -> Log.e("ERROR Remove", throwable.getMessage()));

@@ -57,11 +57,13 @@ public class RetrofitUploadService implements UploaderService {
   @Override
   public Single<UploadDraft> startUploadDraft(String md5, String language, String storeName,
       InstalledApp installedApp) {
-    return Single.just(new UploadDraft(UploadDraft.Status.START, installedApp, md5));
+    return Single.just(new UploadDraft(UploadDraft.Status.IN_QUEUE, installedApp, md5));
   }
 
   @Override public Observable<UploadDraft> createDraft(String md5, InstalledApp installedApp) {
     return accountProvider.getToken()
+        .doOnSuccess(
+            __ -> Log.d("nzxt", "going to create draft: " + md5 + " " + installedApp.toString()))
         .flatMapObservable(
             accessToken -> serviceV7.createDraft(getParamsCreateDraft(accessToken, installedApp))
                 .map(response -> mapCreateDraftResponse(response, installedApp, md5))
@@ -435,7 +437,7 @@ public class RetrofitUploadService implements UploaderService {
 
   @NonNull private UploadDraft mapUploadDraftResponse(Response<GenericDraftResponse> response,
       UploadDraft draft) {
-    if (response.body()
+    if (response.body() != null && response.body()
         .getData()
         .getStatus()
         .equals("ERROR")) {
@@ -518,7 +520,7 @@ public class RetrofitUploadService implements UploaderService {
 
   @NonNull private UploadDraft mapSetDraftStatusResponse(Response<GenericDraftResponse> response,
       UploadDraft draft, DraftStatus draftStatus) {
-    if (response.body()
+    if (response.body() != null && response.body()
         .getInfo()
         .getStatus()
         .equals(Status.FAIL)) {
@@ -547,7 +549,7 @@ public class RetrofitUploadService implements UploaderService {
 
   @NonNull private UploadDraft mapSetDraftMd5sResponse(Response<GenericDraftResponse> response,
       UploadDraft draft) {
-    if (response.body()
+    if (response.body() != null && response.body()
         .getInfo()
         .getStatus()
         .equals(Status.FAIL)) {
@@ -561,7 +563,7 @@ public class RetrofitUploadService implements UploaderService {
 
   @NonNull private UploadDraft mapSetMetadataResponse(Response<GenericDraftResponse> response,
       UploadDraft draft) {
-    if (response.body()
+    if (response.body() != null && response.body()
         .getInfo()
         .getStatus()
         .equals(Status.FAIL)) {

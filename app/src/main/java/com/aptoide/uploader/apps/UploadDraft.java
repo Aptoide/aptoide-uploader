@@ -65,16 +65,12 @@ public class UploadDraft {
     this.installedApp = installedApp;
   }
 
-  public enum Status {
-    START, STATUS_SET_PENDING, STATUS_SET_DRAFT, SET_STATUS_TO_DRAFT, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, META_DATA_ADDED, INTELLECTUAL_RIGHTS, INFECTED, INVALID_SIGNATURE, PUBLISHER_ONLY, APP_BUNDLE, UPLOAD_FAILED, WAITING_UPLOAD_CONFIRMATION, UPLOAD_PENDING, DRAFT_CREATED, MD5S_SET, METADATA_SET, UPLOAD_FAILED_RETRY, UNKNOWN_ERROR_RETRY, UNKNOWN_ERROR, EXCEEDED_GET_RETRIES
+  public List<String> getSplitsToBeUploaded() {
+    return splitsToBeUploaded;
   }
 
   public void setSplitsToBeUploaded(List<String> md5s) {
     splitsToBeUploaded = md5s;
-  }
-
-  public List<String> getSplitsToBeUploaded() {
-    return splitsToBeUploaded;
   }
 
   public Metadata getMetadata() {
@@ -83,5 +79,43 @@ public class UploadDraft {
 
   public void setMetadata(Metadata metadata) {
     this.metadata = metadata;
+  }
+
+  @Override public int hashCode() {
+    return md5.hashCode();
+  }
+
+  @Override public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    UploadDraft that = (UploadDraft) o;
+
+    return md5.equals(that.md5);
+  }
+
+  @Override public String toString() {
+    return "UploadDraft{" + "status=" + status
+        //+ ", installedApp=" + installedApp + '}'
+        ;
+  }
+
+  public boolean isInProgress() {
+    return this.getStatus() == Status.PROGRESS
+        || this.getStatus() == Status.STATUS_SET_PENDING
+        || this.getStatus() == Status.STATUS_SET_DRAFT
+        || this.getStatus() == Status.DRAFT_CREATED
+        || this.getStatus() == Status.MD5S_SET
+        || this.getStatus() == Status.NOT_EXISTENT
+        || this.getStatus() == Status.NO_META_DATA
+        || this.getStatus() == Status.META_DATA_ADDED
+        || this.getStatus() == Status.WAITING_UPLOAD_CONFIRMATION
+        || this.getStatus() == Status.UPLOAD_PENDING
+        || this.getStatus() == Status.METADATA_SET
+        || this.getStatus() == Status.SET_STATUS_TO_DRAFT;
+  }
+
+  public enum Status {
+    IN_QUEUE, STATUS_SET_PENDING, STATUS_SET_DRAFT, SET_STATUS_TO_DRAFT, PROGRESS, COMPLETED, CLIENT_ERROR, NOT_EXISTENT, NO_META_DATA, DUPLICATE, META_DATA_ADDED, INTELLECTUAL_RIGHTS, INFECTED, INVALID_SIGNATURE, PUBLISHER_ONLY, APP_BUNDLE, UPLOAD_FAILED, WAITING_UPLOAD_CONFIRMATION, UPLOAD_PENDING, DRAFT_CREATED, MD5S_SET, METADATA_SET, UPLOAD_FAILED_RETRY, UNKNOWN_ERROR_RETRY, UNKNOWN_ERROR, EXCEEDED_GET_RETRIES
   }
 }
