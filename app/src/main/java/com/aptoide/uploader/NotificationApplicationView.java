@@ -43,14 +43,6 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   @Override
-  public void showGetRetriesExceededNotification(String applicationName, String packageName) {
-    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
-        getString(R.string.application_notification_short_get_retries_exceeded));
-    notificationManager.notify(packageName.hashCode(), mBuilder.build());
-  }
-
-
-  @Override
   public void showCompletedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_success_upload)).setProgress(0, 0,
@@ -174,6 +166,13 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
+  @Override
+  public void showGetRetriesExceededNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_short_get_retries_exceeded));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
   public NotificationCompat.Builder buildNotification(String applicationName, String subText) {
 
     final Intent intent = new Intent(this, MainActivity.class);
@@ -196,7 +195,7 @@ public abstract class NotificationApplicationView extends Application implements
       NotificationManager notificationManager =
           (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
       NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Channel name",
-          NotificationManager.IMPORTANCE_DEFAULT);
+          NotificationManager.IMPORTANCE_LOW);
       channel.setDescription("Channel description");
       notificationManager.createNotificationChannel(channel);
     }
