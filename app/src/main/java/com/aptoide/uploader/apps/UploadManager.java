@@ -128,8 +128,7 @@ public class UploadManager {
   }
 
   private Completable upload(UploadDraft draft) {
-    return createDraft(draft)
-        .flatMap(this::setMd5)
+    return createDraft(draft).flatMap(this::setMd5)
         .flatMap(this::setPending)
         .flatMap(this::getDraftStatus)
         .filter(notExistent())
@@ -142,41 +141,46 @@ public class UploadManager {
   }
 
   private Completable processMd5NotExistent(UploadDraft statusSetDraft) {
-    return uploaderService.hasApplicationMetaData(statusSetDraft)
-        .flatMapCompletable(metaDataDraft -> draftPersistence.save(metaDataDraft)
-            .andThen(uploaderService.setDraftStatus(metaDataDraft, DraftStatus.DRAFT))
-            .flatMapCompletable(draftStatus -> draftPersistence.save(
-                new UploadDraft(UploadDraft.Status.PROGRESS, draftStatus.getInstalledApp(),
-                    draftStatus.getMd5(), draftStatus.getDraftId(), draftStatus.getMetadata()))
-                .andThen(uploaderService.uploadFiles(draftStatus))
-                .flatMapCompletable(uploadedDraft -> {
-                  if (uploadedDraft.getStatus()
-                      .equals(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION)) {
-                    return setPending(uploadedDraft)
-                        .flatMap(this::getDraftStatus)
-                        .toCompletable();
-                  } else {
-                    return draftPersistence.save(uploadedDraft);
-                  }
-                })));
+    return hasApplicationMetadata(statusSetDraft).flatMapObservable(
+        metaDataDraft -> uploaderService.setDraftStatus(metaDataDraft, DraftStatus.DRAFT))
+        .flatMapCompletable(draftStatus -> draftPersistence.save(
+            new UploadDraft(UploadDraft.Status.PROGRESS, draftStatus.getInstalledApp(),
+                draftStatus.getMd5(), draftStatus.getDraftId(), draftStatus.getMetadata()))
+            .andThen(uploaderService.uploadFiles(draftStatus))
+            .flatMapCompletable(uploadedDraft -> {
+              if (uploadedDraft.getStatus()
+                  .equals(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION)) {
+                return setPending(uploadedDraft).flatMap(this::getDraftStatus)
+                    .toCompletable();
+              } else {
+                return draftPersistence.save(uploadedDraft);
+              }
+            }));
   }
 
-  private Single<UploadDraft> getDraftStatus(UploadDraft pendingDraft) {
-    return uploaderService.getDraftStatus(pendingDraft)
+  private Single<UploadDraft> hasApplicationMetadata(UploadDraft draft) {
+    return uploaderService.hasApplicationMetaData(draft)
         .singleOrError()
         .flatMap(statusDraft -> draftPersistence.save(statusDraft)
             .toSingleDefault(statusDraft));
   }
 
-  private Single<UploadDraft> setPending(UploadDraft md5Draft) {
-    return uploaderService.setDraftStatus(md5Draft, DraftStatus.PENDING)
+  private Single<UploadDraft> getDraftStatus(UploadDraft draft) {
+    return uploaderService.getDraftStatus(draft)
+        .singleOrError()
+        .flatMap(statusDraft -> draftPersistence.save(statusDraft)
+            .toSingleDefault(statusDraft));
+  }
+
+  private Single<UploadDraft> setPending(UploadDraft draft) {
+    return uploaderService.setDraftStatus(draft, DraftStatus.PENDING)
         .singleOrError()
         .flatMap(pendingDraft -> draftPersistence.save(pendingDraft)
             .toSingleDefault(pendingDraft));
   }
 
-  private Single<UploadDraft> setMd5(UploadDraft uploadDraft) {
-    return uploaderService.setDraftMd5s(uploadDraft)
+  private Single<UploadDraft> setMd5(UploadDraft draft) {
+    return uploaderService.setDraftMd5s(draft)
         .singleOrError()
         .flatMap(md5draft -> draftPersistence.save(md5draft)
             .toSingleDefault(md5draft));
