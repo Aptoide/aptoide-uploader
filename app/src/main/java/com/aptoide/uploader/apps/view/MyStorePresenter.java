@@ -124,18 +124,18 @@ public class MyStorePresenter implements Presenter {
   private void handleSubmitAppEvent() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(created -> view.submitAppEvent())
-        //.filter(__ -> connectivityProvider.hasConnectivity())
-        .flatMap(__ -> {
-          if (connectivityProvider.hasConnectivity()) {
-            return Observable.just(true);
-          } else {
-            view.showNoConnectivityError();
-            return Observable.just(false);
-          }
-        })
-        .filter(hasConnection -> hasConnection)
-        .doOnNext(apps -> uploadPermissionProvider.requestExternalStoragePermission())
+        .flatMap(created -> view.submitAppEvent()
+            .flatMap(__ -> {
+              if (connectivityProvider.hasConnectivity()) {
+                return Observable.just(true);
+              } else {
+                view.showNoConnectivityError();
+                return Observable.just(false);
+              }
+            })
+            .filter(hasConnection -> hasConnection)
+            .doOnNext(apps -> uploadPermissionProvider.requestExternalStoragePermission())
+            .retry())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
