@@ -14,7 +14,6 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 import org.jetbrains.annotations.NotNull;
@@ -28,6 +27,7 @@ public class UploadManager {
   private final AppUploadStatusManager appUploadStatusManager;
   private final AppUploadStatusPersistence appUploadStatusPersistence;
   private final DraftPersistence draftPersistence;
+  private final QueueManager queueManager = new QueueManager(UPLOADS_IN_PARALLEL);
   private UploadProgressManager uploadProgressManager;
 
   public UploadManager(UploaderService uploaderService, Md5Calculator md5Calculator,
@@ -43,16 +43,6 @@ public class UploadManager {
     this.appUploadStatusPersistence = appUploadStatusPersistence;
     this.uploadProgressManager = uploadProgressManager;
     this.draftPersistence = draftPersistence;
-  }
-
-  private Single<List<UploadDraft>> applyQueue(List<UploadDraft> drafts) {
-    if (drafts.size() > 1) {
-      return Single.just(drafts.subList(0, UPLOADS_IN_PARALLEL));
-    } else {
-      ArrayList<UploadDraft> uploadDrafts = new ArrayList<>();
-      uploadDrafts.add(drafts.get(0));
-      return Single.just(uploadDrafts);
-    }
   }
 
   public void start() {
@@ -111,10 +101,11 @@ public class UploadManager {
                 .flatMapSingle(__ -> getDraftsInQueue().doOnSuccess(
                     drafts -> Log.d("nzxt", "drafts in queue: " + drafts.size())))
                 .filter(uploadDrafts -> !uploadDrafts.isEmpty())
-                .flatMapSingle(this::applyQueue)
-                .flatMapIterable(uploadDraft -> uploadDraft)
-                .flatMapCompletable(this::upload)
-                .toObservable();
+                .map(queueManager::applyQueue)
+                .flatMap(uploadDraftList -> Observable.fromIterable(uploadDraftList)
+                    .flatMapCompletable(uploadDraft -> upload(uploadDraft).doOnTerminate(
+                        () -> queueManager.remove(uploadDraft)))
+                    .toObservable());
           }
           return Observable.empty();
         })
