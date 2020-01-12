@@ -12,6 +12,8 @@ import com.aptoide.uploader.upload.BackgroundService;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.SingleSource;
+import io.reactivex.functions.Function;
 import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import java.util.List;
@@ -123,13 +125,42 @@ public class UploadManager {
         .flatMap(this::setPending)
         .flatMap(this::getDraftStatus)
         .filter(md5NotExistent())
-        .flatMapCompletable(
-            statusSetDraft -> hasApplicationMetadata(statusSetDraft).flatMap(this::setDraft)
-                .flatMap(this::uploadFiles)
-                .filter(waitingUploadConfirmation())
-                .flatMapCompletable(
-                    uploadedDraft -> setPending(uploadedDraft).flatMap(this::getDraftStatus)
-                        .toCompletable()));
+        .flatMapCompletable(statusSetDraft -> hasApplicationMetadata(statusSetDraft).flatMap(
+            handleHasMetadataResult())
+            .flatMap(this::setDraft)
+            .flatMap(this::uploadFiles)
+            .filter(waitingUploadConfirmation())
+            .flatMapCompletable(
+                uploadedDraft -> setPending(uploadedDraft).flatMap(this::getDraftStatus)
+                    .toCompletable()));
+  }
+
+  @NotNull
+  private Function<UploadDraft, SingleSource<? extends UploadDraft>> handleHasMetadataResult() {
+    return metadataInfoDraft -> {
+      if (metadataInfoDraft.getStatus()
+          .equals(UploadDraft.Status.NO_META_DATA)) {
+        return observeMetadataFilling(metadataInfoDraft).flatMap(this::setMetadata);
+      } else if (metadataInfoDraft.getStatus()
+          .equals(UploadDraft.Status.SET_STATUS_TO_DRAFT)) {
+        return Single.just(metadataInfoDraft);
+      }
+      return Single.error(new IllegalStateException(metadataInfoDraft.getStatus()
+          .name()));
+    };
+  }
+
+  private Single<UploadDraft> observeMetadataFilling(UploadDraft metadataInfoDraft) {
+    return draftPersistence.getDrafts()
+        .flatMap(drafts -> Observable.fromIterable(drafts)
+            .filter(draft -> draft.getStatus()
+                .equals(UploadDraft.Status.META_DATA_ADDED) && draft.getMd5()
+                .equals(metadataInfoDraft.getMd5()))
+            .toList()
+            .toObservable())
+        .filter(uploadDrafts -> !uploadDrafts.isEmpty())
+        .firstOrError()
+        .map(uploadDrafts -> uploadDrafts.get(0));
   }
 
   @NotNull private Predicate<UploadDraft> md5NotExistent() {
@@ -145,10 +176,15 @@ public class UploadManager {
   private Single<UploadDraft> uploadFiles(UploadDraft draftDraft) {
     return uploaderService.uploadFiles(draftDraft)
         .singleOrError()
-        .flatMap(uploadedDraft -> draftPersistence.save(
-            new UploadDraft(UploadDraft.Status.PROGRESS, uploadedDraft.getInstalledApp(),
-                uploadedDraft.getMd5(), uploadedDraft.getDraftId(), uploadedDraft.getMetadata()))
-            .toSingleDefault(uploadedDraft));
+        .flatMap(uploadDraft -> draftPersistence.save(uploadDraft)
+            .toSingleDefault(uploadDraft));
+  }
+
+  private Single<UploadDraft> setMetadata(UploadDraft draft) {
+    return uploaderService.setDraftMetadata(draft)
+        .singleOrError()
+        .flatMap(metadataDraft -> draftPersistence.save(metadataDraft)
+            .toSingleDefault(metadataDraft));
   }
 
   private Single<UploadDraft> setDraft(UploadDraft metaDataDraft) {
@@ -226,29 +262,29 @@ public class UploadManager {
   }
 
   @SuppressLint("CheckResult") private void handleMetadataAdded() {
-    draftPersistence.getDrafts()
-        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
-        .flatMapIterable(drafts -> drafts)
-        .filter(draft -> draft.getStatus()
-            .equals(UploadDraft.Status.META_DATA_ADDED))
-        .flatMap(draft -> uploaderService.setDraftMetadata(draft))
-        .flatMapCompletable(draft -> draftPersistence.save(draft))
-        .subscribe();
+    //draftPersistence.getDrafts()
+    //    .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+    //    .flatMapIterable(drafts -> drafts)
+    //    .filter(draft -> draft.getStatus()
+    //        .equals(UploadDraft.Status.META_DATA_ADDED))
+    //    .flatMap(draft -> uploaderService.setDraftMetadata(draft))
+    //    .flatMapCompletable(draft -> draftPersistence.save(draft))
+    //    .subscribe();
   }
 
   @SuppressLint("CheckResult") private void handleMetadataSet() {
-    draftPersistence.getDrafts()
-        .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
-        .flatMapIterable(drafts -> drafts)
-        .filter(draft -> draft.getStatus()
-            .equals(UploadDraft.Status.METADATA_SET))
-        .flatMapCompletable(draft -> {
-          UploadDraft uploadDraft =
-              new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT, draft.getInstalledApp(),
-                  draft.getMd5(), draft.getDraftId(), draft.getMetadata());
-          return draftPersistence.save(uploadDraft);
-        })
-        .subscribe();
+    //draftPersistence.getDrafts()
+    //    .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
+    //    .flatMapIterable(drafts -> drafts)
+    //    .filter(draft -> draft.getStatus()
+    //        .equals(UploadDraft.Status.METADATA_SET))
+    //    .flatMapCompletable(draft -> {
+    //      UploadDraft uploadDraft =
+    //          new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT, draft.getInstalledApp(),
+    //              draft.getMd5(), draft.getDraftId(), draft.getMetadata());
+    //      return draftPersistence.save(uploadDraft);
+    //    })
+    //    .subscribe();
   }
 
   @SuppressLint("CheckResult") private void handleCompletedStatus() {

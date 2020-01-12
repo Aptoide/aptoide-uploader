@@ -35,13 +35,12 @@ public class TokenRevalidatorV7Alternate extends TokenRevalidationInterceptor
       errorCode = errors.getJSONObject(0)
           .getString("code");
     } catch (JSONException e) {
-      Log.d(TAG, "No error");
     }
     if (response.code() == 401 && errorCode.equals("AUTH-2")) {
       Request newRequest = makeTokenRefreshCall(request);
       return chain.proceed(newRequest);
     }
-    Log.d(TAG, "INTERCEPTED:$ " + response.toString());
+    Log.d(TAG, "INTERCEPTED: " + response.toString());
     return response.newBuilder()
         .body(ResponseBody.create(contentType, responseBodyString))
         .build();
