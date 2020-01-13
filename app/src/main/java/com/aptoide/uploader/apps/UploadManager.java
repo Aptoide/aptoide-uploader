@@ -51,8 +51,6 @@ public class UploadManager {
     fillAppUploadStatusPersistence();
     handleBackgroundService();
     dispatchUploads();
-    handleMetadataAdded();
-    handleMetadataSet();
     handleCompletedStatus();
     handleStatusSetDraft();
     checkAppUploadStatus();
@@ -259,32 +257,6 @@ public class UploadManager {
                 draft.getMd5(), draft.getDraftId()))
             .doOnNext(newDraft -> newDraft.setMetadata(metadata))
             .flatMapCompletable(aa -> draftPersistence.save(aa)));
-  }
-
-  @SuppressLint("CheckResult") private void handleMetadataAdded() {
-    //draftPersistence.getDrafts()
-    //    .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
-    //    .flatMapIterable(drafts -> drafts)
-    //    .filter(draft -> draft.getStatus()
-    //        .equals(UploadDraft.Status.META_DATA_ADDED))
-    //    .flatMap(draft -> uploaderService.setDraftMetadata(draft))
-    //    .flatMapCompletable(draft -> draftPersistence.save(draft))
-    //    .subscribe();
-  }
-
-  @SuppressLint("CheckResult") private void handleMetadataSet() {
-    //draftPersistence.getDrafts()
-    //    .distinctUntilChanged((previous, current) -> !draftPersistenceHasChanged(previous, current))
-    //    .flatMapIterable(drafts -> drafts)
-    //    .filter(draft -> draft.getStatus()
-    //        .equals(UploadDraft.Status.METADATA_SET))
-    //    .flatMapCompletable(draft -> {
-    //      UploadDraft uploadDraft =
-    //          new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT, draft.getInstalledApp(),
-    //              draft.getMd5(), draft.getDraftId(), draft.getMetadata());
-    //      return draftPersistence.save(uploadDraft);
-    //    })
-    //    .subscribe();
   }
 
   @SuppressLint("CheckResult") private void handleCompletedStatus() {
