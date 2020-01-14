@@ -35,8 +35,8 @@ public class NotificationPresenter implements Presenter {
           }
         })
         .concatMap(i -> Observable.just(i)
-            .delay(200, TimeUnit.MILLISECONDS))
-        .flatMapCompletable(draft -> showNotification(draft))
+            .delay(25, TimeUnit.MILLISECONDS))
+        .flatMapCompletable(this::showNotification)
         .subscribe();
   }
 

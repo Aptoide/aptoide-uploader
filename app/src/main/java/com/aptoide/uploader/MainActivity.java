@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.app.Fragment;
 import com.aptoide.uploader.account.view.LoginFragment;
+import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.permission.PermissionProviderActivity;
 import com.aptoide.uploader.apps.view.AppFormFragment;
 import com.aptoide.uploader.apps.view.OnBackPressedInterface;
@@ -36,9 +37,11 @@ public class MainActivity extends PermissionProviderActivity {
     if (intent.getAction()
         .equals("dismissNotification")) {
       String md5 = intent.getStringExtra("md5");
-      ((UploaderApplication) getApplicationContext()).getUploadManager()
-          .removeUploadFromPersistence(md5)
+      UploadManager uploadManager =
+          ((UploaderApplication) getApplicationContext()).getUploadManager();
+      uploadManager.removeUploadFromPersistence(md5)
           .subscribe();
+      uploadManager.removeUploadFromQueue(md5);
     }
   }
 

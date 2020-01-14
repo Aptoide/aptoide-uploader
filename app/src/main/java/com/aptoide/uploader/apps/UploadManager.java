@@ -71,6 +71,14 @@ public class UploadManager {
     return draftPersistence.remove(md5);
   }
 
+  public void removeUploadFromQueue(String md5) {
+    getDraftsInProgress().flatMapIterable(drafts -> drafts)
+        .filter(draft -> draft.getMd5()
+            .equals(md5))
+        .doOnNext(queueManager::remove)
+        .subscribe();
+  }
+
   private Observable<List<UploadDraft>> getDraftsInProgress() {
     return draftPersistence.getDrafts()
         .flatMap(drafts -> Observable.fromIterable(drafts)

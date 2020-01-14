@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps;
 
+import android.util.Log;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -24,6 +25,8 @@ class QueueManager {
   }
 
   public void remove(UploadDraft uploadDraft) {
+    Log.d(getClass().getSimpleName(), "removed: " + uploadDraft.getInstalledApp()
+        .getName());
     uploadMd5s.remove(uploadDraft.getMd5());
   }
 }

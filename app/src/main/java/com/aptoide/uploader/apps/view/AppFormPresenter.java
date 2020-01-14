@@ -70,6 +70,7 @@ public class AppFormPresenter implements Presenter {
         .observeOn(scheduler)
         .flatMap(created -> view.backPressedEvent())
         .doOnNext(__ -> appFormNavigator.navigateToMyAppsView())
+        .doOnNext(__ -> uploadManager.removeUploadFromQueue(md5))
         .flatMapCompletable(backPressed -> uploadManager.removeUploadFromPersistence(md5))
         .subscribe();
   }
