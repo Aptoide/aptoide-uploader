@@ -90,6 +90,9 @@ public class NotificationPresenter implements Presenter {
       case APP_BUNDLE:
         view.showAppBundleNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(draft.getMd5());
+      case ANTI_SPAM_RULE:
+        view.showAntiSpamRuleNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case UPLOAD_FAILED_RETRY:
         view.showFailedUploadWithRetryNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(draft.getMd5());

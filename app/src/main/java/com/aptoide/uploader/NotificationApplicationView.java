@@ -49,6 +49,12 @@ public abstract class NotificationApplicationView extends Application implements
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
+  @Override public void showAntiSpamRuleNotification(String applicationName, String packageName) {
+    NotificationCompat.Builder mBuilder = buildNotification(applicationName,
+        getString(R.string.application_notification_short_anti_spam));
+    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+  }
+
   @Override
   public void showCompletedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,

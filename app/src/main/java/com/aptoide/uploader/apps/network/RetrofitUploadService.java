@@ -446,10 +446,6 @@ public class RetrofitUploadService implements UploaderService {
           .getError()
           .get(0)
           .getCode()) {
-        case "APK-103":
-          sendUploadCompleteFailedAnalytics(response);
-          return new UploadDraft(UploadDraft.Status.DUPLICATE, draft.getInstalledApp(),
-              draft.getMd5(), draft.getDraftId());
         case "APK-101":
           sendUploadCompleteFailedAnalytics(response);
           return new UploadDraft(UploadDraft.Status.INTELLECTUAL_RIGHTS, draft.getInstalledApp(),
@@ -458,13 +454,20 @@ public class RetrofitUploadService implements UploaderService {
           sendUploadCompleteFailedAnalytics(response);
           return new UploadDraft(UploadDraft.Status.INFECTED, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
+        case "APK-103":
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.DUPLICATE, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
+        case "APK-104":
+          sendUploadCompleteFailedAnalytics(response);
+          return new UploadDraft(UploadDraft.Status.PUBLISHER_ONLY, draft.getInstalledApp(), draft.getMd5(), draft.getDraftId());
         case "APK-106":
           sendUploadCompleteFailedAnalytics(response);
           return new UploadDraft(UploadDraft.Status.INVALID_SIGNATURE, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
-        case "APK-104":
+        case "APK-107":
           sendUploadCompleteFailedAnalytics(response);
-          return new UploadDraft(UploadDraft.Status.PUBLISHER_ONLY, draft.getInstalledApp(),
+          return new UploadDraft(UploadDraft.Status.ANTI_SPAM_RULE, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "APK-5":
           return new UploadDraft(UploadDraft.Status.NOT_EXISTENT, draft.getInstalledApp(),
@@ -503,7 +506,6 @@ public class RetrofitUploadService implements UploaderService {
           return new UploadDraft(UploadDraft.Status.UPLOAD_FAILED, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "SPLIT-2": //AAB not supported yet.
-        case "APK-107":
         case "FILE-111":
         case "FILE-112":
         case "IARG-1":
