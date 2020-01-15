@@ -7,10 +7,10 @@ import java.util.concurrent.TimeUnit;
 public class RetryWithDelay implements Function<Observable<? extends Throwable>, Observable<?>> {
 
   public static final int BASE_FOR_RETRIES = 2;
-  public static final long TIME_INTERVAL_IN_SEC_FOR_RETRIES = 30L;
+  public static final long TIME_INTERVAL_IN_SEC_FOR_RETRIES = 20L;
 
-  public static final int FIRST_MAX_RETRIES_FOR_GET_STATUS = 6;
-  public static final int SECOND_MAX_RETRIES_FOR_GET_STATUS = 10;
+  public static final int FIRST_MAX_RETRIES_FOR_GET_STATUS = 5;
+  public static final int SECOND_MAX_RETRIES_FOR_GET_STATUS = 9;
 
   private int retryCount;
 
