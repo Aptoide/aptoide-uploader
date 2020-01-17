@@ -32,7 +32,10 @@ android {
     resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
     resValue "string", "fb_login_protocol_scheme",
         "\"" + "fb" + project.FACEBOOK_APP_ID_UPLOADER + "\""
+    buildConfigField "String", "APTOIDE_WEB_SERVICES_RAKAM_HOST",
+        "\"" + "fb" + project.APTOIDE_WEB_SERVICES_RAKAM_HOST + "\""
     resValue "string", "google_id", "\"" + project.GMS_SERVER_ID_VANILLA + "\""
+    buildConfigField "String", "RAKAM_API_KEY", "\"" + project.RAKAM_API_KEY + "\""
     vectorDrawables.useSupportLibrary = true
   }
 
@@ -129,4 +132,7 @@ dependencies {
 
   //Play Services for Flurry
   implementation 'com.google.android.gms:play-services-base:15.0.1'
+
+  //Rakam
+  implementation "io.rakam:android-sdk:${RAKAM_VERSION}"
 }
