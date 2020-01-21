@@ -50,7 +50,6 @@ public class UploaderAnalytics {
     JSONObject eventProperties = new JSONObject();
     try {
       eventProperties.put("status", status);
-      eventProperties.put("status_method", statusMethod);
       eventProperties.put("web_code", webCode);
       eventProperties.put("web_description", webDescription);
     } catch (JSONException exception) {
