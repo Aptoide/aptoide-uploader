@@ -50,6 +50,7 @@ import com.flurry.android.FlurryAgent;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
+import io.rakam.api.Identify;
 import io.rakam.api.Rakam;
 import io.rakam.api.RakamClient;
 import io.reactivex.schedulers.Schedulers;
@@ -313,7 +314,8 @@ public class UploaderApplication extends NotificationApplicationView {
   private void initializeRakam() {
     RakamClient instance = Rakam.getInstance();
 
-    String rakamBaseHost = "https://" + BuildConfig.FLURRY_KEY_UPLOADER;
+    String rakamBaseHost = BuildConfig.SCHEMA + "://" + BuildConfig.APTOIDE_WEB_SERVICES_RAKAM_HOST;
+
     try {
       instance.initialize(this, new URL(rakamBaseHost), BuildConfig.RAKAM_API_KEY);
     } catch (MalformedURLException e) {
@@ -325,5 +327,10 @@ public class UploaderApplication extends NotificationApplicationView {
     instance.setLogLevel(Log.VERBOSE);
     instance.setEventUploadPeriodMillis(1);
     instance.setUserId(getIdsRepository().getUniqueIdentifier());
+
+    Identify identify = new Identify();
+    identify.set("aptoide_package", getPackageName());
+    Rakam.getInstance().identify(identify);
+
   }
 }
