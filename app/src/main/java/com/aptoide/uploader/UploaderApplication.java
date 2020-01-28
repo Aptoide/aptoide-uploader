@@ -1,6 +1,7 @@
 package com.aptoide.uploader;
 
 import android.preference.PreferenceManager;
+import android.util.Log;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.account.AutoLoginPersistence;
@@ -49,8 +50,13 @@ import com.flurry.android.FlurryAgent;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
+import io.rakam.api.Identify;
+import io.rakam.api.Rakam;
+import io.rakam.api.RakamClient;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
+import java.net.MalformedURLException;
+import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
@@ -78,6 +84,7 @@ public class UploaderApplication extends NotificationApplicationView {
   @Override public void onCreate() {
     super.onCreate();
     startFlurryAgent();
+    initializeRakam();
 
     callbackManager = CallbackManager.Factory.create();
     getUploadManager().start();
@@ -302,5 +309,28 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public AutoLoginManager getAutoLoginManager() {
     return new AutoLoginManager(getApplicationContext(), getAutoLoginPersistence());
+  }
+
+  private void initializeRakam() {
+    RakamClient instance = Rakam.getInstance();
+
+    String rakamBaseHost = BuildConfig.SCHEMA + "://" + BuildConfig.APTOIDE_WEB_SERVICES_RAKAM_HOST;
+
+    try {
+      instance.initialize(this, new URL(rakamBaseHost), BuildConfig.RAKAM_API_KEY);
+    } catch (MalformedURLException e) {
+      Log.e(getClass().getSimpleName(), "error: ", e);
+    }
+    instance.setDeviceId(getIdsRepository().getAndroidId());
+    instance.enableForegroundTracking(this);
+    instance.trackSessionEvents(true);
+    instance.setLogLevel(Log.VERBOSE);
+    instance.setEventUploadPeriodMillis(1);
+    instance.setUserId(getIdsRepository().getUniqueIdentifier());
+
+    Identify identify = new Identify();
+    identify.set("aptoide_package", getPackageName());
+    Rakam.getInstance().identify(identify);
+
   }
 }

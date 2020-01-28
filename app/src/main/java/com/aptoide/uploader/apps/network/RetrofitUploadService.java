@@ -105,7 +105,9 @@ public class RetrofitUploadService implements UploaderService {
                 .retryWhen(new RetryWithDelay()))
         .onErrorReturn(throwable -> {
           uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App To Repo", "PROCESSING",
-              "reach the limit of get status");
+              "reach the limit of get status", draft.getInstalledApp()
+                  .getPackageName(), draft.getInstalledApp()
+                  .getVersionCode());
           return new UploadDraft(UploadDraft.Status.EXCEEDED_GET_RETRIES, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         });
@@ -460,7 +462,8 @@ public class RetrofitUploadService implements UploaderService {
               draft.getMd5(), draft.getDraftId());
         case "APK-104":
           sendUploadCompleteFailedAnalytics(response);
-          return new UploadDraft(UploadDraft.Status.PUBLISHER_ONLY, draft.getInstalledApp(), draft.getMd5(), draft.getDraftId());
+          return new UploadDraft(UploadDraft.Status.PUBLISHER_ONLY, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
         case "APK-106":
           sendUploadCompleteFailedAnalytics(response);
           return new UploadDraft(UploadDraft.Status.INVALID_SIGNATURE, draft.getInstalledApp(),
@@ -515,7 +518,7 @@ public class RetrofitUploadService implements UploaderService {
               draft.getMd5(), draft.getDraftId());
       }
     }
-    uploaderAnalytics.sendUploadCompleteEvent("success", "Upload App to Repo", "0", "0");
+    uploaderAnalytics.sendUploadCompleteEvent("success", "Upload App to Repo", "0", "0", "0", 0);
     return new UploadDraft(UploadDraft.Status.COMPLETED, draft.getInstalledApp(), draft.getMd5(),
         draft.getDraftId());
   }
@@ -577,6 +580,7 @@ public class RetrofitUploadService implements UploaderService {
         draft.getDraftId());
   }
 
+  //TODO JA: missing package name and vc
   private void sendUploadCompleteFailedAnalytics(Response<GenericDraftResponse> response) {
     uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App to Repo", response.body()
         .getData()
@@ -586,7 +590,7 @@ public class RetrofitUploadService implements UploaderService {
         .getData()
         .getError()
         .get(0)
-        .getDescription());
+        .getDescription(), "", 0);
   }
 
   public interface ServiceV7 {

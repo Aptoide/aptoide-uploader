@@ -75,3 +75,7 @@
  -keepnames class * implements android.os.Parcelable {
   public static final ** CREATOR;
  }
+
+ #rakam
+ -keep class com.google.android.gms.ads.** { *; }
+ -dontwarn okio.**

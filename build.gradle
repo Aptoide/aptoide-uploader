@@ -25,3 +25,9 @@ wrapper {
   gradleVersion = '4.1'
   distributionUrl = "https://services.gradle.org/distributions/gradle-${gradleVersion}-all.zip"
 }
+
+ext {
+  //Rakam version
+  RAKAM_VERSION = '2.7.14'
+}
+
