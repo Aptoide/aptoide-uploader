@@ -30,8 +30,6 @@ import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
 import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
-import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV3;
-import com.aptoide.uploader.apps.network.TokenRevalidationInterceptorV7;
 import com.aptoide.uploader.apps.network.TokenRevalidatorV7Alternate;
 import com.aptoide.uploader.apps.network.UserAgentInterceptor;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
@@ -130,14 +128,6 @@ public class UploaderApplication extends NotificationApplicationView {
     return new IdsRepository(PreferenceManager.getDefaultSharedPreferences(this));
   }
 
-  public TokenRevalidationInterceptorV3 getTokenRevalidationInterceptorV3() {
-    return new TokenRevalidationInterceptorV3(getAuthenticationProvider());
-  }
-
-  public TokenRevalidationInterceptorV7 getTokenRevalidationInterceptorV7() {
-    return new TokenRevalidationInterceptorV7(getAuthenticationProvider());
-  }
-
   public TokenRevalidatorV7Alternate getTokenRevalidatorV7Alternate() {
     return new TokenRevalidatorV7Alternate(getAuthenticationProvider());
   }
@@ -228,7 +218,9 @@ public class UploaderApplication extends NotificationApplicationView {
 
   private PackageManagerInstalledAppsProvider getPackageManagerInstalledAppsProvider() {
     if (packageManagerInstalledAppsProvider == null) {
-      return new PackageManagerInstalledAppsProvider(getPackageManager(), Schedulers.io());
+      packageManagerInstalledAppsProvider =
+          new PackageManagerInstalledAppsProvider(getPackageManager(), Schedulers.io());
+      return packageManagerInstalledAppsProvider;
     }
     return packageManagerInstalledAppsProvider;
   }
@@ -330,7 +322,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
     Identify identify = new Identify();
     identify.set("aptoide_package", getPackageName());
-    Rakam.getInstance().identify(identify);
-
+    Rakam.getInstance()
+        .identify(identify);
   }
 }

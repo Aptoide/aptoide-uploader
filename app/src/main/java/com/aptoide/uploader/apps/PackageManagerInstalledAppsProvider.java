@@ -31,7 +31,7 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
           return new InstalledApp(packageInfo.applicationInfo,
               applicationInfo.loadLabel(packageManager)
                   .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1,
-              applicationInfo.packageName, applicationInfo.sourceDir, packageInfo.firstInstallTime,
+              applicationInfo.packageName, applicationInfo.sourceDir, packageInfo.lastUpdateTime,
               packageInfo.versionCode, false, getMainObb(applicationInfo.packageName),
               getPatchObb(applicationInfo.packageName));
         })
