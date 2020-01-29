@@ -36,6 +36,7 @@ public class NotificationPresenter implements Presenter {
         })
         .concatMap(i -> Observable.just(i)
             .delay(25, TimeUnit.MILLISECONDS))
+        .distinctUntilChanged(UploadDraft::getStatus)
         .flatMapCompletable(this::showNotification)
         .subscribe();
   }
@@ -86,6 +87,9 @@ public class NotificationPresenter implements Presenter {
         return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
+        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+      case CATAPPULT_CERTIFIED:
+        view.showCatappultCertifiedNotification(appName, packageName);
         return uploadManager.removeUploadFromPersistence(draft.getMd5());
       case APP_BUNDLE:
         view.showAppBundleNotification(appName, packageName);

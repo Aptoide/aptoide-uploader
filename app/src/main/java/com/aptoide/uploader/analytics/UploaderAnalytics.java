@@ -8,9 +8,9 @@ import org.json.JSONObject;
 
 public class UploaderAnalytics {
 
-  public static final String STATUS = "status";
-  public static final String WEB_CODE = "web_code";
-  public static final String WEB_DESCRIPTION = "web_description";
+  private static final String STATUS = "status";
+  private static final String WEB_CODE = "web_code";
+  private static final String WEB_DESCRIPTION = "web_description";
   private static final String SUBMIT_APPS = "Submit_Apps";
   private static final String UPLOAD_COMPLETE = "Upload_Complete";
   private static final String UPLOAD_COMPLETE_TO_RAKAM = "uploader_upload_complete";
@@ -42,7 +42,7 @@ public class UploaderAnalytics {
   }
 
   public void sendUploadCompleteEvent(String status, String statusMethod, String webCode,
-      String webDescription, String packageUploaded, int vcUploaded) {
+      String webDescription, String packageUploaded, int versionCodeUploaded) {
     Bundle bundle = new Bundle();
     bundle.putString(STATUS, status);
     bundle.putString("status_method", statusMethod);
@@ -56,8 +56,8 @@ public class UploaderAnalytics {
       eventProperties.put(WEB_CODE, webCode);
       eventProperties.put(WEB_DESCRIPTION, webDescription);
       eventProperties.put("package_uploaded", packageUploaded);
-      eventProperties.put("version_code_uploaded", vcUploaded);
-    } catch (JSONException exception) {
+      eventProperties.put("version_code_uploaded", versionCodeUploaded);
+    } catch (JSONException ignored) {
     }
     Rakam.getInstance()
         .logEvent(UPLOAD_COMPLETE_TO_RAKAM, eventProperties);
