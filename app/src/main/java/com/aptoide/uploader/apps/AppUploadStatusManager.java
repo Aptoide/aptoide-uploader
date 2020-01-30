@@ -1,8 +1,6 @@
 package com.aptoide.uploader.apps;
 
-import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
-import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import java.util.ArrayList;
@@ -14,7 +12,8 @@ public class AppUploadStatusManager {
   private final RetrofitAppsUploadStatusService retrofitAppsUploadStatusService;
   private final InstalledAppsProvider installedAppsProvider;
 
-  public AppUploadStatusManager(StoreNameProvider storeNameProvider, RetrofitAppsUploadStatusService retrofitAppsUploadStatusService,
+  public AppUploadStatusManager(StoreNameProvider storeNameProvider,
+      RetrofitAppsUploadStatusService retrofitAppsUploadStatusService,
       InstalledAppsProvider installedAppsProvider) {
     this.storeNameProvider = storeNameProvider;
     this.retrofitAppsUploadStatusService = retrofitAppsUploadStatusService;
