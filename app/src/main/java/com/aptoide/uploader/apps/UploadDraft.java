@@ -95,7 +95,7 @@ public class UploadDraft {
   }
 
   @Override public String toString() {
-    return "UploadDraft{" + "status=" + status + ", installedApp=" + installedApp + '}';
+    return "UploadDraft{" + draftId + " status=" + status + ", installedApp=" + installedApp + '}';
   }
 
   public boolean isInProgress() {

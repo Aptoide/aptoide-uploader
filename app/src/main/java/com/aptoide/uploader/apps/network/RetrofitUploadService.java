@@ -5,6 +5,7 @@ import android.os.Build;
 import android.support.annotation.NonNull;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
+import com.aptoide.uploader.account.network.ResponseV7;
 import com.aptoide.uploader.account.network.Status;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.InstalledApp;
@@ -13,6 +14,8 @@ import com.aptoide.uploader.apps.Metadata;
 import com.aptoide.uploader.apps.UploadDraft;
 import com.aptoide.uploader.apps.UploadProgressListener;
 import com.aptoide.uploader.upload.AccountProvider;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
 import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.functions.Function;
@@ -196,7 +199,7 @@ public class RetrofitUploadService implements UploaderService {
   public Observable<UploadDraft> uploadSplits(UploadDraft draft, List<String> paths) {
     return Observable.fromIterable(paths)
         .concatMap(split -> Observable.just(split)
-            .flatMap(__ -> uploadSplit(split, draft.getDraftId(), draft.getInstalledApp()
+            .flatMap(__ -> uploadSplit(split, draft, draft.getInstalledApp()
                 .getPackageName()))
             .doOnNext(response -> {
               if (!response.isSuccessful()) {
@@ -238,7 +241,7 @@ public class RetrofitUploadService implements UploaderService {
       case OBB_PATCH:
         return uploadObbPatch(draft);
       case SPLIT:
-        return uploadSplit(fileToUpload.getPath(), draft.getDraftId(), draft.getInstalledApp()
+        return uploadSplit(fileToUpload.getPath(), draft, draft.getInstalledApp()
             .getPackageName());
       case BASE:
       default:
@@ -256,7 +259,28 @@ public class RetrofitUploadService implements UploaderService {
                 MultipartBody.Part.createFormData("apk_file", draft.getInstalledApp()
                     .getApkPath(), createFileRequestBody("apk", draft.getInstalledApp()
                     .getApkPath(), draft.getInstalledApp()
-                    .getPackageName())))));
+                    .getPackageName())))))
+        .doOnNext(
+            genericDraftResponseResponse -> handleUploadError(draft, genericDraftResponseResponse));
+  }
+
+  private void handleUploadError(UploadDraft draft,
+      Response<GenericDraftResponse> genericDraftResponseResponse) throws IOException {
+    if (!genericDraftResponseResponse.isSuccessful()) {
+      Moshi moshi = new Moshi.Builder().build();
+      JsonAdapter<ResponseV7> jsonAdapter = moshi.adapter(ResponseV7.class);
+      ResponseV7 errorResponse;
+      if (genericDraftResponseResponse.errorBody() != null) {
+        errorResponse = jsonAdapter.fromJson(genericDraftResponseResponse.errorBody()
+            .string());
+        uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App To Repo",
+            errorResponse.getError()
+                .getCode(), errorResponse.getError()
+                .getDescription(), draft.getInstalledApp()
+                .getPackageName(), draft.getInstalledApp()
+                .getVersionCode());
+      }
+    }
   }
 
   private Observable<Response<GenericDraftResponse>> uploadObbMain(UploadDraft draft) {
@@ -269,7 +293,9 @@ public class RetrofitUploadService implements UploaderService {
                 MultipartBody.Part.createFormData("obb_main_file", draft.getInstalledApp()
                     .getObbMainPath(), createFileRequestBody("obb", draft.getInstalledApp()
                     .getObbMainPath(), draft.getInstalledApp()
-                    .getPackageName())))));
+                    .getPackageName())))))
+        .doOnNext(
+            genericDraftResponseResponse -> handleUploadError(draft, genericDraftResponseResponse));
   }
 
   private Observable<Response<GenericDraftResponse>> uploadObbPatch(UploadDraft draft) {
@@ -282,19 +308,23 @@ public class RetrofitUploadService implements UploaderService {
                 MultipartBody.Part.createFormData("obb_patch_file", draft.getInstalledApp()
                     .getObbPatchPath(), createFileRequestBody("obb", draft.getInstalledApp()
                     .getObbPatchPath(), draft.getInstalledApp()
-                    .getPackageName())))));
+                    .getPackageName())))))
+        .doOnNext(
+            genericDraftResponseResponse -> handleUploadError(draft, genericDraftResponseResponse));
   }
 
-  private Observable<Response<GenericDraftResponse>> uploadSplit(String splitPath, int draftId,
-      String packageName) {
+  private Observable<Response<GenericDraftResponse>> uploadSplit(String splitPath,
+      UploadDraft draft, String packageName) {
     return accountProvider.getAccount()
         .firstOrError()
         .flatMapObservable(aptoideAccount -> accountProvider.getToken()
             .toObservable()
-            .flatMap(
-                accessToken -> serviceV7.uploadSplitFile(getParamsSetApkFile(accessToken, draftId),
-                    MultipartBody.Part.createFormData("file", splitPath,
-                        createFileRequestBody("apk", splitPath, packageName)))));
+            .flatMap(accessToken -> serviceV7.uploadSplitFile(
+                getParamsSetApkFile(accessToken, draft.getDraftId()),
+                MultipartBody.Part.createFormData("file", splitPath,
+                    createFileRequestBody("apk", splitPath, packageName)))))
+        .doOnNext(
+            genericDraftResponseResponse -> handleUploadError(draft, genericDraftResponseResponse));
   }
 
   @NonNull private Map<String, okhttp3.RequestBody> getParamsCreateDraft(String token,

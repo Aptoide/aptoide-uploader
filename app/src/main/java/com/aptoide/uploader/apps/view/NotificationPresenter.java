@@ -42,8 +42,13 @@ public class NotificationPresenter implements Presenter {
             .delay(25, TimeUnit.MILLISECONDS))
         .doOnNext(d -> Log.d("notification", "going to show notification " + d.toString()))
         .doOnNext(d -> Log.d("notification", "going to show notification 2" + d.toString()))
-        .flatMapCompletable(
-            draft -> showNotification(draft.getInstalledApp(), draft.getMd5(), draft.getStatus()))
+        .flatMapCompletable(draft -> showNotification(draft.getInstalledApp(), draft.getMd5(),
+            draft.getStatus()).delay(100, TimeUnit.MILLISECONDS)
+            .toObservable()
+            .filter(o -> draft.getStatus()
+                .equals(UploadDraft.Status.COMPLETED))
+            .flatMapCompletable(
+                __ -> showNotification(draft.getInstalledApp(), draft.getMd5(), draft.getStatus())))
         .subscribe();
   }
 
