@@ -11,20 +11,14 @@ import java.util.List;
 public class AppUploadStatusManager {
 
   private final StoreNameProvider storeNameProvider;
-  private final RetrofitStoreService retrofitStoreService;
   private final RetrofitAppsUploadStatusService retrofitAppsUploadStatusService;
   private final InstalledAppsProvider installedAppsProvider;
-  private final UploaderAnalytics uploaderAnalytics;
 
-  public AppUploadStatusManager(StoreNameProvider storeNameProvider,
-      RetrofitStoreService retrofitStoreService,
-      RetrofitAppsUploadStatusService retrofitAppsUploadStatusService,
-      InstalledAppsProvider installedAppsProvider, UploaderAnalytics uploaderAnalytics) {
+  public AppUploadStatusManager(StoreNameProvider storeNameProvider, RetrofitAppsUploadStatusService retrofitAppsUploadStatusService,
+      InstalledAppsProvider installedAppsProvider) {
     this.storeNameProvider = storeNameProvider;
-    this.retrofitStoreService = retrofitStoreService;
     this.retrofitAppsUploadStatusService = retrofitAppsUploadStatusService;
     this.installedAppsProvider = installedAppsProvider;
-    this.uploaderAnalytics = uploaderAnalytics;
   }
 
   public Observable<List<AppUploadStatus>> getApks(List<String> md5List) {

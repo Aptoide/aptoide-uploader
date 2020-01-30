@@ -28,7 +28,6 @@ import com.aptoide.uploader.apps.network.ConnectivityInterceptor;
 import com.aptoide.uploader.apps.network.IdsRepository;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
-import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.network.TokenRevalidatorV7Alternate;
 import com.aptoide.uploader.apps.network.UserAgentInterceptor;
@@ -206,12 +205,9 @@ public class UploaderApplication extends NotificationApplicationView {
 
       appUploadStatusManager =
           new AppUploadStatusManager(new AccountStoreNameProvider(getAccountManager()),
-              new RetrofitStoreService(
-                  retrofitV7Secondary.create(RetrofitStoreService.ServiceV7.class),
-                  getAccessTokenProvider()), new RetrofitAppsUploadStatusService(
-              retrofitV7Secondary.create(RetrofitAppsUploadStatusService.ServiceV7.class),
-              getAccessTokenProvider()), getPackageManagerInstalledAppsProvider(),
-              getUploaderAnalytics());
+              new RetrofitAppsUploadStatusService(
+                  retrofitV7Secondary.create(RetrofitAppsUploadStatusService.ServiceV7.class),
+                  getAccessTokenProvider()), getPackageManagerInstalledAppsProvider());
     }
     return appUploadStatusManager;
   }
