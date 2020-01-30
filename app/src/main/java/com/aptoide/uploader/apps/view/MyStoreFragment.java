@@ -1,9 +1,11 @@
 package com.aptoide.uploader.apps.view;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v4.widget.SwipeRefreshLayout;
@@ -123,6 +125,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       adapter.clearAppsSelection();
     });
     storeBanner.setOnLongClickListener(click -> showVersionDialog());
+    storeBanner.setOnClickListener(click -> navigateToStoreExternal(storeNameText.getText()
+        .toString()));
     refreshLayout.setOnRefreshListener(() -> refreshEvent.onNext(true));
 
     new MyStorePresenter(this,
@@ -149,6 +153,15 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     Glide.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
     super.onDestroyView();
+  }
+
+  private void navigateToStoreExternal(String storeName) {
+    if (storeName != null && !storeName.isEmpty()) {
+      Intent sendIntent =
+          new Intent(Intent.ACTION_VIEW, Uri.parse("https://en.aptoide.com/store/" + storeName));
+      sendIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      startActivity(sendIntent);
+    }
   }
 
   private boolean showVersionDialog() {

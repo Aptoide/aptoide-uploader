@@ -101,8 +101,8 @@ public class RetrofitUploadService implements UploaderService {
                     throw new NetworkErrorException();
                   }
                   return Observable.just(mapUploadDraftResponse(response, draft));
-                })
-                .retryWhen(new RetryWithDelay()))
+                }))
+        .retryWhen(new RetryWithDelay())
         .onErrorReturn(throwable -> {
           uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App To Repo", "PROCESSING",
               "reach the limit of get status", draft.getInstalledApp()

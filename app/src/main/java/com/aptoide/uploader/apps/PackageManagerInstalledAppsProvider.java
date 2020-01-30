@@ -4,6 +4,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.util.Log;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -36,6 +37,7 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
               getPatchObb(applicationInfo.packageName));
         })
         .toList()
+        .doOnSuccess(installedApps -> Log.d("nzxt", String.valueOf(installedApps.size())))
         .subscribeOn(scheduler);
   }
 

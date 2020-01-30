@@ -1,5 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
+import android.util.Log;
+import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.UploadDraft;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.view.Presenter;
@@ -26,6 +28,8 @@ public class NotificationPresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadManager.getDrafts())
         .flatMapIterable(drafts -> drafts)
+        .filter(uploadDraft -> !uploadDraft.getStatus()
+            .equals(UploadDraft.Status.IN_QUEUE))
         .flatMap(draft -> {
           if (draft.getStatus()
               .equals(UploadDraft.Status.PROGRESS)) {
@@ -36,19 +40,23 @@ public class NotificationPresenter implements Presenter {
         })
         .concatMap(i -> Observable.just(i)
             .delay(25, TimeUnit.MILLISECONDS))
-        .distinctUntilChanged(UploadDraft::getStatus)
-        .flatMapCompletable(this::showNotification)
+        .doOnNext(d -> Log.d("notification", "going to show notification " + d.toString()))
+        .doOnNext(d -> Log.d("notification", "going to show notification 2" + d.toString()))
+        .flatMapCompletable(
+            draft -> showNotification(draft.getInstalledApp(), draft.getMd5(), draft.getStatus()))
         .subscribe();
   }
 
-  private Completable showNotification(UploadDraft draft) {
-    String appName = draft.getInstalledApp()
-        .getName();
-    String packageName = draft.getInstalledApp()
-        .getPackageName();
-    String md5 = draft.getMd5();
+  private Completable showNotification(InstalledApp installedApp, String md5,
+      UploadDraft.Status status) {
+    Log.d("notification", "going to show notification 3"
+        + status
+        + " installedapp= "
+        + installedApp.getPackageName());
+    String appName = installedApp.getName();
+    String packageName = installedApp.getPackageName();
 
-    switch (draft.getStatus()) {
+    switch (status) {
       case METADATA_SET:
       case DRAFT_CREATED:
       case MD5S_SET:
@@ -69,48 +77,48 @@ public class NotificationPresenter implements Presenter {
         break;
       case COMPLETED:
         view.showCompletedUploadNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case DUPLICATE:
         view.showDuplicateUploadNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case EXCEEDED_GET_RETRIES:
         view.showGetRetriesExceededNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case INFECTED:
         view.showUploadInfectionNotificaton(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case PUBLISHER_ONLY:
         view.showPublisherOnlyNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case INVALID_SIGNATURE:
         view.showInvalidSignatureNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case INTELLECTUAL_RIGHTS:
         view.showIntellectualRightsNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case CATAPPULT_CERTIFIED:
         view.showCatappultCertifiedNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case APP_BUNDLE:
         view.showAppBundleNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case ANTI_SPAM_RULE:
         view.showAntiSpamRuleNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case UPLOAD_FAILED_RETRY:
         view.showFailedUploadWithRetryNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case UPLOAD_FAILED:
         view.showFailedUploadNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case UNKNOWN_ERROR_RETRY:
         view.showUnknownErrorRetryNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
       case CLIENT_ERROR:
       case UNKNOWN_ERROR:
       default:
         view.showUnknownErrorNotification(appName, packageName);
-        return uploadManager.removeUploadFromPersistence(draft.getMd5());
+        return uploadManager.removeUploadFromPersistence(md5);
     }
     return Completable.complete();
   }
