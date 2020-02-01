@@ -182,8 +182,7 @@ public class NotificationPresenter implements Presenter {
         .getName());
     return uploadManager.getProgress(draft.getInstalledApp()
         .getPackageName())
-        .cache()
-        .sample(1000, TimeUnit.MILLISECONDS)
+        .sample(500, TimeUnit.MILLISECONDS)
         .doOnNext(uploadProgress -> view.updateUploadProgress(draft.getInstalledApp()
             .getName(), draft.getInstalledApp()
             .getPackageName(), uploadProgress.getProgress()))
