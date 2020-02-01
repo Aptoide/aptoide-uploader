@@ -110,20 +110,7 @@ public class UploadManager {
                 .map(queueManager::applyQueue)
                 .flatMap(uploadDraftList -> Observable.fromIterable(uploadDraftList)
                     .flatMapCompletable(uploadDraft -> upload(uploadDraft).doOnTerminate(
-                        () -> queueManager.remove(uploadDraft))
-                        .onErrorResumeNext(
-                            throwable -> getDrafts().flatMapIterable(uploadDrafts -> uploadDrafts)
-                                .filter(uploadDraft2 -> uploadDraft2.getMd5()
-                                    .equals(uploadDraft.getMd5()))
-                                .flatMapCompletable(uploadDraft2 -> {
-                                  if (!uploadDraft2.isError()) {
-                                    return draftPersistence.save(
-                                        new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR,
-                                            uploadDraft2.getInstalledApp(), uploadDraft2.getMd5()));
-                                  } else {
-                                    return Completable.complete();
-                                  }
-                                })))
+                        () -> queueManager.remove(uploadDraft)))
                     .toObservable());
           }
           return Observable.empty();
