@@ -116,9 +116,6 @@ public class MyStorePresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.orderByEvent())
         .doOnNext(order -> view.orderApps(order))
-        .flatMapSingle(sortingOrder -> storeManager.getStore()
-            .flatMap(store -> sort(store.getApps(), sortingOrder)))
-        .observeOn(viewScheduler)
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);

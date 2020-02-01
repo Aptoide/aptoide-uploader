@@ -69,17 +69,15 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private SwipeRefreshLayout refreshLayout;
   private PublishSubject<Boolean> refreshEvent;
   private ProgressBar loadingSpinner;
+  private SortingOrder sortingOrder;
 
   public static MyStoreFragment newInstance() {
     return new MyStoreFragment();
   }
 
-  @Nullable @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    Glide.get(getContext())
-        .setMemoryCategory(MemoryCategory.HIGH);
-    return inflater.inflate(R.layout.fragment_my_apps, container, false);
+  @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    sortingOrder = SortingOrder.DATE;
   }
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -112,7 +110,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       Uri packageURI = Uri.parse("package:" + packageName);
       Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
       startActivity(uninstallIntent);
-    });
+    }, sortingOrder);
     setUpSelectionListener();
     refreshEvent = PublishSubject.create();
     recyclerView.setAdapter(adapter);
@@ -158,6 +156,14 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     Glide.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
     super.onDestroyView();
+  }
+
+  @Nullable @Override
+  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    Glide.get(getContext())
+        .setMemoryCategory(MemoryCategory.HIGH);
+    return inflater.inflate(R.layout.fragment_my_apps, container, false);
   }
 
   private void navigateToStoreExternal(String storeName) {
@@ -258,7 +264,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   }
 
   @Override public Observable<Object> submitAppEvent() {
-    return RxView.clicks(submitButton).map(o -> "");
+    return RxView.clicks(submitButton)
+        .map(o -> "");
   }
 
   @Override public Observable<SortingOrder> orderByEvent() {

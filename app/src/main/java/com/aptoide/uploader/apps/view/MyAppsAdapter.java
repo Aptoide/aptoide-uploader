@@ -19,10 +19,13 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   private final AppSelectedListener selectedAppListener;
   private final AppLongClickListener longClickListener;
   private final PublishSubject<Boolean> selectedPublisher;
+  private SortingOrder currentOrder;
 
-  public MyAppsAdapter(@NonNull List<InstalledApp> list, AppLongClickListener longClickListener) {
+  public MyAppsAdapter(@NonNull List<InstalledApp> list, AppLongClickListener longClickListener,
+      SortingOrder currentOrder) {
     this.installedApps = list;
     this.longClickListener = longClickListener;
+    this.currentOrder = currentOrder;
     this.selectedApps = new ArrayList<>();
     this.selectedAppListener = (view, position) -> setSelected(position);
     this.selectedPublisher = PublishSubject.create();
@@ -54,7 +57,7 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
       installedApps.clear();
       installedApps.addAll(appsList);
       clearAppsSelection(false);
-      setOrder(SortingOrder.DATE);
+      setOrder(currentOrder);
     }
   }
 
@@ -62,10 +65,11 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     installedApps.clear();
     installedApps.addAll(appsList);
     clearAppsSelection(false);
-    setOrder(SortingOrder.DATE);
+    setOrder(currentOrder);
   }
 
   public void setOrder(SortingOrder order) {
+    currentOrder = order;
     if (order.equals(SortingOrder.NAME)) {
       Collections.sort(installedApps, (obj1, obj2) -> obj1.getName()
           .compareToIgnoreCase(obj2.getName()));
