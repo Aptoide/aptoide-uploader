@@ -7,11 +7,6 @@ import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.ContextThemeWrapper;
@@ -28,6 +23,11 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import cm.aptoide.aptoideviews.recyclerview.GridRecyclerView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
@@ -108,7 +108,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
     recyclerView.setAdaptiveLayout(110, 126,
         GridRecyclerView.AdaptStrategy.SCALE_KEEP_ASPECT_RATIO);
-    adapter = new MyAppsAdapter(new ArrayList<>(), getActivity().getPackageManager());
+    adapter = new MyAppsAdapter(new ArrayList<>(), (view1, packageName) -> {
+      Uri packageURI = Uri.parse("package:" + packageName);
+      Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
+      startActivity(uninstallIntent);
+    });
     setUpSelectionListener();
     refreshEvent = PublishSubject.create();
     recyclerView.setAdapter(adapter);
@@ -136,7 +140,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         new UploadPermissionProvider((PermissionProvider) getContext()),
         ((UploaderApplication) getContext().getApplicationContext()).getAppUploadStatusPersistence(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
-        ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider(),
+        ((UploaderApplication) getContext().getApplicationContext()).getUploadManager()).present();
   }
 
   @Override public void onDestroyView() {
@@ -253,7 +258,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   }
 
   @Override public Observable<Object> submitAppEvent() {
-    return RxView.clicks(submitButton);
+    return RxView.clicks(submitButton).map(o -> "");
   }
 
   @Override public Observable<SortingOrder> orderByEvent() {

@@ -32,9 +32,10 @@ import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.network.TokenRevalidatorV7Alternate;
 import com.aptoide.uploader.apps.network.UserAgentInterceptor;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
+import com.aptoide.uploader.apps.persistence.AppUploadsDatabase;
 import com.aptoide.uploader.apps.persistence.DraftPersistence;
-import com.aptoide.uploader.apps.persistence.MemoryAppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
+import com.aptoide.uploader.apps.persistence.RoomUploadStatusDataSource;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
 import com.aptoide.uploader.security.AuthenticationPersistance;
 import com.aptoide.uploader.security.AuthenticationProvider;
@@ -207,7 +208,8 @@ public class UploaderApplication extends NotificationApplicationView {
           new AppUploadStatusManager(new AccountStoreNameProvider(getAccountManager()),
               new RetrofitAppsUploadStatusService(
                   retrofitV7Secondary.create(RetrofitAppsUploadStatusService.ServiceV7.class),
-                  getAccessTokenProvider()), getPackageManagerInstalledAppsProvider());
+                  getAccessTokenProvider()), getPackageManagerInstalledAppsProvider(),
+              getAppUploadStatusPersistence());
     }
     return appUploadStatusManager;
   }
@@ -261,8 +263,9 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public AppUploadStatusPersistence getAppUploadStatusPersistence() {
     if (appUploadStatusPersistence == null) {
-      appUploadStatusPersistence =
-          new MemoryAppUploadStatusPersistence(new HashMap<>(), Schedulers.io());
+      appUploadStatusPersistence = new RoomUploadStatusDataSource(
+          AppUploadsDatabase.getInstance(getApplicationContext())
+              .appUploadsStatusDao());
     }
     return appUploadStatusPersistence;
   }

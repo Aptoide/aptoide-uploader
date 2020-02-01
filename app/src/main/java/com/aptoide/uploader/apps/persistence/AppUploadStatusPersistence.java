@@ -9,13 +9,11 @@ public interface AppUploadStatusPersistence {
 
   Observable<List<AppUploadStatus>> getAppsUploadStatus();
 
+  Observable<List<AppUploadStatus>> getAppsUnknownUploadStatus();
+
   Completable save(AppUploadStatus appUploadStatus);
 
   Completable saveAll(List<AppUploadStatus> appUploadStatusList);
 
-  Completable remove(String md5);
-
-  Completable update(AppUploadStatus appUploadStatus, boolean isUploaded);
-
-  void clear();
+  Completable remove(AppUploadStatus appUploadStatus);
 }

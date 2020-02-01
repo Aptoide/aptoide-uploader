@@ -106,7 +106,7 @@
         </LinearLayout>
 
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
             xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
@@ -119,18 +119,18 @@
               android:layout_height="match_parent"
               android:layoutAnimation="@anim/grid_list_apps_anim"
               android:padding="@dimen/apps_grid_item_margin"
-              tools:layoutManager="android.support.v7.widget.GridLayoutManager"
+              tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
               tools:listitem="@android:layout/simple_list_item_checked"
               tools:spanCount="3"
               />
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 
       </LinearLayout>
     </LinearLayout>
 
-    <android.support.v7.widget.Toolbar
+    <androidx.appcompat.widget.Toolbar
         android:id="@+id/fragment_my_apps_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"

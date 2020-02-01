@@ -3,7 +3,7 @@ package com.aptoide.uploader.account.view;
 import android.content.Context;
 import android.content.Intent;
 import android.net.Uri;
-import android.support.v4.app.FragmentManager;
+import androidx.fragment.app.FragmentManager;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.view.MyStoreFragment;
 

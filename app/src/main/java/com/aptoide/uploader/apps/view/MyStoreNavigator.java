@@ -1,8 +1,8 @@
 package com.aptoide.uploader.apps.view;
 
-import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
-import android.support.v4.app.FragmentTransaction;
+import androidx.fragment.app.Fragment;
+import androidx.fragment.app.FragmentManager;
+import androidx.fragment.app.FragmentTransaction;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.account.view.LoginFragment;
 

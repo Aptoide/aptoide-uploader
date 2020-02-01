@@ -149,8 +149,8 @@ public class UploadManager {
         .flatMapCompletable(uploadDraft -> {
           if (uploadDraft.getStatus()
               .equals(UploadDraft.Status.NOT_EXISTENT)) {
-            return hasApplicationMetadata(uploadDraft).doOnSuccess(
-                uploadDraft1 -> Log.d("upload", "hasApplicationMetadata " + uploadDraft1.toString()))
+            return hasApplicationMetadata(uploadDraft).doOnSuccess(uploadDraft1 -> Log.d("upload",
+                "hasApplicationMetadata " + uploadDraft1.toString()))
                 .flatMap(handleHasMetadataResult())
                 .doOnSuccess(uploadDraft1 -> Log.d("upload",
                     "handle metadata result " + uploadDraft1.toString()))
@@ -220,11 +220,6 @@ public class UploadManager {
         .filter(uploadDrafts -> !uploadDrafts.isEmpty())
         .firstOrError()
         .map(uploadDrafts -> uploadDrafts.get(0));
-  }
-
-  @NotNull private Predicate<UploadDraft> md5NotExistent() {
-    return statusDraft -> statusDraft.getStatus()
-        .equals(UploadDraft.Status.NOT_EXISTENT);
   }
 
   @NotNull private Predicate<UploadDraft> waitingUploadConfirmation() {
@@ -301,19 +296,6 @@ public class UploadManager {
     return uploadProgressManager.getProgress(packageName);
   }
 
-  @SuppressLint("CheckResult") private void fillAppUploadStatusPersistence() {
-    appUploadStatusManager.getNonSystemApps()
-        .toObservable()
-        .flatMapIterable(apps -> apps)
-        .flatMapSingle(installedApp -> md5Calculator.calculate(installedApp.getApkPath())
-            .map(md5 -> new AppUploadStatus(md5, installedApp.getPackageName(), false,
-                String.valueOf(installedApp.getVersionCode()))))
-        .toList()
-        .flatMapCompletable(installedApps -> appUploadStatusPersistence.saveAll(installedApps))
-        .subscribeOn(Schedulers.computation())
-        .subscribe();
-  }
-
   public Completable handleNoMetadata(Metadata metadata, String md5) {
     return draftPersistence.getDrafts()
         .flatMapIterable(drafts -> drafts)
@@ -336,8 +318,9 @@ public class UploadManager {
             .equals(UploadDraft.Status.DUPLICATE))
         .flatMapCompletable(upload -> appUploadStatusPersistence.save(
             new AppUploadStatus(upload.getMd5(), upload.getInstalledApp()
-                .getPackageName(), true, String.valueOf(upload.getInstalledApp()
-                .getVersionCode()))))
+                .getPackageName(), AppUploadStatus.Status.IN_STORE, String.valueOf(
+                upload.getInstalledApp()
+                    .getVersionCode()))))
         .subscribe();
   }
 
@@ -364,20 +347,40 @@ public class UploadManager {
         });
   }
 
+  @SuppressLint("CheckResult") public void fillAppUploadStatusPersistence() {
+    appUploadStatusManager.getUncheckedApps()
+        .toObservable()
+        .flatMapIterable(apps -> apps)
+        .flatMapSingle(installedApp -> md5Calculator.calculate(installedApp.getApkPath())
+            .map(md5 -> new AppUploadStatus(md5, installedApp.getPackageName(),
+                AppUploadStatus.Status.UNKNOWN, String.valueOf(installedApp.getVersionCode()))))
+        .toList()
+        .flatMapCompletable(installedApps -> appUploadStatusPersistence.saveAll(installedApps))
+        .subscribeOn(Schedulers.computation())
+        .subscribe();
+  }
+
   @SuppressLint("CheckResult") private void checkAppUploadStatus() {
     accountProvider.getAccount()
         .switchMap(account -> {
           if (account.isLoggedIn() && account.hasStore()) {
-            return appUploadStatusPersistence.getAppsUploadStatus()
+            return appUploadStatusPersistence.getAppsUnknownUploadStatus()
                 .distinctUntilChanged(
                     (previous, current) -> !appsPersistenceHasChanged(previous, current))
-                .flatMapSingle(appUploadStatuses -> Observable.fromIterable(appUploadStatuses)
-                    .map(app -> app.getMd5())
-                    .toList())
-                .flatMap(md5List -> appUploadStatusManager.getApks(md5List))
-                .flatMap(appUploadStatuses -> Observable.fromIterable(appUploadStatuses)
+                .flatMapSingle(uploadStatuses -> Observable.fromIterable(uploadStatuses)
+                    .map(appUploadStatus -> new AppUploadStatus(appUploadStatus.getMd5(),
+                        appUploadStatus.getPackageName(), AppUploadStatus.Status.PROCESSING,
+                        appUploadStatus.getVercode()))
+                    .toList()
+                    .flatMap(uploadStatuses1 -> appUploadStatusPersistence.saveAll(uploadStatuses1)
+                        .andThen(Single.just(uploadStatuses))))
+                .flatMap(uploadStatuses -> Observable.just(uploadStatuses)
+                    .doOnNext(appUploadStatuses -> Log.d("nzxt", "" + appUploadStatuses.size()))
+                    .flatMapSingle(appUploadStatuses -> Observable.fromIterable(appUploadStatuses)
+                        .toList())
+                    .flatMap(appUploadStatuses -> appUploadStatusManager.getApks(appUploadStatuses))
                     .flatMapCompletable(
-                        appUploadStatus -> appUploadStatusPersistence.save(appUploadStatus))
+                        appUploadStatuses -> appUploadStatusPersistence.saveAll(appUploadStatuses))
                     .toObservable());
           }
           return Observable.empty();
@@ -402,7 +405,19 @@ public class UploadManager {
 
   private boolean appsPersistenceHasChanged(List<AppUploadStatus> previousList,
       List<AppUploadStatus> currentList) {
-    return previousList.size() != currentList.size();
+
+    if (previousList.size() != currentList.size()) {
+      return true;
+    }
+
+    for (AppUploadStatus previous : previousList) {
+      AppUploadStatus current = currentList.get(previousList.indexOf(previous));
+      if (!previous.getStatus()
+          .equals(current.getStatus())) {
+        return true;
+      }
+    }
+    return false;
   }
 
   private boolean draftPersistenceHasChanged(List<UploadDraft> previousList,

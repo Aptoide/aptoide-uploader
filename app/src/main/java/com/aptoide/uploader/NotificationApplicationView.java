@@ -8,8 +8,8 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+import androidx.core.app.NotificationCompat;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.view.NotificationPresenter;
 import com.aptoide.uploader.apps.view.NotificationView;
@@ -142,7 +142,8 @@ public abstract class NotificationApplicationView extends Application implements
 
   @Override
   public void updateUploadProgress(String applicationName, String packageName, int progress) {
-    Log.d("notification", "showing progress notification " + packageName + " " + applicationName + " " + progress);
+    Log.d("notification",
+        "showing progress notification " + packageName + " " + applicationName + " " + progress);
 
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
@@ -176,7 +177,8 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   @Override public void showUnknownErrorNotification(String applicationName, String packageName) {
-    Log.d("notification", "showing unknown error notification " + packageName + " " + applicationName);
+    Log.d("notification",
+        "showing unknown error notification " + packageName + " " + applicationName);
 
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_message_error));
