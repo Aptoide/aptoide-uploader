@@ -1,12 +1,16 @@
 package com.aptoide.uploader.apps.view;
 
+import android.annotation.SuppressLint;
 import android.util.Log;
 import com.aptoide.uploader.apps.UploadDraft;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.notifications.UploadNotification;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
+import io.reactivex.BackpressureStrategy;
 import io.reactivex.Completable;
+import io.reactivex.Flowable;
+import io.reactivex.FlowableOperator;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.util.concurrent.TimeUnit;
@@ -30,12 +34,27 @@ public class NotificationPresenter implements Presenter {
     handleNotificationsStream();
   }
 
-  private void handleNotificationsStream() {
+  @SuppressLint("CheckResult") private void handleNotificationsStream() {
     view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(viewCreated -> notificationEvents)
+        .flatMap(viewCreated -> notificationEvents).distinctUntilChanged(
+        (uploadNotification, uploadNotification2) -> uploadNotification.getType()
+            .equals(uploadNotification2.getType())
+            && uploadNotification.getPackageName()
+            .equals(uploadNotification2.getPackageName())
+            && uploadNotification.getMd5()
+            .equals(uploadNotification2.getMd5())
+            && uploadNotification.getProgress() == uploadNotification2.getProgress())
+        .toFlowable(BackpressureStrategy.BUFFER)
+        .compose(Flowable::onBackpressureBuffer)
+        .lift(allowPerMillis(200))
         .flatMapCompletable(uploadNotification -> showNotification(uploadNotification))
-        .subscribe();
+        .subscribe(() -> {
+        }, Throwable::printStackTrace);
+  }
+
+  private <T> FlowableOperator<T, T> allowPerMillis(int millis) {
+    return observer -> new PeriodicallyRequestingSubscriber<>(observer, millis);
   }
 
   private Completable showNotification(UploadNotification notification) {
@@ -124,8 +143,11 @@ public class NotificationPresenter implements Presenter {
         .map(draft -> mapToNotification(draft.getInstalledApp()
             .getName(), draft.getInstalledApp()
             .getPackageName(), draft.getStatus(), draft.getMd5()))
-        .doOnNext(d -> Log.d("notiticationz1", "going to show notification " + d.toString()))
-        .distinctUntilChanged(notification -> notification.getType())
+        .doOnNext(d -> Log.d("notificationz1", "going to show notification " + d.toString()))
+        .distinctUntilChanged(
+            (uploadNotification, uploadNotification2) -> uploadNotification.getType()
+                .equals(uploadNotification2.getType()) && uploadNotification.getPackageName()
+                .equals(uploadNotification2.getPackageName()))
         .doOnNext(d -> Log.d("notificationz2", "going to show notification 2" + d.toString()))
         .doOnNext(notification -> notify(notification))
         .subscribe();
@@ -213,6 +235,43 @@ public class NotificationPresenter implements Presenter {
         .doOnError(__ -> view.showUnknownErrorRetryNotification(draft.getInstalledApp()
             .getName(), draft.getInstalledApp()
             .getPackageName()));
+  }
+
+  public class PeriodicallyRequestingSubscriber<T> implements Subscriber<T> {
+
+    private final Subscriber<T> upstream;
+
+    private final int millis;
+
+    // If there hasn't been a request for a long time, do not flood
+    private final AtomicBoolean shouldRequest = new AtomicBoolean(true);
+
+    public PeriodicallyRequestingSubscriber(Subscriber<T> upstream, int millis) {
+      this.upstream = upstream;
+      this.millis = millis;
+    }
+
+    @Override public void onSubscribe(Subscription subscription) {
+      Observable.interval(millis, TimeUnit.MILLISECONDS)
+          .subscribe(x -> {
+            if (shouldRequest.getAndSet(false)) subscription.request(1);
+          });
+    }
+
+    @Override public void onNext(T t) {
+      shouldRequest.set(true);
+      if (t != null) {
+        upstream.onNext(t);
+      }
+    }
+
+    @Override public void onError(Throwable throwable) {
+      upstream.onError(throwable);
+    }
+
+    @Override public void onComplete() {
+      upstream.onComplete();
+    }
   }
 }
 

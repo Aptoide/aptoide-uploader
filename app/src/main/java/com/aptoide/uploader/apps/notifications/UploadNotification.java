@@ -40,6 +40,30 @@ public class UploadNotification {
     return md5;
   }
 
+  @Override public int hashCode() {
+    int result = appName != null ? appName.hashCode() : 0;
+    result = 31 * result + (packageName != null ? packageName.hashCode() : 0);
+    result = 31 * result + (md5 != null ? md5.hashCode() : 0);
+    result = 31 * result + (type != null ? type.hashCode() : 0);
+    result = 31 * result + progress;
+    return result;
+  }
+
+  @Override public boolean equals(Object o) {
+    if (this == o) return true;
+    if (o == null || getClass() != o.getClass()) return false;
+
+    UploadNotification that = (UploadNotification) o;
+
+    if (progress != that.progress) return false;
+    if (appName != null ? !appName.equals(that.appName) : that.appName != null) return false;
+    if (packageName != null ? !packageName.equals(that.packageName) : that.packageName != null) {
+      return false;
+    }
+    if (md5 != null ? !md5.equals(that.md5) : that.md5 != null) return false;
+    return type == that.type;
+  }
+
   @Override public String toString() {
     return "UploadNotification{" + "appName='" + appName + '\'' + ", type=" + type + '}';
   }

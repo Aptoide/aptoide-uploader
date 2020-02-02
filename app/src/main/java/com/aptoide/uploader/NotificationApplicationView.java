@@ -50,8 +50,7 @@ public abstract class NotificationApplicationView extends Application implements
   public void showCompletedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_success_upload)).setProgress(0, 0,
-        false)
-        .setPriority(Notification.PRIORITY_MAX);
+        false);
     Log.d("notificationz4", "showing success notification " + packageName + " " + applicationName);
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
@@ -217,7 +216,6 @@ public abstract class NotificationApplicationView extends Application implements
         .setOngoing(false)
         .setContentText(subText)
         .setAutoCancel(true)
-        .setVibrate(null)
         .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
         .setContentIntent(contentIntent);
   }
