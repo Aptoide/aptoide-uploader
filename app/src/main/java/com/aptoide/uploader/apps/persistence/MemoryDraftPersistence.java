@@ -28,8 +28,18 @@ public class MemoryDraftPersistence implements DraftPersistence {
 
   @Override public Completable save(UploadDraft draft) {
     return Completable.fromAction(() -> {
-      draftsMap.put(draft.getMd5(), draft);
-      draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
+      UploadDraft uploadDraft = draftsMap.get(draft.getMd5());
+      if (uploadDraft != null) {
+        if (!draft.getStatus()
+            .equals(UploadDraft.Status.IN_QUEUE) && !uploadDraft.getStatus()
+            .equals(draft.getStatus())) {
+          draftsMap.put(draft.getMd5(), draft);
+          draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
+        }
+      } else {
+        draftsMap.put(draft.getMd5(), draft);
+        draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
+      }
     })
         .subscribeOn(scheduler)
         .doOnError(throwable -> Log.e("ERROR Save", throwable.getMessage()));
