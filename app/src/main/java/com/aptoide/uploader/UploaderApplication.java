@@ -48,7 +48,6 @@ import com.flurry.android.FlurryAgent;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
-import io.rakam.api.Identify;
 import io.rakam.api.Rakam;
 import io.rakam.api.RakamClient;
 import io.reactivex.schedulers.Schedulers;
@@ -58,6 +57,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -319,9 +320,19 @@ public class UploaderApplication extends NotificationApplicationView {
     instance.setEventUploadPeriodMillis(1);
     instance.setUserId(getIdsRepository().getUniqueIdentifier());
 
-    Identify identify = new Identify();
-    identify.set("aptoide_package", getPackageName());
+    JSONObject superProperties = Rakam.getInstance()
+        .getSuperProperties();
+
+    if (superProperties == null) {
+      superProperties = new JSONObject();
+    }
+
+    try {
+      superProperties.put("aptoide_package", getPackageName());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
     Rakam.getInstance()
-        .identify(identify);
+        .setSuperProperties(superProperties);
   }
 }
