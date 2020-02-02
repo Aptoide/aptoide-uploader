@@ -64,8 +64,6 @@ public abstract class NotificationApplicationView extends Application implements
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
             .setOngoing(false)
-            .setGroup(NOTIFICATION_CHANNEL_ID)
-            .setGroupSummary(true)
             .setOnlyAlertOnce(true)
             .setProgress(0, 0, true);
 
@@ -155,9 +153,7 @@ public abstract class NotificationApplicationView extends Application implements
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
             .setOngoing(false)
-            .setGroupSummary(true)
             .setOnlyAlertOnce(true)
-            .setGroup(NOTIFICATION_CHANNEL_ID)
             .setProgress(100, progress, false);
 
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
@@ -221,8 +217,7 @@ public abstract class NotificationApplicationView extends Application implements
         .setOngoing(false)
         .setContentText(subText)
         .setAutoCancel(true)
-        .setGroup(NOTIFICATION_CHANNEL_ID)
-        .setGroupSummary(true)
+        .setVibrate(null)
         .setStyle(new NotificationCompat.BigTextStyle().bigText(subText))
         .setContentIntent(contentIntent);
   }
@@ -231,10 +226,11 @@ public abstract class NotificationApplicationView extends Application implements
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       NotificationManager notificationManager =
           (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-      NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Upload",
+
+      NotificationChannel channelUpload = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Upload",
           NotificationManager.IMPORTANCE_LOW);
-      channel.setDescription("Upload Information Notification");
-      notificationManager.createNotificationChannel(channel);
+      channelUpload.setDescription("Upload Information Notification");
+      notificationManager.createNotificationChannel(channelUpload);
     }
   }
 
