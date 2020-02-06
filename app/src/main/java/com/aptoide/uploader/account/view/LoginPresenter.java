@@ -159,6 +159,7 @@ public class LoginPresenter implements Presenter {
             }))
         .onErrorResumeNext(throwable -> {
           uploaderAnalytics.sendLoginEvent("auto-login", "fail");
+          view.hideLoading();
           return accountManager.logout();
         })
         .andThen(Observable.empty());
