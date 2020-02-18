@@ -15,11 +15,12 @@
 
     <ProgressBar
         android:id="@+id/loadingSPinner"
+        style="?android:attr/progressBarStyleLarge"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_vertical|center_horizontal"
         android:visibility="visible"
-        style="?android:attr/progressBarStyleLarge"
+        tools:visibility="gone"
         />
 
 
@@ -85,12 +86,12 @@
           <FrameLayout
               android:layout_width="118dp"
               android:layout_height="wrap_content"
-              android:layout_marginBottom="3dp"
-              android:layout_marginEnd="6dp"
-              android:layout_marginLeft="3dp"
-              android:layout_marginRight="6dp"
               android:layout_marginStart="3dp"
+              android:layout_marginLeft="3dp"
               android:layout_marginTop="3dp"
+              android:layout_marginEnd="6dp"
+              android:layout_marginRight="6dp"
+              android:layout_marginBottom="3dp"
               android:background="@drawable/spinner_custom_background"
               android:padding="4dp"
               >
@@ -107,7 +108,6 @@
 
 
         <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
-            xmlns:android="http://schemas.android.com/apk/res/android"
             android:id="@+id/swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent"
@@ -119,8 +119,9 @@
               android:layout_height="match_parent"
               android:layoutAnimation="@anim/grid_list_apps_anim"
               android:padding="@dimen/apps_grid_item_margin"
+              tools:layoutAnimation="@null"
               tools:layoutManager="androidx.recyclerview.widget.GridLayoutManager"
-              tools:listitem="@android:layout/simple_list_item_checked"
+              tools:listitem="@layout/item_app"
               tools:spanCount="3"
               />
 
