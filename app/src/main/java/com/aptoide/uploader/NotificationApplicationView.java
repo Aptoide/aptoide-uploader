@@ -1,13 +1,15 @@
 package com.aptoide.uploader;
 
 import android.app.Application;
+import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
-import android.support.v4.app.NotificationCompat;
+import android.util.Log;
+import androidx.core.app.NotificationCompat;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.view.NotificationPresenter;
 import com.aptoide.uploader.apps.view.NotificationView;
@@ -37,6 +39,8 @@ public abstract class NotificationApplicationView extends Application implements
 
   @Override
   public void showDuplicateUploadNotification(String applicationName, String packageName) {
+    Log.d("notificationz4",
+        "showing duplicated notification " + packageName + " " + applicationName);
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_duplicate_upload));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
@@ -47,10 +51,13 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_success_upload)).setProgress(0, 0,
         false);
+    Log.d("notificationz4", "showing success notification " + packageName + " " + applicationName);
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
   }
 
   @Override public void showPendingUploadNotification(String applicationName, String packageName) {
+    Log.d("notificationz4", "showing pending notification " + packageName + " " + applicationName);
+
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
@@ -109,6 +116,9 @@ public abstract class NotificationApplicationView extends Application implements
 
   @Override
   public void showIntellectualRightsNotification(String applicationName, String packageName) {
+    Log.d("notificationz4",
+        "showing intellectual rights notification " + packageName + " " + applicationName);
+
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_intellectual_property));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
@@ -135,6 +145,8 @@ public abstract class NotificationApplicationView extends Application implements
 
   @Override
   public void updateUploadProgress(String applicationName, String packageName, int progress) {
+    Log.d("notificationz4",
+        "showing progress notification " + packageName + " " + applicationName + " " + progress);
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
@@ -167,6 +179,9 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   @Override public void showUnknownErrorNotification(String applicationName, String packageName) {
+    Log.d("notificationz4",
+        "showing unknown error notification " + packageName + " " + applicationName);
+
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_message_error));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
@@ -180,6 +195,8 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   @Override public void showCatappultCertifiedNotification(String appName, String packageName) {
+    Log.d("notificationz4", "showing catappult notification " + packageName + " " + appName);
+
     NotificationCompat.Builder mBuilder = buildNotification(appName,
         getString(R.string.application_notification_short_app_intellectual_property_certified));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
@@ -204,13 +221,14 @@ public abstract class NotificationApplicationView extends Application implements
   }
 
   public void setupChannels() {
-    if (Build.VERSION.SDK_INT >= 26) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
       NotificationManager notificationManager =
           (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-      NotificationChannel channel = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Channel name",
+
+      NotificationChannel channelUpload = new NotificationChannel(NOTIFICATION_CHANNEL_ID, "Upload",
           NotificationManager.IMPORTANCE_LOW);
-      channel.setDescription("Channel description");
-      notificationManager.createNotificationChannel(channel);
+      channelUpload.setDescription("Upload Information Notification");
+      notificationManager.createNotificationChannel(channelUpload);
     }
   }
 

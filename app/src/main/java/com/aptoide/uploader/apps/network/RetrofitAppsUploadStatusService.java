@@ -21,15 +21,18 @@ public class RetrofitAppsUploadStatusService {
     this.accountProvider = accountProvider;
   }
 
-  public Observable<List<AppUploadStatus>> getApks(List<String> md5List, String storeName) {
+  public Observable<List<AppUploadStatus>> getApks(List<AppUploadStatus> uploadStatuses,
+      String storeName) {
     return accountProvider.getToken()
         .flatMapObservable(accessToken -> {
           ArrayList<String> newList = new ArrayList<>();
-          newList.addAll(md5List);
+          for (AppUploadStatus status : uploadStatuses) {
+            newList.add(status.getMd5());
+          }
           return serviceV7.getApks(new GetApksRequest(newList, storeName, accessToken))
               .map(getApksResponse -> {
                 if (getApksResponse.isSuccessful()) {
-                  return mapToApksList(getApksResponse.body());
+                  return mapToApksList(getApksResponse.body(), uploadStatuses);
                 } else {
                   return new ArrayList<AppUploadStatus>();
                 }
@@ -38,14 +41,24 @@ public class RetrofitAppsUploadStatusService {
         });
   }
 
-  private List<AppUploadStatus> mapToApksList(GetApksResponse getApksResponse) {
+  private List<AppUploadStatus> mapToApksList(GetApksResponse getApksResponse,
+      List<AppUploadStatus> uploadStatuses) {
     List<AppUploadStatus> appUploadStatusList = new ArrayList<>();
+
+    for (AppUploadStatus status : uploadStatuses) {
+      appUploadStatusList.add(new AppUploadStatus(status.getMd5(), status.getPackageName(),
+          AppUploadStatus.Status.NOT_IN_STORE, status.getVercode()));
+    }
     for (GetApksResponse.Data apk : getApksResponse.getDatalist()
         .getList()) {
-      appUploadStatusList.add(new AppUploadStatus(apk.getFile()
+      appUploadStatusList.set(appUploadStatusList.indexOf(new AppUploadStatus(apk.getFile()
           .getMd5sum(), apk.getFile()
           .getaPackage()
-          .getName(), true, apk.getFile()
+          .getName(), AppUploadStatus.Status.NOT_IN_STORE, apk.getFile()
+          .getVercode())), new AppUploadStatus(apk.getFile()
+          .getMd5sum(), apk.getFile()
+          .getaPackage()
+          .getName(), AppUploadStatus.Status.IN_STORE, apk.getFile()
           .getVercode()));
     }
     return appUploadStatusList;

@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.view.View;
+import io.reactivex.Completable;
 
 public interface NotificationView extends View {
 

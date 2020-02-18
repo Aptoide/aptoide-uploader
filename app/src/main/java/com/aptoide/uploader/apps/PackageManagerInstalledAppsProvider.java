@@ -4,6 +4,7 @@ import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.os.Environment;
+import android.util.Log;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -13,8 +14,6 @@ import java.util.List;
 public class PackageManagerInstalledAppsProvider implements InstalledAppsProvider {
 
   private final PackageManager packageManager;
-  private PackageInfo packageInfo;
-
   private Scheduler scheduler;
 
   public PackageManagerInstalledAppsProvider(PackageManager packageManager, Scheduler scheduler) {
@@ -27,15 +26,16 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
         packageManager.getInstalledApplications(PackageManager.GET_META_DATA))
         .filter(applicationInfo -> applicationInfo.packageName != null)
         .map(applicationInfo -> {
-          packageInfo = packageManager.getPackageInfo(applicationInfo.packageName, 0);
+          PackageInfo packageInfo = packageManager.getPackageInfo(applicationInfo.packageName, 0);
           return new InstalledApp(packageInfo.applicationInfo,
               applicationInfo.loadLabel(packageManager)
                   .toString(), (applicationInfo.flags & ApplicationInfo.FLAG_SYSTEM) == 1,
-              applicationInfo.packageName, applicationInfo.sourceDir, packageInfo.lastUpdateTime,
+              packageInfo.packageName, applicationInfo.sourceDir, packageInfo.lastUpdateTime,
               packageInfo.versionCode, false, getMainObb(applicationInfo.packageName),
               getPatchObb(applicationInfo.packageName));
         })
         .toList()
+        .doOnSuccess(installedApps -> Log.d("nzxt", String.valueOf(installedApps.size())))
         .subscribeOn(scheduler);
   }
 

@@ -10,7 +10,7 @@ public class RetryWithDelay implements Function<Observable<? extends Throwable>,
   public static final long TIME_INTERVAL_IN_SEC_FOR_RETRIES = 20L;
 
   public static final int FIRST_MAX_RETRIES_FOR_GET_STATUS = 5;
-  public static final int SECOND_MAX_RETRIES_FOR_GET_STATUS = 9;
+  public static final int SECOND_MAX_RETRIES_FOR_GET_STATUS = 11;
 
   private int retryCount;
 

@@ -28,14 +28,14 @@ import com.aptoide.uploader.apps.network.ConnectivityInterceptor;
 import com.aptoide.uploader.apps.network.IdsRepository;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
-import com.aptoide.uploader.apps.network.RetrofitStoreService;
 import com.aptoide.uploader.apps.network.RetrofitUploadService;
 import com.aptoide.uploader.apps.network.TokenRevalidatorV7Alternate;
 import com.aptoide.uploader.apps.network.UserAgentInterceptor;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
+import com.aptoide.uploader.apps.persistence.AppUploadsDatabase;
 import com.aptoide.uploader.apps.persistence.DraftPersistence;
-import com.aptoide.uploader.apps.persistence.MemoryAppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
+import com.aptoide.uploader.apps.persistence.RoomUploadStatusDataSource;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
 import com.aptoide.uploader.security.AuthenticationPersistance;
 import com.aptoide.uploader.security.AuthenticationProvider;
@@ -48,7 +48,6 @@ import com.flurry.android.FlurryAgent;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
-import io.rakam.api.Identify;
 import io.rakam.api.Rakam;
 import io.rakam.api.RakamClient;
 import io.reactivex.schedulers.Schedulers;
@@ -58,6 +57,8 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
+import org.json.JSONException;
+import org.json.JSONObject;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
@@ -206,12 +207,10 @@ public class UploaderApplication extends NotificationApplicationView {
 
       appUploadStatusManager =
           new AppUploadStatusManager(new AccountStoreNameProvider(getAccountManager()),
-              new RetrofitStoreService(
-                  retrofitV7Secondary.create(RetrofitStoreService.ServiceV7.class),
-                  getAccessTokenProvider()), new RetrofitAppsUploadStatusService(
-              retrofitV7Secondary.create(RetrofitAppsUploadStatusService.ServiceV7.class),
-              getAccessTokenProvider()), getPackageManagerInstalledAppsProvider(),
-              getUploaderAnalytics());
+              new RetrofitAppsUploadStatusService(
+                  retrofitV7Secondary.create(RetrofitAppsUploadStatusService.ServiceV7.class),
+                  getAccessTokenProvider()), getPackageManagerInstalledAppsProvider(),
+              getAppUploadStatusPersistence());
     }
     return appUploadStatusManager;
   }
@@ -265,8 +264,9 @@ public class UploaderApplication extends NotificationApplicationView {
 
   public AppUploadStatusPersistence getAppUploadStatusPersistence() {
     if (appUploadStatusPersistence == null) {
-      appUploadStatusPersistence =
-          new MemoryAppUploadStatusPersistence(new HashMap<>(), Schedulers.io());
+      appUploadStatusPersistence = new RoomUploadStatusDataSource(
+          AppUploadsDatabase.getInstance(getApplicationContext())
+              .appUploadsStatusDao());
     }
     return appUploadStatusPersistence;
   }
@@ -320,9 +320,19 @@ public class UploaderApplication extends NotificationApplicationView {
     instance.setEventUploadPeriodMillis(1);
     instance.setUserId(getIdsRepository().getUniqueIdentifier());
 
-    Identify identify = new Identify();
-    identify.set("aptoide_package", getPackageName());
+    JSONObject superProperties = Rakam.getInstance()
+        .getSuperProperties();
+
+    if (superProperties == null) {
+      superProperties = new JSONObject();
+    }
+
+    try {
+      superProperties.put("aptoide_package", getPackageName());
+    } catch (JSONException e) {
+      e.printStackTrace();
+    }
     Rakam.getInstance()
-        .identify(identify);
+        .setSuperProperties(superProperties);
   }
 }

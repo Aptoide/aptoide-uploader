@@ -1,15 +1,12 @@
 package com.aptoide.uploader.apps.view;
 
 import android.content.DialogInterface;
+import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.Bundle;
-import android.support.annotation.Nullable;
-import android.support.v4.widget.SwipeRefreshLayout;
-import android.support.v7.app.AlertDialog;
-import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.Toolbar;
 import android.text.SpannableString;
 import android.text.style.ForegroundColorSpan;
 import android.view.ContextThemeWrapper;
@@ -26,6 +23,11 @@ import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
+import androidx.appcompat.widget.Toolbar;
+import androidx.recyclerview.widget.GridLayoutManager;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import cm.aptoide.aptoideviews.recyclerview.GridRecyclerView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
@@ -67,17 +69,15 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private SwipeRefreshLayout refreshLayout;
   private PublishSubject<Boolean> refreshEvent;
   private ProgressBar loadingSpinner;
+  private SortingOrder sortingOrder;
 
   public static MyStoreFragment newInstance() {
     return new MyStoreFragment();
   }
 
-  @Nullable @Override
-  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    Glide.get(getContext())
-        .setMemoryCategory(MemoryCategory.HIGH);
-    return inflater.inflate(R.layout.fragment_my_apps, container, false);
+  @Override public void onCreate(@Nullable Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    sortingOrder = SortingOrder.DATE;
   }
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -106,7 +106,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
     recyclerView.setAdaptiveLayout(110, 126,
         GridRecyclerView.AdaptStrategy.SCALE_KEEP_ASPECT_RATIO);
-    adapter = new MyAppsAdapter(new ArrayList<>(), getActivity().getPackageManager());
+    adapter = new MyAppsAdapter(new ArrayList<>(), (view1, packageName) -> {
+      Uri packageURI = Uri.parse("package:" + packageName);
+      Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
+      startActivity(uninstallIntent);
+    }, sortingOrder);
     setUpSelectionListener();
     refreshEvent = PublishSubject.create();
     recyclerView.setAdapter(adapter);
@@ -123,6 +127,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       adapter.clearAppsSelection();
     });
     storeBanner.setOnLongClickListener(click -> showVersionDialog());
+    storeBanner.setOnClickListener(click -> navigateToStoreExternal(storeNameText.getText()
+        .toString()));
     refreshLayout.setOnRefreshListener(() -> refreshEvent.onNext(true));
 
     new MyStorePresenter(this,
@@ -132,7 +138,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         new UploadPermissionProvider((PermissionProvider) getContext()),
         ((UploaderApplication) getContext().getApplicationContext()).getAppUploadStatusPersistence(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
-        ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider(),
+        ((UploaderApplication) getContext().getApplicationContext()).getUploadManager()).present();
   }
 
   @Override public void onDestroyView() {
@@ -149,6 +156,23 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     Glide.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
     super.onDestroyView();
+  }
+
+  @Nullable @Override
+  public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    Glide.get(getContext())
+        .setMemoryCategory(MemoryCategory.HIGH);
+    return inflater.inflate(R.layout.fragment_my_apps, container, false);
+  }
+
+  private void navigateToStoreExternal(String storeName) {
+    if (storeName != null && !storeName.isEmpty()) {
+      Intent sendIntent =
+          new Intent(Intent.ACTION_VIEW, Uri.parse("https://en.aptoide.com/store/" + storeName));
+      sendIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
+      startActivity(sendIntent);
+    }
   }
 
   private boolean showVersionDialog() {
@@ -240,7 +264,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   }
 
   @Override public Observable<Object> submitAppEvent() {
-    return RxView.clicks(submitButton);
+    return RxView.clicks(submitButton)
+        .map(o -> "");
   }
 
   @Override public Observable<SortingOrder> orderByEvent() {

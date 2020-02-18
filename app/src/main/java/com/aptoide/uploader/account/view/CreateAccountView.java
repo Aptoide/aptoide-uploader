@@ -1,6 +1,6 @@
 package com.aptoide.uploader.account.view;
 
-import android.support.annotation.Nullable;
+import androidx.annotation.Nullable;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
 

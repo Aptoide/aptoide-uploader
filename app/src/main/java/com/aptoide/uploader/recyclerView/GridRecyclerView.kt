@@ -1,10 +1,10 @@
 package cm.aptoide.aptoideviews.recyclerview
 
 import android.content.Context
-import android.support.annotation.Dimension
-import android.support.annotation.Px
-import android.support.v7.widget.GridLayoutManager
-import android.support.v7.widget.RecyclerView
+import androidx.annotation.Dimension
+import androidx.annotation.Px
+import androidx.recyclerview.widget.GridLayoutManager
+import androidx.recyclerview.widget.RecyclerView
 import android.util.AttributeSet
 import android.util.TypedValue
 import android.view.View
@@ -17,7 +17,7 @@ import com.aptoide.uploader.recyclerView.safeLet
  * An extension of a RecyclerView to make sure that grid animations work correctly and to
  * smartly layout the items according to the screen size.
  */
-class GridRecyclerView : RecyclerView {
+class GridRecyclerView : androidx.recyclerview.widget.RecyclerView {
 
   private data class Size(val width: Int, val height: Int) {
     fun getRatio(): Double {
@@ -35,7 +35,7 @@ class GridRecyclerView : RecyclerView {
       defStyleAttr)
 
   override fun setLayoutManager(layout: LayoutManager?) {
-    if (layout is GridLayoutManager) {
+    if (layout is androidx.recyclerview.widget.GridLayoutManager) {
       super.setLayoutManager(layout)
     } else {
       throw ClassCastException(
@@ -46,7 +46,7 @@ class GridRecyclerView : RecyclerView {
   override fun attachLayoutAnimationParameters(child: View?, params: ViewGroup.LayoutParams,
                                                index: Int, count: Int) {
     val layoutManager = layoutManager
-    if (adapter != null && layoutManager is GridLayoutManager) {
+    if (adapter != null && layoutManager is androidx.recyclerview.widget.GridLayoutManager) {
 
       var animationParams: GridLayoutAnimationController.AnimationParameters? =
           params.layoutAnimationParameters as? GridLayoutAnimationController.AnimationParameters
@@ -91,7 +91,7 @@ class GridRecyclerView : RecyclerView {
     super.onMeasure(widthSpec, heightSpec)
     safeLet(intendedItemSize, adaptStrategy) { itemSize, adaptStrategy ->
       // If we have adaptive layout enabled, let's attempt to get the appropriate span count
-      val manager = (layoutManager as GridLayoutManager)
+      val manager = (layoutManager as androidx.recyclerview.widget.GridLayoutManager)
       val itemSpacing = spacingItemDecorator.spacingPx
       manager.spanCount =
           ((getTotalWidth() - getTotalHorizontalPadding() + itemSpacing) / (itemSize.width + itemSpacing.toDouble())).toInt()
@@ -140,20 +140,20 @@ class GridRecyclerView : RecyclerView {
    * E.g. if [thresholdRow] is set to 3, it returns true if the user has reached the third-last row.
    */
   fun isEndReached(thresholdRow: Int): Boolean {
-    val lManager = layoutManager as GridLayoutManager
+    val lManager = layoutManager as androidx.recyclerview.widget.GridLayoutManager
     return (lManager.itemCount - (lManager.spanCount * thresholdRow)) <= lManager.findLastCompletelyVisibleItemPosition()
   }
 
   @Px
   private fun getItemMeasuredWidth(): Int {
-    val spanCount = (layoutManager as GridLayoutManager).spanCount
+    val spanCount = (layoutManager as androidx.recyclerview.widget.GridLayoutManager).spanCount
     val itemSpacing = spacingItemDecorator.spacingPx
     return (((getTotalWidth() - getTotalHorizontalPadding() + itemSpacing) / spanCount.toDouble()) - itemSpacing).toInt()
   }
 
   @Px
   private fun getAdaptiveMeasuredPadding(itemWidth: Int): Int {
-    val spanCount = (layoutManager as GridLayoutManager).spanCount
+    val spanCount = (layoutManager as androidx.recyclerview.widget.GridLayoutManager).spanCount
     val itemSpacing = spacingItemDecorator.spacingPx
     return (getTotalWidth() - ((itemWidth + itemSpacing) * spanCount.toDouble()) + itemSpacing).toInt()
   }

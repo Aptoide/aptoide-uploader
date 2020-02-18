@@ -68,7 +68,8 @@ class MyStorePresenterTest : Spek({
       val installedAppsPresenter =
           MyStorePresenter(view, storeManager, CompositeDisposable(), navigator,
               Schedulers.trampoline(), uploadPermissionProvider, persistence, uploaderAnalytics,
-              connectivityProvider)
+              connectivityProvider,
+          )
       val appList = mutableListOf(facebook, aptoide)
 
       val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
@@ -129,7 +130,8 @@ class MyStorePresenterTest : Spek({
       val installedAppsPresenter =
           MyStorePresenter(view, storeManager, CompositeDisposable(), navigator,
               Schedulers.trampoline(), uploadPermissionProvider, persistence, uploaderAnalytics,
-              connectivityProvider)
+              connectivityProvider,
+          )
 
       val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()
       val submitAppEvent = PublishSubject.create<MutableList<InstalledApp>>()
@@ -194,7 +196,8 @@ class MyStorePresenterTest : Spek({
       val installedAppsPresenter =
           MyStorePresenter(view, storeManager, CompositeDisposable(), navigator,
               Schedulers.trampoline(), uploadPermissionProvider, persistence, uploaderAnalytics,
-              connectivityProvider)
+              connectivityProvider,
+          )
 
       val unSortedAppList = listOf(aptoide, aptoide2, facebook)
       val sortedAppList = listOf(facebook, aptoide2)
@@ -262,7 +265,8 @@ class MyStorePresenterTest : Spek({
       val installedAppsPresenter =
           MyStorePresenter(view, storeManager, CompositeDisposable(), navigator,
               Schedulers.trampoline(), uploadPermissionProvider, persistence, uploaderAnalytics,
-              connectivityProvider)
+              connectivityProvider,
+          )
 
       val unSortedAppList = listOf(facebook, aptoide, aptoide2)
       val sortedAppList = listOf(aptoide2, facebook)
@@ -313,7 +317,8 @@ class MyStorePresenterTest : Spek({
       val installedAppsPresenter =
           MyStorePresenter(view, storeManager, CompositeDisposable(), navigator,
               Schedulers.trampoline(), uploadPermissionProvider, persistence, uploaderAnalytics,
-              connectivityProvider)
+              connectivityProvider,
+          )
 
       val click = PublishSubject.create<DialogInterface>()
       val lifecycleEvent = PublishSubject.create<View.LifecycleEvent>()

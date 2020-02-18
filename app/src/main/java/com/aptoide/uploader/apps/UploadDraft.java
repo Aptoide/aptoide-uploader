@@ -95,9 +95,7 @@ public class UploadDraft {
   }
 
   @Override public String toString() {
-    return "UploadDraft{" + "status=" + status
-        //+ ", installedApp=" + installedApp + '}'
-        ;
+    return "UploadDraft{" + draftId + " status=" + status + ", installedApp=" + installedApp + '}';
   }
 
   public boolean isInProgress() {
@@ -113,6 +111,12 @@ public class UploadDraft {
         || this.getStatus() == Status.UPLOAD_PENDING
         || this.getStatus() == Status.METADATA_SET
         || this.getStatus() == Status.SET_STATUS_TO_DRAFT;
+  }
+
+  public boolean isError() {
+    return this.getStatus() == Status.CLIENT_ERROR
+        || this.getStatus() == Status.UNKNOWN_ERROR
+        || this.getStatus() == Status.UNKNOWN_ERROR_RETRY;
   }
 
   public enum Status {

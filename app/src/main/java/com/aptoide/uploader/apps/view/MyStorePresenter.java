@@ -5,6 +5,7 @@ import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.StoreManager;
+import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.network.ConnectivityProvider;
 import com.aptoide.uploader.apps.network.NoConnectivityException;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
@@ -17,6 +18,7 @@ import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
+import io.reactivex.schedulers.Schedulers;
 import java.net.SocketTimeoutException;
 import java.util.Collections;
 import java.util.List;
@@ -32,12 +34,13 @@ public class MyStorePresenter implements Presenter {
   private final AppUploadStatusPersistence persistence;
   private final UploaderAnalytics uploaderAnalytics;
   private final ConnectivityProvider connectivityProvider;
+  private final UploadManager uploadManager;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, MyStoreNavigator storeNavigator,
       Scheduler viewScheduler, UploadPermissionProvider uploadPermissionProvider,
       AppUploadStatusPersistence persistence, UploaderAnalytics uploaderAnalytics,
-      ConnectivityProvider connectivityProvider) {
+      ConnectivityProvider connectivityProvider, UploadManager uploadManager) {
     this.connectivityProvider = connectivityProvider;
     this.view = view;
     this.storeManager = storeManager;
@@ -47,6 +50,7 @@ public class MyStorePresenter implements Presenter {
     this.uploadPermissionProvider = uploadPermissionProvider;
     this.persistence = persistence;
     this.uploaderAnalytics = uploaderAnalytics;
+    this.uploadManager = uploadManager;
   }
 
   @Override public void present() {
@@ -112,9 +116,6 @@ public class MyStorePresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.orderByEvent())
         .doOnNext(order -> view.orderApps(order))
-        .flatMapSingle(sortingOrder -> storeManager.getStore()
-            .flatMap(store -> sort(store.getApps(), sortingOrder)))
-        .observeOn(viewScheduler)
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -184,6 +185,7 @@ public class MyStorePresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.refreshEvent()
             .flatMapSingle(refreshEvent -> storeManager.getStore())
+            .doOnNext(refresh -> uploadManager.fillAppUploadStatusPersistence())
             .observeOn(viewScheduler)
             .doOnNext(store -> view.refreshApps(store.getApps()))
             .flatMap(apps -> checkUploadedApps()))
@@ -235,7 +237,7 @@ public class MyStorePresenter implements Presenter {
   private Completable setPersistenceStatusOnLogout() {
     return persistence.getAppsUploadStatus()
         .flatMap(apps -> Observable.fromIterable(apps)
-            .doOnNext(app -> app.setUploaded(false)))
+            .doOnNext(app -> app.setStatus(AppUploadStatus.Status.UNKNOWN)))
         .ignoreElements();
   }
 }
