@@ -40,6 +40,6 @@ public class RetrofitCategoriesService {
   }
 
   public interface ServiceV7 {
-    @GET("apks/groups/get/groups_depth=1") Single<Response<GetCategoriesResponse>> getCategories();
+    @GET("apks/groups/get/groups_depth=1/limit=65") Single<Response<GetCategoriesResponse>> getCategories();
   }
 }
