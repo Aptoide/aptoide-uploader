@@ -164,7 +164,7 @@ public class NotificationPresenter implements Presenter {
         return new UploadNotification(appName, packageName, md5,
             UploadNotification.Type.INDETERMINATE);
       case WAITING_UPLOAD_CONFIRMATION:
-      case UPLOAD_PENDING:
+      case MISSING_SPLITS:
       case META_DATA_ADDED:
       case SET_STATUS_TO_DRAFT:
       case NOT_EXISTENT:

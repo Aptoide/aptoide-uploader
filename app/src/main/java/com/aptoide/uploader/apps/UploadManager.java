@@ -157,7 +157,7 @@ public class UploadManager {
                         uploadDraft1 -> Log.d("upload", "got status " + uploadDraft1.toString()))
                     .toCompletable());
           } else if (uploadDraft.getStatus()
-              .equals(UploadDraft.Status.UPLOAD_PENDING)) {
+              .equals(UploadDraft.Status.MISSING_SPLITS)) {
             return setDraft(uploadDraft, UploadDraft.Status.STATUS_SET_DRAFT).doOnSuccess(
                 uploadDraft1 -> Log.d("upload",
                     "setted STATUS_SET_DRAFT " + uploadDraft1.toString()))

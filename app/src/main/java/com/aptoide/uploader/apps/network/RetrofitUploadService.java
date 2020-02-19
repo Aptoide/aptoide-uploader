@@ -2,9 +2,9 @@ package com.aptoide.uploader.apps.network;
 
 import android.accounts.NetworkErrorException;
 import android.os.Build;
-import androidx.annotation.NonNull;
 import android.util.Log;
 import android.webkit.MimeTypeMap;
+import androidx.annotation.NonNull;
 import com.aptoide.uploader.account.network.ResponseV7;
 import com.aptoide.uploader.account.network.Status;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
@@ -532,7 +532,7 @@ public class RetrofitUploadService implements UploaderService {
               .getDetails()
               .getSplits();
           UploadDraft uploadDraft =
-              new UploadDraft(UploadDraft.Status.UPLOAD_PENDING, draft.getInstalledApp(),
+              new UploadDraft(UploadDraft.Status.MISSING_SPLITS, draft.getInstalledApp(),
                   draft.getMd5(), draft.getDraftId());
           uploadDraft.setSplitsToBeUploaded(splitsMissing);
           return uploadDraft;
