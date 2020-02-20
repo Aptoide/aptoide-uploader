@@ -329,6 +329,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
     try {
       superProperties.put("aptoide_package", getPackageName());
+      superProperties.put("version_code", BuildConfig.VERSION_CODE);
     } catch (JSONException e) {
       e.printStackTrace();
     }
