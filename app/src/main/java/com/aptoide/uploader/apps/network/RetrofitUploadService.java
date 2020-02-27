@@ -118,29 +118,17 @@ public class RetrofitUploadService implements UploaderService {
 
   @Override public Observable<UploadDraft> hasApplicationMetaData(UploadDraft draft) {
     return accountProvider.getToken()
-        .flatMapObservable(accessToken -> serviceV7.hasApplicationMetaData(accessToken,
-            getParamsMetadataExists(draft.getDraftId()))
-            .map(result -> {
-              if (result.isSuccessful()) {
-                if (result.body() != null && result.body()
-                    .getData()
-                    .hasMetaData()) {
-                  UploadDraft uploadDraft = new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT,
-                      draft.getInstalledApp(), draft.getMd5(), draft.getDraftId());
-                  return uploadDraft;
-                } else {
-                  UploadDraft uploadDraft =
-                      new UploadDraft(UploadDraft.Status.NO_META_DATA, draft.getInstalledApp(),
-                          draft.getMd5(), draft.getDraftId());
-                  return uploadDraft;
-                }
-              } else {
-                UploadDraft uploadDraft =
-                    new UploadDraft(UploadDraft.Status.UNKNOWN_ERROR_RETRY, draft.getInstalledApp(),
-                        draft.getMd5(), draft.getDraftId());
-                return uploadDraft;
-              }
-            }));
+        .map(result -> {
+          if (!draft.getStatus()
+              .equals(UploadDraft.Status.MISSING_ARGUMENTS)) {
+            return new UploadDraft(UploadDraft.Status.SET_STATUS_TO_DRAFT, draft.getInstalledApp(),
+                draft.getMd5(), draft.getDraftId());
+          } else {
+            return new UploadDraft(UploadDraft.Status.NO_META_DATA, draft.getInstalledApp(),
+                draft.getMd5(), draft.getDraftId());
+          }
+        })
+        .toObservable();
   }
 
   @Override public Observable<UploadDraft> setDraftMetadata(UploadDraft draft) {
@@ -556,7 +544,10 @@ public class RetrofitUploadService implements UploaderService {
         case "MARG-5":
         case "MARG-101":
         case "MARG-102":
+        case "MARG-103":
         case "MARG-205":
+          return new UploadDraft(UploadDraft.Status.MISSING_ARGUMENTS, draft.getInstalledApp(),
+              draft.getMd5(), draft.getDraftId());
         case "QUOTA-1":
           sendUploadCompleteFailedAnalytics(response, draft.getInstalledApp()
               .getPackageName(), draft.getInstalledApp()
@@ -694,11 +685,6 @@ public class RetrofitUploadService implements UploaderService {
     @Multipart @POST("7/uploader/draft/obb/set")
     Observable<Response<GenericDraftResponse>> uploadObbPatchFile(
         @PartMap Map<String, okhttp3.RequestBody> params, @Part MultipartBody.Part obbPatch);
-
-    @Multipart @POST("7/uploader/draft/metadata/exists")
-    Observable<Response<HasApplicationMetaDataResponse>> hasApplicationMetaData(
-        @Query("access_token") String accessToken,
-        @PartMap Map<String, okhttp3.RequestBody> params);
 
     @Multipart @POST("7/uploader/draft/metadata/set")
     Observable<Response<GenericDraftResponse>> setMetadata(

@@ -37,14 +37,15 @@ public class NotificationPresenter implements Presenter {
   @SuppressLint("CheckResult") private void handleNotificationsStream() {
     view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(viewCreated -> notificationEvents).distinctUntilChanged(
-        (uploadNotification, uploadNotification2) -> uploadNotification.getType()
-            .equals(uploadNotification2.getType())
-            && uploadNotification.getPackageName()
-            .equals(uploadNotification2.getPackageName())
-            && uploadNotification.getMd5()
-            .equals(uploadNotification2.getMd5())
-            && uploadNotification.getProgress() == uploadNotification2.getProgress())
+        .flatMap(viewCreated -> notificationEvents)
+        .distinctUntilChanged(
+            (uploadNotification, uploadNotification2) -> uploadNotification.getType()
+                .equals(uploadNotification2.getType())
+                && uploadNotification.getPackageName()
+                .equals(uploadNotification2.getPackageName())
+                && uploadNotification.getMd5()
+                .equals(uploadNotification2.getMd5())
+                && uploadNotification.getProgress() == uploadNotification2.getProgress())
         .toFlowable(BackpressureStrategy.BUFFER)
         .compose(Flowable::onBackpressureBuffer)
         .lift(allowPerMillis(200))
@@ -170,6 +171,7 @@ public class NotificationPresenter implements Presenter {
       case NOT_EXISTENT:
       case PROGRESS:
       case IN_QUEUE:
+      case MISSING_ARGUMENTS:
         return new UploadNotification(appName, packageName, md5, UploadNotification.Type.HIDDEN);
       case NO_META_DATA:
         return new UploadNotification(appName, packageName, md5,

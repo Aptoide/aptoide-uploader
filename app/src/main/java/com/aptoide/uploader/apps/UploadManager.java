@@ -133,52 +133,76 @@ public class UploadManager {
         .doOnSuccess(uploadDraft -> Log.d("upload", "setted PENDING " + uploadDraft.toString()))
         .flatMap(this::getDraftStatus)
         .doOnSuccess(uploadDraft -> Log.d("upload", "got status " + uploadDraft.toString()))
-        .flatMapCompletable(uploadDraft -> {
+        .flatMap(this::handleDraftStatus)
+        .flatMap(uploadDraft -> {
           if (uploadDraft.getStatus()
-              .equals(UploadDraft.Status.NOT_EXISTENT)) {
-            return hasApplicationMetadata(uploadDraft).doOnSuccess(uploadDraft1 -> Log.d("upload",
-                "hasApplicationMetadata " + uploadDraft1.toString()))
-                .flatMap(handleHasMetadataResult())
-                .doOnSuccess(uploadDraft1 -> Log.d("upload",
-                    "handle metadata result " + uploadDraft1.toString()))
-                .flatMap(metaDataDraft -> setDraft(metaDataDraft, UploadDraft.Status.PROGRESS))
-                .doOnSuccess(
-                    uploadDraft1 -> Log.d("upload", "setted DRAFT" + uploadDraft1.toString()))
-                .flatMap(this::uploadFiles)
-                .doOnSuccess(
-                    uploadDraft1 -> Log.d("upload", "files uploaded" + uploadDraft1.toString()))
-                .filter(waitingUploadConfirmation())
-                .doOnSuccess(
-                    uploadDraft1 -> Log.d("upload", "upload complete " + uploadDraft1.toString()))
-                .flatMapCompletable(uploadedDraft -> setPending(uploadedDraft).doOnSuccess(
-                    uploadDraft1 -> Log.d("upload", "setted PENDING " + uploadDraft1.toString()))
-                    .flatMap(this::getDraftStatus)
-                    .doOnSuccess(
-                        uploadDraft1 -> Log.d("upload", "got status " + uploadDraft1.toString()))
-                    .toCompletable());
-          } else if (uploadDraft.getStatus()
+              .equals(UploadDraft.Status.NOT_EXISTENT) || uploadDraft.getStatus()
+              .equals(UploadDraft.Status.MISSING_ARGUMENTS) || uploadDraft.getStatus()
               .equals(UploadDraft.Status.MISSING_SPLITS)) {
-            return setDraft(uploadDraft, UploadDraft.Status.STATUS_SET_DRAFT).doOnSuccess(
-                uploadDraft1 -> Log.d("upload",
-                    "setted STATUS_SET_DRAFT " + uploadDraft1.toString()))
-                .flatMap(this::setDraftToProgress)
-                .flatMapCompletable(uploadDraft1 -> getSplitsNotExistentPaths(
-                    uploadDraft1.getSplitsToBeUploaded()).doOnSuccess(
-                    splits -> Log.d("upload", "split_paths " + splits))
-                    .flatMapCompletable(splits -> uploaderService.uploadSplits(uploadDraft1, splits)
-                        .filter(waitingUploadConfirmation())
-                        .doOnNext(uploadDraft2 -> Log.d("upload",
-                            "upload complete " + uploadDraft2.toString()))
-                        .flatMapCompletable(uploadedDraft -> setPending(uploadedDraft).doOnSuccess(
-                            uploadDraft2 -> Log.d("upload",
-                                "setted PENDING " + uploadDraft2.toString()))
-                            .flatMap(this::getDraftStatus)
-                            .doOnSuccess(uploadDraft2 -> Log.d("upload",
-                                "got status " + uploadDraft2.toString()))
-                            .toCompletable())));
+            return handleDraftStatus(uploadDraft).flatMap(uploadDraft2 -> {
+              if (uploadDraft2.getStatus()
+                  .equals(UploadDraft.Status.MISSING_ARGUMENTS)) {
+                return setDraft(uploadDraft2, UploadDraft.Status.UNKNOWN_ERROR);
+              }
+              return Single.just(uploadDraft2);
+            });
+          } else {
+            return Single.just(uploadDraft);
           }
-          return Completable.complete();
-        });
+        })
+        .toCompletable();
+  }
+
+  private Single<UploadDraft> handleDraftStatus(UploadDraft uploadDraft) {
+    if (uploadDraft.getStatus()
+        .equals(UploadDraft.Status.MISSING_ARGUMENTS)) {
+      return hasApplicationMetadata(uploadDraft).doOnSuccess(
+          uploadDraft1 -> Log.d("upload", "hasApplicationMetadata " + uploadDraft1.toString()))
+          .flatMap(handleHasMetadataResult())
+          .flatMap(metadataDraft -> setDraft(metadataDraft,
+              UploadDraft.Status.STATUS_SET_DRAFT).doOnSuccess(uploadDraft1 -> Log.d("upload",
+              "setted STATUS_SET_DRAFT " + uploadDraft1.toString())))
+          .doOnSuccess(
+              uploadDraft1 -> Log.d("upload", "handle metadata result " + uploadDraft1.toString()))
+          .flatMap(uploadedDraft -> setPending(uploadedDraft).doOnSuccess(
+              uploadDraft1 -> Log.d("upload", "setted PENDING " + uploadDraft1.toString()))
+              .flatMap(this::getDraftStatus)
+              .doOnSuccess(
+                  uploadDraft1 -> Log.d("upload", "got status " + uploadDraft1.toString())));
+    } else if (uploadDraft.getStatus()
+        .equals(UploadDraft.Status.NOT_EXISTENT)) {
+      return setDraft(uploadDraft, UploadDraft.Status.STATUS_SET_DRAFT).doOnSuccess(
+          uploadDraft1 -> Log.d("upload", "setted STATUS_SET_DRAFT " + uploadDraft1.toString()))
+          .flatMap(this::setDraftToProgress)
+          .flatMap(this::uploadFiles)
+          .filter(waitingUploadConfirmation())
+          .doOnSuccess(
+              uploadDraft1 -> Log.d("upload", "upload complete " + uploadDraft1.toString()))
+          .flatMapSingle(uploadedDraft -> setPending(uploadedDraft).doOnSuccess(
+              uploadDraft1 -> Log.d("upload", "setted PENDING " + uploadDraft1.toString()))
+              .flatMap(this::getDraftStatus)
+              .doOnSuccess(
+                  uploadDraft1 -> Log.d("upload", "got status " + uploadDraft1.toString())));
+    } else if (uploadDraft.getStatus()
+        .equals(UploadDraft.Status.MISSING_SPLITS)) {
+      return setDraft(uploadDraft, UploadDraft.Status.STATUS_SET_DRAFT).doOnSuccess(
+          uploadDraft1 -> Log.d("upload", "setted STATUS_SET_DRAFT " + uploadDraft1.toString()))
+          .flatMap(this::setDraftToProgress)
+          .flatMap(uploadDraft1 -> getSplitsNotExistentPaths(
+              uploadDraft1.getSplitsToBeUploaded()).doOnSuccess(
+              splits -> Log.d("upload", "split_paths " + splits))
+              .flatMap(splits -> uploaderService.uploadSplits(uploadDraft1, splits)
+                  .singleOrError()
+                  .filter(waitingUploadConfirmation())
+                  .doOnSuccess(
+                      uploadDraft2 -> Log.d("upload", "upload complete " + uploadDraft2.toString()))
+                  .flatMapSingle(uploadedDraft -> setPending(uploadedDraft).doOnSuccess(
+                      uploadDraft2 -> Log.d("upload", "setted PENDING " + uploadDraft2.toString()))
+                      .flatMap(this::getDraftStatus)
+                      .doOnSuccess(uploadDraft2 -> Log.d("upload",
+                          "got status " + uploadDraft2.toString())))));
+    }
+    return Single.just(uploadDraft);
   }
 
   @NotNull
@@ -285,6 +309,8 @@ public class UploadManager {
 
   public Completable handleNoMetadata(Metadata metadata, String md5) {
     return draftPersistence.getDrafts()
+        .firstOrError()
+        .toObservable()
         .flatMapIterable(drafts -> drafts)
         .filter(draft -> draft.getStatus()
             .equals(UploadDraft.Status.NO_META_DATA) && draft.getMd5()
