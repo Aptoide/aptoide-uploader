@@ -546,6 +546,9 @@ public class RetrofitUploadService implements UploaderService {
         case "MARG-102":
         case "MARG-103":
         case "MARG-205":
+          sendUploadCompleteFailedAnalytics(response, draft.getInstalledApp()
+              .getPackageName(), draft.getInstalledApp()
+              .getVersionCode());
           return new UploadDraft(UploadDraft.Status.MISSING_ARGUMENTS, draft.getInstalledApp(),
               draft.getMd5(), draft.getDraftId());
         case "QUOTA-1":
