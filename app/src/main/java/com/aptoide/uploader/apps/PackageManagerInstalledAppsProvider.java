@@ -9,6 +9,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import java.io.File;
+import java.util.Arrays;
 import java.util.List;
 
 public class PackageManagerInstalledAppsProvider implements InstalledAppsProvider {
@@ -46,6 +47,7 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
     if (obbDir.isDirectory()) {
       File[] files = obbDir.listFiles();
       if (files != null) {
+      Arrays.sort(files, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
         for (File file : files) {
           if (file.getName()
               .contains("main") && !file.getName()
@@ -67,6 +69,7 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
     if (obbDir.isDirectory()) {
       File[] files = obbDir.listFiles();
       if (files != null) {
+      Arrays.sort(files, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
         for (File file : files) {
           String arr[] = file.getName()
               .split("\\.", 2);
