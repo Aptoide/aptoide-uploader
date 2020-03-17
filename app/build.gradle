@@ -25,7 +25,7 @@ android {
     minSdkVersion 16
     targetSdkVersion 27
     versionCode project.VERSION_CODE_UPLOADER.toInteger()
-    versionName "2.104"
+    versionName "2.105"
     testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     buildConfigField "String", "FLURRY_KEY_UPLOADER", "\"" + project.FLURRY_KEY_UPLOADER + "\""
     resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
