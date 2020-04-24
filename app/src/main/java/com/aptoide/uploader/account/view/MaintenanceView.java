@@ -4,5 +4,6 @@ import com.aptoide.uploader.view.View;
 
 interface MaintenanceView extends View {
 
-  void showMaintenanceView();
+  void showNoLoginMaintenanceView();
+  void showLoginMaintenanceView();
 }
