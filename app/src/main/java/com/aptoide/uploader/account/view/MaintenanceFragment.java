@@ -18,7 +18,8 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    new MaintenancePresenter(this, new MaintenanceNavigator(), new MaintenanceManager()).present();
+    new MaintenancePresenter(this, new MaintenanceNavigator(), new MaintenanceManager(
+        maintenanceService)).present();
   }
 
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {

@@ -6,6 +6,7 @@ import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.account.AutoLoginPersistence;
 import com.aptoide.uploader.account.CredentialsValidator;
+import com.aptoide.uploader.account.MaintenanceService;
 import com.aptoide.uploader.account.SocialLogoutManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
