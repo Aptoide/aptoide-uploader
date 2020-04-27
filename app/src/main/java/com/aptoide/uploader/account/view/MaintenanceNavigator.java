@@ -3,17 +3,23 @@ package com.aptoide.uploader.account.view;
 import android.content.Context;
 import android.net.Uri;
 import androidx.browser.customtabs.CustomTabsIntent;
+import com.aptoide.uploader.R;
 
 public class MaintenanceNavigator {
 
-  public MaintenanceNavigator() {
-    String url = "example.com";
-    customTab(url);
+  private final static String BLOG_URL = "https://blog.aptoide.com";
+  private final Context applicationContext;
+
+  public MaintenanceNavigator(Context applicationContext) {
+    this.applicationContext = applicationContext;
   }
 
-  public void customTab(String url){
+  public void openBlogUrl() {
     CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
     builder.addDefaultShareMenuItem();
-    //builder.build().launchUrl(this, Uri.parse(url));
+    builder.setToolbarColor(applicationContext.getResources()
+        .getColor(R.color.blue));
+    builder.build()
+        .launchUrl(applicationContext, Uri.parse(BLOG_URL));
   }
 }

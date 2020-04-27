@@ -6,11 +6,14 @@ import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.annotation.Nullable;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.view.android.FragmentView;
+import com.jakewharton.rxbinding2.view.RxView;
+import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -23,6 +26,7 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
   private TextView message_second;
   private TextView blog;
   private View socialLoginsGroup;
+  private ImageView blogNextButton;
 
   public static MaintenanceFragment newInstance() {
     return new MaintenanceFragment();
@@ -40,8 +44,9 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
     message_first = view.findViewById(R.id.fragment_maintenance_message1);
     message_second = view.findViewById(R.id.fragment_maintenance_message2);
     blog = view.findViewById(R.id.fragment_maintenance_blog);
+    blogNextButton = view.findViewById(R.id.fragment_maintenance_blognext);
     socialLoginsGroup = view.findViewById(R.id.social_login_buttons_group);
-    new MaintenancePresenter(this, new MaintenanceNavigator(),
+    new MaintenancePresenter(this, new MaintenanceNavigator(getContext().getApplicationContext()),
         ((UploaderApplication) getContext().getApplicationContext()).getMaintenanceManager(),
         new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
   }
@@ -80,6 +85,11 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
         "Our users' security is our top one priority, and that's why we're developing a new login system using your email address. At the moment, you can only access your account using social media accounts.");
     message_second.setText("We're working hard for email login to come back soon, so stay tuned!");
     setupBlogTextView();
+  }
+
+  @Override public Observable<Integer> clickOnBlog() {
+    return Observable.merge(RxView.clicks(blog), RxView.clicks(blogNextButton))
+        .map(__ -> 1);
   }
 
   private void setupBlogTextView() {

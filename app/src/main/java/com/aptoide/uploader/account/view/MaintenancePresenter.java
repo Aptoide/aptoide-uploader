@@ -26,6 +26,16 @@ public class MaintenancePresenter implements Presenter {
 
   @Override public void present() {
     handleLoginStatus();
+    handleBlogClick();
+  }
+
+  private void handleBlogClick() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.clickOnBlog())
+        .doOnNext(__ -> navigator.openBlogUrl())
+        .subscribe(__ -> {
+        }, Throwable::printStackTrace));
   }
 
   private void handleLoginStatus() {
