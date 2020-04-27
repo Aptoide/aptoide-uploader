@@ -4,7 +4,7 @@ import android.content.Intent;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.aptoide.uploader.account.view.LoginFragment;
+import com.aptoide.uploader.account.view.MaintenanceFragment;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.permission.PermissionProviderActivity;
 import com.aptoide.uploader.apps.view.AppFormFragment;
@@ -22,7 +22,7 @@ public class MainActivity extends PermissionProviderActivity {
 
     if (savedInstanceState == null) {
       getSupportFragmentManager().beginTransaction()
-          .replace(R.id.activity_main_container, LoginFragment.newInstance())
+          .replace(R.id.activity_main_container, MaintenanceFragment.newInstance())
           .commit();
     }
   }
