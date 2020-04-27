@@ -1,6 +1,8 @@
 package com.aptoide.uploader.account.view;
 
 import android.os.Bundle;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -66,7 +68,7 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
         "Due to some security concerns, Aptoide Uploader is temporarily unavailable. Our top one priority is our user security and that's why we've temporarily disabled the login function.");
     message_second.setText(
         "We're working hard for it to be back very soon and safer than ever, so just stay tuned!");
-    blog.setText("Check our blog");
+    setupBlogTextView();
   }
 
   @Override public void showSocialLoginMaintenanceView() {
@@ -77,6 +79,12 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
     message_first.setText(
         "Our users' security is our top one priority, and that's why we're developing a new login system using your email address. At the moment, you can only access your account using social media accounts.");
     message_second.setText("We're working hard for email login to come back soon, so stay tuned!");
-    blog.setText("Check our blog");
+    setupBlogTextView();
+  }
+
+  private void setupBlogTextView() {
+    SpannableString content = new SpannableString("Check our blog");
+    content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+    blog.setText(content);
   }
 }
