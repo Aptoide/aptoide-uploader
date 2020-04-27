@@ -142,6 +142,9 @@ dependencies {
   //Play Services for Flurry
   implementation 'com.google.android.gms:play-services-base:15.0.1'
 
+  //Chrome Custom tabs
+  implementation 'com.android.support:customtabs:28.0.0'
+
   //Rakam
   implementation "io.rakam:android-sdk:${RAKAM_VERSION}"
 }

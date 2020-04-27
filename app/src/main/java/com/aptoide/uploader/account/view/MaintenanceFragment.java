@@ -13,7 +13,13 @@ import io.reactivex.disposables.CompositeDisposable;
 
 public class MaintenanceFragment extends FragmentView implements MaintenanceView {
 
-  private TextView testTextView;
+  private View progressbar;
+  private View maintenanceView;
+  private TextView title;
+  private TextView message_first;
+  private TextView message_second;
+  private TextView blog;
+  private View socialLogins;
 
   public static MaintenanceFragment newInstance() {
     return new MaintenanceFragment();
@@ -25,7 +31,13 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    testTextView = view.findViewById(R.id.testString);
+    progressbar = view.findViewById(R.id.fragment_maintenance_progressbar);
+    maintenanceView = view.findViewById(R.id.fragment_maintenance_view);
+    title = view.findViewById(R.id.fragment_maintenance_title);
+    message_first = view.findViewById(R.id.fragment_maintenance_message1);
+    message_second = view.findViewById(R.id.fragment_maintenance_message2);
+    blog = view.findViewById(R.id.fragment_maintenance_blog);
+    socialLogins = view.findViewById(R.id.fragment_maintenance_logins);
 
     new MaintenancePresenter(this, new MaintenanceNavigator(),
         ((UploaderApplication) getContext().getApplicationContext()).getMaintenanceManager(),
@@ -51,10 +63,22 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
   }
 
   @Override public void showNoLoginView() {
-    testTextView.setText("NO SOCIAL");
+    progressbar.setVisibility(View.GONE);
+    maintenanceView.setVisibility(View.VISIBLE);
+    title.setText("We're working!");
+    message_first.setText(
+        "Due to some security concerns, Aptoide Uploader is temporarily unavailable. Our top one priority is our user security and that's why we've temporarily disabled the login function.\n");
+    message_second.setText(
+        "We're working hard for it to be back very soon and safer than ever, so just stay tuned!");
   }
 
   @Override public void showSocialLoginMaintenanceView() {
-    testTextView.setText("SHOW SOCIAL !!! :) ");
+    progressbar.setVisibility(View.GONE);
+    maintenanceView.setVisibility(View.VISIBLE);
+    title.setText("We've got news!");
+    message_first.setText(
+        "Our users' security is our top one priority, and that's why we're developing a new login system using your email address. At the moment, you can only access your account using social media accounts.\n");
+    message_second.setText("We're working hard for email login to come back soon, so stay tuned!");
+    socialLogins.setVisibility(View.VISIBLE);
   }
 }
