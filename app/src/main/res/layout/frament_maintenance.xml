@@ -192,5 +192,13 @@
         app:layout_constraintTop_toBottomOf="@id/facebook_login_button"
         />
 
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/social_login_buttons_group"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="google_sign_in_button,facebook_login_button"
+        />
+
   </androidx.constraintlayout.widget.ConstraintLayout>
 </androidx.constraintlayout.widget.ConstraintLayout>

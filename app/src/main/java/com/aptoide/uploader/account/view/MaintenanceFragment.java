@@ -20,7 +20,7 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
   private TextView message_first;
   private TextView message_second;
   private TextView blog;
-  private View socialLogins;
+  private View socialLoginsGroup;
 
   public static MaintenanceFragment newInstance() {
     return new MaintenanceFragment();
@@ -38,8 +38,7 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
     message_first = view.findViewById(R.id.fragment_maintenance_message1);
     message_second = view.findViewById(R.id.fragment_maintenance_message2);
     blog = view.findViewById(R.id.fragment_maintenance_blog);
-    //socialLogins = view.findViewById(R.id.fragment_maintenance_logins);
-    // TODO: 4/27/20 create group and hide them at the same time !
+    socialLoginsGroup = view.findViewById(R.id.social_login_buttons_group);
     new MaintenancePresenter(this, new MaintenanceNavigator(),
         ((UploaderApplication) getContext().getApplicationContext()).getMaintenanceManager(),
         new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
@@ -72,12 +71,12 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
 
   @Override public void showSocialLoginMaintenanceView() {
     progressbar.setVisibility(View.GONE);
+    socialLoginsGroup.setVisibility(View.VISIBLE);
     maintenanceView.setVisibility(View.VISIBLE);
     title.setText("We've got news!");
     message_first.setText(
         "Our users' security is our top one priority, and that's why we're developing a new login system using your email address. At the moment, you can only access your account using social media accounts.");
     message_second.setText("We're working hard for email login to come back soon, so stay tuned!");
     blog.setText("Check our blog");
-    //    socialLogins.setVisibility(View.VISIBLE);
   }
 }
