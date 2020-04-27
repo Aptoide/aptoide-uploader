@@ -137,9 +137,10 @@
         android:layout_height="12dp"
         android:layout_marginStart="6dp"
         android:layout_marginLeft="6dp"
+        android:layout_marginTop="3dp"
         app:layout_constraintBottom_toBottomOf="@id/fragment_maintenance_blog"
-        app:layout_constraintLeft_toLeftOf="@id/fragment_maintenance_blog"
-        app:layout_constraintStart_toStartOf="@id/fragment_maintenance_blog"
+        app:layout_constraintLeft_toRightOf="@id/fragment_maintenance_blog"
+        app:layout_constraintStart_toEndOf="@id/fragment_maintenance_blog"
         app:layout_constraintTop_toTopOf="@id/fragment_maintenance_blog"
         app:srcCompat="@drawable/next"
         />

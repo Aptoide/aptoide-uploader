@@ -67,6 +67,7 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
         "Due to some security concerns, Aptoide Uploader is temporarily unavailable. Our top one priority is our user security and that's why we've temporarily disabled the login function.\n");
     message_second.setText(
         "We're working hard for it to be back very soon and safer than ever, so just stay tuned!");
+    blog.setText("Check our blog");
   }
 
   @Override public void showSocialLoginMaintenanceView() {
@@ -76,6 +77,7 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
     message_first.setText(
         "Our users' security is our top one priority, and that's why we're developing a new login system using your email address. At the moment, you can only access your account using social media accounts.\n");
     message_second.setText("We're working hard for email login to come back soon, so stay tuned!");
+    blog.setText("Check our blog");
     socialLogins.setVisibility(View.VISIBLE);
   }
 }
