@@ -58,10 +58,6 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
     super.onDestroy();
   }
 
-  @Override public void showMaintenanceView() {
-    // TODO: 24/04/2020 show maintenance whole view
-  }
-
   @Override public void showNoLoginView() {
     progressbar.setVisibility(View.GONE);
     maintenanceView.setVisibility(View.VISIBLE);
