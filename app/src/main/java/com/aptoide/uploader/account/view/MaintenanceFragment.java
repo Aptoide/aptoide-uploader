@@ -9,6 +9,7 @@ import androidx.annotation.Nullable;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.view.android.FragmentView;
+import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class MaintenanceFragment extends FragmentView implements MaintenanceView {
@@ -41,7 +42,7 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
 
     new MaintenancePresenter(this, new MaintenanceNavigator(),
         ((UploaderApplication) getContext().getApplicationContext()).getMaintenanceManager(),
-        new CompositeDisposable()).present();
+        new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
   }
 
   @Override public void onDestroyView() {

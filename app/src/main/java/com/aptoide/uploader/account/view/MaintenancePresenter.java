@@ -3,6 +3,7 @@ package com.aptoide.uploader.account.view;
 import com.aptoide.uploader.account.MaintenanceManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
+import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
 public class MaintenancePresenter implements Presenter {
@@ -11,13 +12,16 @@ public class MaintenancePresenter implements Presenter {
   private MaintenanceNavigator navigator;
   private MaintenanceManager maintenanceManager;
   private CompositeDisposable compositeDisposable;
+  private Scheduler viewScheduler;
 
   public MaintenancePresenter(MaintenanceView view, MaintenanceNavigator navigator,
-      MaintenanceManager maintenanceManager, CompositeDisposable compositeDisposable) {
+      MaintenanceManager maintenanceManager, CompositeDisposable compositeDisposable,
+      Scheduler viewScheduler) {
     this.view = view;
     this.navigator = navigator;
     this.maintenanceManager = maintenanceManager;
     this.compositeDisposable = compositeDisposable;
+    this.viewScheduler = viewScheduler;
   }
 
   @Override public void present() {
@@ -28,6 +32,7 @@ public class MaintenancePresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> maintenanceManager.shouldShowSocialLogin())
+        .observeOn(viewScheduler)
         .doOnNext(shouldShowLogin -> {
           if (shouldShowLogin) {
             view.showSocialLoginMaintenanceView();
