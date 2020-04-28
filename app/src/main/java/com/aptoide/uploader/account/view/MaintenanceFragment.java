@@ -25,7 +25,6 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
   private TextView message_first;
   private TextView message_second;
   private TextView blog;
-  private View socialLoginsGroup;
   private ImageView blogNextButton;
 
   public static MaintenanceFragment newInstance() {
@@ -45,7 +44,6 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
     message_second = view.findViewById(R.id.fragment_maintenance_message2);
     blog = view.findViewById(R.id.fragment_maintenance_blog);
     blogNextButton = view.findViewById(R.id.fragment_maintenance_blognext);
-    socialLoginsGroup = view.findViewById(R.id.social_login_buttons_group);
     new MaintenancePresenter(this,
         new MaintenanceNavigator(getContext().getApplicationContext(), getFragmentManager()),
         ((UploaderApplication) getContext().getApplicationContext()).getMaintenanceManager(),
@@ -59,7 +57,7 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
   @Nullable @Override
   public android.view.View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.frament_maintenance, container, false);
+    return inflater.inflate(R.layout.fragment_maintenance, container, false);
   }
 
   @Override public void onDestroy() {
@@ -79,7 +77,6 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
 
   @Override public void showSocialLoginMaintenanceView() {
     progressbar.setVisibility(View.GONE);
-    socialLoginsGroup.setVisibility(View.VISIBLE);
     maintenanceView.setVisibility(View.VISIBLE);
     title.setText("We've got news!");
     message_first.setText(

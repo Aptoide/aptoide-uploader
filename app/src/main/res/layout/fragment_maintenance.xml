@@ -140,49 +140,6 @@
       app:srcCompat="@drawable/group_4"
       />
 
-  <com.facebook.login.widget.LoginButton
-      android:id="@+id/facebook_login_button"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center_horizontal"
-      android:layout_marginStart="33dp"
-      android:layout_marginLeft="33dp"
-      android:layout_marginTop="32dp"
-      android:layout_marginEnd="33dp"
-      android:layout_marginRight="33dp"
-      app:layout_constraintBottom_toTopOf="@+id/google_sign_in_button"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/fragment_maintenance_blog"
-      />
-
-  <com.google.android.gms.common.SignInButton
-      android:id="@+id/google_sign_in_button"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_gravity="center_horizontal"
-      android:layout_marginStart="30dp"
-      android:layout_marginLeft="30dp"
-      android:layout_marginTop="8dp"
-      android:layout_marginEnd="30dp"
-      android:layout_marginRight="30dp"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/facebook_login_button"
-      />
-
-  <androidx.constraintlayout.widget.Group
-      android:id="@+id/social_login_buttons_group"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:visibility="gone"
-      app:constraint_referenced_ids="google_sign_in_button,facebook_login_button"
-      />
-
   <androidx.constraintlayout.widget.Group
       android:id="@+id/fragment_maintenance_view"
       android:layout_width="wrap_content"
