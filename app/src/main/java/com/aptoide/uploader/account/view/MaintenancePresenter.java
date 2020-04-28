@@ -48,7 +48,9 @@ public class MaintenancePresenter implements Presenter {
         .doOnNext(shouldShowLogin -> {
           if (shouldShowLogin) {
             //navigate to newly edited Login fragment
-            view.showSocialLoginMaintenanceView();
+            view.hideProgressBar();
+            navigator.navigateToLoginFragment();
+            //view.showSocialLoginMaintenanceView();
           } else {
             view.showNoLoginView();
           }

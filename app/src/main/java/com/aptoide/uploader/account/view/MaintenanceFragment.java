@@ -46,7 +46,8 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
     blog = view.findViewById(R.id.fragment_maintenance_blog);
     blogNextButton = view.findViewById(R.id.fragment_maintenance_blognext);
     socialLoginsGroup = view.findViewById(R.id.social_login_buttons_group);
-    new MaintenancePresenter(this, new MaintenanceNavigator(getContext().getApplicationContext()),
+    new MaintenancePresenter(this,
+        new MaintenanceNavigator(getContext().getApplicationContext(), getFragmentManager()),
         ((UploaderApplication) getContext().getApplicationContext()).getMaintenanceManager(),
         new CompositeDisposable(), AndroidSchedulers.mainThread()).present();
   }
@@ -90,6 +91,10 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
   @Override public Observable<Integer> clickOnBlog() {
     return Observable.merge(RxView.clicks(blog), RxView.clicks(blogNextButton))
         .map(__ -> 1);
+  }
+
+  @Override public void hideProgressBar() {
+    progressbar.setVisibility(View.GONE);
   }
 
   private void setupBlogTextView() {
