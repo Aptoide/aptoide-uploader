@@ -3,6 +3,7 @@ package com.aptoide.uploader.account.view;
 import com.aptoide.uploader.account.MaintenanceManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
+import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 
@@ -41,10 +42,12 @@ public class MaintenancePresenter implements Presenter {
   private void handleLoginStatus() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> maintenanceManager.shouldShowSocialLogin())
+        .flatMap(__ -> maintenanceManager.logoutUser().andThen(Observable.just(true)))
+        .flatMap(__-> maintenanceManager.shouldShowSocialLogin())
         .observeOn(viewScheduler)
         .doOnNext(shouldShowLogin -> {
           if (shouldShowLogin) {
+            //navigate to newly edited Login fragment
             view.showSocialLoginMaintenanceView();
           } else {
             view.showNoLoginView();

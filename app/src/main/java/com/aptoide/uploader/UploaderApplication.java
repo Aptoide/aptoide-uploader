@@ -7,6 +7,7 @@ import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.account.AutoLoginPersistence;
 import com.aptoide.uploader.account.CredentialsValidator;
 import com.aptoide.uploader.account.MaintenanceManager;
+import com.aptoide.uploader.account.MaintenancePersistence;
 import com.aptoide.uploader.account.MaintenanceService;
 import com.aptoide.uploader.account.SocialLogoutManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
@@ -349,7 +350,11 @@ public class UploaderApplication extends NotificationApplicationView {
       MaintenanceService maintenanceService = new MaintenanceService(
           retrofitMaintenance.create(MaintenanceService.LoginMaintenanceService.class));
 
-      maintenanceManager = new MaintenanceManager(maintenanceService);
+      MaintenancePersistence maintenancePersistence =
+          new MaintenancePersistence(PreferenceManager.getDefaultSharedPreferences(this));
+
+      maintenanceManager =
+          new MaintenanceManager(maintenanceService, getAccountManager(), maintenancePersistence);
     }
     return maintenanceManager;
   }
