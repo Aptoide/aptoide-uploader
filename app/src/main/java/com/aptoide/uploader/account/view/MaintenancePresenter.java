@@ -6,6 +6,7 @@ import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.exceptions.OnErrorNotImplementedException;
 
 public class MaintenancePresenter implements Presenter {
 
@@ -28,6 +29,17 @@ public class MaintenancePresenter implements Presenter {
   @Override public void present() {
     handleLoginStatus();
     handleBlogClick();
+    clearDisposable();
+  }
+
+  private void clearDisposable() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
+        .doOnNext(__ -> compositeDisposable.clear())
+        .subscribe(lifecycleEvent -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 
   private void handleBlogClick() {
@@ -42,8 +54,9 @@ public class MaintenancePresenter implements Presenter {
   private void handleLoginStatus() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> maintenanceManager.logoutUser().andThen(Observable.just(true)))
-        .flatMap(__-> maintenanceManager.shouldShowSocialLogin())
+        .flatMap(__ -> maintenanceManager.logoutUser()
+            .andThen(Observable.just(true)))
+        .flatMap(__ -> maintenanceManager.shouldShowSocialLogin())
         .observeOn(viewScheduler)
         .doOnNext(shouldShowLogin -> {
           if (shouldShowLogin) {

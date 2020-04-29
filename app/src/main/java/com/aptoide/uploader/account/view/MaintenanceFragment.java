@@ -52,6 +52,13 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
 
   @Override public void onDestroyView() {
     super.onDestroyView();
+    progressbar = null;
+    title = null;
+    message_first = null;
+    message_second = null;
+    blog = null;
+    blogNextButton = null;
+    maintenanceView = null;
   }
 
   @Nullable @Override
