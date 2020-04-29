@@ -56,7 +56,7 @@
           android:textColor="@color/white"
           android:textSize="28sp"
           android:textStyle="bold"
-          tools:text="We've got news!"
+          tools:text="@string/login_disclaimer_title"
           />
 
       <TextView
@@ -75,7 +75,7 @@
           android:textColor="@color/white"
           android:textSize="16sp"
           android:textStyle="normal"
-          tools:text="Our users' security is our top one priority, and that's why we're developing a new login system using your email address. At the moment, you can only access your account using social media accounts."
+          tools:text="@string/login_disclaimer_body_1"
           />
 
       <TextView
@@ -94,7 +94,7 @@
           android:textColor="@color/white"
           android:textSize="16sp"
           android:textStyle="normal"
-          tools:text="We're working hard for email login to come back soon, so stay tuned!"
+          tools:text="@string/login_disclaimer_body_2"
           />
 
       <TextView
@@ -110,7 +110,7 @@
           android:textColor="@color/white"
           android:textSize="14sp"
           android:textStyle="normal"
-          tools:text="Check our blog"
+          tools:text="@string/login_disclaimer_blog_button"
           />
 
       <ImageView

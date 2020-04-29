@@ -90,10 +90,9 @@ public class LoginFragment extends FragmentView implements LoginView {
     setFacebookCustomListener();
 
     fragmentContainer.setVisibility(View.VISIBLE);
-    title.setText("We've got news!");
-    message_first.setText(
-        "Our users' security is our top one priority, and that's why we're developing a new login system using your email address. At the moment, you can only access your account using social media accounts.");
-    message_second.setText("We're working hard for email login to come back soon, so stay tuned!");
+    title.setText(getString(R.string.login_disclaimer_title));
+    message_first.setText(getString(R.string.login_disclaimer_body_1));
+    message_second.setText(getString(R.string.login_disclaimer_body_2));
     setupBlogTextView();
 
     new LoginPresenter(this, accountManager,
@@ -126,7 +125,7 @@ public class LoginFragment extends FragmentView implements LoginView {
   }
 
   private void setupBlogTextView() {
-    SpannableString content = new SpannableString("Check our blog");
+    SpannableString content = new SpannableString(getString(R.string.login_disclaimer_blog_button));
     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
     blog.setText(content);
   }
