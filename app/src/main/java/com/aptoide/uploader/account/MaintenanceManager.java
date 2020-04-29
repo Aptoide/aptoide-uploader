@@ -23,8 +23,15 @@ public class MaintenanceManager {
 
   public Completable logoutUser() {
     if (shouldLogout()) {
-      return accountManager.logout()
-          .doOnComplete(() -> maintenancePersistence.saveLogout());
+      return accountManager.getAccount()
+          .firstElement()
+          .flatMapCompletable(account -> {
+            if (account.isLoggedIn()) {
+              return accountManager.logout();
+            }
+            return Completable.fromAction(() -> maintenancePersistence.saveLogout());
+          })
+          .doOnError(throwable -> throwable.printStackTrace());
     }
     return Completable.complete();
   }
