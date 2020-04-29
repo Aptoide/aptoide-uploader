@@ -74,21 +74,9 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
   @Override public void showNoLoginView() {
     progressbar.setVisibility(View.GONE);
     maintenanceView.setVisibility(View.VISIBLE);
-    title.setText("We're working!");
-    message_first.setText(
-        "Due to some security concerns, Aptoide Uploader is temporarily unavailable. Our top one priority is our user security and that's why we've temporarily disabled the login function.");
-    message_second.setText(
-        "We're working hard for it to be back very soon and safer than ever, so just stay tuned!");
-    setupBlogTextView();
-  }
-
-  @Override public void showSocialLoginMaintenanceView() {
-    progressbar.setVisibility(View.GONE);
-    maintenanceView.setVisibility(View.VISIBLE);
-    title.setText("We've got news!");
-    message_first.setText(
-        "Our users' security is our top one priority, and that's why we're developing a new login system using your email address. At the moment, you can only access your account using social media accounts.");
-    message_second.setText("We're working hard for email login to come back soon, so stay tuned!");
+    title.setText(getString(R.string.login_disclaimer_unavailable_title));
+    message_first.setText(getString(R.string.login_disclaimer_unavailable_body_1));
+    message_second.setText(getString(R.string.login_disclaimer_unavailable_body_2));
     setupBlogTextView();
   }
 
@@ -102,7 +90,7 @@ public class MaintenanceFragment extends FragmentView implements MaintenanceView
   }
 
   private void setupBlogTextView() {
-    SpannableString content = new SpannableString("Check our blog");
+    SpannableString content = new SpannableString(getString(R.string.login_disclaimer_blog_button));
     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
     blog.setText(content);
   }

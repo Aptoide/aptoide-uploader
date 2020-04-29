@@ -7,8 +7,6 @@ interface MaintenanceView extends View {
 
   void showNoLoginView();
 
-  void showSocialLoginMaintenanceView();
-
   Observable<Integer> clickOnBlog();
 
   void hideProgressBar();
