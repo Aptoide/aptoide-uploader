@@ -147,4 +147,36 @@
     <!--Settings-->
   <string name="settings_dark_them_title">Dark Theme</string>
   <string name="settings_dark_them_body">It helps to relieve eye strain when using your device in the dark.</string>
+  
+    <!--New Login-->
+  <string name="login_connect_with_email_button">Connect with email</string>
+  <string name="login_email_field_text">Your email here</string>
+  <string name="login_send_code_body">We\'ll send you a temporary login code.</string>
+  <string name="login_safe_body_1">Secure login</string>
+  <string name="login_safe_body_2">No passwords saved on our side</string>
+  <string name="login_check_email_title">Check your email!</string>
+  <string name="login_check_email_body">Use the code we\'ve sent you to log in.</string>
+  <string name="login_check_email_under_field_body">We\'ve sent a temporary login code. Please check your inbox or spam folder.</string>
+  <string name="login_enter_code_field">Enter code here</string>
+  <string name="login_code_not_received_1">Didn\'t receive it?</string>
+  <string name="login_code_not_received_2_link">Generate a new code</string>
+  <string name="login_finish_button">FINISH</string>
+  <string name="login_generating_code_body">Generating new code&#8230;</string>
+  <string name="login_email_subject_line">Your Aptoide login code</string>
+  <string name="login_email_header">Almost there!</string>
+  <string name="login_email_body_1">To complete the process, please copy and paste this temporary login code:</string>
+  <string name="login_email_under_code_field">This code is valid for 30 minutes.</string>
+  <string name="login_email_body_2">If you didn\'t start the login process, you can safely ignore this email.</string>
+  <string name="login_email_rights_reserved">© 2020 aptoide.com‎ All rights reserved.</string>
+  <string name="login_error_invalid_email">This email isn\'t valid!</string>
+  <string name="login_error_expire_code">This code has expired. Generate a new one!</string>
+  <string name="login_error_wrong_code">Wrong code! Please try again.</string>
+  <string name="login_error_missing_code">Insert your code.</string>
+  <string name="login_disclaimer_title">We\'ve got news!</string>
+  <string name="login_disclaimer_unavailable_title">We\'re working on it!</string>
+  <string name="login_disclaimer_body_1">Our users\' security is our top one priority, and that\'s why we\'re developing a new login system using your email address. At the moment, you can only access to Aptoide using social media accounts.</string>
+  <string name="login_disclaimer_body_2">We\'re working hard for email login to come back soon, so stay tuned!</string>
+  <string name="login_disclaimer_blog_button">Check our blog</string>
+  <string name="login_disclaimer_unavailable_body_1">Our users\' security is our top one priority, so login to Aptoide Uploader is temporarily unavailable while we work to make some change son it. We\'ll be quick!</string>
+  <string name="login_disclaimer_unavailable_body_2">We\'re working hard for it to be back soon, so stay tuned!</string>
 </resources>
