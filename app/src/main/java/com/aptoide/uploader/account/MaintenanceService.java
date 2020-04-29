@@ -16,7 +16,7 @@ public class MaintenanceService {
   }
 
   public interface LoginMaintenanceService {
-    @GET("uploader_login_v2_106_true.json")
+    @GET("uploader_login_v2_106.json")
     Observable<LoginMaintenanceResponse> getLoginMaintenanceStatus();
   }
 }
