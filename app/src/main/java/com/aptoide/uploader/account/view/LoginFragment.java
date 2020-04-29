@@ -117,6 +117,11 @@ public class LoginFragment extends FragmentView implements LoginView {
     progressContainer = null;
     loadingTextView = null;
     facebookLoginButton = null;
+    title = null;
+    message_first = null;
+    message_second = null;
+    blog = null;
+    blogNextButton = null;
     super.onDestroyView();
   }
 
