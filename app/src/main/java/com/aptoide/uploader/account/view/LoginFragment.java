@@ -40,17 +40,12 @@ import java.util.Arrays;
 public class LoginFragment extends FragmentView implements LoginView {
 
   private static final int RC_SIGN_IN = 9001;
-  boolean showPassword = false;
   PublishSubject<GoogleSignInAccount> googleLoginSubject = PublishSubject.create();
   PublishSubject<LoginResult> facebookLoginSubject = PublishSubject.create();
-  //private EditText passwordEditText;
-  //private EditText usernameEditText;
   private View progressContainer;
   private View fragmentContainer;
   private TextView loadingTextView;
   private AptoideAccountManager accountManager;
-  //private View loginButton;
-  //private View signUpButton;
   private LoginButton facebookLoginButton;
   private SignInButton googleLoginButton;
   private GoogleSignInClient mGoogleSignInClient;
@@ -77,10 +72,6 @@ public class LoginFragment extends FragmentView implements LoginView {
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    /*passwordEditText = view.findViewById(R.id.fragment_login_password_edit_text);
-    usernameEditText = view.findViewById(R.id.fragment_login_username_edit_text);
-    loginButton = view.findViewById(R.id.fragment_login_button);
-    signUpButton = view.findViewById(R.id.fragment_login_sign_up);*/
     progressContainer = view.findViewById(R.id.fragment_login_progress_container);
     loadingTextView = view.findViewById(R.id.fragment_login_loading_text_view);
     fragmentContainer = view.findViewById(R.id.fragment_login_content);
@@ -96,7 +87,6 @@ public class LoginFragment extends FragmentView implements LoginView {
     facebookLoginButton = view.findViewById(R.id.facebook_login_button);
     facebookLoginButton.setPermissions(Arrays.asList("email", "public_profile"));
     facebookLoginButton.setFragment(this);
-    //setShowPasswordEye();
     setFacebookCustomListener();
 
     fragmentContainer.setVisibility(View.VISIBLE);
@@ -121,10 +111,6 @@ public class LoginFragment extends FragmentView implements LoginView {
   }
 
   @Override public void onDestroyView() {
-    /*passwordEditText = null;
-    usernameEditText = null;
-    loginButton = null;
-    signUpButton = null;*/
     googleLoginButton = null;
     fragmentContainer = null;
     progressContainer = null;
@@ -139,20 +125,10 @@ public class LoginFragment extends FragmentView implements LoginView {
     blog.setText(content);
   }
 
- /* @Override public Observable<CredentialsViewModel> getLoginEvent() {
-    return RxView.clicks(loginButton)
-        .map(__ -> getViewModel());
-  }*/
-
   @Override public Observable<Object> getGoogleLoginEvent() {
     mGoogleSignInClient = GoogleSignIn.getClient(getActivity(), gso);
     return RxView.clicks(googleLoginButton);
   }
-
-/*  @Override public Observable<CredentialsViewModel> getOpenCreateAccountView() {
-    return RxView.clicks(signUpButton)
-        .map(__ -> getViewModel());
-  }*/
 
   @Override public Observable<GoogleSignInAccount> googleLoginSuccessEvent() {
     return googleLoginSubject;
@@ -210,14 +186,6 @@ public class LoginFragment extends FragmentView implements LoginView {
     startActivityForResult(signInIntent, RC_SIGN_IN);
   }
 
-  /*
-  @NonNull private CredentialsViewModel getViewModel() {
-    return new CredentialsViewModel(usernameEditText.getText()
-        .toString(), passwordEditText.getText()
-        .toString());
-  }
-  */
-
   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
     callbackManager.onActivityResult(requestCode, resultCode, data);
     super.onActivityResult(requestCode, resultCode, data);
@@ -251,37 +219,4 @@ public class LoginFragment extends FragmentView implements LoginView {
       }
     });
   }
-
-  /*@SuppressLint("ClickableViewAccessibility") private void setShowPasswordEye() {
-    passwordEditText.setTransformationMethod(new PasswordTransformationMethod());
-    final Drawable hidePasswordRes = getResources().getDrawable(R.drawable.ic_show_password);
-    final Drawable showPasswordRes = getResources().getDrawable(R.drawable.ic_hide_password);
-
-    passwordEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
-    passwordEditText.setOnTouchListener((v, event) -> {
-      if (passwordEditText.getCompoundDrawables()[2] == null) {
-        return false;
-      }
-      if (event.getAction() != MotionEvent.ACTION_DOWN) {
-        return false;
-      }
-      if (event.getX()
-          > passwordEditText.getWidth()
-          - passwordEditText.getPaddingRight()
-          - hidePasswordRes.getIntrinsicWidth()) {
-        if (showPassword) {
-          showPassword = false;
-          passwordEditText.setTransformationMethod(null);
-          passwordEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, showPasswordRes,
-              null);
-        } else {
-          showPassword = true;
-          passwordEditText.setTransformationMethod(new PasswordTransformationMethod());
-          passwordEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes,
-              null);
-        }
-      }
-      return false;
-    });
-  }*/
 }

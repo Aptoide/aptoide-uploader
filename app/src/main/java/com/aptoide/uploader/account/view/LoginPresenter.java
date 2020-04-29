@@ -3,7 +3,6 @@ package com.aptoide.uploader.account.view;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
-import com.aptoide.uploader.apps.network.NoConnectivityException;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
@@ -57,42 +56,6 @@ public class LoginPresenter implements Presenter {
         }, throwable -> {
           throwable.printStackTrace();
         }));
-
-    /*compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMapCompletable(__ -> view.getLoginEvent()
-            .doOnNext(credentials -> {
-              view.hideKeyboard();
-              view.showLoading(credentials.getUsername());
-            })
-            .flatMapCompletable(credentials -> accountManager.login(credentials.getUsername(),
-                credentials.getPassword())
-                .doOnComplete(() -> uploaderAnalytics.sendLoginEvent("email", "success")))
-            .observeOn(viewScheduler)
-            .doOnError(throwable -> {
-              uploaderAnalytics.sendLoginEvent("email", "fail");
-              view.hideLoading();
-              if (isConnectivityError(throwable)) {
-                view.showNoConnectivityError();
-              } else if (isInternetError(throwable)) {
-                view.showNetworkError();
-              } else {
-                view.showCrendentialsError();
-              }
-            })
-            .retry())
-        .subscribe(() -> {
-        }, throwable -> view.showNetworkError()));*/
-    /*
-
-    compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> view.getOpenCreateAccountView())
-        .observeOn(viewScheduler)
-        .subscribe(__ -> loginNavigator.navigateToCreateAccountView(), throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
-        }));
-    */
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
@@ -166,18 +129,4 @@ public class LoginPresenter implements Presenter {
         })
         .andThen(Observable.empty());
   }
-
-  /*private boolean isInternetError(Throwable throwable) {
-    if (throwable instanceof IllegalStateException) {
-      return false;
-    }
-    return true;
-  }
-
-  private boolean isConnectivityError(Throwable throwable) {
-    if (throwable instanceof NoConnectivityException) {
-      return true;
-    }
-    return false;
-  }*/
 }
