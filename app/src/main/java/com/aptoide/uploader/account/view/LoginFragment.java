@@ -96,7 +96,8 @@ public class LoginFragment extends FragmentView implements LoginView {
     message_second.setText("We're working hard for email login to come back soon, so stay tuned!");
     setupBlogTextView();
 
-    new LoginPresenter(this, accountManager, new LoginNavigator(getFragmentManager()),
+    new LoginPresenter(this, accountManager,
+        new LoginNavigator(getFragmentManager(), getContext().getApplicationContext()),
         new CompositeDisposable(), AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
         ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
@@ -184,6 +185,11 @@ public class LoginFragment extends FragmentView implements LoginView {
   @Override public void startGoogleActivity() {
     Intent signInIntent = mGoogleSignInClient.getSignInIntent();
     startActivityForResult(signInIntent, RC_SIGN_IN);
+  }
+
+  @Override public Observable<Integer> clickOnBlog() {
+    return Observable.merge(RxView.clicks(blog), RxView.clicks(blogNextButton))
+        .map(__ -> 1);
   }
 
   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {

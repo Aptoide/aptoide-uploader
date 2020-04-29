@@ -9,7 +9,7 @@ import com.aptoide.uploader.R;
 
 public class MaintenanceNavigator {
 
-  private final static String BLOG_URL = "https://blog.aptoide.com";
+  public final static String BLOG_URL = "https://blog.aptoide.com";
   private final Context applicationContext;
   private final FragmentManager fragmentManager;
 

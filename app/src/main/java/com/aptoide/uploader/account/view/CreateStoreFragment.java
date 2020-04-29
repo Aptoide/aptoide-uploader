@@ -2,8 +2,6 @@ package com.aptoide.uploader.account.view;
 
 import android.app.Activity;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -13,6 +11,8 @@ import android.widget.EditText;
 import android.widget.RadioButton;
 import android.widget.RadioGroup;
 import android.widget.Toast;
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
@@ -72,16 +72,9 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
           }
         }));
 
-    new CreateStorePresenter(this, accountManager, new LoginNavigator(getFragmentManager()),
-        compositeDisposable,
-        accountErrorMapper, AndroidSchedulers.mainThread()).present();
-  }
-
-  @Nullable @Override
-  public android.view.View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    compositeDisposable = new CompositeDisposable();
-    return inflater.inflate(R.layout.fragment_create_store, container, false);
+    new CreateStorePresenter(this, accountManager,
+        new LoginNavigator(getFragmentManager(), getContext().getApplicationContext()),
+        compositeDisposable, accountErrorMapper, AndroidSchedulers.mainThread()).present();
   }
 
   @Override public void onDestroyView() {
@@ -92,6 +85,13 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
     storePassword = null;
     createStoreButton = null;
     super.onDestroyView();
+  }
+
+  @Nullable @Override
+  public android.view.View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    compositeDisposable = new CompositeDisposable();
+    return inflater.inflate(R.layout.fragment_create_store, container, false);
   }
 
   private void hidePrivateStoreFields() {
@@ -111,17 +111,6 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
   @Override public Observable<CreateStoreViewModel> getStoreInfo() {
     return RxView.clicks(createStoreButton)
         .map(__ -> getViewModel());
-  }
-
-  @NonNull private CreateStoreViewModel getViewModel() {
-    if (isPrivateStore()) {
-      return new CreateStoreViewModel(storeName.getText()
-          .toString(), storeUsername.getText()
-          .toString(), storePassword.getText()
-          .toString());
-    }
-    return new CreateStoreViewModel(storeName.getText()
-        .toString());
   }
 
   @Override public Observable<CreateStoreViewModel> getOpenLoginView() {
@@ -154,8 +143,7 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
   }
 
   @Override public void showErrorStoreAlreadyExists() {
-    Toast.makeText(getContext(), getText(R.string.duplicate_store_error),
-        Toast.LENGTH_LONG)
+    Toast.makeText(getContext(), getText(R.string.duplicate_store_error), Toast.LENGTH_LONG)
         .show();
   }
 
@@ -167,5 +155,16 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
       view = new View(getActivity());
     }
     imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+  }
+
+  @NonNull private CreateStoreViewModel getViewModel() {
+    if (isPrivateStore()) {
+      return new CreateStoreViewModel(storeName.getText()
+          .toString(), storeUsername.getText()
+          .toString(), storePassword.getText()
+          .toString());
+    }
+    return new CreateStoreViewModel(storeName.getText()
+        .toString());
   }
 }

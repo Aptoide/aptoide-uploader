@@ -33,6 +33,9 @@ public interface LoginView extends View {
 
   void startGoogleActivity();
 
+  Observable<Integer> clickOnBlog();
+
+
   class CredentialsViewModel {
 
     private final String username;

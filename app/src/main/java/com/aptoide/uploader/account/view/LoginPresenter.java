@@ -108,6 +108,13 @@ public class LoginPresenter implements Presenter {
           view.showNetworkError();
           uploaderAnalytics.sendLoginEvent("facebook", "fail");
         }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.clickOnBlog())
+        .doOnNext(__ -> loginNavigator.openBlogUrl())
+        .subscribe(__ -> {
+        }, Throwable::printStackTrace));
   }
 
   private Observable<Object> tryAutoLogin() {
