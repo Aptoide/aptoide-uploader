@@ -58,7 +58,7 @@ public class LoginPresenter implements Presenter {
           throwable.printStackTrace();
         }));
 
-    compositeDisposable.add(view.getLifecycleEvent()
+    /*compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMapCompletable(__ -> view.getLoginEvent()
             .doOnNext(credentials -> {
@@ -82,7 +82,8 @@ public class LoginPresenter implements Presenter {
             })
             .retry())
         .subscribe(() -> {
-        }, throwable -> view.showNetworkError()));
+        }, throwable -> view.showNetworkError()));*/
+    /*
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
@@ -91,6 +92,7 @@ public class LoginPresenter implements Presenter {
         .subscribe(__ -> loginNavigator.navigateToCreateAccountView(), throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+    */
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
@@ -165,7 +167,7 @@ public class LoginPresenter implements Presenter {
         .andThen(Observable.empty());
   }
 
-  private boolean isInternetError(Throwable throwable) {
+  /*private boolean isInternetError(Throwable throwable) {
     if (throwable instanceof IllegalStateException) {
       return false;
     }
@@ -177,5 +179,5 @@ public class LoginPresenter implements Presenter {
       return true;
     }
     return false;
-  }
+  }*/
 }
