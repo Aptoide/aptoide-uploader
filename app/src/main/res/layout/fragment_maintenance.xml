@@ -1,152 +1,159 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@drawable/gradient_drawable_maintenance"
+    android:paddingBottom="12dp"
     >
 
-  <ProgressBar
-      android:id="@+id/fragment_maintenance_progressbar"
-      android:layout_width="100dp"
-      android:layout_height="100dp"
-      android:visibility="visible"
-      app:layout_constraintBottom_toBottomOf="parent"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      />
-
-
-  <ImageView
-      android:id="@+id/fragment_maintenance_icon"
-      android:layout_width="38dp"
-      android:layout_height="38dp"
-      android:layout_marginStart="29dp"
-      android:layout_marginLeft="29dp"
-      android:layout_marginTop="48dp"
-      app:layout_constraintBottom_toTopOf="@+id/fragment_maintenance_title"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:srcCompat="@drawable/icon_login"
-      />
-
-  <TextView
-      android:id="@+id/fragment_maintenance_title"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="29dp"
-      android:layout_marginLeft="29dp"
-      android:layout_marginTop="32dp"
-      android:fontFamily="sans-serif"
-      android:lineSpacingExtra="6sp"
-      android:textColor="@color/white"
-      android:textSize="28sp"
-      android:textStyle="bold"
-      app:layout_constraintEnd_toEndOf="@+id/fragment_maintenance_cloudsimage"
-      app:layout_constraintHorizontal_bias="0"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintRight_toLeftOf="@+id/fragment_maintenance_cloudsimage"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/fragment_maintenance_icon"
-      />
-
-  <TextView
-      android:id="@+id/fragment_maintenance_message1"
+  <androidx.constraintlayout.widget.ConstraintLayout
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
-      android:layout_marginStart="29dp"
-      android:layout_marginLeft="29dp"
-      android:layout_marginTop="16dp"
-      android:layout_marginEnd="29dp"
-      android:layout_marginRight="29dp"
-      android:fontFamily="sans-serif"
-      android:gravity="center_vertical"
-      android:lineSpacingExtra="8sp"
-      android:textColor="@color/white"
-      android:textSize="16sp"
-      android:textStyle="normal"
-      app:layout_constraintBottom_toTopOf="@+id/fragment_maintenance_message2"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/fragment_maintenance_title"
-      tools:text=""
-      />
+      >
 
-  <TextView
-      android:id="@+id/fragment_maintenance_message2"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="29dp"
-      android:layout_marginLeft="29dp"
-      android:layout_marginTop="24dp"
-      android:layout_marginEnd="29dp"
-      android:layout_marginRight="29dp"
-      android:fontFamily="sans-serif"
-      android:gravity="center_vertical"
-      android:lineSpacingExtra="8sp"
-      android:textColor="@color/white"
-      android:textSize="16sp"
-      android:textStyle="normal"
-      app:layout_constraintBottom_toTopOf="@+id/fragment_maintenance_blog"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/fragment_maintenance_message1"
-      />
+    <ProgressBar
+        android:id="@+id/fragment_maintenance_progressbar"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:visibility="visible"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        />
 
-  <TextView
-      android:id="@+id/fragment_maintenance_blog"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="29dp"
-      android:layout_marginLeft="29dp"
-      android:layout_marginTop="32dp"
-      android:layout_marginEnd="29dp"
-      android:layout_marginRight="29dp"
-      android:fontFamily="sans-serif-medium"
-      android:gravity="center_horizontal"
-      android:textColor="@color/white"
-      android:textSize="14sp"
-      android:textStyle="normal"
-      app:layout_constraintLeft_toLeftOf="parent"
-      app:layout_constraintStart_toStartOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/fragment_maintenance_message2"
-      tools:text="Check our blog"
-      />
 
-  <ImageView
-      android:id="@+id/fragment_maintenance_blognext"
-      android:layout_width="12dp"
-      android:layout_height="12dp"
-      android:layout_marginStart="6dp"
-      android:layout_marginLeft="6dp"
-      android:layout_marginTop="3dp"
-      app:layout_constraintBottom_toBottomOf="@id/fragment_maintenance_blog"
-      app:layout_constraintLeft_toRightOf="@id/fragment_maintenance_blog"
-      app:layout_constraintStart_toEndOf="@id/fragment_maintenance_blog"
-      app:layout_constraintTop_toTopOf="@id/fragment_maintenance_blog"
-      app:srcCompat="@drawable/next"
-      />
+    <ImageView
+        android:id="@+id/fragment_maintenance_icon"
+        android:layout_width="38dp"
+        android:layout_height="38dp"
+        android:layout_marginStart="29dp"
+        android:layout_marginLeft="29dp"
+        android:layout_marginTop="48dp"
+        app:layout_constraintBottom_toTopOf="@+id/fragment_maintenance_title"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/icon_login"
+        />
 
-  <ImageView
-      android:id="@+id/fragment_maintenance_cloudsimage"
-      android:layout_width="120dp"
-      android:layout_height="140dp"
-      app:layout_constraintBottom_toBottomOf="@id/fragment_maintenance_title"
-      app:layout_constraintEnd_toEndOf="parent"
-      app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintTop_toTopOf="parent"
-      app:srcCompat="@drawable/group_4"
-      />
+    <TextView
+        android:id="@+id/fragment_maintenance_title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="29dp"
+        android:layout_marginLeft="29dp"
+        android:layout_marginTop="32dp"
+        android:fontFamily="sans-serif"
+        android:lineSpacingExtra="6sp"
+        android:textColor="@color/white"
+        android:textSize="28sp"
+        android:textStyle="bold"
+        app:layout_constraintEnd_toEndOf="@+id/fragment_maintenance_cloudsimage"
+        app:layout_constraintHorizontal_bias="0"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toLeftOf="@+id/fragment_maintenance_cloudsimage"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragment_maintenance_icon"
+        />
 
-  <androidx.constraintlayout.widget.Group
-      android:id="@+id/fragment_maintenance_view"
-      android:layout_width="wrap_content"
-      android:layout_height="wrap_content"
-      android:visibility="gone"
-      app:constraint_referenced_ids="fragment_maintenance_icon,fragment_maintenance_title, fragment_maintenance_message1, fragment_maintenance_message2,
+    <TextView
+        android:id="@+id/fragment_maintenance_message1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="29dp"
+        android:layout_marginLeft="29dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="29dp"
+        android:layout_marginRight="29dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:lineSpacingExtra="8sp"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toTopOf="@+id/fragment_maintenance_message2"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragment_maintenance_title"
+        tools:text=""
+        />
+
+    <TextView
+        android:id="@+id/fragment_maintenance_message2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="29dp"
+        android:layout_marginLeft="29dp"
+        android:layout_marginTop="24dp"
+        android:layout_marginEnd="29dp"
+        android:layout_marginRight="29dp"
+        android:fontFamily="sans-serif"
+        android:gravity="center_vertical"
+        android:lineSpacingExtra="8sp"
+        android:textColor="@color/white"
+        android:textSize="16sp"
+        android:textStyle="normal"
+        app:layout_constraintBottom_toTopOf="@+id/fragment_maintenance_blog"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragment_maintenance_message1"
+        />
+
+    <TextView
+        android:id="@+id/fragment_maintenance_blog"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="29dp"
+        android:layout_marginLeft="29dp"
+        android:layout_marginTop="32dp"
+        android:layout_marginEnd="29dp"
+        android:layout_marginRight="29dp"
+        android:fontFamily="sans-serif-medium"
+        android:gravity="center_horizontal"
+        android:textColor="@color/white"
+        android:textSize="14sp"
+        android:textStyle="normal"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toBottomOf="@id/fragment_maintenance_message2"
+        tools:text="Check our blog"
+        />
+
+    <ImageView
+        android:id="@+id/fragment_maintenance_blognext"
+        android:layout_width="12dp"
+        android:layout_height="12dp"
+        android:layout_marginStart="6dp"
+        android:layout_marginLeft="6dp"
+        android:layout_marginTop="3dp"
+        app:layout_constraintBottom_toBottomOf="@id/fragment_maintenance_blog"
+        app:layout_constraintLeft_toRightOf="@id/fragment_maintenance_blog"
+        app:layout_constraintStart_toEndOf="@id/fragment_maintenance_blog"
+        app:layout_constraintTop_toTopOf="@id/fragment_maintenance_blog"
+        app:srcCompat="@drawable/next"
+        />
+
+    <ImageView
+        android:id="@+id/fragment_maintenance_cloudsimage"
+        android:layout_width="120dp"
+        android:layout_height="140dp"
+        app:layout_constraintBottom_toBottomOf="@id/fragment_maintenance_title"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/group_4"
+        />
+
+    <androidx.constraintlayout.widget.Group
+        android:id="@+id/fragment_maintenance_view"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:visibility="gone"
+        app:constraint_referenced_ids="fragment_maintenance_icon,fragment_maintenance_title, fragment_maintenance_message1, fragment_maintenance_message2,
 fragment_maintenance_blog, fragment_maintenance_blognext, fragment_maintenance_cloudsimage"
-      />
+        />
 
-</androidx.constraintlayout.widget.ConstraintLayout>
+  </androidx.constraintlayout.widget.ConstraintLayout>
+</ScrollView>
