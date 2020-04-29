@@ -143,12 +143,12 @@
   <string name="duplicate_store_error">The store name you\'re using already exists. Be creative, dude!</string>
   (edited)
   <string name="connection_error_body">Oops, it seems you\'ve got connection issues. Try again later!</string>
-  
-    <!--Settings-->
+
+  <!--Settings-->
   <string name="settings_dark_them_title">Dark Theme</string>
   <string name="settings_dark_them_body">It helps to relieve eye strain when using your device in the dark.</string>
-  
-    <!--New Login-->
+
+  <!--New Login-->
   <string name="login_connect_with_email_button">Connect with email</string>
   <string name="login_email_field_text">Your email here</string>
   <string name="login_send_code_body">We\'ll send you a temporary login code.</string>
@@ -177,6 +177,6 @@
   <string name="login_disclaimer_body_1">Our users\' security is our top one priority, and that\'s why we\'re developing a new login system using your email address. At the moment, you can only access to Aptoide using social media accounts.</string>
   <string name="login_disclaimer_body_2">We\'re working hard for email login to come back soon, so stay tuned!</string>
   <string name="login_disclaimer_blog_button">Check our blog</string>
-  <string name="login_disclaimer_unavailable_body_1">Our users\' security is our top one priority, so login to Aptoide Uploader is temporarily unavailable while we work to make some change son it. We\'ll be quick!</string>
+  <string name="login_disclaimer_unavailable_body_1">Our users\' security is our top one priority, so login to Aptoide Uploader is temporarily unavailable while we work to make some changes on it. We\'ll be quick!</string>
   <string name="login_disclaimer_unavailable_body_2">We\'re working hard for it to be back soon, so stay tuned!</string>
 </resources>
