@@ -67,6 +67,9 @@ public class MaintenancePresenter implements Presenter {
           }
         })
         .subscribe(__ -> {
-        }, Throwable::printStackTrace));
+        }, throwable -> {
+          view.showNoLoginView();
+          throwable.printStackTrace();
+        }));
   }
 }
