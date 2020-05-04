@@ -60,14 +60,13 @@ public class MaintenancePresenter implements Presenter {
         .observeOn(viewScheduler)
         .doOnNext(shouldShowLogin -> {
           if (shouldShowLogin) {
-            //navigate to newly edited Login fragment
             view.hideProgressBar();
             navigator.navigateToLoginFragment();
-            //view.showSocialLoginMaintenanceView();
           } else {
             view.showNoLoginView();
           }
         })
-        .subscribe());
+        .subscribe(__ -> {
+        }, Throwable::printStackTrace));
   }
 }
