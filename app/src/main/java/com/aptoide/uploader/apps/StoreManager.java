@@ -37,7 +37,8 @@ public class StoreManager {
     return storeNameProvider.getStoreName()
         .flatMapCompletable(storeName -> languageManager.getCurrentLanguageCode()
             .flatMapCompletable(languageCode -> Observable.fromIterable(apps)
-                .flatMapCompletable(app -> uploadManager.upload(storeName, languageCode, app))));
+                    .flatMapCompletable(app -> installedAppsProvider.getInstalledApp(app.getPackageName())
+                            .flatMapCompletable(installedApp -> uploadManager.upload(storeName, languageCode, app)))));
   }
 
   public Completable logout() {
@@ -50,4 +51,5 @@ public class StoreManager {
         .filter(app -> !app.isSystem())
         .toList();
   }
+
 }

@@ -40,6 +40,19 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
         .subscribeOn(scheduler);
   }
 
+  @Override public Single<InstalledApp> getInstalledApp(String packageName) throws PackageManager.NameNotFoundException {
+    return Single.just(packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA))
+            .map(info -> {
+              PackageInfo packageInfo = packageManager.getPackageInfo(info.packageName, 0);
+              return new InstalledApp(packageInfo.applicationInfo,
+                      info.loadLabel(packageManager)
+                              .toString(), (info.flags & ApplicationInfo.FLAG_SYSTEM) == 1,
+                      packageInfo.packageName, info.sourceDir, packageInfo.lastUpdateTime,
+                      packageInfo.versionCode, false, getMainObb(info.packageName),
+                      getPatchObb(info.packageName));
+            });
+  }
+
   private Obb getMainObb(String packageName) {
     String sdcard = Environment.getExternalStorageDirectory()
         .getAbsolutePath();
