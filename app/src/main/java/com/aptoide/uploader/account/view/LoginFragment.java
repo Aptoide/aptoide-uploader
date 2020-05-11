@@ -1,22 +1,19 @@
 package com.aptoide.uploader.account.view;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Intent;
-import android.graphics.drawable.Drawable;
 import android.os.Bundle;
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
-import android.text.method.PasswordTransformationMethod;
+import android.text.SpannableString;
+import android.text.style.UnderlineSpan;
 import android.util.Log;
 import android.view.LayoutInflater;
-import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
-import android.widget.EditText;
+import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.annotation.Nullable;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
@@ -42,24 +39,23 @@ import java.util.Arrays;
 
 public class LoginFragment extends FragmentView implements LoginView {
 
-  private EditText passwordEditText;
-  private EditText usernameEditText;
+  private static final int RC_SIGN_IN = 9001;
+  PublishSubject<GoogleSignInAccount> googleLoginSubject = PublishSubject.create();
+  PublishSubject<LoginResult> facebookLoginSubject = PublishSubject.create();
   private View progressContainer;
   private View fragmentContainer;
   private TextView loadingTextView;
   private AptoideAccountManager accountManager;
-  private View loginButton;
-  private View signUpButton;
   private LoginButton facebookLoginButton;
   private SignInButton googleLoginButton;
   private GoogleSignInClient mGoogleSignInClient;
   private GoogleSignInOptions gso;
   private CallbackManager callbackManager;
-  boolean showPassword = false;
-  private static final int RC_SIGN_IN = 9001;
-
-  PublishSubject<GoogleSignInAccount> googleLoginSubject = PublishSubject.create();
-  PublishSubject<LoginResult> facebookLoginSubject = PublishSubject.create();
+  private TextView title;
+  private TextView message_first;
+  private TextView message_second;
+  private TextView blog;
+  private ImageView blogNextButton;
 
   public static LoginFragment newInstance() {
     return new LoginFragment();
@@ -76,49 +72,62 @@ public class LoginFragment extends FragmentView implements LoginView {
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
-    passwordEditText = view.findViewById(R.id.fragment_login_password_edit_text);
-    usernameEditText = view.findViewById(R.id.fragment_login_username_edit_text);
-    loginButton = view.findViewById(R.id.fragment_login_button);
-    signUpButton = view.findViewById(R.id.fragment_login_sign_up);
     progressContainer = view.findViewById(R.id.fragment_login_progress_container);
     loadingTextView = view.findViewById(R.id.fragment_login_loading_text_view);
     fragmentContainer = view.findViewById(R.id.fragment_login_content);
+
+    title = view.findViewById(R.id.login_title);
+    message_first = view.findViewById(R.id.login_message1);
+    message_second = view.findViewById(R.id.login_message2);
+    blog = view.findViewById(R.id.login_blog);
+    blogNextButton = view.findViewById(R.id.login_blognext);
+
     googleLoginButton = view.findViewById(R.id.google_sign_in_button);
     googleLoginButton.setSize(SignInButton.SIZE_WIDE);
     facebookLoginButton = view.findViewById(R.id.facebook_login_button);
     facebookLoginButton.setPermissions(Arrays.asList("email", "public_profile"));
     facebookLoginButton.setFragment(this);
-    setShowPasswordEye();
     setFacebookCustomListener();
 
-    new LoginPresenter(this, accountManager, new LoginNavigator(getFragmentManager()),
+    fragmentContainer.setVisibility(View.VISIBLE);
+    title.setText(getString(R.string.login_disclaimer_title));
+    message_first.setText(getString(R.string.login_disclaimer_body_1));
+    message_second.setText(getString(R.string.login_disclaimer_body_2));
+    setupBlogTextView();
+
+    new LoginPresenter(this, accountManager,
+        new LoginNavigator(getFragmentManager(), getContext().getApplicationContext()),
         new CompositeDisposable(), AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
         ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
   }
 
+  @Override public void onResume() {
+    super.onResume();
+  }
+
+  @Override public void onPause() {
+    super.onPause();
+  }
+
   @Override public void onDestroyView() {
-    passwordEditText = null;
-    usernameEditText = null;
-    loginButton = null;
-    signUpButton = null;
     googleLoginButton = null;
     fragmentContainer = null;
     progressContainer = null;
     loadingTextView = null;
     facebookLoginButton = null;
+    title = null;
+    message_first = null;
+    message_second = null;
+    blog = null;
+    blogNextButton = null;
     super.onDestroyView();
   }
 
-  @Nullable @Override
-  public android.view.View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
-      @Nullable Bundle savedInstanceState) {
-    return inflater.inflate(R.layout.fragment_login, container, false);
-  }
-
-  @Override public Observable<CredentialsViewModel> getLoginEvent() {
-    return RxView.clicks(loginButton)
-        .map(__ -> getViewModel());
+  private void setupBlogTextView() {
+    SpannableString content = new SpannableString(getString(R.string.login_disclaimer_blog_button));
+    content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+    blog.setText(content);
   }
 
   @Override public Observable<Object> getGoogleLoginEvent() {
@@ -126,9 +135,12 @@ public class LoginFragment extends FragmentView implements LoginView {
     return RxView.clicks(googleLoginButton);
   }
 
-  @Override public Observable<CredentialsViewModel> getOpenCreateAccountView() {
-    return RxView.clicks(signUpButton)
-        .map(__ -> getViewModel());
+  @Override public Observable<GoogleSignInAccount> googleLoginSuccessEvent() {
+    return googleLoginSubject;
+  }
+
+  @Override public Observable<LoginResult> facebookLoginSucessEvent() {
+    return facebookLoginSubject;
   }
 
   @Override public void showLoading(String username) {
@@ -164,12 +176,6 @@ public class LoginFragment extends FragmentView implements LoginView {
         .show();
   }
 
-  @NonNull private CredentialsViewModel getViewModel() {
-    return new CredentialsViewModel(usernameEditText.getText()
-        .toString(), passwordEditText.getText()
-        .toString());
-  }
-
   @Override public void hideKeyboard() {
     InputMethodManager imm =
         (InputMethodManager) getActivity().getSystemService(Activity.INPUT_METHOD_SERVICE);
@@ -183,6 +189,11 @@ public class LoginFragment extends FragmentView implements LoginView {
   @Override public void startGoogleActivity() {
     Intent signInIntent = mGoogleSignInClient.getSignInIntent();
     startActivityForResult(signInIntent, RC_SIGN_IN);
+  }
+
+  @Override public Observable<Integer> clickOnBlog() {
+    return Observable.merge(RxView.clicks(blog), RxView.clicks(blogNextButton))
+        .map(__ -> 1);
   }
 
   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -199,20 +210,10 @@ public class LoginFragment extends FragmentView implements LoginView {
     }
   }
 
-  @Override public Observable<GoogleSignInAccount> googleLoginSuccessEvent() {
-    return googleLoginSubject;
-  }
-
-  @Override public Observable<LoginResult> facebookLoginSucessEvent() {
-    return facebookLoginSubject;
-  }
-
-  @Override public void onPause() {
-    super.onPause();
-  }
-
-  @Override public void onResume() {
-    super.onResume();
+  @Nullable @Override
+  public android.view.View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
+      @Nullable Bundle savedInstanceState) {
+    return inflater.inflate(R.layout.fragment_login, container, false);
   }
 
   private void setFacebookCustomListener() {
@@ -226,39 +227,6 @@ public class LoginFragment extends FragmentView implements LoginView {
 
       @Override public void onError(FacebookException exception) {
       }
-    });
-  }
-
-  @SuppressLint("ClickableViewAccessibility") private void setShowPasswordEye() {
-    passwordEditText.setTransformationMethod(new PasswordTransformationMethod());
-    final Drawable hidePasswordRes = getResources().getDrawable(R.drawable.ic_show_password);
-    final Drawable showPasswordRes = getResources().getDrawable(R.drawable.ic_hide_password);
-
-    passwordEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes, null);
-    passwordEditText.setOnTouchListener((v, event) -> {
-      if (passwordEditText.getCompoundDrawables()[2] == null) {
-        return false;
-      }
-      if (event.getAction() != MotionEvent.ACTION_DOWN) {
-        return false;
-      }
-      if (event.getX()
-          > passwordEditText.getWidth()
-          - passwordEditText.getPaddingRight()
-          - hidePasswordRes.getIntrinsicWidth()) {
-        if (showPassword) {
-          showPassword = false;
-          passwordEditText.setTransformationMethod(null);
-          passwordEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, showPasswordRes,
-              null);
-        } else {
-          showPassword = true;
-          passwordEditText.setTransformationMethod(new PasswordTransformationMethod());
-          passwordEditText.setCompoundDrawablesWithIntrinsicBounds(null, null, hidePasswordRes,
-              null);
-        }
-      }
-      return false;
     });
   }
 }

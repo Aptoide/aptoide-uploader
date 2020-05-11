@@ -7,11 +7,11 @@ import io.reactivex.Observable;
 
 public interface LoginView extends View {
 
-  Observable<CredentialsViewModel> getLoginEvent();
+  //Observable<CredentialsViewModel> getLoginEvent();
 
   Observable<Object> getGoogleLoginEvent();
 
-  Observable<CredentialsViewModel> getOpenCreateAccountView();
+  //Observable<CredentialsViewModel> getOpenCreateAccountView();
 
   Observable<GoogleSignInAccount> googleLoginSuccessEvent();
 
@@ -32,6 +32,9 @@ public interface LoginView extends View {
   void hideKeyboard();
 
   void startGoogleActivity();
+
+  Observable<Integer> clickOnBlog();
+
 
   class CredentialsViewModel {
 
