@@ -8,4 +8,11 @@
   <dimen name="fab_margin">16dp</dimen>
 
   <dimen name="apps_grid_item_margin">3dp</dimen>
+
+
+  <!-- buttons -->
+
+  <dimen name="button_height">48dp</dimen>
+
+
 </resources>
