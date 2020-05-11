@@ -96,6 +96,8 @@
           android:layout_alignParentStart="true"
           android:layout_alignParentLeft="true"
           android:layout_marginTop="32dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
           android:fontFamily="sans-serif-medium"
           android:gravity="center_horizontal"
           android:textColor="@color/white"
@@ -132,24 +134,25 @@
 
       <com.facebook.login.widget.LoginButton
           android:id="@+id/facebook_login_button"
+          style="@style/Aptoide.Button.FacebookFull"
           android:layout_width="match_parent"
-          android:layout_height="117dp"
           android:layout_below="@id/login_blog"
           android:layout_gravity="center_horizontal"
           android:layout_marginTop="42dp"
-          android:layout_marginEnd="33dp"
-          android:layout_marginRight="33dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
           />
 
-      <com.google.android.gms.common.SignInButton
+      <Button
           android:id="@+id/google_sign_in_button"
+          style="@style/Aptoide.Button.Ghost.GreyFogLight.GoogleFull"
           android:layout_width="match_parent"
           android:layout_height="wrap_content"
           android:layout_below="@id/facebook_login_button"
           android:layout_gravity="center_horizontal"
           android:layout_marginTop="16dp"
-          android:layout_marginEnd="30dp"
-          android:layout_marginRight="30dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
           />
 
 

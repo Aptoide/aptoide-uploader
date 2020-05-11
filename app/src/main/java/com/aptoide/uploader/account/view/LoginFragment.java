@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -47,7 +48,7 @@ public class LoginFragment extends FragmentView implements LoginView {
   private TextView loadingTextView;
   private AptoideAccountManager accountManager;
   private LoginButton facebookLoginButton;
-  private SignInButton googleLoginButton;
+  private Button googleLoginButton;
   private GoogleSignInClient mGoogleSignInClient;
   private GoogleSignInOptions gso;
   private CallbackManager callbackManager;
@@ -83,7 +84,7 @@ public class LoginFragment extends FragmentView implements LoginView {
     blogNextButton = view.findViewById(R.id.login_blognext);
 
     googleLoginButton = view.findViewById(R.id.google_sign_in_button);
-    googleLoginButton.setSize(SignInButton.SIZE_WIDE);
+    //googleLoginButton.setSize(SignInButton.SIZE_WIDE);
     facebookLoginButton = view.findViewById(R.id.facebook_login_button);
     facebookLoginButton.setPermissions(Arrays.asList("email", "public_profile"));
     facebookLoginButton.setFragment(this);
