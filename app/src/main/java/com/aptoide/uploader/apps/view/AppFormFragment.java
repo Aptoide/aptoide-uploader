@@ -25,6 +25,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.util.LinkedHashMap;
 import java.util.List;
+
 import static android.util.TypedValue.TYPE_NULL;
 
 public class AppFormFragment extends FragmentView implements AppFormView, OnBackPressedInterface {
@@ -132,7 +133,7 @@ public class AppFormFragment extends FragmentView implements AppFormView, OnBack
     showAgeRatingSpinner();
     showLanguageSpinner();
     setAppName();
-    allowTextViewScroll(parentScrollView,descriptionScrollView);
+    allowTextViewScroll(parentScrollView, descriptionScrollView);
   }
 
   @Override public void showCategories(List<Category> categoriesList) {
@@ -216,18 +217,17 @@ public class AppFormFragment extends FragmentView implements AppFormView, OnBack
 
   public void allowTextViewScroll(final ScrollView parentScrollView, View description) {
     for (int i = ((ViewGroup) description).getChildCount() - 1; i >= 0; i--) {
-        final View child = ((ViewGroup) description).getChildAt(i);
-        if (child instanceof ViewGroup) {
-          allowTextViewScroll(parentScrollView, (ViewGroup) child);
-        } else {
-            child.setOnTouchListener(new View.OnTouchListener() {
-                public boolean onTouch(View v, MotionEvent event)
-                {
-                    parentScrollView.requestDisallowInterceptTouchEvent(true);
-                    return false;
-                }
-            });
-        }
+      final View child = ((ViewGroup) description).getChildAt(i);
+      if (child instanceof ViewGroup) {
+        allowTextViewScroll(parentScrollView, (ViewGroup) child);
+      } else {
+        child.setOnTouchListener(new View.OnTouchListener() {
+          public boolean onTouch(View v, MotionEvent event) {
+            parentScrollView.requestDisallowInterceptTouchEvent(true);
+            return false;
+          }
+        });
+      }
     }
   }
 
