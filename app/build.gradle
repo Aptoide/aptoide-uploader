@@ -134,7 +134,7 @@ dependencies {
   //Flurry
   implementation 'com.flurry.android:analytics:12.0.1'
   //Facebook
-  implementation 'com.facebook.android:facebook-login:[5,6)'
+  implementation 'com.facebook.android:facebook-login:7.0.0'
 
   //Google Sign-In
   implementation 'com.google.android.gms:play-services-auth:16.0.0'
