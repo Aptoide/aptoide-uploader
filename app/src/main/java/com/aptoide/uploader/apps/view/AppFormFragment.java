@@ -4,12 +4,14 @@ import android.app.Activity;
 import android.os.Bundle;
 import androidx.annotation.Nullable;
 import android.view.LayoutInflater;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.EditText;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.Toast;
 import com.aptoide.uploader.R;
@@ -23,7 +25,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.util.LinkedHashMap;
 import java.util.List;
-
 import static android.util.TypedValue.TYPE_NULL;
 
 public class AppFormFragment extends FragmentView implements AppFormView, OnBackPressedInterface {
@@ -42,6 +43,8 @@ public class AppFormFragment extends FragmentView implements AppFormView, OnBack
   private String md5;
   private String appName;
   private PublishSubject<Boolean> backPressedEvent;
+  private ScrollView parentScrollView;
+  private View descriptionScrollView;
 
   public static AppFormFragment newInstance(String md5, String appName) {
     AppFormFragment appFormFragment = new AppFormFragment();
@@ -70,6 +73,8 @@ public class AppFormFragment extends FragmentView implements AppFormView, OnBack
     emailEditText = view.findViewById(R.id.email);
     websiteEditText = view.findViewById(R.id.website);
     submitFormButton = view.findViewById(R.id.submit_app_button);
+    parentScrollView = view.findViewById(R.id.submit_app_content);
+    descriptionScrollView = view.findViewById(R.id.scroll_description);
     backPressedEvent = PublishSubject.create();
 
     new AppFormPresenter(this,
@@ -127,6 +132,7 @@ public class AppFormFragment extends FragmentView implements AppFormView, OnBack
     showAgeRatingSpinner();
     showLanguageSpinner();
     setAppName();
+    allowTextViewScroll(parentScrollView,descriptionScrollView);
   }
 
   @Override public void showCategories(List<Category> categoriesList) {
@@ -206,6 +212,23 @@ public class AppFormFragment extends FragmentView implements AppFormView, OnBack
         android.R.layout.simple_spinner_item);
     adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
     spinner.setAdapter(adapter);
+  }
+
+  public void allowTextViewScroll(final ScrollView parentScrollView, View description) {
+    for (int i = ((ViewGroup) description).getChildCount() - 1; i >= 0; i--) {
+        final View child = ((ViewGroup) description).getChildAt(i);
+        if (child instanceof ViewGroup) {
+          allowTextViewScroll(parentScrollView, (ViewGroup) child);
+        } else {
+            child.setOnTouchListener(new View.OnTouchListener() {
+                public boolean onTouch(View v, MotionEvent event)
+                {
+                    parentScrollView.requestDisallowInterceptTouchEvent(true);
+                    return false;
+                }
+            });
+        }
+    }
   }
 
   @Override public boolean onBackPressed() {
