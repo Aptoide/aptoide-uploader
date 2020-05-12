@@ -132,7 +132,7 @@
           app:srcCompat="@drawable/group_4"
           />
 
-      <com.facebook.login.widget.LoginButton
+      <Button
           android:id="@+id/facebook_login_button"
           style="@style/Aptoide.Button.FacebookFull"
           android:layout_width="match_parent"

@@ -94,7 +94,16 @@ public class LoginPresenter implements Presenter {
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMapCompletable(created -> view.facebookLoginSucessEvent()
+        .flatMap(created -> view.getFacebookLoginEvent())
+        .observeOn(viewScheduler)
+        .doOnNext(__ -> view.navigateToFacebookLogin())
+        .subscribe(__ -> {
+        }, throwable -> {
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMapCompletable(created -> view.facebookLoginSuccessEvent()
             .doOnNext(account -> {
               view.showLoadingWithoutUserName();
             })

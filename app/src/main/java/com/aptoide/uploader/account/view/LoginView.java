@@ -4,6 +4,7 @@ import com.aptoide.uploader.view.View;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import io.reactivex.Observable;
+import io.reactivex.ObservableSource;
 
 public interface LoginView extends View {
 
@@ -15,7 +16,7 @@ public interface LoginView extends View {
 
   Observable<GoogleSignInAccount> googleLoginSuccessEvent();
 
-  Observable<LoginResult> facebookLoginSucessEvent();
+  Observable<LoginResult> facebookLoginSuccessEvent();
 
   void showLoading(String username);
 
@@ -35,6 +36,9 @@ public interface LoginView extends View {
 
   Observable<Integer> clickOnBlog();
 
+  Observable<Object> getFacebookLoginEvent();
+
+  void navigateToFacebookLogin();
 
   class CredentialsViewModel {
 
