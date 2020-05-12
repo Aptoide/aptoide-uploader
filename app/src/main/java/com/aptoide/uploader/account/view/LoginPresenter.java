@@ -114,6 +114,7 @@ public class LoginPresenter implements Presenter {
         .observeOn(viewScheduler)
         .subscribe(() -> {
         }, throwable -> {
+          throwable.printStackTrace();
           view.showNetworkError();
           uploaderAnalytics.sendLoginEvent("facebook", "fail");
         }));
