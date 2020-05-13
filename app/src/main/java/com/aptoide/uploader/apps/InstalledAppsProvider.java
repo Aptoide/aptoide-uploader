@@ -8,5 +8,6 @@ import java.util.List;
 public interface InstalledAppsProvider {
 
   Single<List<InstalledApp>> getInstalledApps();
-  Single<InstalledApp> getInstalledApp(String packageName) throws PackageManager.NameNotFoundException;
+
+  Single<InstalledApp> getInstalledApp(String packageName);
 }
