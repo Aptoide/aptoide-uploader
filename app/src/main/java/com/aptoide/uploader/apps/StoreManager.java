@@ -40,7 +40,8 @@ public class StoreManager {
                 .flatMapCompletable(
                     app -> installedAppsProvider.getInstalledApp(app.getPackageName())
                         .flatMapCompletable(
-                            installedApp -> uploadManager.upload(storeName, languageCode, app)))));
+                            installedApp -> uploadManager.upload(storeName, languageCode,
+                                installedApp)))));
   }
 
   public Completable logout() {
