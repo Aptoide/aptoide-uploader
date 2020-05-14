@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
   <color name="white">#FFFFFF</color>
+  <color name="transparent">#00FFFFFF</color>
   <color name="red">#FF0000</color>
   <color name="blue">#99d6ff</color>
   <color name="medium_blue">#33adff</color>
@@ -9,5 +10,6 @@
   <color name="google_grey">#666666</color>
   <color name="facebook_blue">#3b5999</color>
   <color name="light_grey">#E7E7E7</color>
+  <color name="grey_fog_normal">#d8d8d8</color>
 
 </resources>
