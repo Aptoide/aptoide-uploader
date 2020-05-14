@@ -68,8 +68,9 @@
       app:layout_constraintTop_toBottomOf="@id/create_store_name"
       >
 
-    <RadioButton
+    <androidx.appcompat.widget.AppCompatRadioButton
         android:id="@+id/public_store"
+        style="@style/RadioButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center_horizontal"
@@ -77,8 +78,9 @@
         android:text="@string/public_key"
         />
 
-    <RadioButton
+    <androidx.appcompat.widget.AppCompatRadioButton
         android:id="@+id/private_store"
+        style="@style/RadioButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="37dp"

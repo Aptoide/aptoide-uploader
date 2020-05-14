@@ -105,7 +105,7 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
   }
 
   private boolean isPrivateStore() {
-    return privateStore.isSelected();
+    return privateStore.isChecked();
   }
 
   @Override public Observable<CreateStoreViewModel> getStoreInfo() {
