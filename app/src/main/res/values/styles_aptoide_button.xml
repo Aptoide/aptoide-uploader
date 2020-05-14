@@ -49,5 +49,9 @@
     <item name="android:textColor">@color/grey_fog_light</item>
   </style>
 
+  <style name="Aptoide.Button.White">
+    <item name="android:background">@drawable/background_button_rounded_white</item>
+    <item name="android:textColor">@color/dark_blue</item>
+  </style>
 
 </resources>
