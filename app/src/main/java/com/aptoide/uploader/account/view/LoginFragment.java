@@ -10,6 +10,7 @@ import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -21,13 +22,12 @@ import com.aptoide.uploader.view.android.FragmentView;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
 import com.facebook.FacebookException;
+import com.facebook.login.LoginManager;
 import com.facebook.login.LoginResult;
-import com.facebook.login.widget.LoginButton;
 import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.common.SignInButton;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.Task;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -40,17 +40,18 @@ import java.util.Arrays;
 public class LoginFragment extends FragmentView implements LoginView {
 
   private static final int RC_SIGN_IN = 9001;
-  PublishSubject<GoogleSignInAccount> googleLoginSubject = PublishSubject.create();
-  PublishSubject<LoginResult> facebookLoginSubject = PublishSubject.create();
+  PublishSubject<GoogleSignInAccount> googleLoginSubject;
+  PublishSubject<LoginResult> facebookLoginSubject;
   private View progressContainer;
   private View fragmentContainer;
   private TextView loadingTextView;
   private AptoideAccountManager accountManager;
-  private LoginButton facebookLoginButton;
-  private SignInButton googleLoginButton;
+  private Button facebookLoginButton;
+  private Button googleLoginButton;
   private GoogleSignInClient mGoogleSignInClient;
   private GoogleSignInOptions gso;
   private CallbackManager callbackManager;
+  private LoginManager facebookLoginManager;
   private TextView title;
   private TextView message_first;
   private TextView message_second;
@@ -64,10 +65,27 @@ public class LoginFragment extends FragmentView implements LoginView {
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
     gso = ((UploaderApplication) getContext().getApplicationContext()).getGSO();
+    this.facebookLoginSubject = PublishSubject.create();
+    this.googleLoginSubject = PublishSubject.create();
+    facebookLoginManager =
+        ((UploaderApplication) getContext().getApplicationContext()).getFacebookLoginManager();
     accountManager =
         ((UploaderApplication) getContext().getApplicationContext()).getAccountManager();
     callbackManager =
         ((UploaderApplication) getContext().getApplicationContext()).getCallbackManager();
+
+    facebookLoginManager.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
+      @Override public void onSuccess(LoginResult loginResult) {
+        facebookLoginSubject.onNext(loginResult);
+      }
+
+      @Override public void onCancel() {
+      }
+
+      @Override public void onError(FacebookException error) {
+        error.printStackTrace();
+      }
+    });
   }
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -83,11 +101,7 @@ public class LoginFragment extends FragmentView implements LoginView {
     blogNextButton = view.findViewById(R.id.login_blognext);
 
     googleLoginButton = view.findViewById(R.id.google_sign_in_button);
-    googleLoginButton.setSize(SignInButton.SIZE_WIDE);
     facebookLoginButton = view.findViewById(R.id.facebook_login_button);
-    facebookLoginButton.setPermissions(Arrays.asList("email", "public_profile"));
-    facebookLoginButton.setFragment(this);
-    setFacebookCustomListener();
 
     fragmentContainer.setVisibility(View.VISIBLE);
     title.setText(getString(R.string.login_disclaimer_title));
@@ -139,7 +153,7 @@ public class LoginFragment extends FragmentView implements LoginView {
     return googleLoginSubject;
   }
 
-  @Override public Observable<LoginResult> facebookLoginSucessEvent() {
+  @Override public Observable<LoginResult> facebookLoginSuccessEvent() {
     return facebookLoginSubject;
   }
 
@@ -196,6 +210,14 @@ public class LoginFragment extends FragmentView implements LoginView {
         .map(__ -> 1);
   }
 
+  @Override public Observable<Object> getFacebookLoginEvent() {
+    return RxView.clicks(facebookLoginButton);
+  }
+
+  @Override public void navigateToFacebookLogin() {
+    facebookLoginManager.logInWithReadPermissions(this, Arrays.asList("email", "public_profile"));
+  }
+
   @Override public void onActivityResult(int requestCode, int resultCode, Intent data) {
     callbackManager.onActivityResult(requestCode, resultCode, data);
     super.onActivityResult(requestCode, resultCode, data);
@@ -216,17 +238,9 @@ public class LoginFragment extends FragmentView implements LoginView {
     return inflater.inflate(R.layout.fragment_login, container, false);
   }
 
-  private void setFacebookCustomListener() {
-    facebookLoginButton.registerCallback(callbackManager, new FacebookCallback<LoginResult>() {
-      @Override public void onSuccess(LoginResult loginResult) {
-        facebookLoginSubject.onNext(loginResult);
-      }
-
-      @Override public void onCancel() {
-      }
-
-      @Override public void onError(FacebookException exception) {
-      }
-    });
+  @Override public void onDestroy() {
+    super.onDestroy();
+    googleLoginSubject = null;
+    facebookLoginSubject = null;
   }
 }

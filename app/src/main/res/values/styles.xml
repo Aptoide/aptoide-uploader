@@ -97,4 +97,14 @@
 
   <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
 
+  <style name="EditTextWhite">
+    <item name="android:background">@drawable/background_edit_text_transparent</item>
+    <item name="android:textColorHint">@color/white</item>
+    <item name="android:textColor">@color/white</item>
+  </style>
+
+  <style name="RadioButton">
+    <item name="android:buttonTint">@drawable/radio_button_background</item>
+    <item name="android:textColor">@color/white</item>
+  </style>
 </resources>

@@ -47,6 +47,8 @@ import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence;
 import com.aptoide.uploader.upload.AptoideAccountProvider;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
+import com.facebook.internal.CallbackManagerImpl;
+import com.facebook.login.LoginManager;
 import com.flurry.android.FlurryAgent;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.Scopes;
@@ -83,13 +85,13 @@ public class UploaderApplication extends NotificationApplicationView {
   private CallbackManager callbackManager;
   private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
   private MaintenanceManager maintenanceManager;
+  private LoginManager loginManager;
 
   @Override public void onCreate() {
     super.onCreate();
     startFlurryAgent();
     initializeRakam();
 
-    callbackManager = CallbackManager.Factory.create();
     getUploadManager().start();
   }
 
@@ -288,6 +290,9 @@ public class UploaderApplication extends NotificationApplicationView {
   }
 
   public CallbackManager getCallbackManager() {
+    if (callbackManager == null) {
+      callbackManager = new CallbackManagerImpl();
+    }
     return callbackManager;
   }
 
@@ -357,5 +362,12 @@ public class UploaderApplication extends NotificationApplicationView {
           new MaintenanceManager(maintenanceService, getAccountManager(), maintenancePersistence);
     }
     return maintenanceManager;
+  }
+
+  public LoginManager getFacebookLoginManager() {
+    if (loginManager == null) {
+      loginManager = LoginManager.getInstance();
+    }
+    return loginManager;
   }
 }

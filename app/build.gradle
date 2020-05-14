@@ -31,7 +31,8 @@ android {
     resValue "string", "facebook_app_id", "\"" + project.FACEBOOK_APP_ID_UPLOADER + "\""
     resValue "string", "fb_login_protocol_scheme",
         "\"" + "fb" + project.FACEBOOK_APP_ID_UPLOADER + "\""
-    buildConfigField "String", "APTOIDE_WEB_SERVICES_RAKAM_HOST", "\"" + project.APTOIDE_WEB_SERVICES_RAKAM_HOST + "\""
+    buildConfigField "String", "APTOIDE_WEB_SERVICES_RAKAM_HOST",
+        "\"" + project.APTOIDE_WEB_SERVICES_RAKAM_HOST + "\""
     resValue "string", "google_id", "\"" + project.GMS_SERVER_ID_VANILLA + "\""
     buildConfigField "String", "RAKAM_API_KEY", "\"" + project.RAKAM_API_KEY_TEST + "\""
     vectorDrawables.useSupportLibrary = true
@@ -134,7 +135,7 @@ dependencies {
   //Flurry
   implementation 'com.flurry.android:analytics:12.0.1'
   //Facebook
-  implementation 'com.facebook.android:facebook-login:[5,6)'
+  implementation "com.facebook.android:facebook-login:${FACEBOOK_SDK_VERSION}"
 
   //Google Sign-In
   implementation 'com.google.android.gms:play-services-auth:16.0.0'
