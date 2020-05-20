@@ -50,7 +50,7 @@ public class AptoideAccessTokenProvider implements AuthenticationProvider {
 
   @Override public Single<String> getAccessTokenOAuth(String email, String token, String authMode) {
     String accessToken = authenticationPersistance.getAccessToken();
-    if (accessToken == null) {
+    if (accessToken == null || accessToken.equals("")) {
       final Map<String, String> args = new HashMap<>();
       args.put("authMode", authMode);
       args.put("oauthToken", token);
