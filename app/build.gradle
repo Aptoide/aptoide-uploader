@@ -102,6 +102,7 @@ dependencies {
   implementation "com.jakewharton.rxbinding2:rxbinding-support-v4:2.0.0"
   implementation 'com.jakewharton.rxrelay2:rxrelay:2.0.0'
   implementation "androidx.room:room-rxjava2:2.2.3"
+  api project(path: ':aptoide-authentication-rx')
 
   // Database
   // Room components

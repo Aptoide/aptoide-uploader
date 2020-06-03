@@ -1,5 +1,6 @@
 package com.aptoide.uploader.account;
 
+import com.aptoide.authentication.model.CodeAuth;
 import com.aptoide.uploader.account.network.CreateStoreStatus;
 import io.reactivex.Single;
 
@@ -23,4 +24,6 @@ public interface AccountService {
   Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials);
 
   void removeAccessTokenFromPersistence();
+
+  Single<CodeAuth> sendMagicLink(String email);
 }

@@ -1,7 +1,9 @@
 package com.aptoide.uploader.account;
 
+import com.aptoide.authentication.model.CodeAuth;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class AptoideAccountManager {
 
@@ -34,6 +36,14 @@ public class AptoideAccountManager {
   public Completable loginWithFacebook(String email, String serverAuthToken) {
     return accountService.getAccount(email, serverAuthToken, "facebook_uploader")
         .flatMapCompletable(account -> accountPersistence.save(account));
+  }
+
+  public Single<CodeAuth> sendMagicLink(String email) {
+    return accountService.sendMagicLink(email);
+  }
+
+  public Single<Boolean> isEmailValid(String email) {
+    return credentialsValidator.isEmailValid(email);
   }
 
   public Observable<Account> getAccount() {

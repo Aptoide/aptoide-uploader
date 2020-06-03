@@ -1,6 +1,8 @@
 package com.aptoide.uploader.account;
 
+import android.util.Patterns;
 import io.reactivex.Completable;
+import io.reactivex.Single;
 
 /**
  * Created by jose_messejana on 05-01-2018.
@@ -66,5 +68,17 @@ public class CredentialsValidator {
     }
 
     return hasNumber && hasLetter;
+  }
+
+  public Single<Boolean> isEmailValid(String email) {
+    return Single.just(checkIsEmailValid(email));
+  }
+
+  private boolean checkIsEmailValid(String email) {
+    if (!isEmpty(email) && Patterns.EMAIL_ADDRESS.matcher(email)
+        .matches()) {
+      return true;
+    }
+    return false;
   }
 }

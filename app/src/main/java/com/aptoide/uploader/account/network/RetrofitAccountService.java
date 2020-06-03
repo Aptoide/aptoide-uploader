@@ -1,5 +1,7 @@
 package com.aptoide.uploader.account.network;
 
+import com.aptoide.authentication.model.CodeAuth;
+import com.aptoide.authenticationrx.AptoideAuthenticationRx;
 import com.aptoide.uploader.account.Account;
 import com.aptoide.uploader.account.AccountFactory;
 import com.aptoide.uploader.account.AccountService;
@@ -36,15 +38,18 @@ public class RetrofitAccountService implements AccountService {
   private final SecurityAlgorithms securityAlgorithms;
   private final AccountResponseMapper mapper;
   private final AuthenticationProvider authenticationProvider;
+  private final AptoideAuthenticationRx aptoideAuthentication;
 
   public RetrofitAccountService(ServiceV3 serviceV3, ServiceV7 serviceV7,
       SecurityAlgorithms securityAlgorithms, AccountResponseMapper mapper,
-      AuthenticationProvider authenticationProvider) {
+      AuthenticationProvider authenticationProvider,
+      AptoideAuthenticationRx aptoideAuthentication) {
     this.serviceV3 = serviceV3;
     this.serviceV7 = serviceV7;
     this.securityAlgorithms = securityAlgorithms;
     this.mapper = mapper;
     this.authenticationProvider = authenticationProvider;
+    this.aptoideAuthentication = aptoideAuthentication;
   }
 
   @Override public Single<Account> getAccount(String username, String password) {
@@ -84,35 +89,6 @@ public class RetrofitAccountService implements AccountService {
 
   @Override public Single<Account> createAccount(String email, String password, String storeName) {
     return createAccount(email, password, storeName, null, null);
-  }
-
-  @Override public Single<CreateStoreStatus> createStore(String storeName) {
-    return authenticationProvider.getAccessToken()
-        .flatMap(accessToken -> serviceV3.createRepo(storeName, 1, true, accessToken, "aptoide",
-            accessToken, "json")
-            .singleOrError())
-        .flatMap(response -> mapCreateStoreResponse(response));
-  }
-
-  private Single<CreateStoreStatus> mapCreateStoreResponse(Response<CreateStoreResponse> response) {
-    if (response.isSuccessful() && response.body()
-        .getStatus()
-        .equals(Status.OK)) {
-      return Single.just(new CreateStoreStatus(response.body()
-          .getStatus(), response.body()
-          .getErrors()));
-    } else if (response.body()
-        .getStatus()
-        .equals(Status.FAIL)) {
-      if (response.body()
-          .getErrors()
-          .get(0)
-          .getCode()
-          .equals("WOP-3")) {
-        return Single.error(new DuplicatedStoreException());
-      }
-    }
-    return Single.error(new IOException());
   }
 
   @Override
@@ -191,6 +167,14 @@ public class RetrofitAccountService implements AccountService {
         });
   }
 
+  @Override public Single<CreateStoreStatus> createStore(String storeName) {
+    return authenticationProvider.getAccessToken()
+        .flatMap(accessToken -> serviceV3.createRepo(storeName, 1, true, accessToken, "aptoide",
+            accessToken, "json")
+            .singleOrError())
+        .flatMap(response -> mapCreateStoreResponse(response));
+  }
+
   @Override public Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials) {
     authenticationProvider.saveAuthentication(credentials.getAccessToken(),
         credentials.getRefreshToken());
@@ -208,6 +192,31 @@ public class RetrofitAccountService implements AccountService {
 
   @Override public void removeAccessTokenFromPersistence() {
     authenticationProvider.removeAuthentication();
+  }
+
+  @Override public Single<CodeAuth> sendMagicLink(String email) {
+    return aptoideAuthentication.sendMagicLink(email);
+  }
+
+  private Single<CreateStoreStatus> mapCreateStoreResponse(Response<CreateStoreResponse> response) {
+    if (response.isSuccessful() && response.body()
+        .getStatus()
+        .equals(Status.OK)) {
+      return Single.just(new CreateStoreStatus(response.body()
+          .getStatus(), response.body()
+          .getErrors()));
+    } else if (response.body()
+        .getStatus()
+        .equals(Status.FAIL)) {
+      if (response.body()
+          .getErrors()
+          .get(0)
+          .getCode()
+          .equals("WOP-3")) {
+        return Single.error(new DuplicatedStoreException());
+      }
+    }
+    return Single.error(new IOException());
   }
 
   public interface ServiceV3 {
