@@ -10,14 +10,12 @@ import io.reactivex.Single;
 
 public interface AccountService {
 
-  Single<Account> getAccount(String username, String password);
-
   Single<Account> getAccount(String email, String ServerAuthToken, String authMode);
 
   Single<Account> createAccount(String email, String password, String storeName);
 
-  Single<Account> createAccount(String email, String password, String storeName,
-      String storeUser, String storePass);
+  Single<Account> createAccount(String email, String password, String storeName, String storeUser,
+      String storePass);
 
   Single<CreateStoreStatus> createStore(String storeName);
 
@@ -26,4 +24,6 @@ public interface AccountService {
   void removeAccessTokenFromPersistence();
 
   Single<CodeAuth> sendMagicLink(String email);
+
+  Single<Account> getAccount(String email, String code, String state, String agent);
 }

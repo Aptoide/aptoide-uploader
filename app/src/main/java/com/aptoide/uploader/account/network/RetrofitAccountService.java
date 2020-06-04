@@ -52,20 +52,6 @@ public class RetrofitAccountService implements AccountService {
     this.aptoideAuthentication = aptoideAuthentication;
   }
 
-  @Override public Single<Account> getAccount(String username, String password) {
-    return authenticationProvider.getAccessToken(username, password)
-        .flatMap(accessToken -> serviceV7.getUserInfo(
-            new AccountRequestBody(Collections.singletonList("meta"), accessToken))
-            .singleOrError())
-        .flatMap(response -> {
-          if (response.isSuccessful() && response.body()
-              .isOk()) {
-            return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
-          }
-          return Single.error(new IllegalStateException(response.message()));
-        });
-  }
-
   @Override public Single<Account> getAccount(String email, String token, String authMode) {
     return authenticationProvider.getAccessTokenOAuth(email, token, authMode)
         .flatMap(accessToken -> serviceV7.getUserInfo(
@@ -196,6 +182,22 @@ public class RetrofitAccountService implements AccountService {
 
   @Override public Single<CodeAuth> sendMagicLink(String email) {
     return aptoideAuthentication.sendMagicLink(email);
+  }
+
+  @Override
+  public Single<Account> getAccount(String email, String code, String state, String agent) {
+    return aptoideAuthentication.authenticate(code, state, agent)
+        .flatMap(oAuth2 -> serviceV7.getUserInfo(
+            new AccountRequestBody(Collections.singletonList("meta"), oAuth2.getData()
+                .getAccessToken()))
+            .singleOrError())
+        .flatMap(response -> {
+          if (response.isSuccessful() && response.body()
+              .isOk()) {
+            return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
+          }
+          return Single.error(new IllegalStateException(response.message()));
+        });
   }
 
   private Single<CreateStoreStatus> mapCreateStoreResponse(Response<CreateStoreResponse> response) {
