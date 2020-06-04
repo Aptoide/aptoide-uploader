@@ -5,6 +5,7 @@ import android.util.Log;
 import com.aptoide.authentication.AptoideAuthentication;
 import com.aptoide.authentication.network.RemoteAuthenticationService;
 import com.aptoide.authenticationrx.AptoideAuthenticationRx;
+import com.aptoide.uploader.account.AgentPersistence;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.account.AutoLoginPersistence;
@@ -89,6 +90,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
   private MaintenanceManager maintenanceManager;
   private LoginManager loginManager;
+  private AgentPersistence agentPersistence;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -378,5 +380,13 @@ public class UploaderApplication extends NotificationApplicationView {
       loginManager = LoginManager.getInstance();
     }
     return loginManager;
+  }
+
+  public AgentPersistence getAgentPersistence() {
+    if (agentPersistence == null) {
+      this.agentPersistence =
+          new AgentPersistence(PreferenceManager.getDefaultSharedPreferences(this));
+    }
+    return agentPersistence;
   }
 }
