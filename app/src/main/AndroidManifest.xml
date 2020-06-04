@@ -49,7 +49,7 @@
       </intent-filter>
     </activity>
 
-    <service android:name=".UploaderService" />
+    <service android:name=".NotificationApplicationView" />
   </application>
 
 </manifest>

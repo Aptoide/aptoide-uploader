@@ -5,7 +5,7 @@ package com.aptoide.uploader.upload;
  */
 
 public interface BackgroundService {
-  void enable();
+  int enable();
 
   void disable();
 }

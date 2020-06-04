@@ -1,5 +1,7 @@
 package com.aptoide.uploader;
 
+import android.app.Application;
+import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.aptoide.uploader.account.AptoideAccountManager;
@@ -68,7 +70,7 @@ import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
-public class UploaderApplication extends NotificationApplicationView {
+public class UploaderApplication extends Application {
 
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
@@ -91,8 +93,8 @@ public class UploaderApplication extends NotificationApplicationView {
     super.onCreate();
     startFlurryAgent();
     initializeRakam();
-
     getUploadManager().start();
+    this.startService(new Intent(this, NotificationApplicationView.class));
   }
 
   public UploadManager getUploadManager() {
@@ -107,9 +109,9 @@ public class UploaderApplication extends NotificationApplicationView {
           new RetrofitUploadService(retrofitV7.create(RetrofitUploadService.ServiceV7.class),
               getAccessTokenProvider(), uploadProgressManager, getUploaderAnalytics(),
               getMd5Calculator()), getMd5Calculator(),
-          new ServiceBackgroundService(this, UploaderService.class), getAccessTokenProvider(),
-          getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager,
-          getDraftPersistence());
+          new ServiceBackgroundService(this, NotificationApplicationView.class),
+          getAccessTokenProvider(), getAppUploadStatusManager(), getAppUploadStatusPersistence(),
+          uploadProgressManager, getDraftPersistence());
     }
     return uploadManager;
   }

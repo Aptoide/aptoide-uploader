@@ -37,7 +37,10 @@ public class NotificationPresenter implements Presenter {
   @SuppressLint("CheckResult") private void handleNotificationsStream() {
     view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .doOnNext(lifecycleEvent -> Log.d("LOL",
+            "handleNotificationsStream: Emmited create" + lifecycleEvent))
         .flatMap(viewCreated -> notificationEvents)
+        .doOnNext(__ -> Log.d("LOL", "handleNotificationsStream: after notification event"))
         .distinctUntilChanged(
             (uploadNotification, uploadNotification2) -> uploadNotification.getType()
                 .equals(uploadNotification2.getType())
@@ -51,7 +54,10 @@ public class NotificationPresenter implements Presenter {
         .lift(allowPerMillis(200))
         .flatMapCompletable(uploadNotification -> showNotification(uploadNotification))
         .subscribe(() -> {
-        }, Throwable::printStackTrace);
+        }, throwable -> {
+          Log.d("LOL", "handleNotificationsStream: handleNotificationsStream onError");
+          throwable.printStackTrace();
+        });
   }
 
   private <T> FlowableOperator<T, T> allowPerMillis(int millis) {
@@ -129,16 +135,20 @@ public class NotificationPresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadManager.getDrafts())
         .flatMapIterable(drafts -> drafts)
+        .doOnNext(
+            drafts -> Log.d("LOL", "handleNotificationsStream: Emmited drafts" + drafts.getMd5()))
         .filter(uploadDraft -> !uploadDraft.getStatus()
             .equals(UploadDraft.Status.IN_QUEUE))
         .flatMap(draft -> {
           if (draft.getStatus()
               .equals(UploadDraft.Status.PROGRESS)) {
+
             return updateProgress(draft);
           } else {
             return Observable.just(draft);
           }
         })
+        .doOnNext(__ -> Log.d("LOL", "handleNotificationsStream: after queue check"))
         .concatMap(i -> Observable.just(i)
             .delay(25, TimeUnit.MILLISECONDS))
         .map(draft -> mapToNotification(draft.getInstalledApp()

@@ -1,14 +1,15 @@
 package com.aptoide.uploader;
 
-import android.app.Application;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.IBinder;
 import android.util.Log;
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.view.NotificationPresenter;
@@ -16,21 +17,38 @@ import com.aptoide.uploader.apps.view.NotificationView;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
-public abstract class NotificationApplicationView extends Application implements NotificationView {
+public class NotificationApplicationView extends Service implements NotificationView {
 
   private final String NOTIFICATION_CHANNEL_ID = "Upload";
+  private UploadManager uploadManager;
   private BehaviorSubject<LifecycleEvent> lifecycleSubject;
   private NotificationManager notificationManager;
   private NotificationPresenter systemNotificationShower;
 
   @Override public void onCreate() {
     super.onCreate();
+    Log.i("LOL", "Service has been started onCreate");
     lifecycleSubject = BehaviorSubject.create();
     lifecycleSubject.onNext(LifecycleEvent.CREATE);
+    uploadManager = ((UploaderApplication) getApplicationContext()).getUploadManager();
     notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     systemNotificationShower = new NotificationPresenter(this, getUploadManager());
     attachPresenter();
     setupChannels();
+  }
+
+  @Override public int onStartCommand(Intent intent, int flags, int startId) {
+    Log.i("LOL", "Service has been started");
+    return START_STICKY;
+  }
+
+  @Override public void onDestroy() {
+    Log.i("LOL", "Service has been destroyed");
+    super.onDestroy();
+  }
+
+  @Nullable @Override public IBinder onBind(Intent intent) {
+    return null;
   }
 
   @Override public Observable<LifecycleEvent> getLifecycleEvent() {
@@ -62,7 +80,7 @@ public abstract class NotificationApplicationView extends Application implements
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
-            .setOngoing(false)
+            .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(0, 0, true);
 
@@ -151,7 +169,7 @@ public abstract class NotificationApplicationView extends Application implements
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
-            .setOngoing(false)
+            .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(100, progress, false);
 
@@ -236,5 +254,7 @@ public abstract class NotificationApplicationView extends Application implements
     systemNotificationShower.present();
   }
 
-  public abstract UploadManager getUploadManager();
+  public UploadManager getUploadManager() {
+    return this.uploadManager;
+  }
 }
