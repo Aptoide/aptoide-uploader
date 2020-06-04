@@ -34,12 +34,12 @@ public class AccountErrorMapper {
       case AccountValidationException.EMPTY_EMAIL:
         message = context.getString(R.string.no_email_error_message);
         break;
-      case AccountValidationException.EMPTY_PASSWORD:
+      /*case AccountValidationException.EMPTY_PASSWORD:
         message = context.getString(R.string.no_pass_error_message);
         break;
       case AccountValidationException.EMPTY_STORE:
         message = context.getString(R.string.no_store_error_message);
-        break;
+        break;*/
       case AccountValidationException.INVALID_PASSWORD:
         message = context.getString(R.string.invalid_pass_error_message);
         break;
