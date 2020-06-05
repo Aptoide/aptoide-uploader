@@ -192,4 +192,8 @@
   <string name="login_error_invalid_email">This email isn\'t valid!</string>
   <string name="login_completed_title">Done!</string>
   <string name="login_completed_body">Ready for the best apps?</string>
+
+  <string name="all_message_general_error">Something went wrong. Try again.</string>
+  <string name="please_wait">Please wait…</string>
+
 </resources>

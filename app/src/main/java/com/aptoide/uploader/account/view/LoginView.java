@@ -37,6 +37,8 @@ public interface LoginView extends View {
 
   void navigateToFacebookLogin();
 
+  void showMagicLinkError(String error);
+
   class CredentialsViewModel {
 
     private final String username;
