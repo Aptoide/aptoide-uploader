@@ -11,13 +11,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.sendmagiclink.SendMagicLinkNavigator;
+import com.aptoide.uploader.account.sendmagiclink.SendMagicLinkPresenter;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -52,11 +53,6 @@ public class LoginFragment extends FragmentView implements LoginView {
   private GoogleSignInOptions gso;
   private CallbackManager callbackManager;
   private LoginManager facebookLoginManager;
-  private TextView title;
-  private TextView message_first;
-  private TextView message_second;
-  private TextView blog;
-  private ImageView blogNextButton;
 
   public static LoginFragment newInstance() {
     return new LoginFragment();
@@ -94,19 +90,10 @@ public class LoginFragment extends FragmentView implements LoginView {
     loadingTextView = view.findViewById(R.id.fragment_login_loading_text_view);
     fragmentContainer = view.findViewById(R.id.fragment_login_content);
 
-    title = view.findViewById(R.id.login_title);
-    message_first = view.findViewById(R.id.login_message1);
-    message_second = view.findViewById(R.id.login_message2);
-    blog = view.findViewById(R.id.login_blog);
-    blogNextButton = view.findViewById(R.id.login_blognext);
-
     googleLoginButton = view.findViewById(R.id.google_sign_in_button);
     facebookLoginButton = view.findViewById(R.id.facebook_login_button);
 
     fragmentContainer.setVisibility(View.VISIBLE);
-    title.setText(getString(R.string.login_disclaimer_title));
-    message_first.setText(getString(R.string.login_disclaimer_body_1));
-    message_second.setText(getString(R.string.login_disclaimer_body_2));
     setupBlogTextView();
 
     new LoginPresenter(this, accountManager,
@@ -114,6 +101,9 @@ public class LoginFragment extends FragmentView implements LoginView {
         new CompositeDisposable(), AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
         ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
+    new SendMagicLinkPresenter(this, accountManager,
+        new SendMagicLinkNavigator(getFragmentManager()), AndroidSchedulers.mainThread(),
+        agentPersistence)
   }
 
   @Override public void onResume() {
@@ -130,18 +120,12 @@ public class LoginFragment extends FragmentView implements LoginView {
     progressContainer = null;
     loadingTextView = null;
     facebookLoginButton = null;
-    title = null;
-    message_first = null;
-    message_second = null;
-    blog = null;
-    blogNextButton = null;
     super.onDestroyView();
   }
 
   private void setupBlogTextView() {
     SpannableString content = new SpannableString(getString(R.string.login_disclaimer_blog_button));
     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-    blog.setText(content);
   }
 
   @Override public Observable<Object> getGoogleLoginEvent() {
@@ -203,11 +187,6 @@ public class LoginFragment extends FragmentView implements LoginView {
   @Override public void startGoogleActivity() {
     Intent signInIntent = mGoogleSignInClient.getSignInIntent();
     startActivityForResult(signInIntent, RC_SIGN_IN);
-  }
-
-  @Override public Observable<Integer> clickOnBlog() {
-    return Observable.merge(RxView.clicks(blog), RxView.clicks(blogNextButton))
-        .map(__ -> 1);
   }
 
   @Override public Observable<Object> getFacebookLoginEvent() {

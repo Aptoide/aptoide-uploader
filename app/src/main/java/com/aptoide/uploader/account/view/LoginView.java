@@ -4,7 +4,6 @@ import com.aptoide.uploader.view.View;
 import com.facebook.login.LoginResult;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import io.reactivex.Observable;
-import io.reactivex.ObservableSource;
 
 public interface LoginView extends View {
 
@@ -33,8 +32,6 @@ public interface LoginView extends View {
   void hideKeyboard();
 
   void startGoogleActivity();
-
-  Observable<Integer> clickOnBlog();
 
   Observable<Object> getFacebookLoginEvent();
 

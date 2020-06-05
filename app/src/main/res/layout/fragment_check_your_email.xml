@@ -1,0 +1,107 @@
+<?xml version="1.0" encoding="utf-8"?><!--
+android:fitsSystemWindows="true"
+-->
+<androidx.coordinatorlayout.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:id="@+id/main_content"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:background="@drawable/gradient_drawable_maintenance"
+  android:orientation="vertical"
+  android:paddingBottom="48dp">
+
+  <ScrollView
+    android:layout_width="match_parent"
+    android:layout_height="match_parent">
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content">
+
+
+      <ImageView
+        android:id="@+id/login_cloudsimage"
+        android:layout_width="120dp"
+        android:layout_height="140dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="63dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/background_clouds" />
+
+      <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_horizontal"
+        android:orientation="vertical"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <com.google.android.material.appbar.AppBarLayout
+          android:id="@+id/appbar"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:background="@color/transparent"
+          app:elevation="0dp"
+          app:theme="@style/ThemeOverlay.AppCompat.Dark.ActionBar">
+
+          <androidx.appcompat.widget.Toolbar
+            android:id="@+id/toolbar"
+            android:layout_width="match_parent"
+            android:layout_height="?attr/actionBarSize"
+            app:layout_scrollFlags="scroll|enterAlways"
+            app:popupTheme="@style/ThemeOverlay.AppCompat.Light" />
+        </com.google.android.material.appbar.AppBarLayout>
+
+        <ImageView
+          android:layout_width="96dp"
+          android:layout_height="96dp"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginStart="20dp"
+          android:layout_marginLeft="20dp"
+          android:layout_marginTop="100dp"
+          android:layout_marginEnd="20dp"
+          android:layout_marginRight="20dp"
+          android:layout_marginBottom="20dp"
+          app:srcCompat="@drawable/ic_check_email" />
+
+        <TextView
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_marginBottom="10dp"
+          android:gravity="center"
+          android:text="@string/login_check_email_title"
+          android:textSize="24sp" />
+
+
+        <TextView
+          android:id="@+id/check_your_email_body_text"
+          android:layout_width="match_parent"
+          android:layout_height="match_parent"
+          android:gravity="center"
+          android:paddingStart="32dp"
+          android:paddingLeft="32dp"
+          android:paddingEnd="32dp"
+          android:paddingRight="32dp"
+          android:textSize="14sp"
+          tools:text="@string/login_check_email_body" />
+
+        <Button
+          android:id="@+id/open_email_app_button"
+          android:layout_width="144dp"
+          android:layout_height="40dp"
+          android:layout_marginTop="32dp"
+          android:background="@drawable/background_button_rounded_white"
+          android:text="@string/login_check_email_button"
+          android:textAllCaps="false"
+          android:textColor="@color/dark_blue" />
+
+      </LinearLayout>
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+  </ScrollView>
+
+</androidx.coordinatorlayout.widget.CoordinatorLayout>
