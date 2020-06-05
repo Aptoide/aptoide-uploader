@@ -1,5 +1,6 @@
 package com.aptoide.uploader.account.sendmagiclink
 
+import com.aptoide.uploader.account.AgentPersistence
 import com.aptoide.uploader.account.AptoideAccountManager
 import com.aptoide.uploader.view.Presenter
 import com.aptoide.uploader.view.View.LifecycleEvent
@@ -36,7 +37,6 @@ class SendMagicLinkPresenter(
             }
             .subscribe({}, { e -> e.printStackTrace() })
     )
-
   }
 
   private fun handleSendMagicLinkClick() {
@@ -89,5 +89,4 @@ class SendMagicLinkPresenter(
           throw OnErrorNotImplementedException(throwable)
         })
   }
-
 }
