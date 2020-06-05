@@ -49,7 +49,8 @@ class CreateAccountPresenterTest : Spek({
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
           SecurityAlgorithms(), AccountResponseMapper(),
-          AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence,
+          AptoideAccessTokenProvider(authenticationPersistance, serviceV3),
+          aptoideAuthentication), accountPersistence,
           credentialsValidator)
 
       val view = mock<CreateAccountView>()
@@ -102,7 +103,8 @@ class CreateAccountPresenterTest : Spek({
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
           SecurityAlgorithms(), AccountResponseMapper(),
-          AptoideAccessTokenProvider(authenticationPersistance, serviceV3)), accountPersistence,
+          AptoideAccessTokenProvider(authenticationPersistance, serviceV3),
+          aptoideAuthentication), accountPersistence,
           credentialsValidator)
 
       val view = mock<CreateAccountView>()
@@ -152,7 +154,7 @@ class CreateAccountPresenterTest : Spek({
       val credentialsValidator = mock<CredentialsValidator>()
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-          SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence,
+          SecurityAlgorithms(), AccountResponseMapper(), null, aptoideAuthentication), accountPersistence,
           credentialsValidator)
 
       val view = mock<CreateAccountView>()
@@ -196,7 +198,7 @@ class CreateAccountPresenterTest : Spek({
       val credentialsValidator = mock<CredentialsValidator>()
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-          SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence,
+          SecurityAlgorithms(), AccountResponseMapper(), null, aptoideAuthentication), accountPersistence,
           credentialsValidator)
 
       val view = mock<CreateAccountView>()
@@ -240,7 +242,7 @@ class CreateAccountPresenterTest : Spek({
       val credentialsValidator = mock<CredentialsValidator>()
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-          SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence,
+          SecurityAlgorithms(), AccountResponseMapper(), null, aptoideAuthentication), accountPersistence,
           credentialsValidator)
 
       val view = mock<CreateAccountView>()
@@ -284,7 +286,7 @@ class CreateAccountPresenterTest : Spek({
       val credentialsValidator = mock<CredentialsValidator>()
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-          SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence,
+          SecurityAlgorithms(), AccountResponseMapper(), null, aptoideAuthentication), accountPersistence,
           credentialsValidator)
       val accounts = PublishSubject.create<Account>()
       val view = mock<CreateAccountView>()
@@ -319,7 +321,7 @@ class CreateAccountPresenterTest : Spek({
       val credentialsValidator = mock<CredentialsValidator>()
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3Account, serviceV7,
-          SecurityAlgorithms(), AccountResponseMapper(), null), accountPersistence,
+          SecurityAlgorithms(), AccountResponseMapper(), null, aptoideAuthentication), accountPersistence,
           credentialsValidator)
       val accounts = PublishSubject.create<Account>()
       val view = mock<CreateAccountView>()

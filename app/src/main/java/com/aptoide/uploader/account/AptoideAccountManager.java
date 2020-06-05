@@ -1,7 +1,9 @@
 package com.aptoide.uploader.account;
 
+import com.aptoide.authentication.model.CodeAuth;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class AptoideAccountManager {
 
@@ -21,9 +23,15 @@ public class AptoideAccountManager {
     this.autoLoginPersistence = autoLoginPersistence;
   }
 
-  public Completable login(String username, String password) {
-    return accountService.getAccount(username, password)
+  public Completable login(AptoideCredentials aptoideCredentials) {
+    return credentialsValidator.validate(aptoideCredentials)
+        .andThen(
+            accountService.getAccount(aptoideCredentials.getEmail(), aptoideCredentials.getCode(),
+                aptoideCredentials.getState(), aptoideCredentials.getAgent()))
         .flatMapCompletable(account -> accountPersistence.save(account));
+    // TODO: 6/4/20 one error we had on vanilla was the fact that
+    //  the info being returned on getUserInfo is coming null
+
   }
 
   public Completable loginWithGoogle(String email, String serverAuthToken) {
@@ -36,13 +44,23 @@ public class AptoideAccountManager {
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
+  public Single<CodeAuth> sendMagicLink(String email) {
+    return accountService.sendMagicLink(email);
+  }
+
+  public Single<Boolean> isEmailValid(String email) {
+    return credentialsValidator.isEmailValid(email);
+  }
+
   public Observable<Account> getAccount() {
     return accountPersistence.getAccount();
   }
 
   public Completable create(String email, String password, String storeName) {
-    return credentialsValidator.validate(email, password, storeName)
-        .andThen(accountService.createAccount(email, password, storeName))
+    // TODO: 6/4/20 commented this validation in order to not have to change the call of this method as it is going to probably be removed?
+    /*return credentialsValidator.validate(email, password, storeName)
+        .andThen(*/
+    return accountService.createAccount(email, password, storeName)
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
