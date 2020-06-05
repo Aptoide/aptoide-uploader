@@ -113,7 +113,7 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
         ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
     new SendMagicLinkPresenter(this, accountManager,
         new SendMagicLinkNavigator(getFragmentManager()), AndroidSchedulers.mainThread(),
-        ((UploaderApplication) getContext().getApplicationContext()).getAgentPersistence());
+        ((UploaderApplication) getContext().getApplicationContext()).getAgentPersistence()).present();
   }
 
   @Override public void onResume() {
