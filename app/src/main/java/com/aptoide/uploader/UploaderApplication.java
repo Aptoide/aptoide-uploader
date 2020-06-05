@@ -74,6 +74,9 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class UploaderApplication extends NotificationApplicationView {
 
+  private final String APTOIDE_WEBSERVICES_BASE_HOST = "https://webservices.aptoide.com/api/7/";
+  private final String APTOIDE_WEBSERVICES_BASE_HOST_DEV =
+      "https://webservices-devel.aptoide.com/api/7/";
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
   private UploadManager uploadManager;
@@ -174,8 +177,8 @@ public class UploaderApplication extends NotificationApplicationView {
   }
 
   public AptoideAuthenticationRx getAptoideAuthenticationRx() {
-    return new AptoideAuthenticationRx(
-        new AptoideAuthentication(new RemoteAuthenticationService()));
+    return new AptoideAuthenticationRx(new AptoideAuthentication(
+        new RemoteAuthenticationService(APTOIDE_WEBSERVICES_BASE_HOST_DEV)));
   }
 
   public AuthenticationProvider getAuthenticationProvider() {
