@@ -251,12 +251,12 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
   }
 
   @Override public void setLoadingScreen() {
-    //showLoading();
+    progressDialog.show();
   }
 
   @Override public void removeLoadingScreen() {
     hideKeyboard();
-    hideLoading();
+    progressDialog.dismiss();
   }
 
   @NotNull @Override public Observable<String> getEmailTextChangeEvent() {

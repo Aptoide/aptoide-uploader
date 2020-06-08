@@ -68,7 +68,7 @@ class CheckYourEmailFragment : FragmentView(), CheckYourEmailView {
       activity.setSupportActionBar(toolbar)
       val actionBar = activity.supportActionBar
       actionBar?.setDisplayHomeAsUpEnabled(true)
-      actionBar?.setTitle(toolbar.title)
+      actionBar?.title = toolbar.title
       toolbar.title = ""
     }
   }
@@ -76,4 +76,5 @@ class CheckYourEmailFragment : FragmentView(), CheckYourEmailView {
   override fun getCheckYourEmailClick(): Observable<Any> {
     return RxView.clicks(openEmailAppButton)
   }
+
 }

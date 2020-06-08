@@ -2,6 +2,7 @@ package com.aptoide.uploader;
 
 import android.content.Intent;
 import android.os.Bundle;
+import android.view.MenuItem;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.aptoide.uploader.account.view.MaintenanceFragment;
@@ -66,5 +67,13 @@ public class MainActivity extends PermissionProviderActivity {
 
   @Override protected void onResume() {
     super.onResume();
+  }
+
+  @Override public boolean onOptionsItemSelected(MenuItem item) {
+    if (item.getItemId() == android.R.id.home) {
+      onBackPressed();
+      return true;
+    }
+    return super.onOptionsItemSelected(item);
   }
 }

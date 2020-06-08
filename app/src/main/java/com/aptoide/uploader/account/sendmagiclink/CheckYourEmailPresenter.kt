@@ -10,6 +10,8 @@ class CheckYourEmailPresenter(private val view: CheckYourEmailView,
   private lateinit var compositeDisposable: CompositeDisposable
 
   override fun present() {
+    compositeDisposable = CompositeDisposable()
+
     handleCheckEmailAppClick()
     onDestroyDisposeComposite()
   }
