@@ -2,11 +2,11 @@ package com.aptoide.uploader.apps.permission;
 
 import android.content.pm.PackageManager;
 import android.os.Bundle;
+import android.util.SparseArray;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.core.app.ActivityCompat;
-import androidx.appcompat.app.AppCompatActivity;
-import android.util.SparseArray;
+import com.aptoide.uploader.ActivityView;
 import com.jakewharton.rxrelay2.PublishRelay;
 import io.reactivex.Observable;
 import java.util.ArrayList;
@@ -18,7 +18,7 @@ import java.util.Set;
  * Created by jdandrade on 28/12/2017.
  */
 
-public abstract class PermissionProviderActivity extends AppCompatActivity
+public abstract class PermissionProviderActivity extends ActivityView
     implements PermissionProvider {
 
   private PublishRelay<Set<Permission>> permissionRelay;

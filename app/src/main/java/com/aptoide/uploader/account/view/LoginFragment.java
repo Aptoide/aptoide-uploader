@@ -47,6 +47,9 @@ import org.jetbrains.annotations.NotNull;
 public class LoginFragment extends FragmentView implements LoginView, MagicLinkView {
 
   private static final int RC_SIGN_IN = 9001;
+  public static final String HAS_MAGIC_LINK_ERROR = "has_magic_link_error";
+  public static final String MAGIC_LINK_ERROR_MESSAGE = "magic_link_error_message";
+
   PublishSubject<GoogleSignInAccount> googleLoginSubject;
   PublishSubject<LoginResult> facebookLoginSubject;
   private View progressContainer;
@@ -62,8 +65,20 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
   private SendMagicLinkView sendMagicLinkView;
   private ProgressDialog progressDialog;
 
+  private boolean hasMagicLinkError = false;
+  private String magicLinkErrorMessage = "";
+
   public static LoginFragment newInstance() {
-    return new LoginFragment();
+    return newInstance(false, "");
+  }
+
+  public static LoginFragment newInstance(boolean hasMagicLinkError, String magicLinkErrorMessage) {
+    Bundle args = new Bundle();
+    args.putBoolean(HAS_MAGIC_LINK_ERROR, hasMagicLinkError);
+    args.putString(MAGIC_LINK_ERROR_MESSAGE, magicLinkErrorMessage);
+    LoginFragment loginFragment = new LoginFragment();
+    loginFragment.setArguments(args);
+    return loginFragment;
   }
 
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -90,6 +105,14 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
         error.printStackTrace();
       }
     });
+    if (getArguments() != null) {
+      loadExtras(getArguments());
+    }
+  }
+
+  private void loadExtras(Bundle args) {
+    hasMagicLinkError = args.getBoolean(LoginFragment.HAS_MAGIC_LINK_ERROR);
+    magicLinkErrorMessage = args.getString(LoginFragment.MAGIC_LINK_ERROR_MESSAGE);
   }
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -114,6 +137,10 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
     new SendMagicLinkPresenter(this, accountManager,
         new SendMagicLinkNavigator(getFragmentManager()), AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getAgentPersistence()).present();
+
+    if (hasMagicLinkError && magicLinkErrorMessage != null) {
+      sendMagicLinkView.setState(new SendMagicLinkView.State.Error(magicLinkErrorMessage, false));
+    }
   }
 
   @Override public void onResume() {
