@@ -16,6 +16,7 @@ android:fitsSystemWindows="true"
     android:layout_height="match_parent">
 
     <androidx.constraintlayout.widget.ConstraintLayout
+      android:id="@+id/check_your_email_layout"
       android:layout_width="match_parent"
       android:layout_height="wrap_content">
 
@@ -104,4 +105,31 @@ android:fitsSystemWindows="true"
 
   </ScrollView>
 
+  <RelativeLayout
+    android:id="@+id/fragment_login_progress_container"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:layout_marginBottom="100dp"
+    android:visibility="visible">
+
+    <ProgressBar
+      android:id="@+id/progressBarBar"
+      style="?android:attr/progressBarStyleLarge"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_centerInParent="true"
+      android:layout_centerHorizontal="true" />
+
+    <TextView
+      android:id="@+id/fragment_login_loading_text_view"
+      android:layout_width="wrap_content"
+      android:layout_height="wrap_content"
+      android:layout_below="@id/progressBarBar"
+      android:layout_centerHorizontal="true"
+      android:gravity="center_horizontal"
+      android:padding="25dp"
+      android:text="@string/signing_in"
+      android:textAlignment="center" />
+
+  </RelativeLayout>
 </androidx.coordinatorlayout.widget.CoordinatorLayout>

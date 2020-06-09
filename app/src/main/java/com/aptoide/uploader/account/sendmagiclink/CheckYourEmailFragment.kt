@@ -10,9 +10,12 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
 import com.aptoide.uploader.R
+import com.aptoide.uploader.UploaderApplication
+import com.aptoide.uploader.account.view.LoginNavigator
 import com.aptoide.uploader.view.android.FragmentView
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
+import io.reactivex.android.schedulers.AndroidSchedulers
 import kotlinx.android.synthetic.main.fragment_check_your_email.*
 
 class CheckYourEmailFragment : FragmentView(), CheckYourEmailView {
@@ -47,7 +50,10 @@ class CheckYourEmailFragment : FragmentView(), CheckYourEmailView {
     super.onViewCreated(view, savedInstanceState)
     setupToolbar()
     setupViews(view)
-    CheckYourEmailPresenter(this, CheckYourEmailNavigator(activity)).present()
+    val app = (requireContext().applicationContext as UploaderApplication)
+    CheckYourEmailPresenter(this, CheckYourEmailNavigator(activity), app.accountManager,
+        AndroidSchedulers.mainThread(),
+        LoginNavigator(fragmentManager, requireContext().applicationContext)).present()
   }
 
   private fun setupViews(view: View) {
@@ -75,6 +81,17 @@ class CheckYourEmailFragment : FragmentView(), CheckYourEmailView {
 
   override fun getCheckYourEmailClick(): Observable<Any> {
     return RxView.clicks(openEmailAppButton)
+  }
+
+  override fun showLoadingWithoutUserName() {
+    fragment_login_loading_text_view.text = getString(R.string.logging_in)
+    check_your_email_layout.visibility = View.GONE
+    fragment_login_progress_container.visibility = View.VISIBLE
+  }
+
+  override fun hideLoading() {
+    check_your_email_layout.visibility = View.VISIBLE
+    fragment_login_progress_container.visibility = View.GONE
   }
 
 }

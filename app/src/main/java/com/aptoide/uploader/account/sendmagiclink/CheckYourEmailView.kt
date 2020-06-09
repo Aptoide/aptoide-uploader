@@ -6,4 +6,6 @@ import io.reactivex.Observable
 interface CheckYourEmailView : View {
 
   fun getCheckYourEmailClick(): Observable<Any>
+  fun showLoadingWithoutUserName()
+  fun hideLoading()
 }
