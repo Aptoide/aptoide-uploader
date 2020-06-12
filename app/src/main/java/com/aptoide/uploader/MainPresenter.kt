@@ -39,6 +39,8 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
                 "dismissNotification" -> {
                   return@flatMap handleDismissNotificationIntent(intent)
                 }
+                "android.intent.category.BROWSABLE",
+                "android.intent.category.DEFAULT",
                 "android.intent.action.VIEW" -> {
                   return@flatMap handleActionViewIntent(intent)
                 }
@@ -65,23 +67,30 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
         .andThen(Observable.just(intentData))
   }
 
-  private fun handleActionViewIntent(intentData: IntentData): Observable<IntentData> {
+  private fun handleActionViewIntent(intentData: IntentData): Observable<IntentData>? {
     var uri: Uri? = null
     try {
       uri = Uri.parse(intentData.data)
     } catch (e: Exception) {
       e.printStackTrace()
     }
-    uri?.let { u ->
+    return safeLetArg<Uri, String, String, Observable<IntentData>?>(uri, uri?.host,
+        uri?.path) { u, host, path ->
       when {
         u.scheme.equals("aptoideauth", ignoreCase = true) -> {
           val token: String = intentData.data.split("aptoideauth://").toTypedArray()[1]
-          return authenticate(token)
+          return@safeLetArg authenticate(token)
               .andThen(Observable.just(intentData))
         }
-        else -> return Observable.just(intentData)
+        host.contains("app.aptoide.com") && path.contains("auth/code/") -> {
+          val token = path.split("auth/code/")[1]
+          return@safeLetArg authenticate(token)
+              .andThen(Observable.just(intentData))
+        }
+        else -> return@safeLetArg Observable.just(intentData)
       }
     }
+
     return Observable.just(intentData)
   }
 
@@ -91,7 +100,6 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
         .observeOn(viewScheduler)
         .doOnSubscribe { view.showLoadingView() }
         .doOnComplete { view.hideLoadingView() }
-        .doOnComplete { handleFirstSession() }
         .doOnError { throwable ->
           view.hideLoadingView()
           if (throwable is AuthenticationException
@@ -102,10 +110,6 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
           }
         }
         .onErrorComplete()
-  }
-
-  private fun handleFirstSession() {
-    // TODO: Show create store?
   }
 
   private fun onDestroyDisposeComposite() {
