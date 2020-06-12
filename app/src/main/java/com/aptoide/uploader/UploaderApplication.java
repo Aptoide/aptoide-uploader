@@ -94,7 +94,6 @@ public class UploaderApplication extends Application {
     startFlurryAgent();
     initializeRakam();
     getUploadManager().start();
-    this.startService(new Intent(this, NotificationApplicationView.class));
   }
 
   public UploadManager getUploadManager() {
@@ -202,7 +201,8 @@ public class UploaderApplication extends Application {
 
       storeManager = new StoreManager(getPackageManagerInstalledAppsProvider(),
           new AccountStoreNameProvider(getAccountManager()), getUploadManager(),
-          getLanguageManager(), getAccountManager(), Schedulers.io());
+          getLanguageManager(), getAccountManager(), Schedulers.io(),
+          new ServiceBackgroundService(getApplicationContext(), NotificationApplicationView.class));
     }
     return storeManager;
   }

@@ -1,6 +1,5 @@
 package com.aptoide.uploader.apps;
 
-import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
@@ -21,9 +20,8 @@ public class ServiceBackgroundService implements BackgroundService {
     this.serviceClass = serviceClass;
   }
 
-  @Override public int enable() {
+  @Override public void enable() {
     context.startService(new Intent(context, serviceClass));
-    return Service.START_STICKY;
   }
 
   @Override public void disable() {
