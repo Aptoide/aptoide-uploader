@@ -22,6 +22,8 @@
   <string name="no_store_error_message">Please insert a store</string>
   <string name="invalid_pass_error_message">Password must be at least 8 characters and should have
     at least one letter and one number or special characters (!@#$%*)</string>
+  <string name="all_message_general_error">Something went wrong. Try again.</string>
+  <string name="please_wait">Please wait…</string>
 
   <string name="store">Store</string>
   <string name="store_privacy">Store privacy</string>
