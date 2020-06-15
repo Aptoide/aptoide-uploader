@@ -187,10 +187,15 @@ public class RetrofitAccountService implements AccountService {
   @Override
   public Single<Account> getAccount(String email, String code, String state, String agent) {
     return aptoideAuthentication.authenticate(code, state, agent)
-        .flatMap(oAuth2 -> serviceV7.getUserInfo(
-            new AccountRequestBody(Collections.singletonList("meta"), oAuth2.getData()
-                .getAccessToken()))
-            .singleOrError())
+        .flatMap(oAuth2 -> {
+          authenticationProvider.saveAuthentication(oAuth2.getData()
+              .getAccessToken(), oAuth2.getData()
+              .getRefreshToken());
+          return serviceV7.getUserInfo(new AccountRequestBody(Collections.singletonList("meta"),
+              oAuth2.getData()
+                  .getAccessToken()))
+              .singleOrError();
+        })
         .flatMap(response -> {
           if (response.isSuccessful() && response.body()
               .isOk()) {
