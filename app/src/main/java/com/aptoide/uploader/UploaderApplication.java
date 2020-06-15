@@ -159,7 +159,7 @@ public class UploaderApplication extends NotificationApplicationView {
     if (accountManager == null) {
 
       final Retrofit retrofitV3 =
-          retrofitBuilder("https://webservices.aptoide.com/", buildOkHttpClient());
+          retrofitBuilder("https://webservices-devel.aptoide.com/", buildOkHttpClient());
 
       final Retrofit retrofitV7 = retrofitBuilder("https://ws75-devel.aptoide.com/",
           buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
