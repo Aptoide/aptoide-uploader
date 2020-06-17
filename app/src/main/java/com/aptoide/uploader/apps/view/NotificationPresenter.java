@@ -145,6 +145,12 @@ public class NotificationPresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadManager.getDrafts())
+        .doOnNext( list -> {
+            Log.i("LOL","Inside if verifcation empty  " + list.size());
+            if(list.isEmpty()){
+              view.stopForeground();
+            }
+        }).filter(list -> !list.isEmpty())
         .flatMapIterable(drafts -> drafts)
         .doOnNext(
             drafts -> Log.d("LOL", "handleNotificationsStream: Emmited drafts" + drafts.getMd5()))

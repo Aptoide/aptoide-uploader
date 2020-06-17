@@ -38,5 +38,7 @@ public interface NotificationView extends View {
   void showGetRetriesExceededNotification(String applicationName, String packageName);
 
   void showCatappultCertifiedNotification(String appName, String packageName);
+
+  void stopForeground();
 }
 
