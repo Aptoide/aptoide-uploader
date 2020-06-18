@@ -177,7 +177,7 @@ public class UploaderApplication extends NotificationApplicationView {
   }
 
   public AptoideAuthenticationRx getAptoideAuthenticationRx() {
-    if (authenticationProvider == null) {
+    if (aptoideAuthenticationRx == null) {
       aptoideAuthenticationRx = new AptoideAuthenticationRx(new AptoideAuthentication(
           new RemoteAuthenticationService(APTOIDE_WEBSERVICES_BASE_HOST_DEV,
               buildOkHttpClient().build())));
