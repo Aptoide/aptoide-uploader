@@ -46,7 +46,6 @@ import com.aptoide.uploader.apps.persistence.RoomUploadStatusDataSource;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
 import com.aptoide.uploader.security.AuthenticationPersistance;
 import com.aptoide.uploader.security.AuthenticationProvider;
-import com.aptoide.uploader.security.SecurityAlgorithms;
 import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence;
 import com.aptoide.uploader.upload.AptoideAccountProvider;
 import com.facebook.CallbackManager;
@@ -167,7 +166,7 @@ public class UploaderApplication extends NotificationApplicationView {
 
       accountManager = new AptoideAccountManager(
           new RetrofitAccountService(retrofitV3.create(RetrofitAccountService.ServiceV3.class),
-              retrofitV7.create(RetrofitAccountService.ServiceV7.class), new SecurityAlgorithms(),
+              retrofitV7.create(RetrofitAccountService.ServiceV7.class),
               new AccountResponseMapper(), getAuthenticationProvider(),
               getAptoideAuthenticationRx()),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),

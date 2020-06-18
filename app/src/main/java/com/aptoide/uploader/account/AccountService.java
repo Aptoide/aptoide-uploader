@@ -12,11 +12,6 @@ public interface AccountService {
 
   Single<Account> getAccount(String email, String ServerAuthToken, String authMode);
 
-  Single<Account> createAccount(String email, String password, String storeName);
-
-  Single<Account> createAccount(String email, String password, String storeName, String storeUser,
-      String storePass);
-
   Single<CreateStoreStatus> createStore(String storeName);
 
   Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials);
