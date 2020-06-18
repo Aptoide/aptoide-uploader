@@ -82,6 +82,7 @@ public class UploaderApplication extends NotificationApplicationView {
   private UploadManager uploadManager;
   private LanguageManager languageManager;
   private AuthenticationProvider authenticationProvider;
+  private AptoideAuthenticationRx aptoideAuthenticationRx;
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
   private AutoLoginPersistence autoLoginPersistence;
@@ -177,9 +178,12 @@ public class UploaderApplication extends NotificationApplicationView {
   }
 
   public AptoideAuthenticationRx getAptoideAuthenticationRx() {
-    return new AptoideAuthenticationRx(new AptoideAuthentication(
-        new RemoteAuthenticationService(APTOIDE_WEBSERVICES_BASE_HOST_DEV,
-            buildOkHttpClient().build())));
+    if (authenticationProvider == null) {
+      aptoideAuthenticationRx = new AptoideAuthenticationRx(new AptoideAuthentication(
+          new RemoteAuthenticationService(APTOIDE_WEBSERVICES_BASE_HOST_DEV,
+              buildOkHttpClient().build())));
+    }
+    return aptoideAuthenticationRx;
   }
 
   public AuthenticationProvider getAuthenticationProvider() {
