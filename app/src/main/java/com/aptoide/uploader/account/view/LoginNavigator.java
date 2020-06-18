@@ -10,6 +10,9 @@ import com.aptoide.uploader.apps.view.MyStoreFragment;
 
 public class LoginNavigator {
 
+  public final static String NEW_AUTHENTICATION_BLOG_URL =
+      "https://blog.aptoide.com/aptoide-new-authentication-system-no-user-data-storage/";
+
   private final FragmentManager fragmentManager;
   private final Context applicationContext;
 
@@ -32,12 +35,12 @@ public class LoginNavigator {
         .commitAllowingStateLoss();
   }
 
-  public void openBlogUrl() {
+  public void openNewAuthenticationBlogUrl() {
     CustomTabsIntent.Builder builder = new CustomTabsIntent.Builder();
     builder.addDefaultShareMenuItem();
     builder.setToolbarColor(applicationContext.getResources()
         .getColor(R.color.blue));
     builder.build()
-        .launchUrl(applicationContext, Uri.parse(MaintenanceNavigator.BLOG_URL));
+        .launchUrl(applicationContext, Uri.parse(NEW_AUTHENTICATION_BLOG_URL));
   }
 }

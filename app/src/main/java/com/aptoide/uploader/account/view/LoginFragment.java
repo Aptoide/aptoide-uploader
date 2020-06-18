@@ -305,4 +305,8 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
     progressDialog.setCancelable(false);
     return progressDialog;
   }
+
+  @NotNull @Override public Observable<Object> getSecureLoginTextClick() {
+    return sendMagicLinkView.getSecureLoginTextClick();
+  }
 }

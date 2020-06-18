@@ -39,6 +39,8 @@ public interface LoginView extends View {
 
   void showMagicLinkError(String error);
 
+  Observable<Object> getSecureLoginTextClick();
+
   class CredentialsViewModel {
 
     private final String username;
