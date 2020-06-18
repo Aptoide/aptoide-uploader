@@ -120,11 +120,13 @@ public class LoginPresenter implements Presenter {
         }));
 
     compositeDisposable.add(view.getLifecycleEvent()
-        .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> view.clickOnBlog())
-        .doOnNext(__ -> loginNavigator.openBlogUrl())
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(created -> view.getSecureLoginTextClick()
+            .doOnNext(__ -> loginNavigator.openNewAuthenticationBlogUrl())
+            .retry())
         .subscribe(__ -> {
-        }, Throwable::printStackTrace));
+        }, throwable -> {
+        }));
   }
 
   private Observable<Object> tryAutoLogin() {

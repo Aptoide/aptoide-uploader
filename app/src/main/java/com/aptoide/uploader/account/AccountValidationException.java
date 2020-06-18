@@ -6,8 +6,8 @@ package com.aptoide.uploader.account;
 
 public class AccountValidationException extends Exception {
   public static final int EMPTY_EMAIL = 1;
-  public static final int EMPTY_PASSWORD = 2;
-  public static final int EMPTY_STORE = 3;
+  public static final int EMPTY_CODE = 2;
+  public static final int EMPTY_EMAIL_AND_CODE = 3;
   public static final int INVALID_PASSWORD = 4;
   public static final int EMPTY_EMAIL_AND_PASSWORD = 5;
   public static final int EMPTY_EMAIL_AND_STORE = 6;

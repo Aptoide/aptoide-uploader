@@ -1,7 +1,9 @@
 package com.aptoide.uploader.account;
 
+import com.aptoide.authentication.model.CodeAuth;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.Single;
 
 public class AptoideAccountManager {
 
@@ -21,8 +23,11 @@ public class AptoideAccountManager {
     this.autoLoginPersistence = autoLoginPersistence;
   }
 
-  public Completable login(String username, String password) {
-    return accountService.getAccount(username, password)
+  public Completable login(AptoideCredentials aptoideCredentials) {
+    return credentialsValidator.validate(aptoideCredentials)
+        .andThen(
+            accountService.getAccount(aptoideCredentials.getEmail(), aptoideCredentials.getCode(),
+                aptoideCredentials.getState(), aptoideCredentials.getAgent()))
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
@@ -36,14 +41,16 @@ public class AptoideAccountManager {
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 
-  public Observable<Account> getAccount() {
-    return accountPersistence.getAccount();
+  public Single<CodeAuth> sendMagicLink(String email) {
+    return accountService.sendMagicLink(email);
   }
 
-  public Completable create(String email, String password, String storeName) {
-    return credentialsValidator.validate(email, password, storeName)
-        .andThen(accountService.createAccount(email, password, storeName))
-        .flatMapCompletable(account -> accountPersistence.save(account));
+  public Single<Boolean> isEmailValid(String email) {
+    return credentialsValidator.isEmailValid(email);
+  }
+
+  public Observable<Account> getAccount() {
+    return accountPersistence.getAccount();
   }
 
   public Completable createStore(String storeName) {

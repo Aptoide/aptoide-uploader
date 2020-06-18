@@ -55,7 +55,8 @@ class MyStorePresenterTest : Spek({
       val connectivityProvider = mock<ConnectivityProvider>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
           serviceV7, SecurityAlgorithms(), AccountResponseMapper(),
-          AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)),
+          AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication),
+          aptoideAuthentication),
           accountPersistence, credentialsValidator)
       val uploadManager = mock<UploadManager> {}
       val languageManager = mock<LanguageManager> {}
@@ -114,7 +115,8 @@ class MyStorePresenterTest : Spek({
       val credentialsValidator = mock<CredentialsValidator>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
           serviceV7, SecurityAlgorithms(), AccountResponseMapper(),
-          AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)),
+          AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication),
+          aptoideAuthentication),
           accountPersistence, credentialsValidator)
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val persistence = mock<AppUploadStatusPersistence>()
@@ -180,7 +182,8 @@ class MyStorePresenterTest : Spek({
       val credentialsValidator = mock<CredentialsValidator>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
           serviceV7, SecurityAlgorithms(), AccountResponseMapper(),
-          AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)),
+          AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication),
+          aptoideAuthentication),
           accountPersistence, credentialsValidator)
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val persistence = mock<AppUploadStatusPersistence>()
@@ -249,7 +252,8 @@ class MyStorePresenterTest : Spek({
       val credentialsValidator = mock<CredentialsValidator>()
       val accountManager = AptoideAccountManager(RetrofitAccountService(serviceV3,
           serviceV7, SecurityAlgorithms(), AccountResponseMapper(),
-          AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication)),
+          AptoideAccessTokenProvider(authenticationPersistence, serviceV3Authentication),
+          aptoideAuthentication),
           accountPersistence, credentialsValidator)
       val uploaderAnalytics = mock<UploaderAnalytics>()
       val persistence = mock<AppUploadStatusPersistence>()
