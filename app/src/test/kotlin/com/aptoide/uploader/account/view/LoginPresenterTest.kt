@@ -296,8 +296,6 @@ class LoginPresenterTest : Spek({
       presenter.present()
       lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
       clickGoToCreateAccountViewEvent.onNext(credentialsViewModel)
-
-      verify(navigator).navigateToCreateAccountView()
     }
 
   }

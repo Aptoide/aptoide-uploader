@@ -362,8 +362,6 @@ class CreateAccountPresenterTest : Spek({
 
       whenever(view.lifecycleEvent).doReturn(lifecycleEvent)
       whenever(view.createAccountEvent).doReturn(createAccountEvent)
-      whenever(accountManager.create(any(), any(), any())).doReturn(
-          Completable.error(accountValidationException))
       whenever(accountErrorMapper.map(accountValidationException)).doReturn(buildString { })
 
       presenter.present()

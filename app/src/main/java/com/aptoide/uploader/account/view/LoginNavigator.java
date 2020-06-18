@@ -13,7 +13,6 @@ public class LoginNavigator {
   private final FragmentManager fragmentManager;
   private final Context applicationContext;
 
-
   public LoginNavigator(FragmentManager fragmentManager, Context applicationContext) {
     this.fragmentManager = fragmentManager;
     this.applicationContext = applicationContext;
@@ -25,10 +24,6 @@ public class LoginNavigator {
 
   public void navigateToCreateStoreView() {
     navigateTo(CreateStoreFragment.newInstance());
-  }
-
-  public void navigateToCreateAccountView() {
-    navigateTo(CreateAccountFragment.newInstance());
   }
 
   private void navigateTo(Fragment fragment) {
