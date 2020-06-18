@@ -49,7 +49,7 @@ public class UploadManager {
 
   public void start() {
     fillAppUploadStatusPersistence();
-    //handleBackgroundService();
+    handleBackgroundService();
     dispatchUploads();
     handleCompletedStatus();
     checkAppUploadStatus();
@@ -342,8 +342,7 @@ public class UploadManager {
         .doOnNext(draftList -> Log.d("LOL",
             "handleBackgroundService: after getDrafts" + draftList.size()))
         .flatMapSingle(drafts -> Observable.fromIterable(drafts)
-            .filter(draft -> draft.getStatus()
-                .equals(UploadDraft.Status.COMPLETED))
+            .filter(draft -> draft.isInProgress())
             .toList())
         .doOnNext(draftList -> Log.d("LOL",
             "handleBackgroundService: after get Iterable" + draftList.size()))

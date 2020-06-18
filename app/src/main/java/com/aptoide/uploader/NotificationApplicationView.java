@@ -21,7 +21,7 @@ import io.reactivex.subjects.BehaviorSubject;
 public class NotificationApplicationView extends Service implements NotificationView {
 
   private final String NOTIFICATION_CHANNEL_ID = "Upload";
-  private final int NOTIFICATION_ID_CHANGER= 50;
+  private final int NOTIFICATION_ID_CHANGER = 50;
   private UploadManager uploadManager;
   private BehaviorSubject<LifecycleEvent> lifecycleSubject;
   private NotificationManager notificationManager;
@@ -64,17 +64,18 @@ public class NotificationApplicationView extends Service implements Notification
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_duplicate_upload)).setOngoing(false);
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
   public void showCompletedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_success_upload)).setProgress(0, 0,
-        false).setOngoing(false);
+        false)
+        .setOngoing(false);
     Log.d("notificationz4", "showing success notification " + packageName + " " + applicationName);
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showPendingUploadNotification(String applicationName, String packageName) {
@@ -87,8 +88,8 @@ public class NotificationApplicationView extends Service implements Notification
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(0, 0, true);
-    ServiceCompat.stopForeground(this,ServiceCompat.STOP_FOREGROUND_DETACH);
-    startForeground(packageName.hashCode()+NOTIFICATION_ID_CHANGER, mBuilder.build());
+    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH);
+    startForeground(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
   }
 
   @Override
@@ -121,21 +122,21 @@ public class NotificationApplicationView extends Service implements Notification
             .setDeleteIntent(dismissIntent)
             .setAutoCancel(true);
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showPublisherOnlyNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_publisher_only));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showUploadInfectionNotificaton(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_infection));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -146,21 +147,21 @@ public class NotificationApplicationView extends Service implements Notification
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_intellectual_property));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showAppBundleNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_bundle));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showAntiSpamRuleNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_anti_spam));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -168,7 +169,7 @@ public class NotificationApplicationView extends Service implements Notification
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_invalid_signature));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -182,8 +183,8 @@ public class NotificationApplicationView extends Service implements Notification
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(100, progress, false);
-    ServiceCompat.stopForeground(this,ServiceCompat.STOP_FOREGROUND_DETACH);
-    startForeground(packageName.hashCode()+NOTIFICATION_ID_CHANGER, mBuilder.build());
+    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH);
+    startForeground(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
   }
 
   @Override
@@ -191,7 +192,7 @@ public class NotificationApplicationView extends Service implements Notification
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_message_error_retry));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -199,14 +200,14 @@ public class NotificationApplicationView extends Service implements Notification
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_upload_failed_retry));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showFailedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_upload_failed));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showUnknownErrorNotification(String applicationName, String packageName) {
@@ -216,7 +217,7 @@ public class NotificationApplicationView extends Service implements Notification
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_message_error));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -224,7 +225,7 @@ public class NotificationApplicationView extends Service implements Notification
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_get_retries_exceeded));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showCatappultCertifiedNotification(String appName, String packageName) {
@@ -233,13 +234,7 @@ public class NotificationApplicationView extends Service implements Notification
     NotificationCompat.Builder mBuilder = buildNotification(appName,
         getString(R.string.application_notification_short_app_intellectual_property_certified));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
-    notificationManager.cancel(packageName.hashCode()+NOTIFICATION_ID_CHANGER);
-  }
-
-  @Override public void stopForeground() {
-    Log.i("LOL", "Stop foreground");
-    ServiceCompat.stopForeground(this,ServiceCompat.STOP_FOREGROUND_REMOVE);
-    stopSelf();
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   public NotificationCompat.Builder buildNotification(String applicationName, String subText) {

@@ -13,8 +13,8 @@ import java.util.Map;
 public class MemoryDraftPersistence implements DraftPersistence {
 
   private final Map<String, UploadDraft> draftsMap;
-  private BehaviorSubject<List<UploadDraft>> draftsListSubject;
   private final Scheduler scheduler;
+  private BehaviorSubject<List<UploadDraft>> draftsListSubject;
 
   public MemoryDraftPersistence(Map<String, UploadDraft> draftsMap, Scheduler scheduler) {
     this.draftsMap = draftsMap;
@@ -47,11 +47,8 @@ public class MemoryDraftPersistence implements DraftPersistence {
 
   @Override public Completable remove(String md5) {
     return Completable.fromAction(() -> {
-      if(draftsMap.remove(md5)!=null) {
+      if (draftsMap.remove(md5) != null) {
         draftsListSubject.onNext(new ArrayList<>(draftsMap.values()));
-        if (draftsMap.size()==0){
-          draftsListSubject=BehaviorSubject.create();
-        }
       }
     })
         .subscribeOn(scheduler)

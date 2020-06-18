@@ -1,7 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.view.View;
-import io.reactivex.Completable;
 
 public interface NotificationView extends View {
 
@@ -38,7 +37,5 @@ public interface NotificationView extends View {
   void showGetRetriesExceededNotification(String applicationName, String packageName);
 
   void showCatappultCertifiedNotification(String appName, String packageName);
-
-  void stopForeground();
 }
 
