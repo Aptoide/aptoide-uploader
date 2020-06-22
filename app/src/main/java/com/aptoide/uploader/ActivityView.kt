@@ -2,7 +2,6 @@ package com.aptoide.uploader
 
 import android.content.Intent
 import android.os.Bundle
-import android.os.PersistableBundle
 import androidx.appcompat.app.AppCompatActivity
 import com.aptoide.uploader.view.IntentView
 import com.aptoide.uploader.view.View.LifecycleEvent
@@ -14,8 +13,8 @@ abstract class ActivityView : AppCompatActivity(), IntentView {
   private val lifecycleEvents: Subject<LifecycleEvent> = BehaviorSubject.create()
   private val intentEvents: Subject<IntentData> = BehaviorSubject.create()
 
-  override fun onCreate(savedInstanceState: Bundle?, persistentState: PersistableBundle?) {
-    super.onCreate(savedInstanceState, persistentState)
+  override fun onCreate(savedInstanceState: Bundle?) {
+    super.onCreate(savedInstanceState)
     lifecycleEvents.onNext(LifecycleEvent.CREATE)
     intentEvents.onNext(parseIntent(intent))
   }
