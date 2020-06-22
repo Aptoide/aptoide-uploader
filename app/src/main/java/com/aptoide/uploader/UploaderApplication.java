@@ -74,8 +74,6 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 public class UploaderApplication extends NotificationApplicationView {
 
   private final String APTOIDE_WEBSERVICES_BASE_HOST = "https://webservices.aptoide.com/api/7/";
-  private final String APTOIDE_WEBSERVICES_BASE_HOST_DEV =
-      "https://webservices-devel.aptoide.com/api/7/";
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
   private UploadManager uploadManager;
@@ -159,9 +157,9 @@ public class UploaderApplication extends NotificationApplicationView {
     if (accountManager == null) {
 
       final Retrofit retrofitV3 =
-          retrofitBuilder("https://webservices-devel.aptoide.com/", buildOkHttpClient());
+          retrofitBuilder(APTOIDE_WEBSERVICES_BASE_HOST, buildOkHttpClient());
 
-      final Retrofit retrofitV7 = retrofitBuilder("https://ws75-devel.aptoide.com/",
+      final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/api/7/",
           buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       accountManager = new AptoideAccountManager(
@@ -179,7 +177,7 @@ public class UploaderApplication extends NotificationApplicationView {
   public AptoideAuthenticationRx getAptoideAuthenticationRx() {
     if (aptoideAuthenticationRx == null) {
       aptoideAuthenticationRx = new AptoideAuthenticationRx(new AptoideAuthentication(
-          new RemoteAuthenticationService(APTOIDE_WEBSERVICES_BASE_HOST_DEV,
+          new RemoteAuthenticationService(APTOIDE_WEBSERVICES_BASE_HOST,
               buildOkHttpClient().build())));
     }
     return aptoideAuthenticationRx;
@@ -226,7 +224,7 @@ public class UploaderApplication extends NotificationApplicationView {
   public AppUploadStatusManager getAppUploadStatusManager() {
     if (appUploadStatusManager == null) {
 
-      final Retrofit retrofitV7Secondary = retrofitBuilder("https://ws75-secondary.aptoide.com/",
+      final Retrofit retrofitV7Secondary = retrofitBuilder("https://ws75-secondary.aptoide.com/api/7/",
           buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       appUploadStatusManager =

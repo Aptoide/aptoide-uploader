@@ -144,7 +144,7 @@ public class RetrofitAccountService implements AccountService {
   }
 
   public interface ServiceV7 {
-    @POST("api/7/user/get") Observable<Response<AccountResponse>> getUserInfo(
+    @POST("user/get") Observable<Response<AccountResponse>> getUserInfo(
         @Body AccountRequestBody body);
   }
 }

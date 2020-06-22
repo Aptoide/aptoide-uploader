@@ -65,7 +65,7 @@ public class RetrofitAppsUploadStatusService {
   }
 
   public interface ServiceV7 {
-    @POST("/api/7/my/apps/apks/get") Observable<Response<GetApksResponse>> getApks(
+    @POST("my/apps/apks/get") Observable<Response<GetApksResponse>> getApks(
         @Body GetApksRequest body);
   }
 }
