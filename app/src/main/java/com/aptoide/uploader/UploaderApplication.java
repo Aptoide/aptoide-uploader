@@ -10,9 +10,6 @@ import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.account.AutoLoginPersistence;
 import com.aptoide.uploader.account.CredentialsValidator;
-import com.aptoide.uploader.account.MaintenanceManager;
-import com.aptoide.uploader.account.MaintenancePersistence;
-import com.aptoide.uploader.account.MaintenanceService;
 import com.aptoide.uploader.account.SocialLogoutManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
@@ -89,7 +86,6 @@ public class UploaderApplication extends NotificationApplicationView {
   private UploaderAnalytics uploaderAnalytics;
   private CallbackManager callbackManager;
   private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
-  private MaintenanceManager maintenanceManager;
   private LoginManager loginManager;
   private AgentPersistence agentPersistence;
 
@@ -224,8 +220,9 @@ public class UploaderApplication extends NotificationApplicationView {
   public AppUploadStatusManager getAppUploadStatusManager() {
     if (appUploadStatusManager == null) {
 
-      final Retrofit retrofitV7Secondary = retrofitBuilder("https://ws75-secondary.aptoide.com/api/7/",
-          buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
+      final Retrofit retrofitV7Secondary =
+          retrofitBuilder("https://ws75-secondary.aptoide.com/api/7/",
+              buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       appUploadStatusManager =
           new AppUploadStatusManager(new AccountStoreNameProvider(getAccountManager()),
@@ -360,24 +357,6 @@ public class UploaderApplication extends NotificationApplicationView {
     }
     Rakam.getInstance()
         .setSuperProperties(superProperties);
-  }
-
-  public MaintenanceManager getMaintenanceManager() {
-    if (maintenanceManager == null) {
-
-      final Retrofit retrofitMaintenance =
-          retrofitBuilder("http://imgs.aptoide.com/", buildOkHttpClient());
-
-      MaintenanceService maintenanceService = new MaintenanceService(
-          retrofitMaintenance.create(MaintenanceService.LoginMaintenanceService.class));
-
-      MaintenancePersistence maintenancePersistence =
-          new MaintenancePersistence(PreferenceManager.getDefaultSharedPreferences(this));
-
-      maintenanceManager =
-          new MaintenanceManager(maintenanceService, getAccountManager(), maintenancePersistence);
-    }
-    return maintenanceManager;
   }
 
   public LoginManager getFacebookLoginManager() {
