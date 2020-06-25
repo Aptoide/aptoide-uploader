@@ -69,8 +69,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class UploaderApplication extends NotificationApplicationView {
-
-  private final String APTOIDE_WEBSERVICES_BASE_HOST = "https://webservices.aptoide.com/api/7/";
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
   private UploadManager uploadManager;
@@ -153,7 +151,7 @@ public class UploaderApplication extends NotificationApplicationView {
     if (accountManager == null) {
 
       final Retrofit retrofitV3 =
-          retrofitBuilder(APTOIDE_WEBSERVICES_BASE_HOST, buildOkHttpClient());
+          retrofitBuilder("https://webservices.aptoide.com/", buildOkHttpClient());
 
       final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/api/7/",
           buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
@@ -173,7 +171,7 @@ public class UploaderApplication extends NotificationApplicationView {
   public AptoideAuthenticationRx getAptoideAuthenticationRx() {
     if (aptoideAuthenticationRx == null) {
       aptoideAuthenticationRx = new AptoideAuthenticationRx(new AptoideAuthentication(
-          new RemoteAuthenticationService(APTOIDE_WEBSERVICES_BASE_HOST,
+          new RemoteAuthenticationService("https://webservices.aptoide.com/api/7/",
               buildOkHttpClient().build())));
     }
     return aptoideAuthenticationRx;
