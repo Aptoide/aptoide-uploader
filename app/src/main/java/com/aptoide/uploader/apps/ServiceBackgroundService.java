@@ -25,7 +25,7 @@ public class ServiceBackgroundService implements BackgroundService {
   }
 
   @Override public void disable() {
-    Log.i("LOL", "Going to desable the service");
+    Log.i("LOL", "Going to disable the service");
     context.stopService(new Intent(context, serviceClass));
   }
 }

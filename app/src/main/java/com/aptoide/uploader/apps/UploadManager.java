@@ -340,12 +340,14 @@ public class UploadManager {
   @SuppressLint("CheckResult") private void handleBackgroundService() {
     draftPersistence.getDrafts()
         .doOnNext(draftList -> Log.d("LOL",
-            "handleBackgroundService: after getDrafts" + draftList.size()))
+            "handleBackgroundService: after getDrafts " + draftList.size()))
         .flatMapSingle(drafts -> Observable.fromIterable(drafts)
+            .doOnNext(draft -> Log.d("LOL",
+                "handleBackgroundService: after getDrafts " + draft.isError() + " status " + draft.getStatus()))
             .filter(draft -> draft.isInProgress())
             .toList())
         .doOnNext(draftList -> Log.d("LOL",
-            "handleBackgroundService: after get Iterable" + draftList.size()))
+            "handleBackgroundService: after get Iterable " + draftList.size()))
         .map(drafts -> drafts.size() > 0)
         .doOnNext(hasUploadsRunning -> Log.d("LOL",
             "handleBackgroundService: after map" + hasUploadsRunning))
