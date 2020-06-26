@@ -5,7 +5,6 @@ import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import io.reactivex.internal.operators.completable.CompletableFromAction;
 import java.util.List;
 
 public class StoreManager {

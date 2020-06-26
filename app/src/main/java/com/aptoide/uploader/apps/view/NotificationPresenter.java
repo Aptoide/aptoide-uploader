@@ -48,10 +48,8 @@ public class NotificationPresenter implements Presenter {
   @SuppressLint("CheckResult") private void handleNotificationsStream() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .doOnNext(lifecycleEvent -> Log.d("LOL",
-            "handleNotificationsStream: Emmited create" + lifecycleEvent))
         .flatMap(viewCreated -> notificationEvents)
-        .doOnNext(__ -> Log.d("LOL", "handleNotificationsStream: after notification event"))
+        .doOnNext(__ -> Log.d("uploadService", "handleNotificationsStream: after notification event"))
         .distinctUntilChanged(
             (uploadNotification, uploadNotification2) -> uploadNotification.getType()
                 .equals(uploadNotification2.getType())
@@ -66,7 +64,7 @@ public class NotificationPresenter implements Presenter {
         .flatMapCompletable(uploadNotification -> showNotification(uploadNotification))
         .subscribe(() -> {
         }, throwable -> {
-          Log.d("LOL", "handleNotificationsStream: handleNotificationsStream onError");
+          Log.d("uploadService", "handleNotificationsStream: handleNotificationsStream onError");
           throwable.printStackTrace();
         }));
   }
@@ -147,8 +145,8 @@ public class NotificationPresenter implements Presenter {
         .flatMap(__ -> uploadManager.getDrafts())
         .filter(list -> !list.isEmpty())
         .flatMapIterable(drafts -> drafts)
-        .doOnNext(
-            drafts -> Log.d("LOL", "handleNotificationsStream: Emmited drafts " + drafts.getMd5()))
+        .doOnNext(drafts -> Log.d("uploadService",
+            "handleNotificationsStream: Emmited drafts " + drafts.getMd5()))
         .filter(uploadDraft -> !uploadDraft.getStatus()
             .equals(UploadDraft.Status.IN_QUEUE))
         .flatMap(draft -> {
@@ -160,7 +158,6 @@ public class NotificationPresenter implements Presenter {
             return Observable.just(draft);
           }
         })
-        .doOnNext(__ -> Log.d("LOL", "handleNotificationsStream: after queue check"))
         .concatMap(i -> Observable.just(i)
             .delay(25, TimeUnit.MILLISECONDS))
         .map(draft -> mapToNotification(draft.getInstalledApp()
@@ -175,7 +172,7 @@ public class NotificationPresenter implements Presenter {
         .doOnNext(notification -> notify(notification))
         .subscribe(__ -> {
         }, throwable -> {
-          Log.d("LOL", "handleNotificationsStream: checkUpload onError");
+          Log.d("uploadService", "handleNotificationsStream: checkUpload onError");
           throwable.printStackTrace();
         }));
   }

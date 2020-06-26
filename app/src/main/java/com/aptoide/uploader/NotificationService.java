@@ -18,7 +18,7 @@ import com.aptoide.uploader.apps.view.NotificationView;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
-public class NotificationApplicationView extends Service implements NotificationView {
+public class NotificationService extends Service implements NotificationView {
 
   private final String NOTIFICATION_CHANNEL_ID = "Upload";
   private final int NOTIFICATION_ID_CHANGER = 50;
@@ -29,7 +29,6 @@ public class NotificationApplicationView extends Service implements Notification
 
   @Override public void onCreate() {
     super.onCreate();
-    Log.i("LOL", "Service has been started onCreate");
     lifecycleSubject = BehaviorSubject.create();
     lifecycleSubject.onNext(LifecycleEvent.CREATE);
     uploadManager = ((UploaderApplication) getApplicationContext()).getUploadManager();
@@ -40,12 +39,12 @@ public class NotificationApplicationView extends Service implements Notification
   }
 
   @Override public int onStartCommand(Intent intent, int flags, int startId) {
-    Log.i("LOL", "Service has been started");
+    Log.d("uploadService", "Service has been started");
     return START_STICKY;
   }
 
   @Override public void onDestroy() {
-    Log.i("LOL", "Service has been destroyed");
+    Log.d("uploadService", "Service has been destroyed");
     super.onDestroy();
   }
 

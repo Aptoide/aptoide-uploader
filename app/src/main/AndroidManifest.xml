@@ -49,7 +49,7 @@
       </intent-filter>
     </activity>
 
-    <service android:name=".NotificationApplicationView" />
+    <service android:name=".NotificationService" />
   </application>
 
 </manifest>

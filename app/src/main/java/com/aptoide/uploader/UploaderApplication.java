@@ -1,7 +1,6 @@
 package com.aptoide.uploader;
 
 import android.app.Application;
-import android.content.Intent;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.aptoide.uploader.account.AptoideAccountManager;
@@ -108,9 +107,9 @@ public class UploaderApplication extends Application {
           new RetrofitUploadService(retrofitV7.create(RetrofitUploadService.ServiceV7.class),
               getAccessTokenProvider(), uploadProgressManager, getUploaderAnalytics(),
               getMd5Calculator()), getMd5Calculator(),
-          new ServiceBackgroundService(this, NotificationApplicationView.class),
-          getAccessTokenProvider(), getAppUploadStatusManager(), getAppUploadStatusPersistence(),
-          uploadProgressManager, getDraftPersistence());
+          new ServiceBackgroundService(this, NotificationService.class), getAccessTokenProvider(),
+          getAppUploadStatusManager(), getAppUploadStatusPersistence(), uploadProgressManager,
+          getDraftPersistence());
     }
     return uploadManager;
   }
@@ -202,7 +201,7 @@ public class UploaderApplication extends Application {
       storeManager = new StoreManager(getPackageManagerInstalledAppsProvider(),
           new AccountStoreNameProvider(getAccountManager()), getUploadManager(),
           getLanguageManager(), getAccountManager(), Schedulers.io(),
-          new ServiceBackgroundService(getApplicationContext(), NotificationApplicationView.class));
+          new ServiceBackgroundService(getApplicationContext(), NotificationService.class));
     }
     return storeManager;
   }

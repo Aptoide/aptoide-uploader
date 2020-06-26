@@ -3,7 +3,7 @@ package com.aptoide.uploader.apps;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
-import com.aptoide.uploader.NotificationApplicationView;
+import com.aptoide.uploader.NotificationService;
 import com.aptoide.uploader.upload.BackgroundService;
 
 /**
@@ -12,10 +12,9 @@ import com.aptoide.uploader.upload.BackgroundService;
 
 public class ServiceBackgroundService implements BackgroundService {
   private final Context context;
-  private final Class<NotificationApplicationView> serviceClass;
+  private final Class<NotificationService> serviceClass;
 
-  public ServiceBackgroundService(Context context,
-      Class<NotificationApplicationView> serviceClass) {
+  public ServiceBackgroundService(Context context, Class<NotificationService> serviceClass) {
     this.context = context;
     this.serviceClass = serviceClass;
   }
@@ -25,7 +24,7 @@ public class ServiceBackgroundService implements BackgroundService {
   }
 
   @Override public void disable() {
-    Log.i("LOL", "Going to disable the service");
+    Log.d("uploadService", "Going to disable the service");
     context.stopService(new Intent(context, serviceClass));
   }
 }
