@@ -36,19 +36,15 @@ public class StoreManager {
         .subscribeOn(scheduler);
   }
 
-  public Completable startService() {
-    return Completable.fromAction(() -> serviceBackgroundService.enable());
-  }
-
   public Completable upload(List<InstalledApp> apps) {
     return storeNameProvider.getStoreName()
         .flatMapCompletable(storeName -> languageManager.getCurrentLanguageCode()
-            .flatMapCompletable(languageCode -> startService().andThen(Observable.fromIterable(apps)
+            .flatMapCompletable(languageCode -> Observable.fromIterable(apps)
                 .flatMapCompletable(
                     app -> installedAppsProvider.getInstalledApp(app.getPackageName())
                         .flatMapCompletable(
                             installedApp -> uploadManager.upload(storeName, languageCode,
-                                installedApp))))));
+                                installedApp)))));
   }
 
   public Completable logout() {
