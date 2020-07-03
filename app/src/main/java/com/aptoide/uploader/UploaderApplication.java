@@ -3,6 +3,10 @@ package com.aptoide.uploader;
 import android.app.Application;
 import android.preference.PreferenceManager;
 import android.util.Log;
+import com.aptoide.authentication.AptoideAuthentication;
+import com.aptoide.authentication.network.RemoteAuthenticationService;
+import com.aptoide.authenticationrx.AptoideAuthenticationRx;
+import com.aptoide.uploader.account.AgentPersistence;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.account.AutoLoginPersistence;
@@ -43,7 +47,6 @@ import com.aptoide.uploader.apps.persistence.RoomUploadStatusDataSource;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
 import com.aptoide.uploader.security.AuthenticationPersistance;
 import com.aptoide.uploader.security.AuthenticationProvider;
-import com.aptoide.uploader.security.SecurityAlgorithms;
 import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence;
 import com.aptoide.uploader.upload.AptoideAccountProvider;
 import com.facebook.CallbackManager;
@@ -71,11 +74,13 @@ import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class UploaderApplication extends Application {
 
+  private final String APTOIDE_WEBSERVICES_BASE_HOST = "https://webservices.aptoide.com/api/7/";
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
   private UploadManager uploadManager;
   private LanguageManager languageManager;
   private AuthenticationProvider authenticationProvider;
+  private AptoideAuthenticationRx aptoideAuthenticationRx;
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
   private AutoLoginPersistence autoLoginPersistence;
@@ -87,6 +92,7 @@ public class UploaderApplication extends Application {
   private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
   private MaintenanceManager maintenanceManager;
   private LoginManager loginManager;
+  private AgentPersistence agentPersistence;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -151,20 +157,30 @@ public class UploaderApplication extends Application {
     if (accountManager == null) {
 
       final Retrofit retrofitV3 =
-          retrofitBuilder("https://webservices.aptoide.com/", buildOkHttpClient());
+          retrofitBuilder(APTOIDE_WEBSERVICES_BASE_HOST, buildOkHttpClient());
 
-      final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/",
+      final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/api/7/",
           buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       accountManager = new AptoideAccountManager(
           new RetrofitAccountService(retrofitV3.create(RetrofitAccountService.ServiceV3.class),
-              retrofitV7.create(RetrofitAccountService.ServiceV7.class), new SecurityAlgorithms(),
-              new AccountResponseMapper(), getAuthenticationProvider()),
+              retrofitV7.create(RetrofitAccountService.ServiceV7.class),
+              new AccountResponseMapper(), getAuthenticationProvider(),
+              getAptoideAuthenticationRx()),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),
               PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()),
           new CredentialsValidator(), getSocialLogoutManager(), getAutoLoginPersistence());
     }
     return accountManager;
+  }
+
+  public AptoideAuthenticationRx getAptoideAuthenticationRx() {
+    if (aptoideAuthenticationRx == null) {
+      aptoideAuthenticationRx = new AptoideAuthenticationRx(new AptoideAuthentication(
+          new RemoteAuthenticationService(APTOIDE_WEBSERVICES_BASE_HOST,
+              buildOkHttpClient().build())));
+    }
+    return aptoideAuthenticationRx;
   }
 
   public AuthenticationProvider getAuthenticationProvider() {
@@ -209,7 +225,7 @@ public class UploaderApplication extends Application {
   public AppUploadStatusManager getAppUploadStatusManager() {
     if (appUploadStatusManager == null) {
 
-      final Retrofit retrofitV7Secondary = retrofitBuilder("https://ws75-secondary.aptoide.com/",
+      final Retrofit retrofitV7Secondary = retrofitBuilder("https://ws75-secondary.aptoide.com/api/7/",
           buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       appUploadStatusManager =
@@ -370,5 +386,13 @@ public class UploaderApplication extends Application {
       loginManager = LoginManager.getInstance();
     }
     return loginManager;
+  }
+
+  public AgentPersistence getAgentPersistence() {
+    if (agentPersistence == null) {
+      this.agentPersistence =
+          new AgentPersistence(PreferenceManager.getDefaultSharedPreferences(this));
+    }
+    return agentPersistence;
   }
 }

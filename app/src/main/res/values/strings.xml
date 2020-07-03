@@ -2,9 +2,6 @@
 <resources>
 
   <string name="app_name">Aptoide Uploader</string>
-  <string name="userHint">Username</string>
-  <string name="passHint">Password</string>
-  <string name="login">Sign In</string>
   <string name="action_settings">Settings</string>
   <string name="OK">OK</string>
   <string name="retry">retry</string>
@@ -18,67 +15,28 @@
   <string name="no_email_and_store_error_message">Please insert an email and store</string>
   <string name="no_pass_and_store_error_message">Please insert a password and store</string>
   <string name="no_email_error_message">Please insert an email</string>
-  <string name="no_pass_error_message">Please insert a password</string>
-  <string name="no_store_error_message">Please insert a store</string>
   <string name="invalid_pass_error_message">Password must be at least 8 characters and should have
     at least one letter and one number or special characters (!@#$%*)</string>
+  <string name="all_message_general_error">Something went wrong. Try again.</string>
+  <string name="please_wait">Please wait…</string>
 
   <string name="store">Store</string>
-  <string name="store_privacy">Store privacy</string>
   <string name="public_key">Public</string>
   <string name="private_key">Private</string>
 
   <string name="store_username">Store username</string>
   <string name="store_password">Store password</string>
 
-  <string name="repo_creation_title">"Create your store"</string>
   <string name="create_repo">"Create"</string>
 
-  <string name="facebook_error">You should provide your email in order to login.</string>
-
-  <string name="upload_prepare">Preparing to upload %s</string>
-
-  <string name="age_rating_1">All</string>
-  <string name="age_rating_2">Pre-Teen (minimal age: 10)</string>
-  <string name="age_rating_3">Teen (minimal age: 16)</string>
-  <string name="age_rating_4">Mature (minimal age: 18)</string>
-
-
   <string name="language">Language</string>
-  <string name="language_1" translatable="false">العربية</string>
-  <string name="language_2" translatable="false">বাংলা</string>
-  <string name="language_3" translatable="false">ဗမာစာ</string>
-  <string name="language_4" translatable="false">Deutsch</string>
-  <string name="language_5" translatable="false">English</string>
-  <string name="language_6" translatable="false">Español</string>
-  <string name="language_7" translatable="false">فارسی</string>
-  <string name="language_8" translatable="false">Filipino</string>
-  <string name="language_9" translatable="false">Français</string>
-  <string name="language_10" translatable="false">हिंदी</string>
-  <string name="language_11" translatable="false">Bahasa Indonesia</string>
-  <string name="language_12" translatable="false">Italiano</string>
-  <string name="language_13" translatable="false">Bahasa Melayu</string>
-  <string name="language_14" translatable="false">Português</string>
-  <string name="language_15" translatable="false">Português (Brasil)</string>
-  <string name="language_16" translatable="false">Русский</string>
-  <string name="language_17" translatable="false">ภาษาไทย</string>
-  <string name="language_18" translatable="false">Türk</string>
-  <string name="language_19" translatable="false">Tiếng Việt</string>
-  <string name="language_20" translatable="false">中文</string>
-
 
   <string name="sort_spinner_values_1">By Date</string>
   <string name="sort_spinner_values_2">By Name</string>
   <string name="select_apps_to_upload_to_your_store">Select apps to upload to your store</string>
   <string name="submit_apps">Submit Apps</string>
-  <string name="new_to_aptoide_create_a_free_account">New to Aptoide? Create a free account.</string>
-  <string name="or">OR</string>
   <string name="signing_in">Signing in...</string>
   <string name="jogos">Games</string>
-  <string name="new_account">New Account</string>
-  <string name="already_have_an_account_sign_in">Already have an account? Sign in</string>
-  <string name="forgotten_your_password">Recover password</string>
-  <string name="by_signing_up_you_are_agreeing_to_the_aptoide_terms_of_service_and_aptoide_content_policy_for_developers">By signing up you agree to the Aptoide\'s Terms of Service and Aptoide Content Policy for Developers.</string>
   <string name="loading_content">Loading content...</string>
   <string name="submit">Submit</string>
   <string name="age_rating">Age Rating</string>
@@ -90,36 +48,18 @@
   <string name="e_mail">E-Mail</string>
   <string name="website">Website</string>
   <string name="signout">Sign Out</string>
-  <string name="upload_failed">Upload failed. Please try again later.</string>
-  <string name="upload_more_info">We need more info in order to upload your app, tap here in order to provide it</string>
-  <string name="ok">OK</string>
-  <string name="sending_background">Sending app in the background</string>
-  <string name="sorting_by_date">Sorting by Date</string>
-  <string name="sorting">Sorting…</string>
-  <string name="sorting_by_name">Sorting by Name</string>
-  <string name="missing_username_password">Please fill username and password</string>
   <string name="error_occurred">Sorry, an error occurred</string>
   <string name="missing_fields">Missing mandatory fields</string>
   <string name="no_store_error">The account doesn\'t have a store associated, please create one.</string>
   <string name="yes">Yes</string>
   <string name="no">No</string>
-  <string name="quit_message">Are you sure you want to leave?</string>
-  <string name="exit_confirmation">Really Quit</string>
   <string name="fill_empty_fields">Please fill empty fields!</string>
-  <string name="error_marg_100" translatable="false">MARG-100</string>
-  <string name="error_marg_101" translatable="false">MARG-101</string>
-  <string name="error_marg_102" translatable="false">MARG-102</string>
-  <string name="error_marg_103" translatable="false">MARG-103</string>
   <string name="logging_as">Logging in as</string>
   <string name="logging_in">Logging in</string>
-  <string name="submit_app">Submit App</string>
-  <string name="title_activity_login">Login</string>
   <string name="no_connectivity_error">Sorry, no internet connection available</string>
 
   <!-- Notifications -->
   <string name="application_notification_short_app_success_upload">App successfully uploaded</string>
-  <string name="application_notification_short_app_pending_upload">Preparing upload</string>
-  <string name="application_notification_short_app_progress_upload">Upload in progress</string>
   <string name="application_notification_short_get_retries_exceeded">We\'re processing your app! It\'ll be in your store soon.</string>
   <string name="application_notification_short_app_duplicate_upload">This app is already in your store. (APK-103)</string>
   <string name="application_notification_short_app_intellectual_property">You don\'t hold the distribution rights for this app! Contact us for more info. (APK-101)</string>
@@ -135,8 +75,6 @@
   <string name="application_notification_short_app_bundle">This type of app is not supported... yet. But, it\'ll be supported soon!</string>
   <string name="application_notification_short_anti_spam">Oops&#8230; Your app seems to be spam. Please contact support@aptoide.com.</string>
 
-  <string name="error_user_already_exists">This user already exists</string>
-  <string name="error_store_already_exists">This store already exists</string>
   <string name="logout_confirmation_message">You are about to sign out from Uploader, are you sure? </string>
   <string name="app_selected">App Selected</string>
   <string name="apps_selected">Apps Selected</string>
@@ -149,33 +87,17 @@
   <string name="settings_dark_them_body">It helps to relieve eye strain when using your device in the dark.</string>
 
   <!--New Login-->
-  <string name="login_connect_with_email_button">Connect with email</string>
   <string name="login_email_field_text">Your email here</string>
-  <string name="login_send_code_body">We\'ll send you a temporary login code.</string>
+  <string name="login_send_magic_link_body">We\'ll send you a magic link.</string>
+  <string name="login_send_magic_link_button">Send magic link</string>
   <string name="login_safe_body_1">Secure login</string>
   <string name="login_safe_body_2">No passwords saved on our side</string>
   <string name="login_check_email_title">Check your email!</string>
-  <string name="login_check_email_body">Use the code we\'ve sent you to log in.</string>
-  <string name="login_check_email_under_field_body">We\'ve sent a temporary login code. Please check your inbox or spam folder.</string>
-  <string name="login_enter_code_field">Enter code here</string>
-  <string name="login_code_not_received_1">Didn\'t receive it?</string>
-  <string name="login_code_not_received_2_link">Generate a new code</string>
-  <string name="login_finish_button">FINISH</string>
-  <string name="login_generating_code_body">Generating new code&#8230;</string>
-  <string name="login_email_subject_line">Your Aptoide login code</string>
-  <string name="login_email_header">Almost there!</string>
-  <string name="login_email_body_1">To complete the process, please copy and paste this temporary login code:</string>
-  <string name="login_email_under_code_field">This code is valid for 30 minutes.</string>
-  <string name="login_email_body_2">If you didn\'t start the login process, you can safely ignore this email.</string>
-  <string name="login_email_rights_reserved">© 2020 aptoide.com‎ All rights reserved.</string>
+  <string name="login_check_email_body">We\'ve sent a magic link to %s to log in.</string>
+  <string name="login_check_email_button">Open email app</string>
+  <string name="login_error_magic_link_expired">Your magic link expired! Send a new one to your email.</string>
   <string name="login_error_invalid_email">This email isn\'t valid!</string>
-  <string name="login_error_expire_code">This code has expired. Generate a new one!</string>
-  <string name="login_error_wrong_code">Wrong code! Please try again.</string>
-  <string name="login_error_missing_code">Insert your code.</string>
-  <string name="login_disclaimer_title">We\'ve got news!</string>
   <string name="login_disclaimer_unavailable_title">We\'re working on it!</string>
-  <string name="login_disclaimer_body_1">Our users\' security is our top one priority, and that\'s why we\'re developing a new login system using your email address. At the moment, you can only access to Aptoide using social media accounts.</string>
-  <string name="login_disclaimer_body_2">We\'re working hard for email login to come back soon, so stay tuned!</string>
   <string name="login_disclaimer_blog_button">Check our blog</string>
   <string name="login_disclaimer_unavailable_body_1">Our users\' security is our top one priority, so login to Aptoide Uploader is temporarily unavailable while we work to make some changes on it. We\'ll be quick!</string>
   <string name="login_disclaimer_unavailable_body_2">We\'re working hard for it to be back soon, so stay tuned!</string>

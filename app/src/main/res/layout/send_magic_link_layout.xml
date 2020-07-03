@@ -1,0 +1,96 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  xmlns:tools="http://schemas.android.com/tools"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent">
+
+  <AutoCompleteTextView
+    android:id="@+id/email"
+    android:layout_width="match_parent"
+    android:layout_height="38dp"
+    android:background="@drawable/button_border_grey"
+    android:focusable="true"
+    android:focusableInTouchMode="true"
+    android:fontFamily="sans-serif"
+    android:hint="@string/login_email_field_text"
+    android:imeOptions="actionDone"
+    android:inputType="textEmailAddress"
+    android:maxLength="63"
+    android:maxLines="1"
+    android:paddingStart="20dp"
+    android:paddingEnd="20dp"
+    android:textColor="@color/white"
+    android:textColorHint="@color/white"
+    android:textSize="14sp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toTopOf="parent" />
+
+  <TextView
+    android:id="@+id/tip"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="24dp"
+    android:layout_marginTop="14dp"
+    android:text="@string/login_send_magic_link_body"
+    android:textColor="@color/white"
+    android:textSize="14sp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/email" />
+
+  <TextView
+    android:id="@+id/tip_error"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:minHeight="24dp"
+    android:layout_marginTop="14dp"
+    android:drawableStart="@drawable/ic_error_outline_red"
+    android:drawableLeft="@drawable/ic_error_outline_red"
+    android:drawablePadding="8dp"
+    android:drawableTint="@color/darker_red"
+    android:text="@string/login_error_invalid_email"
+    android:textColor="@color/darker_red"
+    android:textSize="14sp"
+    android:visibility="gone"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/email"
+    tools:visibility="visible" />
+
+  <androidx.constraintlayout.widget.Barrier
+    android:id="@+id/tip_barrier"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    app:barrierDirection="bottom"
+    app:constraint_referenced_ids="tip,tip_error" />
+
+  <Button
+    android:id="@+id/send_magic_link_button"
+    android:layout_width="match_parent"
+    android:layout_height="48dp"
+    android:layout_marginTop="20dp"
+    android:background="@drawable/background_button_rounded_white"
+    android:text="@string/login_send_magic_link_button"
+    android:textColor="@color/dark_blue"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/tip_barrier" />
+
+  <TextView
+    android:id="@+id/login_benefits_textview"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:layout_marginTop="20dp"
+    android:drawableStart="@drawable/ic_shield"
+    android:drawableLeft="@drawable/ic_shield"
+    android:drawablePadding="5dp"
+    android:gravity="center_vertical"
+    android:textSize="12sp"
+    app:layout_constraintEnd_toEndOf="parent"
+    app:layout_constraintStart_toStartOf="parent"
+    app:layout_constraintTop_toBottomOf="@+id/send_magic_link_button"
+    tools:text="Secure Login - No passwords saved on our side" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

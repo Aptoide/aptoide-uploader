@@ -1,23 +1,29 @@
 package com.aptoide.uploader.account.view;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableString;
 import android.text.style.UnderlineSpan;
 import android.util.Log;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
-import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.sendmagiclink.MagicLinkView;
+import com.aptoide.uploader.account.sendmagiclink.SendMagicLinkNavigator;
+import com.aptoide.uploader.account.sendmagiclink.SendMagicLinkPresenter;
+import com.aptoide.uploader.account.sendmagiclink.SendMagicLinkView;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.facebook.CallbackManager;
 import com.facebook.FacebookCallback;
@@ -36,10 +42,14 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.PublishSubject;
 import java.util.Arrays;
+import org.jetbrains.annotations.NotNull;
 
-public class LoginFragment extends FragmentView implements LoginView {
+public class LoginFragment extends FragmentView implements LoginView, MagicLinkView {
 
   private static final int RC_SIGN_IN = 9001;
+  public static final String HAS_MAGIC_LINK_ERROR = "has_magic_link_error";
+  public static final String MAGIC_LINK_ERROR_MESSAGE = "magic_link_error_message";
+
   PublishSubject<GoogleSignInAccount> googleLoginSubject;
   PublishSubject<LoginResult> facebookLoginSubject;
   private View progressContainer;
@@ -52,14 +62,23 @@ public class LoginFragment extends FragmentView implements LoginView {
   private GoogleSignInOptions gso;
   private CallbackManager callbackManager;
   private LoginManager facebookLoginManager;
-  private TextView title;
-  private TextView message_first;
-  private TextView message_second;
-  private TextView blog;
-  private ImageView blogNextButton;
+  private SendMagicLinkView sendMagicLinkView;
+  private ProgressDialog progressDialog;
+
+  private boolean hasMagicLinkError = false;
+  private String magicLinkErrorMessage = "";
 
   public static LoginFragment newInstance() {
-    return new LoginFragment();
+    return newInstance(false, "");
+  }
+
+  public static LoginFragment newInstance(boolean hasMagicLinkError, String magicLinkErrorMessage) {
+    Bundle args = new Bundle();
+    args.putBoolean(HAS_MAGIC_LINK_ERROR, hasMagicLinkError);
+    args.putString(MAGIC_LINK_ERROR_MESSAGE, magicLinkErrorMessage);
+    LoginFragment loginFragment = new LoginFragment();
+    loginFragment.setArguments(args);
+    return loginFragment;
   }
 
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -86,6 +105,14 @@ public class LoginFragment extends FragmentView implements LoginView {
         error.printStackTrace();
       }
     });
+    if (getArguments() != null) {
+      loadExtras(getArguments());
+    }
+  }
+
+  private void loadExtras(Bundle args) {
+    hasMagicLinkError = args.getBoolean(LoginFragment.HAS_MAGIC_LINK_ERROR);
+    magicLinkErrorMessage = args.getString(LoginFragment.MAGIC_LINK_ERROR_MESSAGE);
   }
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
@@ -93,20 +120,13 @@ public class LoginFragment extends FragmentView implements LoginView {
     progressContainer = view.findViewById(R.id.fragment_login_progress_container);
     loadingTextView = view.findViewById(R.id.fragment_login_loading_text_view);
     fragmentContainer = view.findViewById(R.id.fragment_login_content);
-
-    title = view.findViewById(R.id.login_title);
-    message_first = view.findViewById(R.id.login_message1);
-    message_second = view.findViewById(R.id.login_message2);
-    blog = view.findViewById(R.id.login_blog);
-    blogNextButton = view.findViewById(R.id.login_blognext);
+    sendMagicLinkView = view.findViewById(R.id.send_magic_link_view);
 
     googleLoginButton = view.findViewById(R.id.google_sign_in_button);
     facebookLoginButton = view.findViewById(R.id.facebook_login_button);
+    progressDialog = createGenericPleaseWaitDialog(getContext(), R.style.DialogTheme);
 
     fragmentContainer.setVisibility(View.VISIBLE);
-    title.setText(getString(R.string.login_disclaimer_title));
-    message_first.setText(getString(R.string.login_disclaimer_body_1));
-    message_second.setText(getString(R.string.login_disclaimer_body_2));
     setupBlogTextView();
 
     new LoginPresenter(this, accountManager,
@@ -114,6 +134,13 @@ public class LoginFragment extends FragmentView implements LoginView {
         new CompositeDisposable(), AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
         ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
+    new SendMagicLinkPresenter(this, accountManager,
+        new SendMagicLinkNavigator(getFragmentManager()), AndroidSchedulers.mainThread(),
+        ((UploaderApplication) getContext().getApplicationContext()).getAgentPersistence()).present();
+
+    if (hasMagicLinkError && magicLinkErrorMessage != null) {
+      sendMagicLinkView.setState(new SendMagicLinkView.State.Error(magicLinkErrorMessage, false));
+    }
   }
 
   @Override public void onResume() {
@@ -130,18 +157,12 @@ public class LoginFragment extends FragmentView implements LoginView {
     progressContainer = null;
     loadingTextView = null;
     facebookLoginButton = null;
-    title = null;
-    message_first = null;
-    message_second = null;
-    blog = null;
-    blogNextButton = null;
     super.onDestroyView();
   }
 
   private void setupBlogTextView() {
     SpannableString content = new SpannableString(getString(R.string.login_disclaimer_blog_button));
     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
-    blog.setText(content);
   }
 
   @Override public Observable<Object> getGoogleLoginEvent() {
@@ -205,11 +226,6 @@ public class LoginFragment extends FragmentView implements LoginView {
     startActivityForResult(signInIntent, RC_SIGN_IN);
   }
 
-  @Override public Observable<Integer> clickOnBlog() {
-    return Observable.merge(RxView.clicks(blog), RxView.clicks(blogNextButton))
-        .map(__ -> 1);
-  }
-
   @Override public Observable<Object> getFacebookLoginEvent() {
     return RxView.clicks(facebookLoginButton);
   }
@@ -242,5 +258,55 @@ public class LoginFragment extends FragmentView implements LoginView {
     super.onDestroy();
     googleLoginSubject = null;
     facebookLoginSubject = null;
+  }
+
+  @NotNull @Override public Observable<String> getMagicLinkClick() {
+    return sendMagicLinkView.getMagicLinkSubmit();
+  }
+
+  @Override public void setInitialState() {
+    sendMagicLinkView.setState(SendMagicLinkView.State.Initial.INSTANCE);
+  }
+
+  @Override public void removeTextFieldError() {
+    sendMagicLinkView.resetTextFieldError();
+  }
+
+  @Override public void setEmailInvalidError() {
+    sendMagicLinkView.setState(
+        new SendMagicLinkView.State.Error(getString(R.string.login_error_invalid_email), true));
+  }
+
+  @Override public void setLoadingScreen() {
+    progressDialog.show();
+  }
+
+  @Override public void removeLoadingScreen() {
+    hideKeyboard();
+    progressDialog.dismiss();
+  }
+
+  @NotNull @Override public Observable<String> getEmailTextChangeEvent() {
+    return sendMagicLinkView.getEmailChangeEvent();
+  }
+
+  @Override public void showUnknownError() {
+    showMagicLinkError(getString(R.string.all_message_general_error));
+  }
+
+  @Override public void showMagicLinkError(String error) {
+    sendMagicLinkView.setState(new SendMagicLinkView.State.Error(error, false));
+  }
+
+  private ProgressDialog createGenericPleaseWaitDialog(Context context, int resourceId) {
+    ProgressDialog progressDialog =
+        new ProgressDialog(new ContextThemeWrapper(context, resourceId));
+    progressDialog.setMessage(context.getString(R.string.please_wait));
+    progressDialog.setCancelable(false);
+    return progressDialog;
+  }
+
+  @NotNull @Override public Observable<Object> getSecureLoginTextClick() {
+    return sendMagicLinkView.getSecureLoginTextClick();
   }
 }
