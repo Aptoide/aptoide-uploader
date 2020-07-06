@@ -15,16 +15,19 @@ public class StoreManager {
   private final LanguageManager languageManager;
   private final AptoideAccountManager accountManager;
   private Scheduler scheduler;
+  private ServiceBackgroundService serviceBackgroundService;
 
   public StoreManager(InstalledAppsProvider installedAppsProvider,
       StoreNameProvider storeNameProvider, UploadManager uploadManager,
-      LanguageManager languageManager, AptoideAccountManager accountManager, Scheduler scheduler) {
+      LanguageManager languageManager, AptoideAccountManager accountManager, Scheduler scheduler,
+      ServiceBackgroundService serviceBackgroundService) {
     this.installedAppsProvider = installedAppsProvider;
     this.storeNameProvider = storeNameProvider;
     this.uploadManager = uploadManager;
     this.languageManager = languageManager;
     this.accountManager = accountManager;
     this.scheduler = scheduler;
+    this.serviceBackgroundService = serviceBackgroundService;
   }
 
   public Single<Store> getStore() {

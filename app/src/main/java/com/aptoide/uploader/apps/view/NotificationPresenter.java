@@ -12,6 +12,7 @@ import io.reactivex.Completable;
 import io.reactivex.Flowable;
 import io.reactivex.FlowableOperator;
 import io.reactivex.Observable;
+import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.subjects.PublishSubject;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicBoolean;
@@ -22,6 +23,7 @@ public class NotificationPresenter implements Presenter {
   private final NotificationView view;
   private final UploadManager uploadManager;
   private final PublishSubject<UploadNotification> notificationEvents;
+  private CompositeDisposable compositeDisposable = new CompositeDisposable();
 
   public NotificationPresenter(NotificationView view, UploadManager uploadManager) {
     this.view = view;
@@ -32,12 +34,22 @@ public class NotificationPresenter implements Presenter {
   @Override public void present() {
     checkUploads();
     handleNotificationsStream();
+    clearDisposables();
+  }
+
+  private void clearDisposables() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.DESTROY))
+        .doOnNext(__ -> compositeDisposable.clear())
+        .subscribe(__ -> {
+        }, Throwable::printStackTrace));
   }
 
   @SuppressLint("CheckResult") private void handleNotificationsStream() {
-    view.getLifecycleEvent()
+    compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(viewCreated -> notificationEvents)
+        .doOnNext(__ -> Log.d("uploadService", "handleNotificationsStream: after notification event"))
         .distinctUntilChanged(
             (uploadNotification, uploadNotification2) -> uploadNotification.getType()
                 .equals(uploadNotification2.getType())
@@ -51,7 +63,10 @@ public class NotificationPresenter implements Presenter {
         .lift(allowPerMillis(200))
         .flatMapCompletable(uploadNotification -> showNotification(uploadNotification))
         .subscribe(() -> {
-        }, Throwable::printStackTrace);
+        }, throwable -> {
+          Log.d("uploadService", "handleNotificationsStream: handleNotificationsStream onError");
+          throwable.printStackTrace();
+        }));
   }
 
   private <T> FlowableOperator<T, T> allowPerMillis(int millis) {
@@ -125,15 +140,19 @@ public class NotificationPresenter implements Presenter {
   }
 
   private void checkUploads() {
-    view.getLifecycleEvent()
+    compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadManager.getDrafts())
+        .filter(list -> !list.isEmpty())
         .flatMapIterable(drafts -> drafts)
+        .doOnNext(drafts -> Log.d("uploadService",
+            "handleNotificationsStream: Emmited drafts " + drafts.getMd5()))
         .filter(uploadDraft -> !uploadDraft.getStatus()
             .equals(UploadDraft.Status.IN_QUEUE))
         .flatMap(draft -> {
           if (draft.getStatus()
               .equals(UploadDraft.Status.PROGRESS)) {
+
             return updateProgress(draft);
           } else {
             return Observable.just(draft);
@@ -151,7 +170,11 @@ public class NotificationPresenter implements Presenter {
                 .equals(uploadNotification2.getPackageName()))
         .doOnNext(d -> Log.d("notificationz2", "going to show notification 2" + d.toString()))
         .doOnNext(notification -> notify(notification))
-        .subscribe();
+        .subscribe(__ -> {
+        }, throwable -> {
+          Log.d("uploadService", "handleNotificationsStream: checkUpload onError");
+          throwable.printStackTrace();
+        }));
   }
 
   private UploadNotification mapToNotification(String appName, String packageName,

@@ -1,24 +1,28 @@
 package com.aptoide.uploader;
 
-import android.app.Application;
-import android.app.Notification;
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
+import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Build;
+import android.os.IBinder;
 import android.util.Log;
+import androidx.annotation.Nullable;
 import androidx.core.app.NotificationCompat;
+import androidx.core.app.ServiceCompat;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.view.NotificationPresenter;
 import com.aptoide.uploader.apps.view.NotificationView;
 import io.reactivex.Observable;
 import io.reactivex.subjects.BehaviorSubject;
 
-public abstract class NotificationApplicationView extends Application implements NotificationView {
+public class NotificationService extends Service implements NotificationView {
 
   private final String NOTIFICATION_CHANNEL_ID = "Upload";
+  private final int NOTIFICATION_ID_CHANGER = 50;
+  private UploadManager uploadManager;
   private BehaviorSubject<LifecycleEvent> lifecycleSubject;
   private NotificationManager notificationManager;
   private NotificationPresenter systemNotificationShower;
@@ -27,10 +31,25 @@ public abstract class NotificationApplicationView extends Application implements
     super.onCreate();
     lifecycleSubject = BehaviorSubject.create();
     lifecycleSubject.onNext(LifecycleEvent.CREATE);
+    uploadManager = ((UploaderApplication) getApplicationContext()).getUploadManager();
     notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     systemNotificationShower = new NotificationPresenter(this, getUploadManager());
     attachPresenter();
     setupChannels();
+  }
+
+  @Override public int onStartCommand(Intent intent, int flags, int startId) {
+    Log.d("uploadService", "Service has been started");
+    return START_STICKY;
+  }
+
+  @Override public void onDestroy() {
+    Log.d("uploadService", "Service has been destroyed");
+    super.onDestroy();
+  }
+
+  @Nullable @Override public IBinder onBind(Intent intent) {
+    return null;
   }
 
   @Override public Observable<LifecycleEvent> getLifecycleEvent() {
@@ -42,17 +61,20 @@ public abstract class NotificationApplicationView extends Application implements
     Log.d("notificationz4",
         "showing duplicated notification " + packageName + " " + applicationName);
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
-        getString(R.string.application_notification_short_app_duplicate_upload));
+        getString(R.string.application_notification_short_app_duplicate_upload)).setOngoing(false);
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
   public void showCompletedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_success_upload)).setProgress(0, 0,
-        false);
+        false)
+        .setOngoing(false);
     Log.d("notificationz4", "showing success notification " + packageName + " " + applicationName);
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showPendingUploadNotification(String applicationName, String packageName) {
@@ -62,11 +84,11 @@ public abstract class NotificationApplicationView extends Application implements
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
-            .setOngoing(false)
+            .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(0, 0, true);
-
-    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH);
+    startForeground(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
   }
 
   @Override
@@ -98,20 +120,22 @@ public abstract class NotificationApplicationView extends Application implements
             .setContentIntent(contentIntent)
             .setDeleteIntent(dismissIntent)
             .setAutoCancel(true);
-
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showPublisherOnlyNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_publisher_only));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showUploadInfectionNotificaton(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_infection));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -122,18 +146,21 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_intellectual_property));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showAppBundleNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_bundle));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showAntiSpamRuleNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_anti_spam));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -141,6 +168,7 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_invalid_signature));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -151,11 +179,11 @@ public abstract class NotificationApplicationView extends Application implements
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
-            .setOngoing(false)
+            .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(100, progress, false);
-
-    notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH);
+    startForeground(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
   }
 
   @Override
@@ -163,6 +191,7 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_message_error_retry));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -170,12 +199,14 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_upload_failed_retry));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showFailedUploadNotification(String applicationName, String packageName) {
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_app_upload_failed));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showUnknownErrorNotification(String applicationName, String packageName) {
@@ -185,6 +216,7 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_message_error));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override
@@ -192,6 +224,7 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder = buildNotification(applicationName,
         getString(R.string.application_notification_short_get_retries_exceeded));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   @Override public void showCatappultCertifiedNotification(String appName, String packageName) {
@@ -200,6 +233,7 @@ public abstract class NotificationApplicationView extends Application implements
     NotificationCompat.Builder mBuilder = buildNotification(appName,
         getString(R.string.application_notification_short_app_intellectual_property_certified));
     notificationManager.notify(packageName.hashCode(), mBuilder.build());
+    notificationManager.cancel(packageName.hashCode() + NOTIFICATION_ID_CHANGER);
   }
 
   public NotificationCompat.Builder buildNotification(String applicationName, String subText) {
@@ -236,5 +270,7 @@ public abstract class NotificationApplicationView extends Application implements
     systemNotificationShower.present();
   }
 
-  public abstract UploadManager getUploadManager();
+  public UploadManager getUploadManager() {
+    return this.uploadManager;
+  }
 }

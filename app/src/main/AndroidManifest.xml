@@ -60,7 +60,7 @@
       </intent-filter>
     </activity>
 
-    <service android:name=".UploaderService" />
+    <service android:name=".NotificationService" />
   </application>
 
 </manifest>
