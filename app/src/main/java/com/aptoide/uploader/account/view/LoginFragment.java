@@ -58,6 +58,7 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
   private AptoideAccountManager accountManager;
   private Button facebookLoginButton;
   private Button googleLoginButton;
+  private Button autoLoginButton;
   private GoogleSignInClient mGoogleSignInClient;
   private GoogleSignInOptions gso;
   private CallbackManager callbackManager;
@@ -124,6 +125,7 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
 
     googleLoginButton = view.findViewById(R.id.google_sign_in_button);
     facebookLoginButton = view.findViewById(R.id.facebook_login_button);
+    autoLoginButton = view.findViewById(R.id.auto_login_with_aptoide);
     progressDialog = createGenericPleaseWaitDialog(getContext(), R.style.DialogTheme);
 
     fragmentContainer.setVisibility(View.VISIBLE);
@@ -157,12 +159,17 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
     progressContainer = null;
     loadingTextView = null;
     facebookLoginButton = null;
+    autoLoginButton = null;
     super.onDestroyView();
   }
 
   private void setupBlogTextView() {
     SpannableString content = new SpannableString(getString(R.string.login_disclaimer_blog_button));
     content.setSpan(new UnderlineSpan(), 0, content.length(), 0);
+  }
+
+  @Override public Observable<Object> getAutoLoginEvent() {
+    return RxView.clicks(autoLoginButton);
   }
 
   @Override public Observable<Object> getGoogleLoginEvent() {

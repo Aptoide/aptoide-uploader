@@ -7,11 +7,9 @@ import io.reactivex.Single;
 
 public class AutoLoginManager {
   private Context context;
-  private AutoLoginPersistence persistence;
 
-  public AutoLoginManager(Context context, AutoLoginPersistence persistence) {
+  public AutoLoginManager(Context context) {
     this.context = context;
-    this.persistence = persistence;
   }
 
   public Single<AutoLoginCredentials> getStoredUserCredentials() {
@@ -49,13 +47,5 @@ public class AutoLoginManager {
       return Single.error(e);
     }
     return Single.just(new AutoLoginCredentials());
-  }
-
-  public boolean getAutologinFlag() {
-    return persistence.isForcedLogout();
-  }
-
-  public void setAutoLoginFlag(boolean flag) {
-    persistence.setForcedLogout(flag);
   }
 }

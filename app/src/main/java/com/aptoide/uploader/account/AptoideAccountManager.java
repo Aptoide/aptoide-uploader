@@ -11,16 +11,13 @@ public class AptoideAccountManager {
   private final AccountPersistence accountPersistence;
   private final CredentialsValidator credentialsValidator;
   private final SocialLogoutManager socialLogoutManager;
-  private final AutoLoginPersistence autoLoginPersistence;
 
   public AptoideAccountManager(AccountService accountService, AccountPersistence accountPersistence,
-      CredentialsValidator credentialsValidator, SocialLogoutManager socialLogoutManager,
-      AutoLoginPersistence autoLoginPersistence) {
+      CredentialsValidator credentialsValidator, SocialLogoutManager socialLogoutManager) {
     this.accountService = accountService;
     this.accountPersistence = accountPersistence;
     this.credentialsValidator = credentialsValidator;
     this.socialLogoutManager = socialLogoutManager;
-    this.autoLoginPersistence = autoLoginPersistence;
   }
 
   public Completable login(AptoideCredentials aptoideCredentials) {
@@ -80,8 +77,7 @@ public class AptoideAccountManager {
         })
         .doOnError(throwable -> throwable.printStackTrace())
         .firstOrError()
-        .flatMapCompletable(account -> accountPersistence.remove())
-        .doOnComplete(() -> autoLoginPersistence.setForcedLogout(true));
+        .flatMapCompletable(account -> accountPersistence.remove());
   }
 
   public void removeAccessTokenFromPersistence() {

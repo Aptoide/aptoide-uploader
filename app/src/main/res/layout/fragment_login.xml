@@ -115,6 +115,18 @@
         android:layout_marginEnd="29dp"
         android:layout_marginRight="29dp" />
 
+      <Button
+          android:id="@+id/auto_login_with_aptoide"
+          style="@style/Aptoide.Button.White"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_below="@id/google_sign_in_button"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginTop="16dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
+          />
+
 
     </RelativeLayout>
 

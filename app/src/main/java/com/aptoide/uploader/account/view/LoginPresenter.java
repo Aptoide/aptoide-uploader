@@ -48,7 +48,6 @@ public class LoginPresenter implements Presenter {
             }
           } else {
             view.hideLoading();
-            return tryAutoLogin();
           }
           return Observable.empty();
         })
@@ -64,6 +63,17 @@ public class LoginPresenter implements Presenter {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(created -> view.getAutoLoginEvent())
+        .observeOn(viewScheduler)
+        .flatMap(__ -> {
+          accountManager.logout();
+          accountManager.removeAccessTokenFromPersistence();
+          return tryAutoLogin();
+        })
+        .subscribe());
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
@@ -130,15 +140,13 @@ public class LoginPresenter implements Presenter {
   }
 
   private Observable<Object> tryAutoLogin() {
-    return Observable.just(autoLoginManager.getAutologinFlag())
-        .filter(flag -> !flag)
+    return Observable.just(accountManager.getAccount())
         .doOnNext(__ -> view.showLoadingWithoutUserName())
         .flatMap(__ -> autoLoginManager.getStoredUserCredentials()
             .flatMapObservable(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
         .observeOn(viewScheduler)
         .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account)
             .doOnComplete(() -> {
-              autoLoginManager.setAutoLoginFlag(true);
               uploaderAnalytics.sendLoginEvent("auto-login", "success");
             }))
         .onErrorResumeNext(throwable -> {
