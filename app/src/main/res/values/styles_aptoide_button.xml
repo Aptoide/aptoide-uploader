@@ -54,4 +54,26 @@
     <item name="android:textColor">@color/dark_blue</item>
   </style>
 
+  <style name="Aptoide.Button.AutoLogin">
+    <item name="android:paddingRight">50dp</item>
+    <item name="android:paddingLeft">50dp</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:textSize">14sp</item>
+    <item name="android:textAllCaps">false</item>
+    <item name="android:background">@drawable/button_gradient</item>
+    <item name="android:text">Login as ....</item>
+    <item name="android:textColor">@color/white</item>
+  </style>
+
+  <style name="Aptoide.Button.OtherLogins">
+    <item name="android:paddingRight">50dp</item>
+    <item name="android:paddingLeft">50dp</item>
+    <item name="android:fontFamily">sans-serif-medium</item>
+    <item name="android:textSize">14sp</item>
+    <item name="android:textAllCaps">false</item>
+    <item name="android:background">@drawable/button_border_blue</item>
+    <item name="android:text">Use other account</item>
+    <item name="android:textColor">@color/dark_blue</item>
+  </style>
+
 </resources>
