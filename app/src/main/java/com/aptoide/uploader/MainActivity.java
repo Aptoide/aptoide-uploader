@@ -7,7 +7,7 @@ import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
-import com.aptoide.uploader.account.view.MaintenanceFragment;
+import com.aptoide.uploader.account.view.LoginFragment;
 import com.aptoide.uploader.apps.permission.PermissionProviderActivity;
 import com.aptoide.uploader.apps.view.AppFormFragment;
 import com.aptoide.uploader.apps.view.OnBackPressedInterface;
@@ -30,7 +30,7 @@ public class MainActivity extends PermissionProviderActivity implements MainView
 
     if (savedInstanceState == null) {
       getSupportFragmentManager().beginTransaction()
-          .replace(R.id.activity_main_container, MaintenanceFragment.newInstance())
+          .replace(R.id.activity_main_container, LoginFragment.newInstance())
           .commit();
     }
     UploaderApplication app = ((UploaderApplication) getApplicationContext());
