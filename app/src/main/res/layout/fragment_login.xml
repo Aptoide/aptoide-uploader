@@ -19,7 +19,7 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:paddingBottom="16dp"
-        android:visibility="gone"
+        android:visibility="visible"
         >
       <Button
           android:id="@+id/other_logins_backbutton"
@@ -58,21 +58,6 @@
           android:layout_marginTop="16dp"
           style="@style/Aptoide.Button.Ghost.GreyFogLight.GoogleFull"
           />
-
-      <Button
-          android:id="@+id/autologin_with_aptoide"
-          android:layout_width="match_parent"
-          android:layout_height="wrap_content"
-          android:layout_below="@id/google_sign_in_button"
-          android:layout_gravity="center_horizontal"
-          android:layout_marginLeft="29dp"
-          android:layout_marginStart="29dp"
-          android:layout_marginEnd="29dp"
-          android:layout_marginRight="29dp"
-          android:layout_marginTop="16dp"
-          style="@style/Aptoide.Button.White"
-          />
-
 
       <ImageView
           android:id="@+id/login_cloudsimage"
@@ -190,71 +175,5 @@
       android:text="@string/signing_in"
       android:textAlignment="center" />
 
-  </RelativeLayout>
-
-  <RelativeLayout
-      android:id="@+id/fragmement_autologin"
-      android:visibility="visible"
-      android:layout_width="match_parent"
-      android:layout_height="match_parent">
-
-    <ImageView
-        android:id="@+id/login_autologin_icon"
-        android:layout_width="93dp"
-        android:layout_height="93dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="190dp"
-        app:srcCompat="@drawable/icon_login" />
-
-    <ImageView
-        android:id="@+id/login_autologin_cloudsimage2"
-        android:layout_width="120dp"
-        android:layout_height="140dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="63dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/background_clouds" />
-
-    <LinearLayout
-        android:layout_width="match_parent"
-        android:layout_height="162dp"
-        android:background="@drawable/background_autologin_container"
-        android:layout_alignParentBottom="true"
-        android:orientation="vertical">
-
-      <Button
-          android:id="@+id/autologin_aptoide"
-          style="@style/Aptoide.Button.AutoLogin"
-          android:layout_width="match_parent"
-          android:layout_height="40dp"
-          android:layout_gravity="center_horizontal"
-          android:layout_marginLeft="29dp"
-          android:layout_marginStart="29dp"
-          android:layout_marginTop="24dp"
-          android:layout_marginEnd="29dp"
-          android:layout_marginRight="29dp" />
-
-      <Button
-          android:id="@+id/login_other_logins"
-          style="@style/Aptoide.Button.OtherLogins"
-          android:layout_below="@id/autologin_aptoide"
-          android:layout_width="match_parent"
-          android:layout_height="40dp"
-          android:layout_gravity="center_horizontal"
-          android:layout_marginLeft="29dp"
-          android:layout_marginStart="29dp"
-          android:layout_marginTop="16dp"
-          android:layout_marginEnd="29dp"
-          android:layout_marginRight="29dp"
-          android:layout_marginBottom="42dp"/>
-    </LinearLayout>
   </RelativeLayout>
 </RelativeLayout>

@@ -1,8 +1,10 @@
 package com.aptoide.uploader
 
+import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.aptoide.uploader.account.view.AutoLoginFragment
 import com.aptoide.uploader.account.view.LoginFragment
 import com.aptoide.uploader.apps.view.AppFormFragment
 
@@ -34,6 +36,26 @@ class MainNavigator(val activity: AppCompatActivity) {
     fragmentTransaction =
         fragmentTransaction.replace(R.id.activity_main_container, LoginFragment.newInstance(true,
             activity.getString(R.string.login_error_magic_link_expired)), null)
+    fragmentTransaction.commit()
+  }
+
+  fun navigateToAutoLoginFragment(name: String?) {
+    var bundle: Bundle = Bundle()
+    bundle.putString("name", name)
+
+    var fragment = AutoLoginFragment.newInstance()
+    fragment.arguments = bundle
+
+    var fragmentTransaction: FragmentTransaction =
+        activity.supportFragmentManager.beginTransaction()
+    fragmentTransaction.replace(R.id.activity_main_container, fragment, null)
+    fragmentTransaction.commit()
+  }
+
+  fun navigateToLoginFragment() {
+    var fragmentTransaction: FragmentTransaction =
+        activity.supportFragmentManager.beginTransaction()
+    fragmentTransaction.replace(R.id.activity_main_container, LoginFragment.newInstance(), null)
     fragmentTransaction.commit()
   }
 }

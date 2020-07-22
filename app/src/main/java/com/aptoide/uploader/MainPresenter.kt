@@ -5,6 +5,7 @@ import com.aptoide.authentication.AuthenticationException
 import com.aptoide.uploader.account.AgentPersistence
 import com.aptoide.uploader.account.AptoideAccountManager
 import com.aptoide.uploader.account.AptoideCredentials
+import com.aptoide.uploader.account.AutoLoginManager
 import com.aptoide.uploader.apps.UploadManager
 import com.aptoide.uploader.view.Presenter
 import com.aptoide.uploader.view.View
@@ -15,6 +16,7 @@ import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.exceptions.OnErrorNotImplementedException
 
 class MainPresenter(val view: MainView, val accountManager: AptoideAccountManager,
+                    var autoLoginManager: AutoLoginManager,
                     val agentPersistence: AgentPersistence, val viewScheduler: Scheduler,
                     val uploadManager: UploadManager, val mainNavigator: MainNavigator) :
     Presenter {
@@ -23,9 +25,28 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
 
   override fun present() {
     compositeDisposable = CompositeDisposable()
-
+    handleLoginView()
     handleIntentEvents()
     onDestroyDisposeComposite()
+  }
+
+  private fun isNullOrEmpty(str: String?): Boolean {
+    if (str != null && !str.trim().isEmpty())
+      return false
+    return true
+  }
+
+  private fun handleLoginView() {
+    autoLoginManager.storedUserCredentials
+    if (isNullOrEmpty(autoLoginManager.autoLoginCredentials.email)) {
+      mainNavigator.navigateToLoginFragment()
+    } else {
+      if (isNullOrEmpty(autoLoginManager.autoLoginCredentials.storeName)) {
+        mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.email)
+      } else {
+        mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.storeName)
+      }
+    }
   }
 
   private fun handleIntentEvents() {

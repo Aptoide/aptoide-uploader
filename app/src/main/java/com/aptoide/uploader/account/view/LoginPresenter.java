@@ -66,17 +66,6 @@ public class LoginPresenter implements Presenter {
 
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(created -> view.getAutoLoginEvent())
-        .observeOn(viewScheduler)
-        .flatMap(__ -> {
-          accountManager.logout();
-          accountManager.removeAccessTokenFromPersistence();
-          return tryAutoLogin();
-        })
-        .subscribe());
-
-    compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.getGoogleLoginEvent()
             .doOnNext(__ -> {
               accountManager.logout();
@@ -137,23 +126,5 @@ public class LoginPresenter implements Presenter {
         .subscribe(__ -> {
         }, throwable -> {
         }));
-  }
-
-  private Observable<Object> tryAutoLogin() {
-    return Observable.just(accountManager.getAccount())
-        .doOnNext(__ -> view.showLoadingWithoutUserName())
-        .flatMap(__ -> autoLoginManager.getStoredUserCredentials()
-            .flatMapObservable(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
-        .observeOn(viewScheduler)
-        .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account)
-            .doOnComplete(() -> {
-              uploaderAnalytics.sendLoginEvent("auto-login", "success");
-            }))
-        .onErrorResumeNext(throwable -> {
-          uploaderAnalytics.sendLoginEvent("auto-login", "fail");
-          view.hideLoading();
-          return accountManager.logout();
-        })
-        .andThen(Observable.empty());
   }
 }

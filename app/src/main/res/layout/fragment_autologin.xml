@@ -1,0 +1,76 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+  xmlns:app="http://schemas.android.com/apk/res-auto"
+  android:layout_width="match_parent"
+  android:layout_height="match_parent"
+  android:animateLayoutChanges="true"
+  android:background="@drawable/gradient_drawable_maintenance">
+
+  <RelativeLayout
+      android:visibility="visible"
+      android:layout_width="match_parent"
+      android:layout_height="match_parent">1
+
+    <ImageView
+        android:id="@+id/login_autologin_cloudsimage2"
+        android:layout_width="120dp"
+        android:layout_height="140dp"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentEnd="true"
+        android:layout_alignParentRight="true"
+        android:layout_marginTop="63dp"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:srcCompat="@drawable/background_clouds" />
+
+    <LinearLayout
+        android:id="@+id/autologin_container"
+        android:layout_width="match_parent"
+        android:layout_height="248dp"
+        android:background="@drawable/background_autologin_container"
+        android:layout_marginTop="205dp"
+        android:layout_marginLeft="29dp"
+        android:layout_marginStart="29dp"
+        android:layout_marginEnd="29dp"
+        android:layout_marginRight="29dp"
+        android:orientation="vertical">
+
+      <ImageView
+          android:id="@+id/autologin_avatar"
+          android:layout_width="67dp"
+          android:layout_height="67dp"
+          android:layout_marginTop="29dp"
+          android:layout_marginLeft="120dp"
+          android:layout_marginStart="120dp"
+          android:layout_marginEnd="120dp"
+          android:layout_marginRight="120dp"/>
+
+      <Button
+          android:id="@+id/autologin_aptoide"
+          style="@style/Aptoide.Button.AutoLogin"
+          android:layout_width="match_parent"
+          android:layout_height="40dp"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginTop="32dp"
+          android:layout_marginLeft="29dp"
+          android:layout_marginStart="29dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp" />
+
+      <Button
+          android:id="@+id/login_other_logins"
+          style="@style/Aptoide.Button.OtherLogins"
+          android:layout_below="@id/autologin_aptoide"
+          android:layout_width="match_parent"
+          android:layout_height="40dp"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginTop="16dp"
+          android:layout_marginLeft="29dp"
+          android:layout_marginStart="29dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
+          android:layout_marginBottom="42dp"/>
+    </LinearLayout>
+  </RelativeLayout>
+</RelativeLayout>
