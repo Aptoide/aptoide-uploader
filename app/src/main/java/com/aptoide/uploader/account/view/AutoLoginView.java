@@ -8,5 +8,5 @@ public interface AutoLoginView extends View {
 
   Observable<Object> clickOtherLogins();
 
-  void showName();
+  void showStrings();
 }

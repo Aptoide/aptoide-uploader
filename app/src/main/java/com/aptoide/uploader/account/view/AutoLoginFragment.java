@@ -72,8 +72,9 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
     return RxView.clicks(otherLoginsButton);
   }
 
-  @Override public void showName() {
+  @Override public void showStrings() {
     Bundle bundle = this.getArguments();
-    autoLoginButton.setText(getString(R.string.logging_as).concat(" " + bundle.getString("name")));
+    autoLoginButton.setText(String.format(getString(R.string.login_as_button),bundle.getString("name")));
+    otherLoginsButton.setText(R.string.login_other_account_button);
   }
 }
