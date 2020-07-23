@@ -103,4 +103,6 @@
   <string name="login_disclaimer_unavailable_body_2">We\'re working hard for it to be back soon, so stay tuned!</string>
   <string name="connect_with_facebook">Connect with Facebook</string>
   <string name="connect_with_google">Connect with Google</string>
+  <string name="login_as_button">Log in as %s</string>
+  <string name="login_other_account_button">Use other account</string>
 </resources>
