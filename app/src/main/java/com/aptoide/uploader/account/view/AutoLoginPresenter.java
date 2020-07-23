@@ -81,7 +81,12 @@ public class AutoLoginPresenter implements Presenter {
         .observeOn(viewScheduler)
         .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account)
             .doOnComplete(() -> {
-              navigator.navigateToMyAppsView();
+              if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
+                  .getStoreName())) {
+                navigator.navigateToCreateStoreView();
+              } else {
+                navigator.navigateToMyAppsView();
+              }
               uploaderAnalytics.sendLoginEvent("auto-login", "success");
             }))
         .onErrorResumeNext(throwable -> {

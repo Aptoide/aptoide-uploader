@@ -20,6 +20,10 @@ public class AutoLoginNavigator {
     navigateTo(LoginFragment.newInstance());
   }
 
+  public void navigateToCreateStoreView() {
+    navigateTo(CreateStoreFragment.newInstance());
+  }
+
   public void navigateToMyAppsView() {
     navigateTo(MyStoreFragment.newInstance());
   }
