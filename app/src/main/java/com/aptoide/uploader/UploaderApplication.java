@@ -310,7 +310,7 @@ public class UploaderApplication extends Application {
   }
 
   public AutoLoginManager getAutoLoginManager() {
-    return new AutoLoginManager(getApplicationContext());
+    return AutoLoginManager.getInstance(getApplicationContext());
   }
 
   private void initializeRakam() {

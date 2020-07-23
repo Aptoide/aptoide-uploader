@@ -1,6 +1,7 @@
 package com.aptoide.uploader
 
 import android.net.Uri
+import android.util.Log
 import com.aptoide.authentication.AuthenticationException
 import com.aptoide.uploader.account.AgentPersistence
 import com.aptoide.uploader.account.AptoideAccountManager
@@ -30,18 +31,16 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
     onDestroyDisposeComposite()
   }
 
-  private fun isNullOrEmpty(str: String?): Boolean {
-    if (str != null && !str.trim().isEmpty())
-      return false
-    return true
-  }
-
   private fun handleLoginView() {
-    autoLoginManager.storedUserCredentials
-    if (isNullOrEmpty(autoLoginManager.autoLoginCredentials.email)) {
+    autoLoginManager.firstStoredUserCredentials
+    Log.d("LOL",
+        "MyStorePresenter StoreName " + autoLoginManager.autoLoginCredentials.storeName)
+    Log.d("LOL",
+        "MyStorePresenter Email " + autoLoginManager.autoLoginCredentials.email)
+    if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.email)) {
       mainNavigator.navigateToLoginFragment()
     } else {
-      if (isNullOrEmpty(autoLoginManager.autoLoginCredentials.storeName)) {
+      if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.storeName)) {
         mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.email)
       } else {
         mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.storeName)

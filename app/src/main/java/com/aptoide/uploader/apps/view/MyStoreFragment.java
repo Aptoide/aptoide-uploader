@@ -139,7 +139,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         ((UploaderApplication) getContext().getApplicationContext()).getAppUploadStatusPersistence(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
         ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider(),
-        ((UploaderApplication) getContext().getApplicationContext()).getUploadManager()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(),
+        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
   }
 
   @Override public void onDestroyView() {

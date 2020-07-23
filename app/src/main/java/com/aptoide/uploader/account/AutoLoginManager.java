@@ -3,14 +3,21 @@ package com.aptoide.uploader.account;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
+import android.util.Log;
 import io.reactivex.Single;
 
 public class AutoLoginManager {
-  private Context context;
+  private static Context context;
   private AutoLoginCredentials autoLoginCredentials = new AutoLoginCredentials();
+  private static AutoLoginManager single_instance;
 
   public AutoLoginManager(Context context) {
     this.context = context;
+  }
+
+  public static AutoLoginManager getInstance(Context context) {
+    if (single_instance == null) single_instance = new AutoLoginManager(context);
+    return single_instance;
   }
 
   public AutoLoginCredentials getAutoLoginCredentials() {
@@ -18,6 +25,10 @@ public class AutoLoginManager {
   }
 
   public Single<AutoLoginCredentials> getStoredUserCredentials() {
+    return Single.just(autoLoginCredentials);
+  }
+
+  public Single<AutoLoginCredentials> getFirstStoredUserCredentials() {
     try {
       String URL = "content://cm.aptoide.pt.StubProvider";
       Uri token_uri = Uri.parse(URL + "/token");
@@ -46,17 +57,26 @@ public class AutoLoginManager {
         autoLoginCredentials.setStoreName(c3.getString(c3.getColumnIndex("userRepo")));
         autoLoginCredentials.setEmail(c4.getString(c4.getColumnIndex("loginName")));
 
+        Log.d("LOL", "AutoLoginManager StoreName " + autoLoginCredentials.getStoreName());
+        Log.d("LOL", "AutoLoginManager Email " + autoLoginCredentials.getEmail());
+
         c1.close();
         c2.close();
         c3.close();
         c4.close();
-
-        return Single.just(autoLoginCredentials);
       }
     } catch (Exception e) {
       e.printStackTrace();
       return Single.error(e);
     }
-    return Single.just(new AutoLoginCredentials());
+    return Single.just(autoLoginCredentials);
+  }
+
+  public boolean isNullOrEmpty(String str) {
+    if (str != null && !str.trim()
+        .isEmpty()) {
+      return false;
+    }
+    return true;
   }
 }

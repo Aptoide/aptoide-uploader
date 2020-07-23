@@ -1,9 +1,11 @@
 package com.aptoide.uploader.apps.view;
 
+import android.os.Bundle;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.aptoide.uploader.R;
+import com.aptoide.uploader.account.view.AutoLoginFragment;
 import com.aptoide.uploader.account.view.LoginFragment;
 
 /**
@@ -20,6 +22,16 @@ class MyStoreNavigator {
 
   public void navigateToLoginView() {
     navigateToWithoutBackSave(R.id.activity_main_container, LoginFragment.newInstance(), true);
+  }
+
+  public void navigateToAutoLoginFragment(String name) {
+    Bundle bundle = new Bundle();
+    bundle.putString("name", name);
+
+    Fragment fragment = AutoLoginFragment.newInstance();
+    fragment.setArguments(bundle);
+
+    navigateToWithoutBackSave(R.id.activity_main_container, fragment, true);
   }
 
   private void navigateToWithoutBackSave(int containerId, Fragment fragment, boolean replace) {
