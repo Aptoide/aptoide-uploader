@@ -10,9 +10,6 @@ import com.aptoide.uploader.account.AgentPersistence;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.account.CredentialsValidator;
-import com.aptoide.uploader.account.MaintenanceManager;
-import com.aptoide.uploader.account.MaintenancePersistence;
-import com.aptoide.uploader.account.MaintenanceService;
 import com.aptoide.uploader.account.SocialLogoutManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
@@ -71,8 +68,6 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class UploaderApplication extends Application {
-
-  private final String APTOIDE_WEBSERVICES_BASE_HOST = "https://webservices.aptoide.com/api/7/";
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
   private UploadManager uploadManager;
@@ -87,7 +82,6 @@ public class UploaderApplication extends Application {
   private UploaderAnalytics uploaderAnalytics;
   private CallbackManager callbackManager;
   private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
-  private MaintenanceManager maintenanceManager;
   private LoginManager loginManager;
   private AgentPersistence agentPersistence;
 
@@ -154,7 +148,7 @@ public class UploaderApplication extends Application {
     if (accountManager == null) {
 
       final Retrofit retrofitV3 =
-          retrofitBuilder(APTOIDE_WEBSERVICES_BASE_HOST, buildOkHttpClient());
+          retrofitBuilder("https://webservices.aptoide.com/", buildOkHttpClient());
 
       final Retrofit retrofitV7 = retrofitBuilder("https://ws75.aptoide.com/api/7/",
           buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
@@ -174,7 +168,7 @@ public class UploaderApplication extends Application {
   public AptoideAuthenticationRx getAptoideAuthenticationRx() {
     if (aptoideAuthenticationRx == null) {
       aptoideAuthenticationRx = new AptoideAuthenticationRx(new AptoideAuthentication(
-          new RemoteAuthenticationService(APTOIDE_WEBSERVICES_BASE_HOST,
+          new RemoteAuthenticationService("https://webservices.aptoide.com/api/7/",
               buildOkHttpClient().build())));
     }
     return aptoideAuthenticationRx;
@@ -351,24 +345,6 @@ public class UploaderApplication extends Application {
     }
     Rakam.getInstance()
         .setSuperProperties(superProperties);
-  }
-
-  public MaintenanceManager getMaintenanceManager() {
-    if (maintenanceManager == null) {
-
-      final Retrofit retrofitMaintenance =
-          retrofitBuilder("http://imgs.aptoide.com/", buildOkHttpClient());
-
-      MaintenanceService maintenanceService = new MaintenanceService(
-          retrofitMaintenance.create(MaintenanceService.LoginMaintenanceService.class));
-
-      MaintenancePersistence maintenancePersistence =
-          new MaintenancePersistence(PreferenceManager.getDefaultSharedPreferences(this));
-
-      maintenanceManager =
-          new MaintenanceManager(maintenanceService, getAccountManager(), maintenancePersistence);
-    }
-    return maintenanceManager;
   }
 
   public LoginManager getFacebookLoginManager() {
