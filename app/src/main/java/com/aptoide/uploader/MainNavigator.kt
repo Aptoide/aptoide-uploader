@@ -39,9 +39,10 @@ class MainNavigator(val activity: AppCompatActivity) {
     fragmentTransaction.commit()
   }
 
-  fun navigateToAutoLoginFragment(name: String?) {
+  fun navigateToAutoLoginFragment(name: String?, avatarPath: String?) {
     var bundle: Bundle = Bundle()
     bundle.putString("name", name)
+    bundle.putString("avatarPath",avatarPath)
 
     var fragment = AutoLoginFragment.newInstance()
     fragment.arguments = bundle

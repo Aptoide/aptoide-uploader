@@ -94,11 +94,11 @@ public class MyStorePresenter implements Presenter {
                     .getStoreName())) {
                   storeNavigator.navigateToAutoLoginFragment(
                       autoLoginManager.getAutoLoginCredentials()
-                          .getEmail());
+                          .getEmail(), autoLoginManager.getAutoLoginCredentials().getAvatarPath());
                 } else {
                   storeNavigator.navigateToAutoLoginFragment(
                       autoLoginManager.getAutoLoginCredentials()
-                          .getStoreName());
+                          .getStoreName(),autoLoginManager.getAutoLoginCredentials().getAvatarPath());
                 }
               }
             })

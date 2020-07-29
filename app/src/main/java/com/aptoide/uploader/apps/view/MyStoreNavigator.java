@@ -24,9 +24,10 @@ class MyStoreNavigator {
     navigateToWithoutBackSave(R.id.activity_main_container, LoginFragment.newInstance(), true);
   }
 
-  public void navigateToAutoLoginFragment(String name) {
+  public void navigateToAutoLoginFragment(String name, String avatarPath) {
     Bundle bundle = new Bundle();
     bundle.putString("name", name);
+    bundle.putString("avatarPath", avatarPath);
 
     Fragment fragment = AutoLoginFragment.newInstance();
     fragment.setArguments(bundle);

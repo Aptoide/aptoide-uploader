@@ -6,6 +6,7 @@ public class AutoLoginCredentials {
   private String refreshToken;
   private String storeName;
   private String email;
+  private String avatarPath;
 
   public AutoLoginCredentials() {
   }
@@ -26,6 +27,10 @@ public class AutoLoginCredentials {
     this.email = email;
   }
 
+  public void setAvatarPath(String avatarPath) {
+    this.avatarPath = avatarPath;
+  }
+
   public String getAccessToken() {
     return accessToken;
   }
@@ -40,5 +45,9 @@ public class AutoLoginCredentials {
 
   public String getEmail() {
     return email;
+  }
+
+  public String getAvatarPath() {
+    return avatarPath;
   }
 }
