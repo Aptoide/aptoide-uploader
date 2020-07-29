@@ -11,6 +11,8 @@ import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.view.android.FragmentView;
+import com.bumptech.glide.Glide;
+import com.bumptech.glide.request.RequestOptions;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -72,9 +74,18 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
     return RxView.clicks(otherLoginsButton);
   }
 
+  @Override public void showAvatar() {
+    Bundle bundle = this.getArguments();
+    Glide.with(this)
+        .load(bundle.getString("avatarPath"))
+        .apply(RequestOptions.circleCropTransform())
+        .into(autoLoginAvatar);
+  }
+
   @Override public void showStrings() {
     Bundle bundle = this.getArguments();
-    autoLoginButton.setText(String.format(getString(R.string.login_as_button),bundle.getString("name")));
+    autoLoginButton.setText(
+        String.format(getString(R.string.login_as_button), bundle.getString("name")));
     otherLoginsButton.setText(R.string.login_other_account_button);
   }
 }

@@ -36,10 +36,15 @@ public class AutoLoginPresenter implements Presenter {
   }
 
   @Override public void present() {
-    view.showStrings();
+    showUserInfo();
     handleAutoLogin();
     handleOtherLoginsClick();
     clearDisposable();
+  }
+
+  private void showUserInfo() {
+    view.showAvatar();
+    view.showStrings();
   }
 
   private void handleAutoLogin() {
