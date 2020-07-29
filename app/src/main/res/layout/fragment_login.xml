@@ -11,7 +11,6 @@
       android:layout_width="match_parent"
       android:layout_height="match_parent"
       android:layout_alignParentTop="true"
-      android:layout_marginTop="-1dp"
       >
 
     <RelativeLayout
@@ -29,7 +28,6 @@
           android:layout_marginLeft="16dp"
           android:layout_marginTop="45dp"
           android:background="@drawable/ic_arrow_back_24dp">
-
       </Button>
 
       <Button
@@ -61,17 +59,14 @@
 
       <ImageView
           android:id="@+id/login_cloudsimage"
-          android:layout_width="120dp"
-          android:layout_height="140dp"
+          android:layout_width="match_parent"
+          android:layout_height="700dp"
+          android:layout_marginTop="61dp"
+          android:layout_marginBottom="85dp"
+          android:layout_alignParentTop="true"
           android:layout_alignParentEnd="true"
           android:layout_alignParentRight="true"
-          android:layout_alignParentTop="true"
-          android:layout_marginTop="63dp"
-          app:layout_constraintEnd_toEndOf="parent"
-          app:layout_constraintRight_toRightOf="parent"
-          app:layout_constraintTop_toTopOf="parent"
-          app:srcCompat="@drawable/background_clouds"
-          />
+          app:srcCompat="@drawable/background_full_clouds"/>
 
       <ImageView
           android:id="@+id/login_maintenance_icon"
