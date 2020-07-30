@@ -12,17 +12,11 @@
       android:layout_height="wrap_content">
 
     <ImageView
-        android:id="@+id/login_autologin_cloudsimage"
+        android:id="@+id/autologin_cloudsimage"
         android:layout_width="match_parent"
-        android:layout_height="match_parent"
-        android:layout_marginTop="61dp"
-        android:layout_marginBottom="85dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        app:srcCompat="@drawable/background_full_clouds"/>
+        android:layout_height="600dp"
+        android:layout_marginTop="60dp"
+        android:background="@drawable/background_full_clouds"/>
 
     <FrameLayout
         android:id="@+id/autologin_container"
@@ -53,6 +47,7 @@
           android:scaleType="fitXY"
           android:background="@drawable/autologin_avatar_border"
           />
+
       <Button
           android:id="@+id/autologin_aptoide"
           style="@style/Aptoide.Button.AutoLogin"
@@ -77,6 +72,7 @@
           android:layout_marginEnd="17dp"
           android:layout_marginRight="17dp"
           android:layout_marginBottom="24dp"/>
+
     </FrameLayout>
   </RelativeLayout>
 </RelativeLayout>
