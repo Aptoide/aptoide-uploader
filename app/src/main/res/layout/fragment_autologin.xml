@@ -6,10 +6,19 @@
   android:animateLayoutChanges="true"
   android:background="@drawable/gradient_drawable_maintenance">
 
-  <RelativeLayout
-      android:visibility="visible"
+  <ScrollView
       android:layout_width="match_parent"
-      android:layout_height="wrap_content">
+      android:layout_height="match_parent"
+      android:layout_alignParentTop="true"
+      >
+
+  <RelativeLayout
+      android:id="@+id/fragment_login_content"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:paddingBottom="16dp"
+      android:visibility="visible"
+      >
 
     <ImageView
         android:id="@+id/autologin_cloudsimage"
@@ -75,4 +84,5 @@
 
     </FrameLayout>
   </RelativeLayout>
+  </ScrollView>
 </RelativeLayout>

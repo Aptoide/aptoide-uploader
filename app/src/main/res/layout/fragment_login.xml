@@ -6,12 +6,6 @@
   android:animateLayoutChanges="true"
   android:background="@drawable/gradient_drawable_maintenance">
 
-  <ImageView
-      android:id="@+id/login_cloudsimage"
-      android:layout_width="match_parent"
-      android:layout_height="600dp"
-      android:layout_marginTop="60dp"
-      android:background="@drawable/background_full_clouds"/>
 
   <ScrollView
       android:layout_width="match_parent"
@@ -26,6 +20,13 @@
         android:paddingBottom="16dp"
         android:visibility="visible"
         >
+
+      <ImageView
+          android:id="@+id/login_cloudsimage"
+          android:layout_width="match_parent"
+          android:layout_height="600dp"
+          android:layout_marginTop="60dp"
+          android:background="@drawable/background_full_clouds"/>
 
       <Button
           android:id="@+id/other_logins_backbutton"
