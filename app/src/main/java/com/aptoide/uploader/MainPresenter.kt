@@ -37,11 +37,15 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
         "MyStorePresenter StoreName " + autoLoginManager.autoLoginCredentials.storeName)
     Log.d("LOL",
         "MyStorePresenter Email " + autoLoginManager.autoLoginCredentials.email)
-    if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.email)) {
+    if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.accessToken)) {
       mainNavigator.navigateToLoginFragment()
     } else {
       if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.storeName)) {
-        mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.email, autoLoginManager.autoLoginCredentials.avatarPath)
+        if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.name)){
+          mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.email, autoLoginManager.autoLoginCredentials.avatarPath)
+        }else{
+          mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.name, autoLoginManager.autoLoginCredentials.avatarPath)
+        }
       } else {
         mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.storeName, autoLoginManager.autoLoginCredentials.avatarPath)
       }

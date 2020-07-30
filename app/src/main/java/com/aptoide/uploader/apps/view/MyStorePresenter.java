@@ -86,19 +86,17 @@ public class MyStorePresenter implements Presenter {
                       .getStoreName());
               Log.d("LOL", "MyStorePresenter Email " + autoLoginManager.getAutoLoginCredentials()
                   .getEmail());
-              if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
-                  .getAccessToken())) {
+              if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials().getAccessToken())) {
                 storeNavigator.navigateToLoginView();
               } else {
-                if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
-                    .getStoreName())) {
-                  storeNavigator.navigateToAutoLoginFragment(
-                      autoLoginManager.getAutoLoginCredentials()
-                          .getEmail(), autoLoginManager.getAutoLoginCredentials().getAvatarPath());
+                if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials().getStoreName())) {
+                  if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials().getName())){
+                    storeNavigator.navigateToAutoLoginFragment(autoLoginManager.getAutoLoginCredentials().getEmail(), autoLoginManager.getAutoLoginCredentials().getAvatarPath());
+                  }else{
+                    storeNavigator.navigateToAutoLoginFragment(autoLoginManager.getAutoLoginCredentials().getName(), autoLoginManager.getAutoLoginCredentials().getAvatarPath());
+                  }
                 } else {
-                  storeNavigator.navigateToAutoLoginFragment(
-                      autoLoginManager.getAutoLoginCredentials()
-                          .getStoreName(),autoLoginManager.getAutoLoginCredentials().getAvatarPath());
+                  storeNavigator.navigateToAutoLoginFragment(autoLoginManager.getAutoLoginCredentials().getStoreName(), autoLoginManager.getAutoLoginCredentials().getAvatarPath());
                 }
               }
             })
