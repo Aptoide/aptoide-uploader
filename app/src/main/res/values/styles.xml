@@ -2,7 +2,7 @@
 
   <!-- Base application theme. -->
   <style name="AppTheme" parent="Theme.AppCompat.Light.NoActionBar">
-    <item name="actionModeBackground">@drawable/gradient_drawable</item>
+    <item name="actionModeBackground">@drawable/splash_screen</item>
     <item name="colorPrimary">#0078ab</item>
     <item name="colorAccent">#0078ab</item>
     <item name="android:textColor">@android:color/white</item>
@@ -14,7 +14,7 @@
     <item name="android:spinnerItemStyle">@style/SpinnerItem</item>
     <item name="android:spinnerDropDownItemStyle">@style/Spinner.Dropdown</item>
     <item name="colorPrimaryDark">#006294</item>
-    <item name="android:windowBackground">@drawable/gradient_drawable</item>
+    <item name="android:windowBackground">@drawable/splash_screen</item>
     <item name="actionButtonStyle">@style/Widget.Aptoide.AppCompat.ActionButton</item>
   </style>
 
