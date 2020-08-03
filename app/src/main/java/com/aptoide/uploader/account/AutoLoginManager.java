@@ -73,10 +73,7 @@ public class AutoLoginManager {
   }
 
   public boolean isNullOrEmpty(String str) {
-    if (str != null && !str.trim()
-        .isEmpty()) {
-      return false;
-    }
-    return true;
+    return str == null || str.trim()
+        .isEmpty();
   }
 }
