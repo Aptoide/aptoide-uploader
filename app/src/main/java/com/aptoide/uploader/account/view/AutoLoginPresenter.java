@@ -1,7 +1,6 @@
 package com.aptoide.uploader.account.view;
 
 import com.aptoide.uploader.account.AptoideAccountManager;
-import com.aptoide.uploader.account.AutoLoginCredentials;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.view.Presenter;
@@ -20,7 +19,6 @@ public class AutoLoginPresenter implements Presenter {
   private AutoLoginNavigator navigator;
   private CompositeDisposable compositeDisposable;
   private Scheduler viewScheduler;
-  private AutoLoginCredentials autoLoginCredentials;
 
   public AutoLoginPresenter(AutoLoginView view, AptoideAccountManager accountManager,
       UploaderAnalytics uploaderAnalytics, AutoLoginManager autoLoginManager,
@@ -43,8 +41,8 @@ public class AutoLoginPresenter implements Presenter {
   }
 
   private void showUserInfo() {
-    view.showAvatar();
     view.showStrings();
+    view.showAvatar();
   }
 
   private void handleAutoLogin() {

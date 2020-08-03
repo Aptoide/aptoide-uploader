@@ -56,10 +56,6 @@ public class AutoLoginManager {
         autoLoginCredentials.setRefreshToken(c2.getString(c2.getColumnIndex("userRefreshToken")));
         autoLoginCredentials.setStoreName(c3.getString(c3.getColumnIndex("userRepo")));
         autoLoginCredentials.setEmail(c4.getString(c4.getColumnIndex("loginName")));
-        autoLoginCredentials.setAvatarPath("https://widgetwhats.com/app/uploads/2019/11/free-profile-photo-whatsapp-1.png");
-
-        Log.d("LOL", "AutoLoginManager StoreName " + autoLoginCredentials.getStoreName());
-        Log.d("LOL", "AutoLoginManager Email " + autoLoginCredentials.getEmail());
 
         c1.close();
         c2.close();

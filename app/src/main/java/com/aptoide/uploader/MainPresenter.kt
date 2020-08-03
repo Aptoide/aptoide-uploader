@@ -31,23 +31,28 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
     onDestroyDisposeComposite()
   }
 
+  private fun checkAvatar(name: String) {
+    if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.avatarPath)) {
+      mainNavigator.navigateToAutoLoginFragment(name)
+    } else {
+      mainNavigator.navigateToAutoLoginFragment(name,
+          autoLoginManager.autoLoginCredentials.avatarPath)
+    }
+  }
+
   private fun handleLoginView() {
     autoLoginManager.firstStoredUserCredentials
-    Log.d("LOL",
-        "MyStorePresenter StoreName " + autoLoginManager.autoLoginCredentials.storeName)
-    Log.d("LOL",
-        "MyStorePresenter Email " + autoLoginManager.autoLoginCredentials.email)
     if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.accessToken)) {
       mainNavigator.navigateToLoginFragment()
     } else {
       if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.storeName)) {
-        if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.name)){
-          mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.email, autoLoginManager.autoLoginCredentials.avatarPath)
-        }else{
-          mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.name, autoLoginManager.autoLoginCredentials.avatarPath)
+        if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.name)) {
+          checkAvatar(autoLoginManager.autoLoginCredentials.email)
+        } else {
+          checkAvatar(autoLoginManager.autoLoginCredentials.name)
         }
       } else {
-        mainNavigator.navigateToAutoLoginFragment(autoLoginManager.autoLoginCredentials.storeName, autoLoginManager.autoLoginCredentials.avatarPath)
+        checkAvatar(autoLoginManager.autoLoginCredentials.storeName)
       }
     }
   }

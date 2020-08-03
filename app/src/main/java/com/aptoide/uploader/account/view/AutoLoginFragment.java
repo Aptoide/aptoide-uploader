@@ -74,18 +74,25 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
     return RxView.clicks(otherLoginsButton);
   }
 
-  @Override public void showAvatar() {
-    Bundle bundle = this.getArguments();
-    Glide.with(this)
-        .load(bundle.getString("avatarPath"))
-        .apply(RequestOptions.circleCropTransform())
-        .into(autoLoginAvatar);
-  }
-
   @Override public void showStrings() {
     Bundle bundle = this.getArguments();
     autoLoginButton.setText(
         String.format(getString(R.string.login_as_button), bundle.getString("name")));
     otherLoginsButton.setText(R.string.login_other_account_button);
+  }
+
+  @Override public void showAvatar() {
+    Bundle bundle = this.getArguments();
+    if(bundle.getString("avatarPath")!=null){
+      Glide.with(this)
+          .load(bundle.getString("avatarPath"))
+          .apply(RequestOptions.circleCropTransform())
+          .into(autoLoginAvatar);
+    }else {
+      Glide.with(this)
+          .load(getResources().getDrawable(R.drawable.avatar_default))
+          .apply(RequestOptions.circleCropTransform())
+          .into(autoLoginAvatar);
+    }
   }
 }

@@ -74,6 +74,14 @@ public class MyStorePresenter implements Presenter {
     checkUploadedApps();
   }
 
+  private void checkAvatar(String name){
+    if(autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials().getAvatarPath())){
+      storeNavigator.navigateToAutoLoginFragment(name);
+    }else{
+      storeNavigator.navigateToAutoLoginFragment(name, autoLoginManager.getAutoLoginCredentials().getAvatarPath());
+    }
+  }
+
   private void handlePositiveDialogClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
@@ -81,22 +89,23 @@ public class MyStorePresenter implements Presenter {
         .flatMapCompletable(click -> storeManager.logout()
             .observeOn(viewScheduler)
             .doOnComplete(() -> {
-              Log.d("LOL",
-                  "MyStorePresenter StoreName " + autoLoginManager.getAutoLoginCredentials()
-                      .getStoreName());
-              Log.d("LOL", "MyStorePresenter Email " + autoLoginManager.getAutoLoginCredentials()
-                  .getEmail());
-              if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials().getAccessToken())) {
+              if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
+                  .getAccessToken())) {
                 storeNavigator.navigateToLoginView();
               } else {
-                if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials().getStoreName())) {
-                  if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials().getName())){
-                    storeNavigator.navigateToAutoLoginFragment(autoLoginManager.getAutoLoginCredentials().getEmail(), autoLoginManager.getAutoLoginCredentials().getAvatarPath());
-                  }else{
-                    storeNavigator.navigateToAutoLoginFragment(autoLoginManager.getAutoLoginCredentials().getName(), autoLoginManager.getAutoLoginCredentials().getAvatarPath());
+                if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
+                    .getStoreName())) {
+                  if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
+                      .getName())) {
+                    checkAvatar(autoLoginManager.getAutoLoginCredentials()
+                        .getEmail());
+                  } else {
+                    checkAvatar(autoLoginManager.getAutoLoginCredentials()
+                        .getName());
                   }
                 } else {
-                  storeNavigator.navigateToAutoLoginFragment(autoLoginManager.getAutoLoginCredentials().getStoreName(), autoLoginManager.getAutoLoginCredentials().getAvatarPath());
+                  checkAvatar(autoLoginManager.getAutoLoginCredentials()
+                      .getStoreName());
                 }
               }
             })

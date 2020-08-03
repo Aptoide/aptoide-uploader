@@ -35,6 +35,16 @@ class MyStoreNavigator {
     navigateToWithoutBackSave(R.id.activity_main_container, fragment, true);
   }
 
+  public void navigateToAutoLoginFragment(String name) {
+    Bundle bundle = new Bundle();
+    bundle.putString("name", name);
+
+    Fragment fragment = AutoLoginFragment.newInstance();
+    fragment.setArguments(bundle);
+
+    navigateToWithoutBackSave(R.id.activity_main_container, fragment, true);
+  }
+
   private void navigateToWithoutBackSave(int containerId, Fragment fragment, boolean replace) {
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
