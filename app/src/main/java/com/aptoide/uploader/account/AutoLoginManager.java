@@ -45,22 +45,25 @@ public class AutoLoginManager {
       Cursor c4 = context.getContentResolver()
           .query(email_uri, null, null, null, null);
 
-      if (c1 != null && c2 != null && (c3 != null || c4 != null)) {
-
+      if (c1 != null && c2 != null) {
         c1.moveToFirst();
         c2.moveToFirst();
-        c3.moveToFirst();
-        c4.moveToFirst();
-
         autoLoginCredentials.setAccessToken(c1.getString(c1.getColumnIndex("userToken")));
         autoLoginCredentials.setRefreshToken(c2.getString(c2.getColumnIndex("userRefreshToken")));
-        autoLoginCredentials.setStoreName(c3.getString(c3.getColumnIndex("userRepo")));
-        autoLoginCredentials.setEmail(c4.getString(c4.getColumnIndex("loginName")));
-
         c1.close();
         c2.close();
-        c3.close();
-        c4.close();
+
+        if (c3 != null) {
+          c3.moveToFirst();
+          autoLoginCredentials.setStoreName(c3.getString(c3.getColumnIndex("userRepo")));
+          c3.close();
+        }
+
+        if (c4 != null) {
+          c4.moveToFirst();
+          autoLoginCredentials.setEmail(c4.getString(c4.getColumnIndex("loginName")));
+          c4.close();
+        }
       }
     } catch (Exception e) {
       e.printStackTrace();
