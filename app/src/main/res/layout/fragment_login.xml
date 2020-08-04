@@ -29,16 +29,6 @@
           android:background="@drawable/background_full_clouds"/>
 
       <Button
-          android:id="@+id/other_logins_backbutton"
-          android:layout_width="24dp"
-          android:layout_height="24dp"
-          android:layout_marginStart="16dp"
-          android:layout_marginLeft="16dp"
-          android:layout_marginTop="45dp"
-          android:background="@drawable/ic_arrow_back_24dp">
-      </Button>
-
-      <Button
           android:id="@+id/facebook_login_button"
           android:layout_width="match_parent"
           android:layout_below="@id/separator"
