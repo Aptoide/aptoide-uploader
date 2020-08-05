@@ -11,8 +11,6 @@ public interface LoginView extends View {
 
   Observable<Object> getGoogleLoginEvent();
 
-  //Observable<Object> getAutoLoginEvent();
-
   //Observable<CredentialsViewModel> getOpenCreateAccountView();
 
   Observable<GoogleSignInAccount> googleLoginSuccessEvent();

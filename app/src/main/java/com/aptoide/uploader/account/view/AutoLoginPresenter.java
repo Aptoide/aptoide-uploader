@@ -35,6 +35,7 @@ public class AutoLoginPresenter implements Presenter {
 
   @Override public void present() {
     showUserInfo();
+    checkLoginStatus();
     handleAutoLogin();
     handleOtherLoginsClick();
     clearDisposable();
@@ -43,6 +44,27 @@ public class AutoLoginPresenter implements Presenter {
   private void showUserInfo() {
     view.showStrings();
     view.showAvatar();
+  }
+
+  private void checkLoginStatus(){
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> accountManager.getAccount())
+        .observeOn(viewScheduler)
+        .flatMap(account -> {
+          if (account.isLoggedIn()) {
+            if (account.hasStore()) {
+              navigator.navigateToMyAppsView();
+            } else {
+              navigator.navigateToCreateStoreView();
+            }
+          }
+          return Observable.empty();
+        })
+        .subscribe(__ -> {
+        }, throwable -> {
+          throwable.printStackTrace();
+        }));
   }
 
   private void handleAutoLogin() {
