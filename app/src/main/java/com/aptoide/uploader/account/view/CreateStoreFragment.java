@@ -69,7 +69,7 @@ public class CreateStoreFragment extends FragmentView
     backPressedEvent = PublishSubject.create();
     logoutConfirmation = new RxAlertDialog.Builder(
         new ContextThemeWrapper(getContext(), R.style.ConfirmationDialog)).setMessage(
-        R.string.logout_confirmation_message)
+        R.string.create_store_leave_confirmation)
         .setPositiveButton(R.string.yes)
         .setNegativeButton(R.string.no)
         .build();
