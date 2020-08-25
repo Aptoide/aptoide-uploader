@@ -32,7 +32,7 @@ public class CreateStorePresenter implements Presenter {
   }
 
   @Override public void present() {
-    handleSignOutClick();
+    handlePressBack();
     handlePositiveDialogClick();
     handleCreateStoreClick();
     onDestroyClearDisposables();
@@ -87,7 +87,7 @@ public class CreateStorePresenter implements Presenter {
         }));
   }
 
-  private void handleSignOutClick() {
+  private void handlePressBack() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.pressBack())
