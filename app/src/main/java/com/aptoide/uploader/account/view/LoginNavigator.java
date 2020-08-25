@@ -2,13 +2,15 @@ package com.aptoide.uploader.account.view;
 
 import android.content.Context;
 import android.net.Uri;
+import android.os.Bundle;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import com.aptoide.uploader.R;
+import com.aptoide.uploader.account.Navigator;
 import com.aptoide.uploader.apps.view.MyStoreFragment;
 
-public class LoginNavigator {
+public class LoginNavigator extends Navigator {
 
   public final static String NEW_AUTHENTICATION_BLOG_URL =
       "https://blog.aptoide.com/aptoide-new-authentication-system-no-user-data-storage/";
@@ -32,8 +34,29 @@ public class LoginNavigator {
         .commitAllowingStateLoss();
   }
 
-  public void navigateToBackToLoginView() {
+  public void navigateToLoginFragment() {
     navigateTo(LoginFragment.newInstance());
+  }
+
+  public void navigateToAutoLoginFragment(String name, String avatarPath) {
+    Bundle bundle = new Bundle();
+    bundle.putString("name", name);
+    bundle.putString("avatarPath", avatarPath);
+
+    Fragment fragment = AutoLoginFragment.newInstance();
+    fragment.setArguments(bundle);
+
+    navigateTo(fragment);
+  }
+
+  public void navigateToAutoLoginFragment(String name) {
+    Bundle bundle = new Bundle();
+    bundle.putString("name", name);
+
+    Fragment fragment = AutoLoginFragment.newInstance();
+    fragment.setArguments(bundle);
+
+    navigateTo(fragment);
   }
 
   private void navigateTo(Fragment fragment) {

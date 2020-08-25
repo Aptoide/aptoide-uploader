@@ -46,7 +46,7 @@ public class AutoLoginPresenter implements Presenter {
     view.showAvatar();
   }
 
-  private void checkLoginStatus(){
+  private void checkLoginStatus() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> accountManager.getAccount())
@@ -94,7 +94,7 @@ public class AutoLoginPresenter implements Presenter {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(lifecycleEvent -> lifecycleEvent.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.clickOtherLogins())
-        .doOnNext(__ -> navigator.navigateToOtherLogins())
+        .doOnNext(__ -> navigator.navigateToLoginFragment())
         .subscribe(__ -> {
         }, Throwable::printStackTrace));
   }

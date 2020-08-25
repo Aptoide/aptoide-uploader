@@ -2,6 +2,7 @@ package com.aptoide.uploader.account.view;
 
 import com.aptoide.uploader.account.AccountValidationException;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.account.network.error.DuplicatedStoreException;
 import com.aptoide.uploader.account.network.error.DuplicatedUserException;
 import com.aptoide.uploader.view.Presenter;
@@ -19,16 +20,19 @@ public class CreateStorePresenter implements Presenter {
   private final CompositeDisposable compositeDisposable;
   private final AccountErrorMapper accountErrorMapper;
   private final Scheduler viewScheduler;
+  private AutoLoginManager autoLoginManager;
 
   public CreateStorePresenter(CreateStoreView view, AptoideAccountManager accountManager,
       LoginNavigator accountNavigator, CompositeDisposable compositeDisposable,
-      AccountErrorMapper accountErrorMapper, Scheduler viewScheduler) {
+      AccountErrorMapper accountErrorMapper, Scheduler viewScheduler,
+      AutoLoginManager autoLoginManager) {
     this.view = view;
     this.accountManager = accountManager;
     this.accountNavigator = accountNavigator;
     this.compositeDisposable = compositeDisposable;
     this.accountErrorMapper = accountErrorMapper;
     this.viewScheduler = viewScheduler;
+    this.autoLoginManager = autoLoginManager;
   }
 
   @Override public void present() {
@@ -75,7 +79,9 @@ public class CreateStorePresenter implements Presenter {
         .flatMap(created -> view.positiveClick())
         .flatMapCompletable(click -> accountManager.logout()
             .observeOn(viewScheduler)
-            .doOnComplete(accountNavigator::navigateToBackToLoginView)
+            .doOnComplete(() -> {
+              autoLoginManager.checkLoginStatus(accountNavigator);
+            })
             .doOnError(throwable -> {
               view.dismissDialog();
               view.showError();

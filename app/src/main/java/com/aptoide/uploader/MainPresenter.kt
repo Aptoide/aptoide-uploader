@@ -1,7 +1,6 @@
 package com.aptoide.uploader
 
 import android.net.Uri
-import android.util.Log
 import com.aptoide.authentication.AuthenticationException
 import com.aptoide.uploader.account.AgentPersistence
 import com.aptoide.uploader.account.AptoideAccountManager
@@ -31,30 +30,9 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
     onDestroyDisposeComposite()
   }
 
-  private fun checkAvatar(name: String) {
-    if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.avatarPath)) {
-      mainNavigator.navigateToAutoLoginFragment(name)
-    } else {
-      mainNavigator.navigateToAutoLoginFragment(name,
-          autoLoginManager.autoLoginCredentials.avatarPath)
-    }
-  }
-
   private fun handleLoginView() {
     autoLoginManager.firstStoredUserCredentials
-    if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.accessToken)) {
-      mainNavigator.navigateToLoginFragment()
-    } else {
-      if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.storeName)) {
-        if (autoLoginManager.isNullOrEmpty(autoLoginManager.autoLoginCredentials.name)) {
-          checkAvatar(autoLoginManager.autoLoginCredentials.email)
-        } else {
-          checkAvatar(autoLoginManager.autoLoginCredentials.name)
-        }
-      } else {
-        checkAvatar(autoLoginManager.autoLoginCredentials.storeName)
-      }
-    }
+    autoLoginManager.checkLoginStatus(mainNavigator)
   }
 
   private fun handleIntentEvents() {

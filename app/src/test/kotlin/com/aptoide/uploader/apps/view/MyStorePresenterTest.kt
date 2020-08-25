@@ -336,7 +336,7 @@ class MyStorePresenterTest : Spek({
       lifecycleEvent.onNext(View.LifecycleEvent.CREATE)
       click.onNext(dialogInterface)
       verify(storeManager).logout()
-      verify(navigator).navigateToLoginView()
+      verify(navigator).navigateToLoginFragment()
     }
   }
 })

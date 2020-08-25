@@ -74,14 +74,6 @@ public class MyStorePresenter implements Presenter {
     checkUploadedApps();
   }
 
-  private void checkAvatar(String name){
-    if(autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials().getAvatarPath())){
-      storeNavigator.navigateToAutoLoginFragment(name);
-    }else{
-      storeNavigator.navigateToAutoLoginFragment(name, autoLoginManager.getAutoLoginCredentials().getAvatarPath());
-    }
-  }
-
   private void handlePositiveDialogClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
@@ -89,25 +81,7 @@ public class MyStorePresenter implements Presenter {
         .flatMapCompletable(click -> storeManager.logout()
             .observeOn(viewScheduler)
             .doOnComplete(() -> {
-              if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
-                  .getAccessToken())) {
-                storeNavigator.navigateToLoginView();
-              } else {
-                if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
-                    .getStoreName())) {
-                  if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
-                      .getName())) {
-                    checkAvatar(autoLoginManager.getAutoLoginCredentials()
-                        .getEmail());
-                  } else {
-                    checkAvatar(autoLoginManager.getAutoLoginCredentials()
-                        .getName());
-                  }
-                } else {
-                  checkAvatar(autoLoginManager.getAutoLoginCredentials()
-                      .getStoreName());
-                }
-              }
+              autoLoginManager.checkLoginStatus(storeNavigator);
             })
             .andThen(setPersistenceStatusOnLogout())
             .doOnError(throwable -> {

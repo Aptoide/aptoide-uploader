@@ -5,6 +5,7 @@ import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
 import androidx.fragment.app.FragmentTransaction;
 import com.aptoide.uploader.R;
+import com.aptoide.uploader.account.Navigator;
 import com.aptoide.uploader.account.view.AutoLoginFragment;
 import com.aptoide.uploader.account.view.LoginFragment;
 
@@ -12,7 +13,7 @@ import com.aptoide.uploader.account.view.LoginFragment;
  * Created by jose_messejana on 28-12-2017.
  */
 
-class MyStoreNavigator {
+class MyStoreNavigator extends Navigator {
 
   private final FragmentManager fragmentManager;
 
@@ -20,7 +21,7 @@ class MyStoreNavigator {
     this.fragmentManager = fragmentManager;
   }
 
-  public void navigateToLoginView() {
+  public void navigateToLoginFragment() {
     navigateToWithoutBackSave(R.id.activity_main_container, LoginFragment.newInstance(), true);
   }
 

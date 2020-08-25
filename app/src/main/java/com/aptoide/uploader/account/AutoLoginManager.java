@@ -3,7 +3,6 @@ package com.aptoide.uploader.account;
 import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
-import android.util.Log;
 import io.reactivex.Single;
 
 public class AutoLoginManager {
@@ -75,5 +74,29 @@ public class AutoLoginManager {
   public boolean isNullOrEmpty(String str) {
     return str == null || str.trim()
         .isEmpty();
+  }
+
+  public void checkAvatar(String name, Navigator nav) {
+    if (isNullOrEmpty(getAutoLoginCredentials().getAvatarPath())) {
+      nav.navigateToAutoLoginFragment(name);
+    } else {
+      nav.navigateToAutoLoginFragment(name, getAutoLoginCredentials().getAvatarPath());
+    }
+  }
+
+  public void checkLoginStatus(Navigator nav) {
+    if (isNullOrEmpty(getAutoLoginCredentials().getAccessToken())) {
+      nav.navigateToLoginFragment();
+    } else {
+      if (isNullOrEmpty(getAutoLoginCredentials().getStoreName())) {
+        if (isNullOrEmpty(getAutoLoginCredentials().getName())) {
+          checkAvatar(getAutoLoginCredentials().getEmail(), nav);
+        } else {
+          checkAvatar(getAutoLoginCredentials().getName(), nav);
+        }
+      } else {
+        checkAvatar(getAutoLoginCredentials().getStoreName(), nav);
+      }
+    }
   }
 }

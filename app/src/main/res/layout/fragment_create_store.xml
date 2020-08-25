@@ -21,11 +21,11 @@
 
   <ImageView
       android:id="@+id/cloud_background"
-      android:layout_width="120dp"
+      android:layout_width="140dp"
       android:layout_height="140dp"
       android:layout_marginStart="13dp"
       android:layout_marginLeft="13dp"
-      android:layout_marginTop="63dp"
+      android:layout_marginTop="60dp"
       android:background="@drawable/background_clouds"
       app:layout_constraintHorizontal_bias="1"
       app:layout_constraintLeft_toRightOf="@id/uploader_icon"

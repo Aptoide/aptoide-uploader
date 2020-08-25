@@ -4,11 +4,12 @@ import android.os.Bundle
 import androidx.appcompat.app.AppCompatActivity
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.FragmentTransaction
+import com.aptoide.uploader.account.Navigator
 import com.aptoide.uploader.account.view.AutoLoginFragment
 import com.aptoide.uploader.account.view.LoginFragment
 import com.aptoide.uploader.apps.view.AppFormFragment
 
-class MainNavigator(val activity: AppCompatActivity) {
+class MainNavigator(val activity: AppCompatActivity) : Navigator() {
 
   fun navigateToSubmitAppView(md5: String?, appName: String?) {
     navigateToWithoutBackSave(R.id.activity_main_container,
@@ -39,10 +40,10 @@ class MainNavigator(val activity: AppCompatActivity) {
     fragmentTransaction.commit()
   }
 
-  fun navigateToAutoLoginFragment(name: String?, avatarPath: String?) {
+  override fun navigateToAutoLoginFragment(name: String?, avatarPath: String?) {
     var bundle = Bundle()
     bundle.putString("name", name)
-    bundle.putString("avatarPath",avatarPath)
+    bundle.putString("avatarPath", avatarPath)
 
     var fragment = AutoLoginFragment.newInstance()
     fragment.arguments = bundle
@@ -53,7 +54,7 @@ class MainNavigator(val activity: AppCompatActivity) {
     fragmentTransaction.commit()
   }
 
-  fun navigateToAutoLoginFragment(name: String?) {
+  override fun navigateToAutoLoginFragment(name: String?) {
     var bundle = Bundle()
     bundle.putString("name", name)
 
@@ -66,7 +67,7 @@ class MainNavigator(val activity: AppCompatActivity) {
     fragmentTransaction.commit()
   }
 
-  fun navigateToLoginFragment() {
+  override fun navigateToLoginFragment() {
     var fragmentTransaction: FragmentTransaction =
         activity.supportFragmentManager.beginTransaction()
     fragmentTransaction.replace(R.id.activity_main_container, LoginFragment.newInstance(), null)
