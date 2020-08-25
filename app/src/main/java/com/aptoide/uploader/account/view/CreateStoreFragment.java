@@ -89,7 +89,8 @@ public class CreateStoreFragment extends FragmentView
 
     new CreateStorePresenter(this, accountManager,
         new LoginNavigator(getFragmentManager(), getContext().getApplicationContext()),
-        compositeDisposable, accountErrorMapper, AndroidSchedulers.mainThread()).present();
+        compositeDisposable, accountErrorMapper, AndroidSchedulers.mainThread(),
+        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
   }
 
   @Override public void onDestroyView() {
