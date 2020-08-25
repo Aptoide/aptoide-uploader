@@ -32,6 +32,8 @@ public class CreateStorePresenter implements Presenter {
   }
 
   @Override public void present() {
+    handlePressBack();
+    handlePositiveDialogClick();
     handleCreateStoreClick();
     onDestroyClearDisposables();
   }
@@ -67,6 +69,35 @@ public class CreateStorePresenter implements Presenter {
         }));
   }
 
+  private void handlePositiveDialogClick() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(created -> view.positiveClick())
+        .flatMapCompletable(click -> accountManager.logout()
+            .observeOn(viewScheduler)
+            .doOnComplete(accountNavigator::navigateToBackToLoginView)
+            .doOnError(throwable -> {
+              view.dismissDialog();
+              view.showError();
+            })
+            .retry())
+        .subscribe(() -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void handlePressBack() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.pressBack())
+        .doOnNext(click -> view.showDialog())
+        .subscribe(click -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
   private void onDestroyClearDisposables() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
@@ -78,10 +109,7 @@ public class CreateStorePresenter implements Presenter {
   }
 
   private boolean invalidFieldError(Throwable throwable) {
-    if (throwable instanceof AccountValidationException) {
-      return true;
-    }
-    return false;
+    return throwable instanceof AccountValidationException;
   }
 
   private boolean isUserNameTaken(Throwable throwable) {
@@ -93,9 +121,6 @@ public class CreateStorePresenter implements Presenter {
   }
 
   private boolean isInternetError(Throwable throwable) {
-    if (throwable instanceof IOException) {
-      return true;
-    }
-    return false;
+    return throwable instanceof IOException;
   }
 }

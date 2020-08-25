@@ -7,6 +7,8 @@ import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.aptoide.uploader.account.view.CreateStoreFragment;
+import com.aptoide.uploader.account.view.LoginFragment;
 import com.aptoide.uploader.apps.permission.PermissionProviderActivity;
 import com.aptoide.uploader.apps.view.AppFormFragment;
 import com.aptoide.uploader.apps.view.OnBackPressedInterface;
@@ -37,7 +39,7 @@ public class MainActivity extends PermissionProviderActivity implements MainView
 
     Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.activity_main_container);
 
-    if (!(fragment instanceof AppFormFragment)) {
+    if (!(fragment instanceof AppFormFragment || fragment instanceof CreateStoreFragment)) {
       super.onBackPressed();
     } else {
       ((OnBackPressedInterface) fragment).onBackPressed();

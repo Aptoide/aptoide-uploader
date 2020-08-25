@@ -11,9 +11,9 @@
       android:id="@+id/uploader_icon"
       android:layout_width="93dp"
       android:layout_height="93dp"
-      android:layout_marginTop="33dp"
+      android:layout_marginTop="93dp"
       android:background="@drawable/ic_uploader_big"
-      app:layout_constraintBottom_toTopOf="@+id/create_store_name"
+
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent"
       app:layout_constraintTop_toTopOf="parent"
@@ -25,7 +25,7 @@
       android:layout_height="140dp"
       android:layout_marginStart="13dp"
       android:layout_marginLeft="13dp"
-      android:layout_marginTop="2dp"
+      android:layout_marginTop="63dp"
       android:background="@drawable/background_clouds"
       app:layout_constraintHorizontal_bias="1"
       app:layout_constraintLeft_toRightOf="@id/uploader_icon"
@@ -33,6 +33,20 @@
       app:layout_constraintTop_toTopOf="parent"
       />
 
+  <TextView
+      android:id="@+id/create_store_info"
+      android:layout_width="match_parent"
+      android:layout_height="wrap_content"
+      android:layout_marginLeft="32dp"
+      android:layout_marginTop="43dp"
+      android:layout_marginRight="32dp"
+      android:textSize="14sp"
+      android:gravity="center"
+      android:text="You don't have a store yet! Create your own one and start uploading apps."
+      app:layout_constraintLeft_toLeftOf="parent"
+      app:layout_constraintRight_toRightOf="parent"
+      app:layout_constraintTop_toBottomOf="@id/uploader_icon"
+      />
 
   <EditText
       android:id="@+id/create_store_name"
@@ -40,7 +54,7 @@
       android:layout_width="match_parent"
       android:layout_height="wrap_content"
       android:layout_marginLeft="32dp"
-      android:layout_marginTop="74dp"
+      android:layout_marginTop="23dp"
       android:layout_marginRight="32dp"
       android:layout_marginBottom="28dp"
       android:hint="@string/store"
@@ -50,13 +64,13 @@
       android:textSize="14sp"
       app:layout_constraintLeft_toLeftOf="parent"
       app:layout_constraintRight_toRightOf="parent"
-      app:layout_constraintTop_toBottomOf="@id/uploader_icon"
+      app:layout_constraintTop_toBottomOf="@id/create_store_info"
       />
 
   <RadioGroup
       android:id="@+id/create_store_privacy_radiogroup"
       android:layout_width="match_parent"
-      android:layout_height="40dp"
+      android:layout_height="wrap_content"
       android:layout_gravity="center"
       android:layout_marginStart="40dp"
       android:layout_marginLeft="40dp"

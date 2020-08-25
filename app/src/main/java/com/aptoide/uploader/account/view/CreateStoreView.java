@@ -1,5 +1,6 @@
 package com.aptoide.uploader.account.view;
 
+import android.content.DialogInterface;
 import androidx.annotation.Nullable;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
@@ -25,6 +26,16 @@ public interface CreateStoreView extends View {
   void showErrorStoreAlreadyExists();
 
   void hideKeyboard();
+
+  Observable<Boolean> pressBack();
+
+  void showDialog();
+
+  void dismissDialog();
+
+  Observable<DialogInterface> positiveClick();
+
+  void showError();
 
   class CreateStoreViewModel {
     private final String storeName;

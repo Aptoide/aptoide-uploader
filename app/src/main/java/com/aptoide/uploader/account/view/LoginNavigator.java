@@ -26,7 +26,14 @@ public class LoginNavigator {
   }
 
   public void navigateToCreateStoreView() {
-    navigateTo(CreateStoreFragment.newInstance());
+    fragmentManager.beginTransaction()
+        .replace(R.id.activity_main_container, CreateStoreFragment.newInstance())
+        .addToBackStack(String.valueOf(R.layout.fragment_create_store))
+        .commitAllowingStateLoss();
+  }
+
+  public void navigateToBackToLoginView() {
+    navigateTo(LoginFragment.newInstance());
   }
 
   private void navigateTo(Fragment fragment) {
