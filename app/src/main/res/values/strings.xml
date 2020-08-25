@@ -105,4 +105,9 @@
   <string name="connect_with_google">Connect with Google</string>
   <string name="login_as_button">Log in as %s</string>
   <string name="login_other_account_button">Use other account</string>
+  
+  <!--Create Store flow-->
+  <string name="create_store_body">You don\'t have a store yet! Create your own one and start uploading apps.</string>
+  <string name="create_store_leave_confirmation">Are you sure you want to leave?</string>
+
 </resources>
