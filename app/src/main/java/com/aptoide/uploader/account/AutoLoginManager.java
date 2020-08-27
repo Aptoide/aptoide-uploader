@@ -34,6 +34,8 @@ public class AutoLoginManager {
       Uri refresh_token_uri = Uri.parse(URL + "/refreshToken");
       Uri repo_uri = Uri.parse(URL + "/repo");
       Uri email_uri = Uri.parse(URL + "/loginName");
+      Uri nickname_uri = Uri.parse(URL + "/loginNickname");
+      Uri avatar_uri = Uri.parse(URL + "/loginAvatar");
 
       Cursor c1 = context.getContentResolver()
           .query(token_uri, null, null, null, null);
@@ -43,6 +45,10 @@ public class AutoLoginManager {
           .query(repo_uri, null, null, null, null);
       Cursor c4 = context.getContentResolver()
           .query(email_uri, null, null, null, null);
+      Cursor c5 = context.getContentResolver()
+          .query(nickname_uri, null, null, null, null);
+      Cursor c6 = context.getContentResolver()
+          .query(avatar_uri, null, null, null, null);
 
       if (c1 != null && c2 != null) {
         c1.moveToFirst();
@@ -62,6 +68,16 @@ public class AutoLoginManager {
           c4.moveToFirst();
           autoLoginCredentials.setEmail(c4.getString(c4.getColumnIndex("loginName")));
           c4.close();
+        }
+        if (c5 != null) {
+          c5.moveToFirst();
+          autoLoginCredentials.setName(c5.getString(c5.getColumnIndex("loginNickname")));
+          c5.close();
+        }
+        if (c6 != null) {
+          c6.moveToFirst();
+          autoLoginCredentials.setAvatarPath(c6.getString(c6.getColumnIndex("loginAvatar")));
+          c6.close();
         }
       }
     } catch (Exception e) {
