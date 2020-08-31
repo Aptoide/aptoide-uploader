@@ -80,7 +80,7 @@ public class CreateStorePresenter implements Presenter {
         .flatMapCompletable(click -> accountManager.logout()
             .observeOn(viewScheduler)
             .doOnComplete(() -> {
-              autoLoginManager.checkLoginStatus(accountNavigator);
+              autoLoginManager.checkAvailableFieldsAndNavigateTo(accountNavigator);
             })
             .doOnError(throwable -> {
               view.dismissDialog();

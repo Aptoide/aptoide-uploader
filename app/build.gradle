@@ -155,7 +155,4 @@ dependencies {
 
   //Rakam
   implementation "io.rakam:android-sdk:${RAKAM_VERSION}"
-
-  //CircularImage
-  annotationProcessor 'com.github.bumptech.glide:compiler:4.11.0'
 }

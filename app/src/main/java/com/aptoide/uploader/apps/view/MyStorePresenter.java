@@ -81,7 +81,7 @@ public class MyStorePresenter implements Presenter {
         .flatMapCompletable(click -> storeManager.logout()
             .observeOn(viewScheduler)
             .doOnComplete(() -> {
-              autoLoginManager.checkLoginStatus(storeNavigator);
+              autoLoginManager.checkAvailableFieldsAndNavigateTo(storeNavigator);
             })
             .andThen(setPersistenceStatusOnLogout())
             .doOnError(throwable -> {

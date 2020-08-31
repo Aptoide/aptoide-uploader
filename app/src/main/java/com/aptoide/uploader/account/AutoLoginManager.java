@@ -100,7 +100,7 @@ public class AutoLoginManager {
     }
   }
 
-  public void checkLoginStatus(Navigator nav) {
+  public void checkAvailableFieldsAndNavigateTo(Navigator nav) {
     if (isNullOrEmpty(getAutoLoginCredentials().getAccessToken())) {
       nav.navigateToLoginFragment();
     } else {

@@ -31,8 +31,8 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
   }
 
   private fun handleLoginView() {
-    autoLoginManager.firstStoredUserCredentials
-    autoLoginManager.checkLoginStatus(mainNavigator)
+    autoLoginManager.firstStoredUserCredentials.subscribe()
+    autoLoginManager.checkAvailableFieldsAndNavigateTo(mainNavigator)
   }
 
   private fun handleIntentEvents() {
