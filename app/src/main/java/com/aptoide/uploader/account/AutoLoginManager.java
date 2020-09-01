@@ -87,7 +87,7 @@ public class AutoLoginManager {
     return Single.just(autoLoginCredentials);
   }
 
-  public void checkAvatar(String name, Navigator nav) {
+  private void checkAvatarAndNavigateTo(String name, Navigator nav) {
     if (autoLoginCredentials.getAvatarPath() == null || autoLoginCredentials.getAvatarPath()
         .trim()
         .isEmpty()) {
@@ -109,12 +109,12 @@ public class AutoLoginManager {
         if (autoLoginCredentials.getName() == null || autoLoginCredentials.getName()
             .trim()
             .isEmpty()) {
-          checkAvatar(autoLoginCredentials.getEmail(), nav);
+          checkAvatarAndNavigateTo(autoLoginCredentials.getEmail(), nav);
         } else {
-          checkAvatar(autoLoginCredentials.getName(), nav);
+          checkAvatarAndNavigateTo(autoLoginCredentials.getName(), nav);
         }
       } else {
-        checkAvatar(autoLoginCredentials.getStoreName(), nav);
+        checkAvatarAndNavigateTo(autoLoginCredentials.getStoreName(), nav);
       }
     }
   }
