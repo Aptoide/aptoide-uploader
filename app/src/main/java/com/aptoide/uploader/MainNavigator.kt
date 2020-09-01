@@ -41,13 +41,7 @@ class MainNavigator(val activity: AppCompatActivity) : Navigator() {
   }
 
   override fun navigateToAutoLoginFragment(name: String?, avatarPath: String?) {
-    var bundle = Bundle()
-    bundle.putString("name", name)
-    bundle.putString("avatarPath", avatarPath)
-
-    var fragment = AutoLoginFragment.newInstance()
-    fragment.arguments = bundle
-
+    var fragment = AutoLoginFragment.newInstance(name, avatarPath)
     var fragmentTransaction: FragmentTransaction =
         activity.supportFragmentManager.beginTransaction()
     fragmentTransaction.replace(R.id.activity_main_container, fragment, null)
@@ -55,12 +49,7 @@ class MainNavigator(val activity: AppCompatActivity) : Navigator() {
   }
 
   override fun navigateToAutoLoginFragment(name: String?) {
-    var bundle = Bundle()
-    bundle.putString("name", name)
-
-    var fragment = AutoLoginFragment.newInstance()
-    fragment.arguments = bundle
-
+    var fragment = AutoLoginFragment.newInstance(name, null)
     var fragmentTransaction: FragmentTransaction =
         activity.supportFragmentManager.beginTransaction()
     fragmentTransaction.replace(R.id.activity_main_container, fragment, null)

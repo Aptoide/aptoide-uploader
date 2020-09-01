@@ -2,7 +2,6 @@ package com.aptoide.uploader.account.view;
 
 import android.content.Context;
 import android.net.Uri;
-import android.os.Bundle;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
@@ -39,23 +38,12 @@ public class LoginNavigator extends Navigator {
   }
 
   public void navigateToAutoLoginFragment(String name, String avatarPath) {
-    Bundle bundle = new Bundle();
-    bundle.putString("name", name);
-    bundle.putString("avatarPath", avatarPath);
-
-    Fragment fragment = AutoLoginFragment.newInstance();
-    fragment.setArguments(bundle);
-
+    Fragment fragment = AutoLoginFragment.newInstance(name, avatarPath);
     navigateTo(fragment);
   }
 
   public void navigateToAutoLoginFragment(String name) {
-    Bundle bundle = new Bundle();
-    bundle.putString("name", name);
-
-    Fragment fragment = AutoLoginFragment.newInstance();
-    fragment.setArguments(bundle);
-
+    Fragment fragment = AutoLoginFragment.newInstance(name, null);
     navigateTo(fragment);
   }
 

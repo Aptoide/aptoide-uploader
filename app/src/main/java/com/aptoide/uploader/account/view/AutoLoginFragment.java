@@ -23,12 +23,16 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
   private Button otherLoginsButton;
   private ImageView autoLoginAvatar;
   private AptoideAccountManager accountManager;
+  private String loginName;
+  private String loginAvatarPath;
 
-  public AutoLoginFragment() {
+  public AutoLoginFragment(String loginName, String loginAvatarPath) {
+    this.loginName = loginName;
+    this.loginAvatarPath = loginAvatarPath;
   }
 
-  public static AutoLoginFragment newInstance() {
-    return new AutoLoginFragment();
+  public static AutoLoginFragment newInstance(String loginName, String loginAvatarPath) {
+    return new AutoLoginFragment(loginName, loginAvatarPath);
   }
 
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,25 +78,23 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
     return RxView.clicks(otherLoginsButton);
   }
 
-  @Override public void showStrings() {
-    Bundle bundle = this.getArguments();
-    autoLoginButton.setText(
-        String.format(getString(R.string.login_as_button), bundle.getString("name")));
-    otherLoginsButton.setText(R.string.login_other_account_button);
-  }
-
-  @Override public void showAvatar() {
-    Bundle bundle = this.getArguments();
-    if(bundle.getString("avatarPath")!=null){
+  @Override public void showLoginAvatar() {
+    if (loginAvatarPath != null || loginAvatarPath.trim()
+        .isEmpty()) {
       Glide.with(this)
-          .load(bundle.getString("avatarPath"))
+          .load(loginAvatarPath)
           .apply(RequestOptions.circleCropTransform())
           .into(autoLoginAvatar);
-    }else {
+    } else {
       Glide.with(this)
           .load(getResources().getDrawable(R.drawable.avatar_default))
           .apply(RequestOptions.circleCropTransform())
           .into(autoLoginAvatar);
     }
+  }
+
+  @Override public void showLoginName() {
+    autoLoginButton.setText(String.format(getString(R.string.login_as_button), loginName));
+    otherLoginsButton.setText(R.string.login_other_account_button);
   }
 }
