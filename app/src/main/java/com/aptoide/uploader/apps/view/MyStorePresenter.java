@@ -80,9 +80,7 @@ public class MyStorePresenter implements Presenter {
         .flatMap(created -> view.positiveClick())
         .flatMapCompletable(click -> storeManager.logout()
             .observeOn(viewScheduler)
-            .doOnComplete(() -> {
-              autoLoginManager.checkAvailableFieldsAndNavigateTo(storeNavigator);
-            })
+            .doOnComplete(() -> autoLoginManager.checkAvailableFieldsAndNavigateTo(storeNavigator))
             .andThen(setPersistenceStatusOnLogout())
             .doOnError(throwable -> {
               view.dismissDialog();

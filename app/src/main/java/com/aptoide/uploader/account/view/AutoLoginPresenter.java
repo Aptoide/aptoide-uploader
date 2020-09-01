@@ -82,7 +82,8 @@ public class AutoLoginPresenter implements Presenter {
           accountManager.logout();
           return tryAutoLogin();
         })
-        .subscribe());
+        .subscribe(__ -> {
+        }, Throwable::printStackTrace));
   }
 
   private void clearDisposable() {

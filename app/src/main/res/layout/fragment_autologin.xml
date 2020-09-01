@@ -53,7 +53,6 @@
           android:layout_height="77dp"
           android:layout_marginTop="29dp"
           android:layout_gravity="center_horizontal"
-          android:scaleType="fitXY"
           android:background="@drawable/autologin_avatar_border"
           />
 
