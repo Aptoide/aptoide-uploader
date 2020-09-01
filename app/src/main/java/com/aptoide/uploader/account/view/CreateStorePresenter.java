@@ -20,7 +20,7 @@ public class CreateStorePresenter implements Presenter {
   private final CompositeDisposable compositeDisposable;
   private final AccountErrorMapper accountErrorMapper;
   private final Scheduler viewScheduler;
-  private AutoLoginManager autoLoginManager;
+  private final AutoLoginManager autoLoginManager;
 
   public CreateStorePresenter(CreateStoreView view, AptoideAccountManager accountManager,
       LoginNavigator accountNavigator, CompositeDisposable compositeDisposable,

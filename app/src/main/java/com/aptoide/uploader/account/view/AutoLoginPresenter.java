@@ -42,8 +42,16 @@ public class AutoLoginPresenter implements Presenter {
   }
 
   private void showUserInfo() {
-    view.showStrings();
-    view.showAvatar();
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .observeOn(viewScheduler)
+        .flatMap(__ -> {
+          view.showLoginName();
+          view.showLoginAvatar();
+          return Observable.empty();
+        })
+        .subscribe(__ -> {
+        }, Throwable::printStackTrace));
   }
 
   private void checkLoginStatus() {
@@ -62,9 +70,7 @@ public class AutoLoginPresenter implements Presenter {
           return Observable.empty();
         })
         .subscribe(__ -> {
-        }, throwable -> {
-          throwable.printStackTrace();
-        }));
+        }, Throwable::printStackTrace));
   }
 
   private void handleAutoLogin() {
@@ -74,7 +80,6 @@ public class AutoLoginPresenter implements Presenter {
         .observeOn(viewScheduler)
         .flatMap(__ -> {
           accountManager.logout();
-          accountManager.removeAccessTokenFromPersistence();
           return tryAutoLogin();
         })
         .subscribe());
@@ -101,13 +106,16 @@ public class AutoLoginPresenter implements Presenter {
 
   private Observable<Object> tryAutoLogin() {
     return Observable.just(accountManager.getAccount())
-        .flatMap(__ -> autoLoginManager.getStoredUserCredentials()
-            .flatMapObservable(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
+        .flatMap(__ -> autoLoginManager.fetchStoredUserCredentials()
+            .flatMapObservable(accountManager::saveAutoLoginCredentials))
         .observeOn(viewScheduler)
         .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account)
             .doOnComplete(() -> {
-              if (autoLoginManager.isNullOrEmpty(autoLoginManager.getAutoLoginCredentials()
-                  .getStoreName())) {
+              if (autoLoginManager.getAutoLoginCredentials()
+                  .getStoreName() == null || autoLoginManager.getAutoLoginCredentials()
+                  .getStoreName()
+                  .trim()
+                  .isEmpty()) {
                 navigator.navigateToCreateStoreView();
               } else {
                 navigator.navigateToMyAppsView();

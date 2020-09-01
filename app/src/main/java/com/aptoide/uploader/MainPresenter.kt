@@ -31,8 +31,16 @@ class MainPresenter(val view: MainView, val accountManager: AptoideAccountManage
   }
 
   private fun handleLoginView() {
-    autoLoginManager.firstStoredUserCredentials.subscribe()
-    autoLoginManager.checkAvailableFieldsAndNavigateTo(mainNavigator)
+    compositeDisposable.add(view.lifecycleEvent
+        .filter { event: View.LifecycleEvent -> event == View.LifecycleEvent.CREATE }
+        .doOnNext {
+          autoLoginManager.fetchStoredUserCredentials()
+          autoLoginManager.checkAvailableFieldsAndNavigateTo(mainNavigator)
+        }
+        .subscribe({}) { throwable ->
+          throw OnErrorNotImplementedException(throwable)
+        })
+
   }
 
   private fun handleIntentEvents() {
