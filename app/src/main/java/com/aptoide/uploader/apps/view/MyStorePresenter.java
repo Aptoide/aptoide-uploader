@@ -35,7 +35,7 @@ public class MyStorePresenter implements Presenter {
   private final UploaderAnalytics uploaderAnalytics;
   private final ConnectivityProvider connectivityProvider;
   private final UploadManager uploadManager;
-  private AutoLoginManager autoLoginManager;
+  private final AutoLoginManager autoLoginManager;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, MyStoreNavigator storeNavigator,

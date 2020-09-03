@@ -29,25 +29,19 @@ public class AutoLoginManager {
         .isEmpty()) {
       try {
         String URL = "content://cm.aptoide.pt.StubProvider";
-        Uri token_uri = Uri.parse(URL + "/token");
-        Uri refresh_token_uri = Uri.parse(URL + "/refreshToken");
-        Uri store_name_uri = Uri.parse(URL + "/repo");
-        Uri email_uri = Uri.parse(URL + "/loginName");
-        Uri name_uri = Uri.parse(URL + "/loginNickname");
-        Uri avatar_uri = Uri.parse(URL + "/loginAvatar");
+        Uri tokenUri = Uri.parse(URL + "/token");
+        Uri refreshTokenUri = Uri.parse(URL + "/refreshToken");
+        Uri storeNameUri = Uri.parse(URL + "/repo");
+        Uri emailUri = Uri.parse(URL + "/loginName");
 
         Cursor c1 = context.getContentResolver()
-            .query(token_uri, null, null, null, null);
+            .query(tokenUri, null, null, null, null);
         Cursor c2 = context.getContentResolver()
-            .query(refresh_token_uri, null, null, null, null);
+            .query(refreshTokenUri, null, null, null, null);
         Cursor c3 = context.getContentResolver()
-            .query(store_name_uri, null, null, null, null);
+            .query(storeNameUri, null, null, null, null);
         Cursor c4 = context.getContentResolver()
-            .query(email_uri, null, null, null, null);
-        Cursor c5 = context.getContentResolver()
-            .query(name_uri, null, null, null, null);
-        Cursor c6 = context.getContentResolver()
-            .query(avatar_uri, null, null, null, null);
+            .query(emailUri, null, null, null, null);
 
         if (c1 != null && c2 != null) {
           c1.moveToFirst();
@@ -68,15 +62,28 @@ public class AutoLoginManager {
             autoLoginCredentials.setEmail(c4.getString(c4.getColumnIndex("loginName")));
             c4.close();
           }
-          if (c5 != null) {
-            c5.moveToFirst();
-            autoLoginCredentials.setName(c5.getString(c5.getColumnIndex("loginNickname")));
-            c5.close();
-          }
-          if (c6 != null) {
-            c6.moveToFirst();
-            autoLoginCredentials.setAvatarPath(c6.getString(c6.getColumnIndex("loginAvatar")));
-            c6.close();
+          try {
+            Uri nameUri = Uri.parse(URL + "/loginNickname");
+            Uri avatarUri = Uri.parse(URL + "/loginAvatar");
+
+            Cursor c5 = context.getContentResolver()
+                .query(nameUri, null, null, null, null);
+            Cursor c6 = context.getContentResolver()
+                .query(avatarUri, null, null, null, null);
+
+            if (c5 != null) {
+              c5.moveToFirst();
+              autoLoginCredentials.setName(c5.getString(c5.getColumnIndex("loginNickname")));
+              c5.close();
+            }
+            if (c6 != null) {
+              c6.moveToFirst();
+              autoLoginCredentials.setAvatarPath(c6.getString(c6.getColumnIndex("loginAvatar")));
+              c6.close();
+            }
+          } catch (Exception e) {
+            e.printStackTrace();
+            return Single.error(e);
           }
         }
       } catch (Exception e) {

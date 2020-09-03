@@ -6,7 +6,6 @@
   android:animateLayoutChanges="true"
   android:background="@drawable/gradient_drawable_maintenance">
 
-
   <ScrollView
       android:layout_width="match_parent"
       android:layout_height="match_parent"

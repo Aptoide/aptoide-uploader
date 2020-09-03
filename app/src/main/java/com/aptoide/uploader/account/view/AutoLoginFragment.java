@@ -23,16 +23,17 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
   private Button otherLoginsButton;
   private ImageView autoLoginAvatar;
   private AptoideAccountManager accountManager;
-  private String loginName;
-  private String loginAvatarPath;
 
-  public AutoLoginFragment(String loginName, String loginAvatarPath) {
-    this.loginName = loginName;
-    this.loginAvatarPath = loginAvatarPath;
+  public AutoLoginFragment() {
   }
 
   public static AutoLoginFragment newInstance(String loginName, String loginAvatarPath) {
-    return new AutoLoginFragment(loginName, loginAvatarPath);
+    AutoLoginFragment autoLoginFragment = new AutoLoginFragment();
+    Bundle bundle = new Bundle();
+    bundle.putString("loginName", loginName);
+    bundle.putString("loginAvatarPath", loginAvatarPath);
+    autoLoginFragment.setArguments(bundle);
+    return autoLoginFragment;
   }
 
   @Override public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -79,10 +80,12 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
   }
 
   @Override public void showLoginAvatar() {
-    if (loginAvatarPath != null || loginAvatarPath.trim()
+    Bundle bundle = this.getArguments();
+    if (bundle.getString("loginAvatarPath") != null && !bundle.getString("loginAvatarPath")
+        .trim()
         .isEmpty()) {
       Glide.with(this)
-          .load(loginAvatarPath)
+          .load(bundle.getString("loginAvatarPath"))
           .apply(RequestOptions.circleCropTransform())
           .into(autoLoginAvatar);
     } else {
@@ -94,7 +97,9 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
   }
 
   @Override public void showLoginName() {
-    autoLoginButton.setText(String.format(getString(R.string.login_as_button), loginName));
+    Bundle bundle = this.getArguments();
+    autoLoginButton.setText(
+        String.format(getString(R.string.login_as_button), bundle.getString("loginName")));
     otherLoginsButton.setText(R.string.login_other_account_button);
   }
 }
