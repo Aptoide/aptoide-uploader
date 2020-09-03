@@ -6,6 +6,7 @@
   <string name="OK">OK</string>
   <string name="retry">retry</string>
   <string name="cancel">Cancel</string>
+  <string name="or">Or</string>
 
   <!-- Error Messages -->
   <string name="loginFail">Login failed. Wrong username or password.</string>
