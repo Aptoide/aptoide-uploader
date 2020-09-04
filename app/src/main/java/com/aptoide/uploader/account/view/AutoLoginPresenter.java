@@ -106,9 +106,8 @@ public class AutoLoginPresenter implements Presenter {
   }
 
   private Observable<Object> tryAutoLogin() {
-    return Observable.just(accountManager.getAccount())
-        .flatMap(__ -> autoLoginManager.fetchStoredUserCredentials()
-            .flatMapObservable(accountManager::saveAutoLoginCredentials))
+    return autoLoginManager.fetchStoredUserCredentials()
+        .flatMapObservable(accountManager::saveAutoLoginCredentials)
         .observeOn(viewScheduler)
         .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account)
             .doOnComplete(() -> {
@@ -123,10 +122,7 @@ public class AutoLoginPresenter implements Presenter {
               }
               uploaderAnalytics.sendLoginEvent("auto-login", "success");
             }))
-        .onErrorResumeNext(throwable -> {
-          uploaderAnalytics.sendLoginEvent("auto-login", "fail");
-          return accountManager.logout();
-        })
+        .doOnError(throwable -> uploaderAnalytics.sendLoginEvent("auto-login", "fail"))
         .andThen(Observable.empty());
   }
 }
