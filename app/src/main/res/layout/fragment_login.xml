@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
   xmlns:app="http://schemas.android.com/apk/res-auto"
   android:layout_width="match_parent"
   android:layout_height="match_parent"
@@ -7,126 +7,134 @@
   android:background="@drawable/gradient_drawable_maintenance">
 
   <ScrollView
-    android:layout_width="match_parent"
-    android:layout_height="match_parent"
-    android:layout_alignParentTop="true">
+      android:layout_width="match_parent"
+      android:layout_height="match_parent"
+      android:layout_alignParentTop="true"
+      >
 
     <RelativeLayout
-      android:id="@+id/fragment_login_content"
-      android:layout_width="match_parent"
-      android:layout_height="wrap_content"
-      android:layout_marginStart="29dp"
-      android:layout_marginLeft="29dp"
-      android:paddingBottom="16dp">
+        android:id="@+id/fragment_login_content"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:paddingBottom="16dp"
+        android:visibility="visible"
+        >
 
       <ImageView
-        android:id="@+id/login_maintenance_icon"
-        android:layout_width="93dp"
-        android:layout_height="93dp"
-        android:layout_alignParentStart="true"
-        android:layout_alignParentLeft="true"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="94dp"
-        android:layout_marginEnd="29dp"
-        android:layout_marginRight="29dp"
-        app:srcCompat="@drawable/icon_login" />
+          android:id="@+id/login_cloudsimage"
+          android:layout_width="match_parent"
+          android:layout_height="600dp"
+          android:layout_marginTop="60dp"
+          android:background="@drawable/background_full_clouds"/>
 
-      <com.aptoide.uploader.account.sendmagiclink.SendMagicLinkView
-        android:id="@+id/send_magic_link_view"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/login_maintenance_icon"
-        android:layout_marginTop="74dp"
-        android:layout_marginEnd="29dp"
-        android:layout_marginRight="29dp" />
+      <Button
+          android:id="@+id/facebook_login_button"
+          android:layout_width="match_parent"
+          android:layout_below="@id/separator"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginLeft="29dp"
+          android:layout_marginStart="29dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
+          android:layout_marginTop="18dp"
+          style="@style/Aptoide.Button.FacebookFull"
+          />
+
+      <Button
+          android:id="@+id/google_sign_in_button"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_below="@id/facebook_login_button"
+          android:layout_gravity="center_horizontal"
+          android:layout_marginLeft="29dp"
+          android:layout_marginStart="29dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
+          android:layout_marginTop="16dp"
+          style="@style/Aptoide.Button.Ghost.GreyFogLight.GoogleFull"
+          />
+
+      <ImageView
+          android:id="@+id/login_maintenance_icon"
+          android:layout_width="93dp"
+          android:layout_height="93dp"
+          android:layout_alignParentEnd="true"
+          android:layout_alignParentLeft="true"
+          android:layout_alignParentRight="true"
+          android:layout_alignParentStart="true"
+          android:layout_alignParentTop="true"
+          android:layout_marginLeft="29dp"
+          android:layout_marginStart="29dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
+          android:layout_marginTop="94dp"
+          app:srcCompat="@drawable/icon_login"
+          />
 
       <LinearLayout
-        android:id="@+id/separator"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/send_magic_link_view"
-        android:layout_marginTop="34dp"
-        android:layout_marginEnd="29dp"
-        android:layout_marginRight="29dp"
-        android:orientation="horizontal">
+          android:id="@+id/separator"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_below="@id/send_magic_link_view"
+          android:layout_marginLeft="29dp"
+          android:layout_marginStart="29dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
+          android:layout_marginTop="34dp"
+          android:orientation="horizontal"
+          >
 
         <View
-          android:layout_width="0dp"
-          android:layout_height="1dp"
-          android:layout_gravity="center_vertical"
-          android:layout_weight="1"
-          android:background="@color/white" />
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="@color/white"
+            />
 
         <TextView
-          android:layout_width="wrap_content"
-          android:layout_height="wrap_content"
-          android:paddingStart="12dp"
-          android:paddingLeft="12dp"
-          android:paddingEnd="12dp"
-          android:paddingRight="12dp"
-          android:text="Or"
-          android:textStyle="italic" />
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:paddingEnd="12dp"
+            android:paddingLeft="12dp"
+            android:paddingRight="12dp"
+            android:paddingStart="12dp"
+            android:text="@string/or"
+            android:textStyle="italic"
+            />
 
         <View
-          android:layout_width="0dp"
-          android:layout_height="1dp"
-          android:layout_gravity="center_vertical"
-          android:layout_weight="1"
-          android:background="@color/white"
+            android:layout_width="0dp"
+            android:layout_height="1dp"
+            android:layout_gravity="center_vertical"
+            android:layout_weight="1"
+            android:background="@color/white"
 
-          />
+            />
 
       </LinearLayout>
 
-
-      <ImageView
-        android:id="@+id/login_cloudsimage"
-        android:layout_width="120dp"
-        android:layout_height="140dp"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentEnd="true"
-        android:layout_alignParentRight="true"
-        android:layout_marginTop="63dp"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
-        app:layout_constraintTop_toTopOf="parent"
-        app:srcCompat="@drawable/background_clouds" />
-
-      <Button
-        android:id="@+id/facebook_login_button"
-        style="@style/Aptoide.Button.FacebookFull"
-        android:layout_width="match_parent"
-        android:layout_below="@id/separator"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="18dp"
-        android:layout_marginEnd="29dp"
-        android:layout_marginRight="29dp" />
-
-      <Button
-        android:id="@+id/google_sign_in_button"
-        style="@style/Aptoide.Button.Ghost.GreyFogLight.GoogleFull"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_below="@id/facebook_login_button"
-        android:layout_gravity="center_horizontal"
-        android:layout_marginTop="16dp"
-        android:layout_marginEnd="29dp"
-        android:layout_marginRight="29dp" />
-
+      <com.aptoide.uploader.account.sendmagiclink.SendMagicLinkView
+          android:id="@+id/send_magic_link_view"
+          android:layout_width="match_parent"
+          android:layout_height="wrap_content"
+          android:layout_below="@id/login_maintenance_icon"
+          android:layout_marginLeft="29dp"
+          android:layout_marginStart="29dp"
+          android:layout_marginEnd="29dp"
+          android:layout_marginRight="29dp"
+          android:layout_marginTop="74dp"
+          />
 
     </RelativeLayout>
 
   </ScrollView>
-
-
   <RelativeLayout
     android:id="@+id/fragment_login_progress_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:layout_marginBottom="100dp"
-    android:visibility="visible">
+    android:visibility="gone">
 
     <ProgressBar
       android:id="@+id/progressBarBar"
@@ -148,5 +156,4 @@
       android:textAlignment="center" />
 
   </RelativeLayout>
-
-</RelativeLayout>
+</FrameLayout>

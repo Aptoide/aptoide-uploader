@@ -48,7 +48,6 @@ public class LoginPresenter implements Presenter {
             }
           } else {
             view.hideLoading();
-            return tryAutoLogin();
           }
           return Observable.empty();
         })
@@ -127,25 +126,5 @@ public class LoginPresenter implements Presenter {
         .subscribe(__ -> {
         }, throwable -> {
         }));
-  }
-
-  private Observable<Object> tryAutoLogin() {
-    return Observable.just(autoLoginManager.getAutologinFlag())
-        .filter(flag -> !flag)
-        .doOnNext(__ -> view.showLoadingWithoutUserName())
-        .flatMap(__ -> autoLoginManager.getStoredUserCredentials()
-            .flatMapObservable(credentials -> accountManager.saveAutoLoginCredentials(credentials)))
-        .observeOn(viewScheduler)
-        .flatMapCompletable(account -> accountManager.loginWithAutoLogin(account)
-            .doOnComplete(() -> {
-              autoLoginManager.setAutoLoginFlag(true);
-              uploaderAnalytics.sendLoginEvent("auto-login", "success");
-            }))
-        .onErrorResumeNext(throwable -> {
-          uploaderAnalytics.sendLoginEvent("auto-login", "fail");
-          view.hideLoading();
-          return accountManager.logout();
-        })
-        .andThen(Observable.empty());
   }
 }

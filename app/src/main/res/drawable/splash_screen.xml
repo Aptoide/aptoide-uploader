@@ -1,0 +1,16 @@
+<layer-list xmlns:android="http://schemas.android.com/apk/res/android"
+android:opacity="opaque">
+<item
+    android:drawable="@drawable/gradient_drawable_maintenance"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"/>
+  <item
+      android:top="229dp"
+      android:right="82dp"
+      android:left="82dp"
+      android:bottom="308dp">
+    <bitmap
+        android:gravity="center_horizontal"
+        android:src="@drawable/app_logo_name"/>
+  </item>
+</layer-list>

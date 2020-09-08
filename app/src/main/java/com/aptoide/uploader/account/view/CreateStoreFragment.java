@@ -1,7 +1,9 @@
 package com.aptoide.uploader.account.view;
 
 import android.app.Activity;
+import android.content.DialogInterface;
 import android.os.Bundle;
+import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,14 +18,18 @@ import androidx.annotation.Nullable;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.account.AptoideAccountManager;
+import com.aptoide.uploader.apps.view.OnBackPressedInterface;
+import com.aptoide.uploader.view.Rx.RxAlertDialog;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxRadioGroup;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.PublishSubject;
 
-public class CreateStoreFragment extends FragmentView implements CreateStoreView {
+public class CreateStoreFragment extends FragmentView
+    implements CreateStoreView, OnBackPressedInterface {
 
   private EditText storeName;
   private RadioButton publicStore;
@@ -34,6 +40,8 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
   private CompositeDisposable compositeDisposable;
   private AptoideAccountManager accountManager;
   private AccountErrorMapper accountErrorMapper;
+  private PublishSubject<Boolean> backPressedEvent;
+  private RxAlertDialog logoutConfirmation;
 
   public CreateStoreFragment() {
   }
@@ -58,6 +66,13 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
     storeUsername = view.findViewById(R.id.store_username);
     storePassword = view.findViewById(R.id.store_password);
     createStoreButton = view.findViewById(R.id.fragment_create_store_button);
+    backPressedEvent = PublishSubject.create();
+    logoutConfirmation = new RxAlertDialog.Builder(
+        new ContextThemeWrapper(getContext(), R.style.ConfirmationDialog)).setMessage(
+        R.string.create_store_leave_confirmation)
+        .setPositiveButton(R.string.yes)
+        .setNegativeButton(R.string.no)
+        .build();
 
     RadioGroup storePrivacyRadioGroup = view.findViewById(R.id.create_store_privacy_radiogroup);
     compositeDisposable.add(RxRadioGroup.checkedChanges(storePrivacyRadioGroup)
@@ -74,7 +89,8 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
 
     new CreateStorePresenter(this, accountManager,
         new LoginNavigator(getFragmentManager(), getContext().getApplicationContext()),
-        compositeDisposable, accountErrorMapper, AndroidSchedulers.mainThread()).present();
+        compositeDisposable, accountErrorMapper, AndroidSchedulers.mainThread(),
+        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
   }
 
   @Override public void onDestroyView() {
@@ -84,6 +100,7 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
     storeUsername = null;
     storePassword = null;
     createStoreButton = null;
+    backPressedEvent = null;
     super.onDestroyView();
   }
 
@@ -166,5 +183,35 @@ public class CreateStoreFragment extends FragmentView implements CreateStoreView
     }
     return new CreateStoreViewModel(storeName.getText()
         .toString());
+  }
+
+  @Override public boolean onBackPressed() {
+    backPressedEvent.onNext(true);
+    return true;
+  }
+
+  @Override public Observable<Boolean> pressBack() {
+    return backPressedEvent;
+  }
+
+  @Override public void showDialog() {
+    if (!logoutConfirmation.isShowing()) {
+      logoutConfirmation.show();
+    }
+  }
+
+  @Override public void dismissDialog() {
+    if (logoutConfirmation.isShowing()) {
+      logoutConfirmation.dismiss();
+    }
+  }
+
+  @Override public Observable<DialogInterface> positiveClick() {
+    return logoutConfirmation.positiveClicks();
+  }
+
+  @Override public void showError() {
+    Toast.makeText(getContext(), R.string.error_occurred, Toast.LENGTH_SHORT)
+        .show();
   }
 }

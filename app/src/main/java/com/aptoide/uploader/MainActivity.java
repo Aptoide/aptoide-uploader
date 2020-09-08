@@ -7,6 +7,7 @@ import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
+import com.aptoide.uploader.account.view.CreateStoreFragment;
 import com.aptoide.uploader.account.view.LoginFragment;
 import com.aptoide.uploader.apps.permission.PermissionProviderActivity;
 import com.aptoide.uploader.apps.view.AppFormFragment;
@@ -28,21 +29,17 @@ public class MainActivity extends PermissionProviderActivity implements MainView
     setContentView(R.layout.activity_main);
     progressDialog = createGenericPleaseWaitDialog(this, R.style.DialogTheme);
 
-    if (savedInstanceState == null) {
-      getSupportFragmentManager().beginTransaction()
-          .replace(R.id.activity_main_container, LoginFragment.newInstance())
-          .commit();
-    }
     UploaderApplication app = ((UploaderApplication) getApplicationContext());
-    new MainPresenter(this, app.getAccountManager(), app.getAgentPersistence(),
-        AndroidSchedulers.mainThread(), app.getUploadManager(), new MainNavigator(this)).present();
+    new MainPresenter(this, app.getAccountManager(), app.getAutoLoginManager(),
+        app.getAgentPersistence(), AndroidSchedulers.mainThread(), app.getUploadManager(),
+        new MainNavigator(this)).present();
   }
 
   @Override public void onBackPressed() {
 
     Fragment fragment = getSupportFragmentManager().findFragmentById(R.id.activity_main_container);
 
-    if (!(fragment instanceof AppFormFragment)) {
+    if (!(fragment instanceof AppFormFragment || fragment instanceof CreateStoreFragment)) {
       super.onBackPressed();
     } else {
       ((OnBackPressedInterface) fragment).onBackPressed();

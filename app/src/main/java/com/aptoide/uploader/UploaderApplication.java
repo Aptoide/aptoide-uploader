@@ -9,13 +9,11 @@ import com.aptoide.authenticationrx.AptoideAuthenticationRx;
 import com.aptoide.uploader.account.AgentPersistence;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
-import com.aptoide.uploader.account.AutoLoginPersistence;
 import com.aptoide.uploader.account.CredentialsValidator;
 import com.aptoide.uploader.account.SocialLogoutManager;
 import com.aptoide.uploader.account.network.AccountResponseMapper;
 import com.aptoide.uploader.account.network.RetrofitAccountService;
 import com.aptoide.uploader.account.persistence.SharedPreferencesAccountPersistence;
-import com.aptoide.uploader.account.persistence.SharedPreferencesAutoLoginPersistence;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
@@ -78,7 +76,6 @@ public class UploaderApplication extends Application {
   private AptoideAuthenticationRx aptoideAuthenticationRx;
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
-  private AutoLoginPersistence autoLoginPersistence;
   private AppUploadStatusPersistence appUploadStatusPersistence;
   private DraftPersistence draftPersistence;
   private AppUploadStatusManager appUploadStatusManager;
@@ -163,7 +160,7 @@ public class UploaderApplication extends Application {
               getAptoideAuthenticationRx()),
           new SharedPreferencesAccountPersistence(PublishSubject.create(),
               PreferenceManager.getDefaultSharedPreferences(this), Schedulers.io()),
-          new CredentialsValidator(), getSocialLogoutManager(), getAutoLoginPersistence());
+          new CredentialsValidator(), getSocialLogoutManager());
     }
     return accountManager;
   }
@@ -272,14 +269,6 @@ public class UploaderApplication extends Application {
     return draftPersistence;
   }
 
-  public AutoLoginPersistence getAutoLoginPersistence() {
-    if (autoLoginPersistence == null) {
-      autoLoginPersistence = new SharedPreferencesAutoLoginPersistence(
-          PreferenceManager.getDefaultSharedPreferences(this));
-    }
-    return autoLoginPersistence;
-  }
-
   public AppUploadStatusPersistence getAppUploadStatusPersistence() {
     if (appUploadStatusPersistence == null) {
       appUploadStatusPersistence = new RoomUploadStatusDataSource(
@@ -321,7 +310,7 @@ public class UploaderApplication extends Application {
   }
 
   public AutoLoginManager getAutoLoginManager() {
-    return new AutoLoginManager(getApplicationContext(), getAutoLoginPersistence());
+    return AutoLoginManager.getInstance(getApplicationContext());
   }
 
   private void initializeRakam() {

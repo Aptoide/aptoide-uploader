@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
 import android.util.Log;
+import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
@@ -18,7 +19,6 @@ import io.reactivex.Scheduler;
 import io.reactivex.Single;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
-import io.reactivex.schedulers.Schedulers;
 import java.net.SocketTimeoutException;
 import java.util.Collections;
 import java.util.List;
@@ -35,12 +35,14 @@ public class MyStorePresenter implements Presenter {
   private final UploaderAnalytics uploaderAnalytics;
   private final ConnectivityProvider connectivityProvider;
   private final UploadManager uploadManager;
+  private final AutoLoginManager autoLoginManager;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, MyStoreNavigator storeNavigator,
       Scheduler viewScheduler, UploadPermissionProvider uploadPermissionProvider,
       AppUploadStatusPersistence persistence, UploaderAnalytics uploaderAnalytics,
-      ConnectivityProvider connectivityProvider, UploadManager uploadManager) {
+      ConnectivityProvider connectivityProvider, UploadManager uploadManager,
+      AutoLoginManager autoLoginManager) {
     this.connectivityProvider = connectivityProvider;
     this.view = view;
     this.storeManager = storeManager;
@@ -51,6 +53,7 @@ public class MyStorePresenter implements Presenter {
     this.persistence = persistence;
     this.uploaderAnalytics = uploaderAnalytics;
     this.uploadManager = uploadManager;
+    this.autoLoginManager = autoLoginManager;
   }
 
   @Override public void present() {
@@ -77,7 +80,7 @@ public class MyStorePresenter implements Presenter {
         .flatMap(created -> view.positiveClick())
         .flatMapCompletable(click -> storeManager.logout()
             .observeOn(viewScheduler)
-            .doOnComplete(() -> storeNavigator.navigateToLoginView())
+            .doOnComplete(() -> autoLoginManager.checkAvailableFieldsAndNavigateTo(storeNavigator))
             .andThen(setPersistenceStatusOnLogout())
             .doOnError(throwable -> {
               view.dismissDialog();
