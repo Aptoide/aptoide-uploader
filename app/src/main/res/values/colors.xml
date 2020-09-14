@@ -12,5 +12,6 @@
   <color name="facebook_blue">#3b5999</color>
   <color name="light_grey">#E7E7E7</color>
   <color name="grey_fog_normal">#d8d8d8</color>
-
+  <color name= "default_blue">#3688bc</color>
+  <color name= "end_blue_gradient">#3896d8</color>
 </resources>

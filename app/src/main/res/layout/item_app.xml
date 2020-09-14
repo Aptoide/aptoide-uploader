@@ -17,16 +17,16 @@
       android:background="@color/white"
       >
 
-    <ImageView
+    <com.google.android.material.imageview.ShapeableImageView
         android:id="@+id/item_app_icon"
         android:layout_width="0dp"
         android:layout_height="0dp"
-        android:layout_marginStart="9dp"
-        android:layout_marginLeft="9dp"
-        android:layout_marginTop="9dp"
-        android:layout_marginEnd="9dp"
-        android:layout_marginRight="9dp"
-        android:scaleType="fitCenter"
+        android:layout_marginStart="20dp"
+        android:layout_marginLeft="20dp"
+        android:layout_marginTop="16dp"
+        android:layout_marginEnd="20dp"
+        android:layout_marginRight="20dp"
+        app:shapeAppearanceOverlay="@style/ShapeAppearanceOverlay.App.CornerSize50Percent"
         app:layout_constraintBottom_toTopOf="@id/item_app_name"
         app:layout_constraintDimensionRatio="1:1"
         app:layout_constraintEnd_toEndOf="parent"

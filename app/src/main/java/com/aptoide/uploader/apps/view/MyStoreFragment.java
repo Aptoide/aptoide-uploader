@@ -89,7 +89,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         .findItem(R.id.logout_button);
 
     SpannableString s = new SpannableString(getResources().getString(R.string.signout));
-    s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length(), 0);
+    s.setSpan(new ForegroundColorSpan(getResources().getColor(R.color.default_blue)), 0, s.length(), 0);
     logoutItem.setTitle(s);
 
     recyclerView = view.findViewById(R.id.fragment_my_apps_list);
