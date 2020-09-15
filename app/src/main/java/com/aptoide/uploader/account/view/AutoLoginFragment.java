@@ -104,6 +104,13 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
     otherLoginsButton.setText(R.string.login_other_account_button);
   }
 
+  @Override public void showLoginMessage() {
+    Bundle bundle = this.getArguments();
+    Toast.makeText(getContext(),
+        getString(R.string.logging_as) + " " + bundle.getString("loginName"), Toast.LENGTH_LONG)
+        .show();
+  }
+
   @Override public void showNetworkError() {
     Toast.makeText(getContext(), getString(R.string.connection_error_body), Toast.LENGTH_LONG)
         .show();

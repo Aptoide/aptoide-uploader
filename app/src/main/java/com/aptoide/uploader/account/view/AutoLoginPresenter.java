@@ -5,6 +5,7 @@ import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
+import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
@@ -79,6 +80,7 @@ public class AutoLoginPresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.clickAutoLogin()
             .observeOn(viewScheduler)
+            .doOnNext(__ -> view.showLoginMessage())
             .flatMap(__ -> {
               accountManager.logout();
               return tryAutoLogin();
@@ -132,7 +134,6 @@ public class AutoLoginPresenter implements Presenter {
         .doOnError(throwable -> uploaderAnalytics.sendLoginEvent("auto-login", "fail"))
         .andThen(Observable.empty());
   }
-
   private boolean isInternetError(Throwable throwable) {
     return throwable instanceof IOException;
   }
