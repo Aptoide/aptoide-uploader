@@ -11,4 +11,6 @@ public interface AutoLoginView extends View {
   void showLoginAvatar();
 
   void showLoginName();
+
+  void showNetworkError();
 }

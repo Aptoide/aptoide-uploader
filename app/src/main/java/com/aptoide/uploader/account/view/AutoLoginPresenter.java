@@ -9,6 +9,7 @@ import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
+import java.io.IOException;
 
 public class AutoLoginPresenter implements Presenter {
 
@@ -76,12 +77,18 @@ public class AutoLoginPresenter implements Presenter {
   private void handleAutoLogin() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(created -> view.clickAutoLogin())
-        .observeOn(viewScheduler)
-        .flatMap(__ -> {
-          accountManager.logout();
-          return tryAutoLogin();
-        })
+        .flatMap(created -> view.clickAutoLogin()
+            .observeOn(viewScheduler)
+            .flatMap(__ -> {
+              accountManager.logout();
+              return tryAutoLogin();
+            })
+            .doOnError(throwable -> {
+              if (isInternetError(throwable)) {
+                view.showNetworkError();
+              }
+            })
+            .retry())
         .subscribe(__ -> {
         }, Throwable::printStackTrace));
   }
@@ -124,5 +131,9 @@ public class AutoLoginPresenter implements Presenter {
             }))
         .doOnError(throwable -> uploaderAnalytics.sendLoginEvent("auto-login", "fail"))
         .andThen(Observable.empty());
+  }
+
+  private boolean isInternetError(Throwable throwable) {
+    return throwable instanceof IOException;
   }
 }

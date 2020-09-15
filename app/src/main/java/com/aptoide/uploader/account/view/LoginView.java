@@ -27,8 +27,6 @@ public interface LoginView extends View {
 
   void showNetworkError();
 
-  void showNoConnectivityError();
-
   void hideKeyboard();
 
   void startGoogleActivity();
