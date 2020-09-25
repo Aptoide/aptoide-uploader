@@ -50,7 +50,7 @@ public class CreateStorePresenter implements Presenter {
               view.showLoading();
               view.hideKeyboard();
             })
-            .flatMapCompletable(data -> accountManager.createStore(data.getStoreName())
+            .flatMapCompletable(data -> accountManager.createStore(data.getStoreName(), data.getStoreUser(), data.getStorePassword())
                 .observeOn(viewScheduler)
                 .doOnComplete(() -> accountNavigator.navigateToMyAppsView()))
             .doOnError(throwable -> {

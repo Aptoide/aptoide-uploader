@@ -12,7 +12,7 @@ public interface AccountService {
 
   Single<Account> getAccount(String email, String ServerAuthToken, String authMode);
 
-  Single<CreateStoreStatus> createStore(String storeName);
+  Single<CreateStoreStatus> createStore(String storeName, String privateUserName, String privatePassword);
 
   Single<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials);
 

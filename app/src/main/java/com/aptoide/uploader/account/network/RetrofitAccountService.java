@@ -62,9 +62,9 @@ public class RetrofitAccountService implements AccountService {
         });
   }
 
-  @Override public Single<CreateStoreStatus> createStore(String storeName) {
+  @Override public Single<CreateStoreStatus> createStore(String storeName, String privateUserName, String privatePassword) {
     return authenticationProvider.getAccessToken()
-        .flatMap(accessToken -> serviceV3.createRepo(storeName, 1, true, accessToken, "aptoide",
+        .flatMap(accessToken -> serviceV3.createRepo(storeName, privateUserName, privatePassword, 1, true, accessToken, "aptoide",
             accessToken, "json")
             .singleOrError())
         .flatMap(response -> mapCreateStoreResponse(response));
@@ -138,6 +138,7 @@ public class RetrofitAccountService implements AccountService {
   public interface ServiceV3 {
     @POST("webservices/3/checkUserCredentials") @FormUrlEncoded
     Observable<Response<CreateStoreResponse>> createRepo(@Field("repo") String storeName,
+        @Field("privacy_user") String privacyUser, @Field("privacy_pass ") String privacyPass,
         @Field("createRepo") int createRepo, @Field("oauthCreateRepo") boolean oauthCreateRepo,
         @Field("oauthToken") String oauthtoken, @Field("authMode") String authMode,
         @Field("access_token") String accessToken, @Field("mode") String mode);
