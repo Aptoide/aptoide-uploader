@@ -1,5 +1,6 @@
 package com.aptoide.uploader.account.view;
 
+import android.util.Log;
 import com.aptoide.uploader.account.AccountValidationException;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
@@ -50,9 +51,20 @@ public class CreateStorePresenter implements Presenter {
               view.showLoading();
               view.hideKeyboard();
             })
-            .flatMapCompletable(data -> accountManager.createStore(data.getStoreName(), data.getStoreUser(), data.getStorePassword())
-                .observeOn(viewScheduler)
-                .doOnComplete(() -> accountNavigator.navigateToMyAppsView()))
+            .flatMapCompletable(data -> {
+              if (data.isPrivateStore()) {
+                data.setPrivacyFlag(true);
+              }
+              Log.d("MOB-", "handleCreateStoreClick: isPrivate? " + data.isPrivateStore());
+              Log.d("MOB-", "handleCreateStoreClick: getStoreUser " + data.getStoreUser());
+              //falta sha1 na password
+              Log.d("MOB-", "handleCreateStoreClick: getStorePassword " + data.getStorePassword());
+              Log.d("MOB-", "handleCreateStoreClick: privacy flag " + data.getPrivacyFlag());
+              return accountManager.createStore(data.getStoreName(), data.getStoreUser(),
+                  data.getStorePassword(), data.getPrivacyFlag())
+                  .observeOn(viewScheduler)
+                  .doOnComplete(() -> accountNavigator.navigateToMyAppsView());
+            })
             .doOnError(throwable -> {
               view.hideLoading();
               if (isInternetError(throwable)) {

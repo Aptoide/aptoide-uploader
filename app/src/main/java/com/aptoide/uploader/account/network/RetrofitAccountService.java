@@ -62,10 +62,11 @@ public class RetrofitAccountService implements AccountService {
         });
   }
 
-  @Override public Single<CreateStoreStatus> createStore(String storeName, String privateUserName, String privatePassword) {
+  @Override public Single<CreateStoreStatus> createStore(String storeName, String privateUserName,
+      String privatePassword, boolean privacyFlag) {
     return authenticationProvider.getAccessToken()
-        .flatMap(accessToken -> serviceV3.createRepo(storeName, privateUserName, privatePassword, 1, true, accessToken, "aptoide",
-            accessToken, "json")
+        .flatMap(accessToken -> serviceV3.createRepo(storeName, privateUserName, privatePassword,
+            privacyFlag, 1, true, accessToken, "aptoide", accessToken, "json")
             .singleOrError())
         .flatMap(response -> mapCreateStoreResponse(response));
   }
@@ -139,9 +140,10 @@ public class RetrofitAccountService implements AccountService {
     @POST("webservices/3/checkUserCredentials") @FormUrlEncoded
     Observable<Response<CreateStoreResponse>> createRepo(@Field("repo") String storeName,
         @Field("privacy_user") String privacyUser, @Field("privacy_pass ") String privacyPass,
-        @Field("createRepo") int createRepo, @Field("oauthCreateRepo") boolean oauthCreateRepo,
-        @Field("oauthToken") String oauthtoken, @Field("authMode") String authMode,
-        @Field("access_token") String accessToken, @Field("mode") String mode);
+        @Field("privacy") boolean privacyFlag, @Field("createRepo") int createRepo,
+        @Field("oauthCreateRepo") boolean oauthCreateRepo, @Field("oauthToken") String oauthtoken,
+        @Field("authMode") String authMode, @Field("access_token") String accessToken,
+        @Field("mode") String mode);
   }
 
   public interface ServiceV7 {

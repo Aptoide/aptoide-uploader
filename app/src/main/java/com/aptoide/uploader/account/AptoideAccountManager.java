@@ -50,11 +50,16 @@ public class AptoideAccountManager {
     return accountPersistence.getAccount();
   }
 
-  public Completable createStore(String storeName, String privateUserName, String privatePassword) {
-    return accountService.createStore(storeName, privateUserName, privatePassword)
+  public Completable createStore(String storeName, String privateUserName, String privatePassword,
+      boolean privacyFlag) {
+    return accountService.createStore(storeName, privateUserName, privatePassword, privacyFlag)
         .flatMap(createStoreStatus -> getAccount().firstOrError())
         .map(newAccount -> AccountFactory.of(true, true, storeName, newAccount.getLoginType()))
         .flatMapCompletable(account -> accountPersistence.save(account));
+  }
+
+  public void setPrivacyFlag() {
+
   }
 
   public Observable<Account> saveAutoLoginCredentials(AutoLoginCredentials credentials) {

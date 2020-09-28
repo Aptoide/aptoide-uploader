@@ -121,7 +121,7 @@ public class CreateStoreFragment extends FragmentView
     storePassword.setVisibility(View.VISIBLE);
   }
 
-  private boolean isPrivateStore() {
+  public boolean isPrivateStore() {
     return privateStore.isChecked();
   }
 

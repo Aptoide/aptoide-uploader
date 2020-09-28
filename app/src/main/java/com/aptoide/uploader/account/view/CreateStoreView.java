@@ -41,6 +41,7 @@ public interface CreateStoreView extends View {
     private final String storeName;
     private final String storeUser;
     private final String storePassword;
+    private boolean privacyFlag = false;
 
     public CreateStoreViewModel(String storeName) {
       this(storeName, null, null);
@@ -67,6 +68,14 @@ public interface CreateStoreView extends View {
 
     public boolean isPrivateStore() {
       return storePassword != null && !storePassword.isEmpty();
+    }
+
+    public boolean getPrivacyFlag() {
+      return privacyFlag;
+    }
+
+    public void setPrivacyFlag(boolean flag) {
+      privacyFlag = flag;
     }
   }
 }
