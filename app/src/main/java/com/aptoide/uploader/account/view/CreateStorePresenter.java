@@ -61,7 +61,8 @@ public class CreateStorePresenter implements Presenter {
               Log.d("MOB-", "handleCreateStoreClick: getStorePassword " + data.getStorePassword());
               Log.d("MOB-", "handleCreateStoreClick: privacy flag " + data.getPrivacyFlag());
               return accountManager.createStore(data.getStoreName(), data.getStoreUser(),
-                  data.getStorePassword(), data.getPrivacyFlag())
+                  CreateStoreView.AlgorithmU.computeSha1(data.getStorePassword()),
+                  data.getPrivacyFlag())
                   .observeOn(viewScheduler)
                   .doOnComplete(() -> accountNavigator.navigateToMyAppsView());
             })
