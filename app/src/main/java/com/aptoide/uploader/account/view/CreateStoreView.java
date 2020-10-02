@@ -83,7 +83,7 @@ public interface CreateStoreView extends View {
     }
   }
 
-  public static class AlgorithmU {
+  class AlgorithmU {
 
     private static final String TAG = AlgorithmU.class.getName();
 
