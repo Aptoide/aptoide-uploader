@@ -32,10 +32,10 @@ public class CreateStoreFragment extends FragmentView
     implements CreateStoreView, OnBackPressedInterface {
 
   private EditText storeName;
-  private RadioButton publicStore;
-  private RadioButton privateStore;
-  private EditText storeUsername;
-  private EditText storePassword;
+  //private RadioButton publicStore;
+  //private RadioButton privateStore;
+  //private EditText storeUsername;
+  //private EditText storePassword;
   private Button createStoreButton;
   private CompositeDisposable compositeDisposable;
   private AptoideAccountManager accountManager;
@@ -60,12 +60,12 @@ public class CreateStoreFragment extends FragmentView
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
-    storeName = view.findViewById(R.id.create_store_name);
-    publicStore = view.findViewById(R.id.public_store);
-    privateStore = view.findViewById(R.id.private_store);
-    storeUsername = view.findViewById(R.id.store_username);
-    storePassword = view.findViewById(R.id.store_password);
-    createStoreButton = view.findViewById(R.id.fragment_create_store_button);
+    storeName = view.findViewById(R.id.create_store_name_temp);
+    //publicStore = view.findViewById(R.id.public_store);
+    //privateStore = view.findViewById(R.id.private_store);
+    //storeUsername = view.findViewById(R.id.store_username);
+    //storePassword = view.findViewById(R.id.store_password);
+    createStoreButton = view.findViewById(R.id.fragment_create_store_button_temp);
     backPressedEvent = PublishSubject.create();
     logoutConfirmation = new RxAlertDialog.Builder(
         new ContextThemeWrapper(getContext(), R.style.ConfirmationDialog)).setMessage(
@@ -74,7 +74,7 @@ public class CreateStoreFragment extends FragmentView
         .setNegativeButton(R.string.no)
         .build();
 
-    RadioGroup storePrivacyRadioGroup = view.findViewById(R.id.create_store_privacy_radiogroup);
+  /*  RadioGroup storePrivacyRadioGroup = view.findViewById(R.id.create_store_privacy_radiogroup);
     compositeDisposable.add(RxRadioGroup.checkedChanges(storePrivacyRadioGroup)
         .skip(1)
         .map(id -> id == R.id.private_store)
@@ -85,7 +85,7 @@ public class CreateStoreFragment extends FragmentView
           } else {
             hidePrivateStoreFields();
           }
-        }));
+        }));*/
 
     new CreateStorePresenter(this, accountManager,
         new LoginNavigator(getFragmentManager(), getContext().getApplicationContext()),
@@ -95,10 +95,10 @@ public class CreateStoreFragment extends FragmentView
 
   @Override public void onDestroyView() {
     storeName = null;
-    publicStore = null;
-    privateStore = null;
-    storeUsername = null;
-    storePassword = null;
+    //publicStore = null;
+    //privateStore = null;
+    //storeUsername = null;
+    //storePassword = null;
     createStoreButton = null;
     backPressedEvent = null;
     super.onDestroyView();
@@ -108,22 +108,22 @@ public class CreateStoreFragment extends FragmentView
   public android.view.View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
     compositeDisposable = new CompositeDisposable();
-    return inflater.inflate(R.layout.fragment_create_store, container, false);
+    return inflater.inflate(R.layout.fragment_create_store_temp, container, false);
   }
 
-  private void hidePrivateStoreFields() {
+  /*private void hidePrivateStoreFields() {
     storeUsername.setVisibility(View.GONE);
     storePassword.setVisibility(View.GONE);
-  }
+  }*/
 
-  private void showPrivateStoreFields() {
+ /* private void showPrivateStoreFields() {
     storeUsername.setVisibility(View.VISIBLE);
     storePassword.setVisibility(View.VISIBLE);
-  }
+  }*/
 
-  private boolean isPrivateStore() {
+ /* private boolean isPrivateStore() {
     return privateStore.isChecked();
-  }
+  }*/
 
   @Override public Observable<CreateStoreViewModel> getStoreInfo() {
     return RxView.clicks(createStoreButton)
@@ -175,12 +175,12 @@ public class CreateStoreFragment extends FragmentView
   }
 
   @NonNull private CreateStoreViewModel getViewModel() {
-    if (isPrivateStore()) {
+    /*if (isPrivateStore()) {
       return new CreateStoreViewModel(storeName.getText()
           .toString(), storeUsername.getText()
           .toString(), storePassword.getText()
           .toString());
-    }
+    }*/
     return new CreateStoreViewModel(storeName.getText()
         .toString());
   }
