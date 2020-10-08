@@ -5,7 +5,6 @@ import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
@@ -86,7 +85,7 @@ public class AutoLoginPresenter implements Presenter {
               return tryAutoLogin();
             })
             .doOnError(throwable -> {
-              if (isInternetError(throwable)) {
+              if (isNoNetworkError(throwable)) {
                 view.showNetworkError();
               }
             })
@@ -134,7 +133,8 @@ public class AutoLoginPresenter implements Presenter {
         .doOnError(throwable -> uploaderAnalytics.sendLoginEvent("auto-login", "fail"))
         .andThen(Observable.empty());
   }
-  private boolean isInternetError(Throwable throwable) {
+
+  private boolean isNoNetworkError(Throwable throwable) {
     return throwable instanceof IOException;
   }
 }

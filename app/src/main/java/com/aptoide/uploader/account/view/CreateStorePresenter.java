@@ -55,7 +55,7 @@ public class CreateStorePresenter implements Presenter {
                 .doOnComplete(() -> accountNavigator.navigateToMyAppsView()))
             .doOnError(throwable -> {
               view.hideLoading();
-              if (isInternetError(throwable)) {
+              if (isNoNetworkError(throwable)) {
                 view.showNetworkError();
               }
               if (invalidFieldError(throwable)) {
@@ -126,7 +126,7 @@ public class CreateStorePresenter implements Presenter {
     return throwable instanceof DuplicatedStoreException;
   }
 
-  private boolean isInternetError(Throwable throwable) {
+  private boolean isNoNetworkError(Throwable throwable) {
     return throwable instanceof IOException;
   }
 }
