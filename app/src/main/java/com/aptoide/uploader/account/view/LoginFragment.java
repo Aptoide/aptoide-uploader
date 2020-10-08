@@ -202,12 +202,7 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
   }
 
   @Override public void showNetworkError() {
-    Toast.makeText(getContext(), R.string.error_occurred, Toast.LENGTH_SHORT)
-        .show();
-  }
-
-  @Override public void showNoConnectivityError() {
-    Toast.makeText(getContext(), R.string.no_connectivity_error, Toast.LENGTH_LONG)
+    Toast.makeText(getContext(), R.string.connection_error_body, Toast.LENGTH_SHORT)
         .show();
   }
 

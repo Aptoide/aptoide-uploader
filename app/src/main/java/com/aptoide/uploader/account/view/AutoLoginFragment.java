@@ -6,6 +6,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.Toast;
 import androidx.annotation.Nullable;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
@@ -101,5 +102,17 @@ public class AutoLoginFragment extends FragmentView implements AutoLoginView {
     autoLoginButton.setText(
         String.format(getString(R.string.login_as_button), bundle.getString("loginName")));
     otherLoginsButton.setText(R.string.login_other_account_button);
+  }
+
+  @Override public void showLoginMessage() {
+    Bundle bundle = this.getArguments();
+    Toast.makeText(getContext(),
+        getString(R.string.logging_as) + " " + bundle.getString("loginName"), Toast.LENGTH_LONG)
+        .show();
+  }
+
+  @Override public void showNetworkError() {
+    Toast.makeText(getContext(), getString(R.string.connection_error_body), Toast.LENGTH_LONG)
+        .show();
   }
 }
