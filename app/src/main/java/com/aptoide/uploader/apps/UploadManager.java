@@ -380,7 +380,7 @@ public class UploadManager {
     accountProvider.getAccount()
         .switchMap(account -> {
           if (account.isLoggedIn() && account.hasStore()) {
-            return appUploadStatusPersistence.getAppsUnknownUploadStatus()
+            return appUploadStatusPersistence.getAppsUploadStatus()
                 .distinctUntilChanged(
                     (previous, current) -> !appsPersistenceHasChanged(previous, current))
                 .flatMapSingle(uploadStatuses -> Observable.fromIterable(uploadStatuses)
@@ -395,6 +395,7 @@ public class UploadManager {
                     .flatMapSingle(appUploadStatuses -> Observable.fromIterable(appUploadStatuses)
                         .toList())
                     .flatMap(appUploadStatuses -> appUploadStatusManager.getApks(appUploadStatuses))
+                    .doOnNext(appUploadStatuses -> Log.d("nzxt", "checkAppUploadStatus: after get APKs -> size " + appUploadStatuses.size()))
                     .flatMapCompletable(
                         appUploadStatuses -> appUploadStatusPersistence.saveAll(appUploadStatuses))
                     .toObservable());
