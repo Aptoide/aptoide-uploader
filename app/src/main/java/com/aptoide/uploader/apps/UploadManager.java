@@ -380,7 +380,7 @@ public class UploadManager {
     accountProvider.getAccount()
         .switchMap(account -> {
           if (account.isLoggedIn() && account.hasStore()) {
-            return appUploadStatusPersistence.getAppsUploadStatus()
+            return appUploadStatusPersistence.getAppsUnknownUploadStatus()
                 .distinctUntilChanged(
                     (previous, current) -> !appsPersistenceHasChanged(previous, current))
                 .flatMapSingle(uploadStatuses -> Observable.fromIterable(uploadStatuses)
