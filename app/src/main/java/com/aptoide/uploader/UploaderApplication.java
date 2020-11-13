@@ -1,6 +1,7 @@
 package com.aptoide.uploader;
 
 import android.app.Application;
+import android.content.pm.PackageManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.aptoide.authentication.AptoideAuthentication;
@@ -19,9 +20,12 @@ import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
 import com.aptoide.uploader.apps.AppUploadStatusManager;
 import com.aptoide.uploader.apps.CategoriesManager;
+import com.aptoide.uploader.apps.InstallManager;
+import com.aptoide.uploader.apps.InstalledRepository;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
+import com.aptoide.uploader.apps.RoomInstalledPersistence;
 import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
@@ -71,6 +75,7 @@ public class UploaderApplication extends Application {
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
   private UploadManager uploadManager;
+  private InstallManager installManager;
   private LanguageManager languageManager;
   private AuthenticationProvider authenticationProvider;
   private AptoideAuthenticationRx aptoideAuthenticationRx;
@@ -82,6 +87,8 @@ public class UploaderApplication extends Application {
   private UploaderAnalytics uploaderAnalytics;
   private CallbackManager callbackManager;
   private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
+  private PackageManager packageManager;
+  private RoomInstalledPersistence roomInstalledPersistence;
   private LoginManager loginManager;
   private AgentPersistence agentPersistence;
 
@@ -109,6 +116,12 @@ public class UploaderApplication extends Application {
           getDraftPersistence());
     }
     return uploadManager;
+  }
+  public InstallManager getInstallManager() {
+    if (installManager == null) {
+      installManager = new InstallManager(new InstalledRepository(roomInstalledPersistence,packageManager));
+    }
+    return installManager;
   }
 
   public OkHttpClient.Builder buildOkHttpClient() {
