@@ -9,15 +9,15 @@ import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 import java.util.*
 
-class InstalledRepository(private val installedPersistence: RoomInstalledPersistence?,
+class InstalledRepository(private val installedPersistence: RoomInstalledPersistence,
                           private val packageManager: PackageManager) {
 
-  fun save(installed: RoomInstalled?): Completable? {
-    return installedPersistence!!.insert(installed)
+  fun save(installed: RoomInstalled): Completable {
+    return installedPersistence.insert(installed)
   }
 
-  operator fun contains(packageName: String?): Boolean {
-    return installedPersistence!!.isInstalled(packageName)!!
+  operator fun contains(packageName: String): Boolean {
+    return installedPersistence.isInstalled(packageName)!!
         .blockingFirst()!!
 
   }
@@ -28,47 +28,32 @@ class InstalledRepository(private val installedPersistence: RoomInstalledPersist
    * Note that it only assures that these apps were synced at least once since the app started.
    */
 
-  private fun allInstalled(): Observable<MutableList<RoomInstalled?>?>? {
-    return installedPersistence?.allInstalled()
-  }
-  fun getAsList(packageName: String?, versionCode: Int): Observable<RoomInstalled?>? {
-    return installedPersistence?.getAsList(packageName, versionCode)!!
-        .observeOn(Schedulers.io())
-        .map { installedList ->
-          if (installedList.isEmpty()) {
-            return@map null
-          } else {
-            return@map installedList[0]
-          }
-        }
+  private fun allInstalled(): Observable<MutableList<RoomInstalled>> {
+    return installedPersistence.allInstalled()
   }
 
   fun getAsList(
-      packageName: String?): Observable<MutableList<RoomInstalled?>?>? {
-    return installedPersistence!!.getAllAsList(packageName)
+      packageName: String): Observable<MutableList<RoomInstalled>> {
+    return installedPersistence.getAllAsList(packageName)
   }
 
-  fun getInstalled(packageName: String?): Observable<RoomInstalled?>? {
-    return installedPersistence!!.getInstalled(packageName)
+  fun getInstalled(packageName: String): Observable<RoomInstalled> {
+    return installedPersistence.getInstalled(packageName)
   }
 
-  fun remove(packageName: String?, versionCode: Int): Completable? {
-    return installedPersistence!!.remove(packageName, versionCode)
+  fun remove(packageName: String, versionCode: Int): Completable {
+    return installedPersistence.remove(packageName, versionCode)
   }
 
-  fun isInstalled(packageName: String?): Observable<Boolean?>? {
-    return installedPersistence!!.isInstalled(packageName)
+  fun isInstalled(packageName: String): Observable<Boolean> {
+    return installedPersistence.isInstalled(packageName)
   }
 
-  fun isInstalled(packageName: String?, versionCode: Int): Single<Boolean?>? {
-    return installedPersistence!!.isInstalled(packageName, versionCode)
+  fun allInstalledSorted(): Observable<MutableList<RoomInstalled>> {
+    return installedPersistence.allInstalledSorted()
   }
-
-  fun allInstalledSorted(): Observable<MutableList<RoomInstalled?>?>? {
-    return installedPersistence?.allInstalledSorted()
-  }
-  operator fun get(packageName: String?, versionCode: Int): Observable<RoomInstalled?>? {
-    return installedPersistence!![packageName, versionCode]
+  operator fun get(packageName: String, versionCode: Int): Observable<RoomInstalled> {
+    return installedPersistence[packageName, versionCode]
   }
 
   fun getAllInstalledApps(

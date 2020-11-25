@@ -70,6 +70,7 @@
         <data android:scheme="package" />
       </intent-filter>
     </receiver>
+    <service android:name=".apps.InstalledIntentService" />
   </application>
 
 </manifest>

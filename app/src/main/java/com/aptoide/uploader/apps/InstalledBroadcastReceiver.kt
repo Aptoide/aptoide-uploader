@@ -7,11 +7,9 @@ import android.util.Log
 
 class InstalledBroadcastReceiver : BroadcastReceiver() {
   override fun onReceive(context: Context, intent: Intent?) {
-    Log.d("APP-85", "InstalledBroadcastReceiver onReceive")
     val callService = Intent(intent)
     callService.setClassName(context, InstalledIntentService::class.java.getName())
     context.startService(callService)
-
     // from the documentation @ https://developer.android.com/reference/android/content/BroadcastReceiver.html#ProcessLifecycle
     /*
     This means that for longer-running operations you will often use a Service in conjunction with a

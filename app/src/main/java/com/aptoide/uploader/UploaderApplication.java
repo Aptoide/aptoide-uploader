@@ -21,10 +21,12 @@ import com.aptoide.uploader.apps.AndroidLanguageManager;
 import com.aptoide.uploader.apps.AppUploadStatusManager;
 import com.aptoide.uploader.apps.CategoriesManager;
 import com.aptoide.uploader.apps.InstallManager;
+import com.aptoide.uploader.apps.InstalledDao;
 import com.aptoide.uploader.apps.InstalledRepository;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
+import com.aptoide.uploader.apps.RoomInstalled;
 import com.aptoide.uploader.apps.RoomInstalledPersistence;
 import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
@@ -58,13 +60,18 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
 import io.rakam.api.Rakam;
 import io.rakam.api.RakamClient;
+import io.reactivex.Completable;
+import io.reactivex.Observable;
+import io.reactivex.Single;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.HashMap;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
+import org.jetbrains.annotations.Nullable;
 import org.json.JSONException;
 import org.json.JSONObject;
 import retrofit2.Retrofit;
@@ -87,8 +94,6 @@ public class UploaderApplication extends Application {
   private UploaderAnalytics uploaderAnalytics;
   private CallbackManager callbackManager;
   private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
-  private PackageManager packageManager;
-  private RoomInstalledPersistence roomInstalledPersistence;
   private LoginManager loginManager;
   private AgentPersistence agentPersistence;
 
@@ -119,7 +124,8 @@ public class UploaderApplication extends Application {
   }
   public InstallManager getInstallManager() {
     if (installManager == null) {
-      installManager = new InstallManager(new InstalledRepository(roomInstalledPersistence,packageManager));
+      RoomInstalledPersistence roomInstalledPersistence = new RoomInstalledPersistence(AppUploadsDatabase.getInstance(getApplicationContext()).installedDao());
+      installManager = new InstallManager(new InstalledRepository(roomInstalledPersistence,getPackageManager()));
     }
     return installManager;
   }

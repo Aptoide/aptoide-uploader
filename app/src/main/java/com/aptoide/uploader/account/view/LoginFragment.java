@@ -58,6 +58,7 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
   private AptoideAccountManager accountManager;
   private Button facebookLoginButton;
   private Button googleLoginButton;
+  private Button queryButtonDB;
   private GoogleSignInClient mGoogleSignInClient;
   private GoogleSignInOptions gso;
   private CallbackManager callbackManager;
@@ -124,6 +125,7 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
 
     googleLoginButton = view.findViewById(R.id.google_sign_in_button);
     facebookLoginButton = view.findViewById(R.id.facebook_login_button);
+    queryButtonDB = view.findViewById(R.id.query_db);
     progressDialog = createGenericPleaseWaitDialog(getContext(), R.style.DialogTheme);
 
     fragmentContainer.setVisibility(View.VISIBLE);
@@ -157,6 +159,7 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
     progressContainer = null;
     loadingTextView = null;
     facebookLoginButton = null;
+    queryButtonDB = null;
     super.onDestroyView();
   }
 
@@ -223,6 +226,9 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
 
   @Override public Observable<Object> getFacebookLoginEvent() {
     return RxView.clicks(facebookLoginButton);
+  }
+  @Override public Observable<Object> getRoomInstalledQueryDB() {
+    return RxView.clicks(queryButtonDB);
   }
 
   @Override public void navigateToFacebookLogin() {
