@@ -18,6 +18,7 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
     super.onCreate()
     installManager = (applicationContext as UploaderApplication).installManager
     myPackageManager = packageManager
+    installManager.insertAllInstalled()
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -66,7 +67,7 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
     if (checkNullPackageInfo(packageInfo)) {
       return packageInfo
     }
-    val installed = RoomInstalled(packageInfo, packageManager)
+    val installed = InstalledApp(packageInfo, packageManager)
     compositeDisposable.add(installManager.onAppInstalled(installed)
         .subscribe({
         }, { throwable -> throwable.printStackTrace() }))
@@ -79,7 +80,7 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
       return packageInfo
     }
     compositeDisposable.add(
-        installManager.onUpdateConfirmed(RoomInstalled(packageInfo, packageManager))
+        installManager.onUpdateConfirmed(InstalledApp(packageInfo, packageManager))
             .subscribe({
             }, { throwable -> throwable.printStackTrace() }))
     return packageInfo

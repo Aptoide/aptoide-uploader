@@ -54,7 +54,7 @@ public class StoreManager {
   private Single<List<InstalledApp>> getNonSystemApps() {
     return installedAppsProvider.getInstalledApps()
         .flatMapObservable(apps -> Observable.fromIterable(apps))
-        .filter(app -> !app.isSystem())
+        .filter(app -> !app.isSystemApp())
         .toList();
   }
 }

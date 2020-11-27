@@ -44,7 +44,7 @@ public class AppUploadStatusManager {
   public Single<List<InstalledApp>> getUncheckedApps() {
     return installedAppsProvider.getInstalledApps()
         .flatMapObservable(apps -> Observable.fromIterable(apps))
-        .filter(app -> !app.isSystem())
+        .filter(app -> !app.isSystemApp())
         .flatMap(app -> appUploadStatusPersistence.getAppsUploadStatus()
             .firstOrError()
             .flatMapObservable(appUploadStatuses -> {

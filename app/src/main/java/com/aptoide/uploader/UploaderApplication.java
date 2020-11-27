@@ -125,7 +125,7 @@ public class UploaderApplication extends Application {
   public InstallManager getInstallManager() {
     if (installManager == null) {
       RoomInstalledPersistence roomInstalledPersistence = new RoomInstalledPersistence(AppUploadsDatabase.getInstance(getApplicationContext()).installedDao());
-      installManager = new InstallManager(new InstalledRepository(roomInstalledPersistence,getPackageManager()));
+      installManager = new InstallManager(new InstalledRepository(roomInstalledPersistence,getPackageManager()), getPackageManagerInstalledAppsProvider());
     }
     return installManager;
   }

@@ -11,10 +11,10 @@ import io.reactivex.Single
 @Dao
 interface InstalledDao {
   @Query("SELECT * FROM Installed")
-  fun allInstalled(): Observable<MutableList<RoomInstalled>>
+  fun allInstalled(): Observable<MutableList<InstalledApp>>
 
   @Query("SELECT * FROM Installed ORDER BY name ASC")
-  fun allSortedAsc(): Observable<MutableList<RoomInstalled>>
+  fun allSortedAsc(): Observable<MutableList<InstalledApp>>
 
   @Query(
       "DELETE FROM Installed where packageName = :packageName AND versionCode = :versionCode")
@@ -22,23 +22,18 @@ interface InstalledDao {
 
   @Query(
       "SELECT * FROM Installed where packageName = :packageName AND versionCode = :versionCode LIMIT 1")
-  fun get(packageName: String,
-                   versionCode: Int): Observable<RoomInstalled>
-
-  @Query(
-      "SELECT * FROM Installed where packageName = :packageName AND versionCode = :versionCode")
-  fun getAsList(packageName: String,
-                versionCode: Int): Observable<MutableList<RoomInstalled>>
+  fun getInstalled(packageName: String,
+                   versionCode: Int): Observable<InstalledApp>
 
   @Query("SELECT * FROM Installed where packageName = :packageName")
-  fun getAsListByPackageName(
-      packageName: String): Observable<MutableList<RoomInstalled>>
+  fun getInstalledVersionsList(
+      packageName: String): Observable<MutableList<InstalledApp>>
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insertAll(installedList: MutableList<RoomInstalled>)
+  fun insertAll(installedList: MutableList<InstalledApp>)
 
   @Insert(onConflict = OnConflictStrategy.REPLACE)
-  fun insert(roomInstalled: RoomInstalled)
+  fun insert(roomInstalledApp: InstalledApp)
 
   @Query("DELETE FROM installed")
   fun removeAll()
@@ -46,5 +41,5 @@ interface InstalledDao {
   @Query(
       "SELECT * FROM installed where packageName = :packageName AND versionCode = :versionCode")
   fun isInstalledByVersion(packageName: String,
-                           versionCode: Int): Single<RoomInstalled>
+                           versionCode: Int): Single<InstalledApp>
 }

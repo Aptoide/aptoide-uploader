@@ -1,37 +1,213 @@
 package com.aptoide.uploader.apps;
 
 import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Build;
+import android.os.Environment;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
+import java.io.File;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-public class InstalledApp {
-
-  private final String name;
-  private final boolean isSystem;
-  private final String packageName;
-  private final String apkPath;
-  private final long installedDate;
-  private final int versionCode;
-  private final Obb obbMain;
-  private final Obb obbPatch;
+@Entity(tableName = "installed") public class InstalledApp {
+  @Ignore public static final int STATUS_COMPLETED = 4;
+  @PrimaryKey @NonNull private String packageAndVersionCode;
+  private String packageName;
+  private  String name;
+  private String versionName;
+  private int versionCode;
+  private boolean isSystemApp;
+  private String apkPath;
+  private String iconPath;
+  private long installedDate;
+  @Ignore private Obb obbMain;
+  @Ignore private Obb obbPatch;
   private boolean isUploaded;
-  private ApplicationInfo appInfo;
+  private int status;
+  @Ignore private ApplicationInfo appInfo;
 
-  public InstalledApp(ApplicationInfo appInfo, String name, boolean isSystem, String packageName,
-      String apkPath, long installedDate, int versionCode, boolean isUploaded, Obb obbMain,
-      Obb obbPatch) {
-    this.appInfo = appInfo;
-    this.name = name;
-    this.isSystem = isSystem;
+  public InstalledApp(){
+  }
+
+  public InstalledApp(PackageInfo packageInfo, PackageManager packageManager) {
+    setAppInfo(packageInfo.applicationInfo);
+    setPackageAndVersionCode(packageInfo.packageName + packageInfo.versionCode);
+    setPackageName(packageInfo.packageName);
+    setName(appInfo.loadLabel(packageManager).toString());
+    setVersionName(packageInfo.versionName);
+    setVersionCode(packageInfo.versionCode);
+    setIsSystemApp((appInfo.flags & appInfo.FLAG_SYSTEM) != 0);
+    setApkPath(appInfo.sourceDir);
+    setIconPath("android.resource://"+ packageInfo.packageName+ "/"+ packageInfo.applicationInfo.icon);
+    setInstalledDate(packageInfo.lastUpdateTime);
+    setIsUploaded(false);
+    setObbMain(getMainObb(packageName));
+    setObbPatch(getPatchObb(packageName));
+    setStatus(STATUS_COMPLETED);
+  }
+
+  @NonNull public String getPackageAndVersionCode() {
+    return packageAndVersionCode;
+  }
+
+  public void setPackageAndVersionCode(@NotNull String packageAndVersionCode) {
+    this.packageAndVersionCode = packageAndVersionCode;
+  }
+
+  public String getPackageName() {
+    return packageName;
+  }
+
+  public void setPackageName(String packageName) {
     this.packageName = packageName;
-    this.apkPath = apkPath;
-    this.installedDate = installedDate;
+  }
+
+  public String getName() {
+    return name;
+  }
+
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getVersionName() {
+    return versionName;
+  }
+
+  public void setVersionName(String versionName) {
+    this.versionName = versionName;
+  }
+
+  public int getVersionCode() {
+    return versionCode;
+  }
+
+  public void setVersionCode(int versionCode) {
     this.versionCode = versionCode;
-    this.isUploaded = isUploaded;
+  }
+
+  public boolean isSystemApp() {
+    return isSystemApp;
+  }
+
+  public void setIsSystemApp(boolean systemApp) {
+    this.isSystemApp = systemApp;
+  }
+
+  public String getApkPath() {
+    return apkPath;
+  }
+
+  public void setApkPath(String apkPath) {
+    this.apkPath = apkPath;
+  }
+
+  public String getIconPath() {
+    return iconPath;
+  }
+
+  public void setIconPath(String icon) {
+    this.iconPath = icon;
+  }
+
+  public long getInstalledDate() {
+    return installedDate;
+  }
+
+  public void setInstalledDate(long installedDate) {
+    this.installedDate = installedDate;
+  }
+
+  public Obb getObbMain() {
+    return obbMain;
+  }
+
+  public void setObbMain(Obb obbMain) {
     this.obbMain = obbMain;
+  }
+
+  public Obb getObbPatch() {
+    return obbPatch;
+  }
+
+  public void setObbPatch(Obb obbPatch) {
     this.obbPatch = obbPatch;
+  }
+
+  public boolean isUploaded() {
+    return isUploaded;
+  }
+
+  public void setIsUploaded(boolean uploaded) {
+    isUploaded = uploaded;
+  }
+
+  public int getStatus() {
+    return status;
+  }
+
+  public void setStatus(int status) {
+    this.status = status;
+  }
+
+  public ApplicationInfo getAppInfo() {
+    return appInfo;
+  }
+
+  public void setAppInfo(ApplicationInfo appInfo) {
+    this.appInfo = appInfo;
+  }
+
+  private Obb getMainObb(String packageName) {
+    String sdcard = Environment.getExternalStorageDirectory()
+        .getAbsolutePath();
+    File obbDir = new File(sdcard + "/Android/obb/" + packageName + "/");
+    if (obbDir.isDirectory()) {
+      File[] files = obbDir.listFiles();
+      if (files != null) {
+        Arrays.sort(files, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
+        for (File file : files) {
+          if (file.getName()
+              .contains("main") && !file.getName()
+              .contains("--downloading")) {
+            String obbMainPath = file.getAbsolutePath();
+            return new Obb(obbMainPath.substring(obbMainPath.lastIndexOf("/") + 1), null,
+                obbMainPath);
+          }
+        }
+      }
+    }
+    return null;
+  }
+
+  private Obb getPatchObb(String packageName) {
+    String sdcard = Environment.getExternalStorageDirectory()
+        .getAbsolutePath();
+    File obbDir = new File(sdcard + "/Android/obb/" + packageName + "/");
+    if (obbDir.isDirectory()) {
+      File[] files = obbDir.listFiles();
+      if (files != null) {
+        Arrays.sort(files, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
+        for (File file : files) {
+          String arr[] = file.getName()
+              .split("\\.", 2);
+          if (arr[0].equals("patch") && !file.getName()
+              .contains("--downloading")) {
+            String obbPatchPath = file.getAbsolutePath();
+            return new Obb(obbPatchPath.substring(obbPatchPath.lastIndexOf("/") + 1), null,
+                obbPatchPath);
+          }
+        }
+      }
+    }
+    return null;
   }
 
   public String getObbMainPath() {
@@ -76,18 +252,6 @@ public class InstalledApp {
     return null;
   }
 
-  public String getName() {
-    return name;
-  }
-
-  public boolean isSystem() {
-    return isSystem;
-  }
-
-  public String getPackageName() {
-    return packageName;
-  }
-
   @Override public int hashCode() {
     return packageName.hashCode();
   }
@@ -97,36 +261,11 @@ public class InstalledApp {
     if (o == null || getClass() != o.getClass()) return false;
 
     InstalledApp that = (InstalledApp) o;
-
     return packageName.equals(that.packageName);
   }
 
   @Override public String toString() {
     return "InstalledApp{" + "packageName='" + packageName + '\'' + '}';
-  }
-
-  public String getApkPath() {
-    return apkPath;
-  }
-
-  public long getInstalledDate() {
-    return installedDate;
-  }
-
-  public int getVersionCode() {
-    return versionCode;
-  }
-
-  public boolean isUploaded() {
-    return isUploaded;
-  }
-
-  public void setIsUploaded(boolean value) {
-    isUploaded = value;
-  }
-
-  public ApplicationInfo getAppInfo() {
-    return appInfo;
   }
 
   public List<String> getObbList() {

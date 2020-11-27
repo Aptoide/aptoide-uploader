@@ -146,7 +146,7 @@ public class LoginPresenter implements Presenter {
         .flatMap(created -> view.getRoomInstalledQueryDB())
         .flatMap(__ -> {
           RoomInstalledPersistence roomInstalledPersistence =new RoomInstalledPersistence(AppUploadsDatabase.getInstance(getApplicationContext()).installedDao());
-          return roomInstalledPersistence.allApps();
+          return roomInstalledPersistence.allInstalled();
         } )
         .concatMap(Observable::fromIterable)
         .doOnNext(installed -> Log.d("APP-85", "LoginPresent: QUERY: packageName: " + installed.getPackageName() + "\tname: "+ installed.getName()+ "\tversionName: "+installed.getVersionName()))
