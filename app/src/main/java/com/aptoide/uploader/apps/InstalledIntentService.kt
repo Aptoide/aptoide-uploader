@@ -18,12 +18,12 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
     super.onCreate()
     installManager = (applicationContext as UploaderApplication).installManager
     myPackageManager = packageManager
-    installManager.insertAllInstalled()
+    //installManager.insertAllInstalled()
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
     super.onStartCommand(intent, flags, startId)
-        return Service.START_STICKY
+    return Service.START_STICKY
   }
 
   override fun onHandleIntent(intent: Intent?) {
@@ -35,6 +35,7 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
               Intent.EXTRA_REPLACING, false)) {
         return
       }
+      installManager.insertAllInstalled()
       when (action) {
         Intent.ACTION_PACKAGE_ADDED -> onPackageAdded(packageName)
         Intent.ACTION_PACKAGE_REPLACED -> onPackageReplaced(packageName)
@@ -48,6 +49,7 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
     Log.d("APP-85", "onDestroy: InstalledIntentService")
     super.onDestroy()
   }
+
   protected fun onPackageAdded(packageName: String) {
     Log.d("APP-85", "InstalledIntentService: Package added: $packageName")
     databaseOnPackageAdded(packageName)
@@ -62,6 +64,7 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
     Log.d("APP-85", "InstalledIntentService: Packaged removed: $packageName")
     databaseOnPackageRemoved(packageName)
   }
+
   private fun databaseOnPackageAdded(packageName: String): PackageInfo {
     val packageInfo: PackageInfo = myPackageManager.getPackageInfo(packageName, 0);
     if (checkNullPackageInfo(packageInfo)) {

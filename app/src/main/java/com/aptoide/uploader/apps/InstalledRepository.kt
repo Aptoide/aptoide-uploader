@@ -3,8 +3,6 @@ package com.aptoide.uploader.apps
 import android.content.pm.PackageManager
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.ObservableEmitter
-import io.reactivex.Single
 
 class InstalledRepository(private val installedPersistence: RoomInstalledPersistence,
                           private val packageManager: PackageManager) {

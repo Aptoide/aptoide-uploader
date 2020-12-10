@@ -1,33 +1,16 @@
 package com.aptoide.uploader.apps
 
+import android.util.Log
 import io.reactivex.Completable
-import io.reactivex.Single
 
-class InstallManager(private val installedRepository: InstalledRepository, private val packageManagerInstalledAppsProvider: PackageManagerInstalledAppsProvider) {
-  
-  fun insertAllInstalled(): Completable{
+class InstallManager(private val installedRepository: InstalledRepository,
+                     private val packageManagerInstalledAppsProvider: PackageManagerInstalledAppsProvider) {
+
+  fun insertAllInstalled(): Completable {
     return packageManagerInstalledAppsProvider.installedApps
         .flatMapCompletable { installed ->
-          return@flatMapCompletable installedRepository.replaceAllBy(installed)
-        }
-  }
-
-  fun onAppInstalled1(installed: InstalledApp): Completable {
-    return installedRepository.getInstalledVersionsList(installed.packageName).firstOrError().toObservable()
-        .flatMapIterable { installeds ->
-          if (installeds.isEmpty()) {
-            installeds.add(installed)
-          }
-          installeds
-        }
-        .flatMapCompletable { databaseInstalled ->
-          if (databaseInstalled.versionCode === installed.versionCode) {
-            installed.status = RoomInstalled.STATUS_COMPLETED
-            return@flatMapCompletable installedRepository.save(installed)
-          } else {
-            return@flatMapCompletable installedRepository.remove(databaseInstalled.getPackageName(),
-                databaseInstalled.versionCode)
-          }
+          Log.d("APP-85", "insertAllInstalled: installedApps size "+  installed.size)
+          installedRepository.replaceAllBy(installed)
         }
   }
 
@@ -45,10 +28,9 @@ class InstallManager(private val installedRepository: InstalledRepository, priva
         }
         .flatMapCompletable { databaseInstalled ->
           if (databaseInstalled.versionCode === installed.versionCode) {
-            installed.status = InstalledApp.STATUS_COMPLETED
             return@flatMapCompletable installedRepository.save(installed)
           } else {
-            return@flatMapCompletable installedRepository.remove(databaseInstalled.getPackageName(),
+            return@flatMapCompletable installedRepository.remove(databaseInstalled.packageName,
                 databaseInstalled.versionCode)
           }
         }
@@ -57,6 +39,8 @@ class InstallManager(private val installedRepository: InstalledRepository, priva
   fun onAppRemoved(packageName: String): Completable {
     return installedRepository.getInstalledVersionsList(packageName)
         .flatMapIterable { installeds -> installeds }
-        .flatMapCompletable { installed -> installedRepository.remove(packageName, installed.versionCode) }
+        .flatMapCompletable { installed ->
+          installedRepository.remove(packageName, installed.versionCode)
+        }
   }
 }

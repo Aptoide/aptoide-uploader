@@ -140,19 +140,5 @@ public class LoginPresenter implements Presenter {
         .subscribe(__ -> {
         }, throwable -> {
         }));
-
-    compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(created -> view.getRoomInstalledQueryDB())
-        .flatMap(__ -> {
-          RoomInstalledPersistence roomInstalledPersistence =new RoomInstalledPersistence(AppUploadsDatabase.getInstance(getApplicationContext()).installedDao());
-          return roomInstalledPersistence.allInstalled();
-        } )
-        .concatMap(Observable::fromIterable)
-        .doOnNext(installed -> Log.d("APP-85", "LoginPresent: QUERY: packageName: " + installed.getPackageName() + "\tname: "+ installed.getName()+ "\tversionName: "+installed.getVersionName()))
-        .subscribe(__ -> {
-        }, throwable -> {
-        }));
-
   }
 }

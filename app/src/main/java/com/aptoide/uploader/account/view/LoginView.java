@@ -57,5 +57,4 @@ public interface LoginView extends View {
       return password;
     }
   }
-  Observable<Object> getRoomInstalledQueryDB();
 }

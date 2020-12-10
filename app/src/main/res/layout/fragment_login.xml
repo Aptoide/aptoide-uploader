@@ -53,18 +53,7 @@
           android:layout_marginTop="16dp"
           style="@style/Aptoide.Button.Ghost.GreyFogLight.GoogleFull"
           />
-      <Button
-          android:id="@+id/query_db"
-          android:layout_width="match_parent"
-          android:layout_below="@id/google_sign_in_button"
-          android:layout_gravity="center_horizontal"
-          android:layout_marginLeft="29dp"
-          android:layout_marginStart="29dp"
-          android:layout_marginEnd="29dp"
-          android:layout_marginRight="29dp"
-          android:layout_marginTop="18dp"
-          style="@style/Aptoide.Button.White"
-          />
+
       <ImageView
           android:id="@+id/login_maintenance_icon"
           android:layout_width="93dp"

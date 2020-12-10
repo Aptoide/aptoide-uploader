@@ -1,4 +1,5 @@
 package com.aptoide.uploader.apps
+
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
@@ -11,10 +12,11 @@ class RoomInstalledPersistence(private val installedDao: InstalledDao) :
     return installedDao.allInstalled()
         .subscribeOn(Schedulers.io())
   }
+
   override fun allInstalledSorted(): Observable<MutableList<InstalledApp>> {
-      return installedDao.allSortedAsc()
-          .subscribeOn(Schedulers.io())
-    }
+    return installedDao.allSortedAsc()
+        .subscribeOn(Schedulers.io())
+  }
 
   override fun remove(packageName: String, versionCode: Int): Completable {
     return installedDao.remove(packageName, versionCode)

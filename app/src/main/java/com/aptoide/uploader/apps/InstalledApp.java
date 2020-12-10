@@ -20,7 +20,7 @@ import org.jetbrains.annotations.NotNull;
   @Ignore public static final int STATUS_COMPLETED = 4;
   @PrimaryKey @NonNull private String packageAndVersionCode;
   private String packageName;
-  private  String name;
+  private String name;
   private String versionName;
   private int versionCode;
   private boolean isSystemApp;
@@ -33,19 +33,21 @@ import org.jetbrains.annotations.NotNull;
   private int status;
   @Ignore private ApplicationInfo appInfo;
 
-  public InstalledApp(){
+  public InstalledApp() {
   }
 
   public InstalledApp(PackageInfo packageInfo, PackageManager packageManager) {
     setAppInfo(packageInfo.applicationInfo);
     setPackageAndVersionCode(packageInfo.packageName + packageInfo.versionCode);
     setPackageName(packageInfo.packageName);
-    setName(appInfo.loadLabel(packageManager).toString());
+    setName(appInfo.loadLabel(packageManager)
+        .toString());
     setVersionName(packageInfo.versionName);
     setVersionCode(packageInfo.versionCode);
     setIsSystemApp((appInfo.flags & appInfo.FLAG_SYSTEM) != 0);
     setApkPath(appInfo.sourceDir);
-    setIconPath("android.resource://"+ packageInfo.packageName+ "/"+ packageInfo.applicationInfo.icon);
+    setIconPath(
+        "android.resource://" + packageInfo.packageName + "/" + packageInfo.applicationInfo.icon);
     setInstalledDate(packageInfo.lastUpdateTime);
     setIsUploaded(false);
     setObbMain(getMainObb(packageName));
