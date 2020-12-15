@@ -57,6 +57,8 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
 import io.rakam.api.Rakam;
 import io.rakam.api.RakamClient;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.exceptions.OnErrorNotImplementedException;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.net.MalformedURLException;
@@ -71,6 +73,7 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class UploaderApplication extends Application {
+  private final CompositeDisposable compositeDisposable = new CompositeDisposable();
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
   private UploadManager uploadManager;
@@ -94,6 +97,16 @@ public class UploaderApplication extends Application {
     startFlurryAgent();
     initializeRakam();
     getUploadManager().start();
+    refreshInstalledApps();
+  }
+
+  private void refreshInstalledApps() {
+    getInstallManager();
+    compositeDisposable.add(installManager.insertAllInstalled()
+        .subscribe(() -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 
   public UploadManager getUploadManager() {

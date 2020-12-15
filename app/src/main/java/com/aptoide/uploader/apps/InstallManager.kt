@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps
 
 import android.util.Log
+import com.flurry.sdk.t
 import io.reactivex.Completable
 
 class InstallManager(private val installedRepository: InstalledRepository,
@@ -8,6 +9,7 @@ class InstallManager(private val installedRepository: InstalledRepository,
 
   fun insertAllInstalled(): Completable {
     return packageManagerInstalledAppsProvider.installedApps
+        .doOnError{throwable -> Log.e("APP-85","Error "+ throwable.printStackTrace())}
         .flatMapCompletable { installed ->
           Log.d("APP-85", "insertAllInstalled: installedApps size "+  installed.size)
           installedRepository.replaceAllBy(installed)

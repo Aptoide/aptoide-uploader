@@ -1,27 +1,14 @@
 package com.aptoide.uploader.account.view;
 
-import android.util.Log;
-import androidx.room.Room;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
-import com.aptoide.uploader.apps.InstalledDao;
-import com.aptoide.uploader.apps.RoomInstalled;
-import com.aptoide.uploader.apps.RoomInstalledPersistence;
-import com.aptoide.uploader.apps.persistence.AppUploadsDatabase;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
-import io.reactivex.Observer;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
-import io.reactivex.internal.operators.observable.ObservableError;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.facebook.FacebookSdk.getApplicationContext;
 
 public class LoginPresenter implements Presenter {
 

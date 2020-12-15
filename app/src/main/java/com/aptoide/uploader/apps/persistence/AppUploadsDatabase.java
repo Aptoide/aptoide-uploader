@@ -7,7 +7,6 @@ import androidx.room.RoomDatabase;
 import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.InstalledDao;
-import com.aptoide.uploader.apps.RoomInstalled;
 
 @Database(entities = { AppUploadStatus.class , InstalledApp.class }, version = 1)
 public abstract class AppUploadsDatabase extends RoomDatabase {

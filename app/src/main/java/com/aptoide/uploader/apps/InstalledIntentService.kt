@@ -18,7 +18,6 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
     super.onCreate()
     installManager = (applicationContext as UploaderApplication).installManager
     myPackageManager = packageManager
-    //installManager.insertAllInstalled()
   }
 
   override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
@@ -35,7 +34,6 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
               Intent.EXTRA_REPLACING, false)) {
         return
       }
-      installManager.insertAllInstalled()
       when (action) {
         Intent.ACTION_PACKAGE_ADDED -> onPackageAdded(packageName)
         Intent.ACTION_PACKAGE_REPLACED -> onPackageReplaced(packageName)

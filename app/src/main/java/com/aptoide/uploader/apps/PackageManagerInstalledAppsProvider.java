@@ -31,7 +31,7 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
           return new InstalledApp(packageInfo,packageManager);
         })
         .toList()
-        .doOnSuccess(installedApps -> Log.d("APP-85", String.valueOf(installedApps.size())))
+        .doOnSuccess(installedApps -> Log.d("nzxt", String.valueOf(installedApps.size())))
         .subscribeOn(scheduler);
   }
 
