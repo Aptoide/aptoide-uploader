@@ -17,6 +17,7 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
   private static final String IS_LOGGED_IN = "IS_LOGGED_IN";
   private static final String STORE_NAME = "store_name";
   private static final String LOGIN_TYPE = "LOGIN_TYPE";
+  private static final String AVATAR_PATH = "AVATAR_PATH";
   private final PublishSubject<Account> accountSubject;
   private final SharedPreferences preferences;
   private final Scheduler scheduler;
@@ -38,6 +39,7 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
         .putBoolean(IS_LOGGED_IN, account.isLoggedIn())
         .putBoolean(HAS_STORE, account.hasStore())
         .putString(STORE_NAME, account.getStoreName())
+        .putString(AVATAR_PATH, account.getAvatarPath())
         .putString(LOGIN_TYPE, account.getLoginType()
             .getText())
         .commit())
@@ -50,6 +52,7 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
         .remove(IS_LOGGED_IN)
         .remove(HAS_STORE)
         .remove(STORE_NAME)
+        .remove(AVATAR_PATH)
         .remove(LOGIN_TYPE)
         .remove("access_token")
         .remove("refresh_token")
@@ -61,6 +64,7 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
     return AccountFactory.of(preferences.getBoolean(HAS_STORE, false),
         preferences.getBoolean(IS_LOGGED_IN, false), preferences.getString(STORE_NAME, null),
         BaseAccount.LoginType.valueOf(
-            preferences.getString(LOGIN_TYPE, BaseAccount.LoginType.NONE.name())));
+            preferences.getString(LOGIN_TYPE, BaseAccount.LoginType.NONE.name())),
+        preferences.getString(AVATAR_PATH, null));
   }
 }

@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps;
 
+import android.util.Log;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import io.reactivex.Single;
 

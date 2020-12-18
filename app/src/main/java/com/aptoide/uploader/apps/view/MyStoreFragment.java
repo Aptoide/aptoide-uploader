@@ -19,6 +19,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -38,6 +39,7 @@ import com.aptoide.uploader.view.Rx.RxAlertDialog;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.MemoryCategory;
+import com.bumptech.glide.request.RequestOptions;
 import com.jakewharton.rxbinding2.view.RxMenuItem;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
@@ -56,6 +58,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private GridRecyclerView recyclerView;
   private MyAppsAdapter adapter;
   private TextView storeNameText;
+  private ImageView profileAvatar;
   private Spinner spinner;
   private MenuItem logoutItem;
   private Toolbar toolbar;
@@ -94,6 +97,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
     recyclerView = view.findViewById(R.id.fragment_my_apps_list);
     storeNameText = view.findViewById(R.id.fragment_my_apps_store_name);
+    profileAvatar = view.findViewById(R.id.fragment_my_apps_profile_avatar);
     spinner = view.findViewById(R.id.sort_spinner);
     mainScreen = view.findViewById(R.id.grid_view_and_hint);
     storeBanner = view.findViewById(R.id.store_info);
@@ -140,7 +144,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
         ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(),
-        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager(),
+        ((UploaderApplication) getContext().getApplicationContext()).getAccountManager()).present();
   }
 
   @Override public void onDestroyView() {
@@ -236,6 +241,22 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void showStoreName(@NotNull String storeName) {
     storeNameText.setText(storeName);
+  }
+
+  @Override public void showAvatar(String avatarPath) {
+    if (avatarPath != null && !avatarPath.trim()
+        .isEmpty()) {
+      Uri uri = Uri.parse(avatarPath);
+      Glide.with(this)
+          .load(uri)
+          .apply(RequestOptions.circleCropTransform())
+          .into(profileAvatar);
+    } else {
+      Glide.with(this)
+          .load(getResources().getDrawable(R.drawable.avatar_default))
+          .apply(RequestOptions.circleCropTransform())
+          .into(profileAvatar);
+    }
   }
 
   @Override public void showDialog() {

@@ -18,6 +18,8 @@ public interface MyStoreView extends View {
 
   void showStoreName(@NotNull String storeName);
 
+  void showAvatar(String avatarPath);
+
   void showDialog();
 
   void dismissDialog();

@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
 import android.util.Log;
+import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AppUploadStatus;
@@ -36,13 +37,14 @@ public class MyStorePresenter implements Presenter {
   private final ConnectivityProvider connectivityProvider;
   private final UploadManager uploadManager;
   private final AutoLoginManager autoLoginManager;
+  private final AptoideAccountManager accountManager;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, MyStoreNavigator storeNavigator,
       Scheduler viewScheduler, UploadPermissionProvider uploadPermissionProvider,
       AppUploadStatusPersistence persistence, UploaderAnalytics uploaderAnalytics,
       ConnectivityProvider connectivityProvider, UploadManager uploadManager,
-      AutoLoginManager autoLoginManager) {
+      AutoLoginManager autoLoginManager, AptoideAccountManager accountManager) {
     this.connectivityProvider = connectivityProvider;
     this.view = view;
     this.storeManager = storeManager;
@@ -54,10 +56,13 @@ public class MyStorePresenter implements Presenter {
     this.uploaderAnalytics = uploaderAnalytics;
     this.uploadManager = uploadManager;
     this.autoLoginManager = autoLoginManager;
+    this.accountManager = accountManager;
   }
 
   @Override public void present() {
     showStoreAndApps();
+
+    showAvatarPath();
 
     refreshStoreAndApps();
 
@@ -177,6 +182,21 @@ public class MyStorePresenter implements Presenter {
         .doOnNext(store -> view.showStoreName(store.getName()))
         .doOnNext(store -> view.showApps(store.getApps()))
         .flatMap(__ -> checkUploadedApps())
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void showAvatarPath() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> accountManager.getAccount()
+            .firstOrError()
+            .map(aptoideAccount -> aptoideAccount.getAvatarPath())
+            .toObservable())
+        .observeOn(viewScheduler)
+        .doOnNext(avatarPath -> view.showAvatar(avatarPath))
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);

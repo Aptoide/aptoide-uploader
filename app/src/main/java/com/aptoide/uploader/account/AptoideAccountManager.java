@@ -53,7 +53,8 @@ public class AptoideAccountManager {
   public Completable createStore(String storeName) {
     return accountService.createStore(storeName)
         .flatMap(createStoreStatus -> getAccount().firstOrError())
-        .map(newAccount -> AccountFactory.of(true, true, storeName, newAccount.getLoginType()))
+        .map(
+            newAccount -> AccountFactory.of(true, true, storeName, newAccount.getLoginType(), null))
         .flatMapCompletable(account -> accountPersistence.save(account));
   }
 

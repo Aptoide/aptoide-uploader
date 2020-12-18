@@ -8,5 +8,7 @@ public interface Account {
 
   String getStoreName();
 
+  String getAvatarPath();
+
   BaseAccount.LoginType getLoginType();
 }
