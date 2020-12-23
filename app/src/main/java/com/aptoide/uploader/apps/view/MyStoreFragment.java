@@ -91,7 +91,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     logoutItem = toolbar.getMenu()
         .findItem(R.id.logout_button);
 
-    SpannableString s = new SpannableString(getResources().getString(R.string.signout));
+    SpannableString s = new SpannableString(getResources().getString(R.string.action_settings));
     s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length(), 0);
     logoutItem.setTitle(s);
 

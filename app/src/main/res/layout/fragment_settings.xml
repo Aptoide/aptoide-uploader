@@ -13,7 +13,7 @@
       >
 
     <androidx.appcompat.widget.Toolbar
-        android:id="@+id/fragment_my_apps_toolbar"
+        android:id="@+id/fragment_settings_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:background="@color/light_blue_appbar"
@@ -100,6 +100,7 @@
         </LinearLayout>
       </LinearLayout>
       <LinearLayout
+          android:id="@+id/fragment_settings_autoupload"
           android:layout_width="match_parent"
           android:layout_height="64dp"
           android:orientation="horizontal"
@@ -127,6 +128,7 @@
             />
       </LinearLayout>
       <LinearLayout
+          android:id="@+id/fragment_settings_feedback"
           android:layout_width="match_parent"
           android:layout_height="64dp"
           android:orientation="horizontal"
@@ -155,6 +157,7 @@
             />
       </LinearLayout>
       <LinearLayout
+          android:id="@+id/fragment_settings_aboutus"
           android:layout_width="match_parent"
           android:layout_height="64dp"
           android:orientation="horizontal"
@@ -183,6 +186,7 @@
             />
       </LinearLayout>
       <LinearLayout
+          android:id="@+id/fragment_settings_terms"
           android:layout_width="match_parent"
           android:layout_height="64dp"
           android:orientation="horizontal"
@@ -211,6 +215,7 @@
             />
       </LinearLayout>
       <LinearLayout
+          android:id="@+id/fragment_settings_privacy"
           android:layout_width="match_parent"
           android:layout_height="64dp"
           android:orientation="horizontal"

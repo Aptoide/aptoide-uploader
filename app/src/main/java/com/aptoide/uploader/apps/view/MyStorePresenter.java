@@ -60,9 +60,11 @@ public class MyStorePresenter implements Presenter {
   }
 
   @Override public void present() {
-    showStoreAndApps();
+    showApps();
 
     showAvatarPath();
+
+    showStoreName();
 
     refreshStoreAndApps();
 
@@ -70,39 +72,74 @@ public class MyStorePresenter implements Presenter {
 
     handleOrderByEvent();
 
-    handleSignOutClick();
-
-    handlePositiveDialogClick();
+    handleSettingsClick();
 
     onDestroyDisposeComposite();
 
     checkUploadedApps();
   }
 
-  private void handlePositiveDialogClick() {
+  private void showApps() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(created -> view.positiveClick())
-        .flatMapCompletable(click -> storeManager.logout()
-            .observeOn(viewScheduler)
-            .doOnComplete(() -> autoLoginManager.checkAvailableFieldsAndNavigateTo(storeNavigator))
-            .andThen(setPersistenceStatusOnLogout())
-            .doOnError(throwable -> {
-              view.dismissDialog();
-              view.showError();
-            })
-            .retry())
-        .subscribe(() -> {
+        .flatMapSingle(__ -> storeManager.getStore())
+        .observeOn(viewScheduler)
+        .doOnNext(store -> view.showApps(store.getApps()))
+        .flatMap(__ -> checkUploadedApps())
+        .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
   }
 
-  private void handleSignOutClick() {
+  private void showStoreName() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> accountManager.getAccount()
+            .firstOrError()
+            .map(aptoideAccount -> aptoideAccount.getStoreName())
+            .toObservable())
+        .observeOn(viewScheduler)
+        .doOnNext(store -> view.showStoreName(store))
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void showAvatarPath() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> accountManager.getAccount()
+            .firstOrError()
+            .map(aptoideAccount -> aptoideAccount.getAvatarPath())
+            .toObservable())
+        .observeOn(viewScheduler)
+        .doOnNext(avatarPath -> view.showAvatar(avatarPath))
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void refreshStoreAndApps() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> view.refreshEvent()
+            .flatMapSingle(refreshEvent -> storeManager.getStore())
+            .doOnNext(refresh -> uploadManager.fillAppUploadStatusPersistence())
+            .observeOn(viewScheduler)
+            .doOnNext(store -> view.refreshApps(store.getApps()))
+            .flatMap(apps -> checkUploadedApps()))
+        .subscribe());
+  }
+
+  private void handleSettingsClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.logoutEvent())
-        .doOnNext(click -> view.showDialog())
+        .doOnNext(click -> storeNavigator.navigateToSettingsFragment())
+        .doOnNext(__ -> setPersistenceStatus())
         .subscribe(click -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -174,47 +211,6 @@ public class MyStorePresenter implements Presenter {
         }));
   }
 
-  private void showStoreAndApps() {
-    compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMapSingle(__ -> storeManager.getStore())
-        .observeOn(viewScheduler)
-        .doOnNext(store -> view.showStoreName(store.getName()))
-        .doOnNext(store -> view.showApps(store.getApps()))
-        .flatMap(__ -> checkUploadedApps())
-        .subscribe(__ -> {
-        }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
-        }));
-  }
-
-  private void showAvatarPath() {
-    compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> accountManager.getAccount()
-            .firstOrError()
-            .map(aptoideAccount -> aptoideAccount.getAvatarPath())
-            .toObservable())
-        .observeOn(viewScheduler)
-        .doOnNext(avatarPath -> view.showAvatar(avatarPath))
-        .subscribe(__ -> {
-        }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
-        }));
-  }
-
-  private void refreshStoreAndApps() {
-    compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(__ -> view.refreshEvent()
-            .flatMapSingle(refreshEvent -> storeManager.getStore())
-            .doOnNext(refresh -> uploadManager.fillAppUploadStatusPersistence())
-            .observeOn(viewScheduler)
-            .doOnNext(store -> view.refreshApps(store.getApps()))
-            .flatMap(apps -> checkUploadedApps()))
-        .subscribe());
-  }
-
   private Single<List<InstalledApp>> sort(List<InstalledApp> apps, SortingOrder sortingOrder) {
     if (sortingOrder.equals(SortingOrder.DATE)) {
       Collections.sort(apps,
@@ -257,7 +253,7 @@ public class MyStorePresenter implements Presenter {
     return !previousList.equals(currentList);
   }
 
-  private Completable setPersistenceStatusOnLogout() {
+  private Completable setPersistenceStatus() {
     return persistence.getAppsUploadStatus()
         .flatMap(apps -> Observable.fromIterable(apps)
             .doOnNext(app -> app.setStatus(AppUploadStatus.Status.UNKNOWN)))
