@@ -36,7 +36,7 @@ public interface MyStoreView extends View {
 
   void setSubmitButtonVisibility(boolean status);
 
-  Observable<Object> logoutEvent();
+  Observable<Object> goToSettings();
 
   Single<List<InstalledApp>> getSelectedApps();
 

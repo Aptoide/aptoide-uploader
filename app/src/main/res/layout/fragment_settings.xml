@@ -44,7 +44,7 @@
             android:paddingEnd="15dp"
             android:textAppearance="@style/AppTheme.Toolbar.Title"
             android:textColor="@color/white"
-            android:text="Settings"
+            android:text="@string/action_settings"
             />
       </LinearLayout>
     </androidx.appcompat.widget.Toolbar>
@@ -84,18 +84,17 @@
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_marginBottom="8dp"
-              android:textAppearance="@style/AppTheme.Toolbar.Title"
+              android:textSize="16sp"
               android:textColor="@color/black"
-              android:text="Settings"
               />
           <TextView
               android:id="@+id/fragment_settings_sign_out"
               android:layout_width="wrap_content"
               android:layout_height="wrap_content"
               android:layout_marginBottom="40dp"
-              android:textAppearance="@style/AppTheme.Toolbar.Title"
+              android:textSize="16sp"
               android:textColor="@color/dark_blue"
-              android:text="Sign out"
+              android:text="@string/signout"
               />
         </LinearLayout>
       </LinearLayout>
@@ -117,12 +116,14 @@
             android:layout_marginStart="16dp"
             android:layout_marginRight="16dp"
             android:layout_marginEnd="16dp"
+            android:src="@drawable/auto_upload_icon"
             />
         <TextView
             android:id="@+id/fragment_settings_autoupload_string"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/AppTheme.Toolbar.Title"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
             android:textColor="@color/black"
             android:text="Auto upload"
             />
@@ -151,7 +152,8 @@
             android:id="@+id/fragment_settings_feedback_string"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/AppTheme.Toolbar.Title"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
             android:textColor="@color/black"
             android:text="Send feedback"
             />
@@ -180,7 +182,8 @@
             android:id="@+id/fragment_settings_aboutus_string"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/AppTheme.Toolbar.Title"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
             android:textColor="@color/black"
             android:text="About us"
             />
@@ -209,7 +212,8 @@
             android:id="@+id/fragment_settings_terms_string"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/AppTheme.Toolbar.Title"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
             android:textColor="@color/black"
             android:text="Terms and Conditions"
             />
@@ -238,7 +242,8 @@
             android:id="@+id/fragment_settings_privacy_string"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="@style/AppTheme.Toolbar.Title"
+            android:layout_gravity="center_vertical"
+            android:textSize="16sp"
             android:textColor="@color/black"
             android:text="Privacy Policy"
             />

@@ -137,7 +137,7 @@ public class MyStorePresenter implements Presenter {
   private void handleSettingsClick() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMap(created -> view.logoutEvent())
+        .flatMap(created -> view.goToSettings())
         .doOnNext(click -> storeNavigator.navigateToSettingsFragment())
         .doOnNext(__ -> setPersistenceStatus())
         .subscribe(click -> {

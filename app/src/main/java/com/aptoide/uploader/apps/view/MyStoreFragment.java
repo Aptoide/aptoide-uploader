@@ -60,7 +60,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private TextView storeNameText;
   private ImageView profileAvatar;
   private Spinner spinner;
-  private MenuItem logoutItem;
+  private MenuItem settingsItem;
   private Toolbar toolbar;
   private RxAlertDialog logoutConfirmation;
   private View storeBanner;
@@ -88,12 +88,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     loadingSpinner = view.findViewById(R.id.loadingSPinner);
     toolbar = view.findViewById(R.id.fragment_my_apps_toolbar);
     toolbar.inflateMenu(R.menu.app_grid_menu);
-    logoutItem = toolbar.getMenu()
-        .findItem(R.id.logout_button);
-
-    SpannableString s = new SpannableString(getResources().getString(R.string.action_settings));
-    s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length(), 0);
-    logoutItem.setTitle(s);
+    settingsItem = toolbar.getMenu()
+        .findItem(R.id.settings_button);
 
     recyclerView = view.findViewById(R.id.fragment_my_apps_list);
     storeNameText = view.findViewById(R.id.fragment_my_apps_store_name);
@@ -157,7 +153,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     selectionObservable.dispose();
     logoutConfirmation.dismiss();
     logoutConfirmation = null;
-    logoutItem = null;
+    settingsItem = null;
     toolbar = null;
     Glide.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
@@ -349,8 +345,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     }
   }
 
-  @Override public Observable<Object> logoutEvent() {
-    return RxMenuItem.clicks(logoutItem)
+  @Override public Observable<Object> goToSettings() {
+    return RxMenuItem.clicks(settingsItem)
         .subscribeOn(AndroidSchedulers.mainThread())
         .unsubscribeOn(AndroidSchedulers.mainThread());
   }
@@ -432,10 +428,10 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private void setToolbarVisibility(boolean shouldShow) {
     if (shouldShow) {
       toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
-      logoutItem.setVisible(false);
+      settingsItem.setVisible(false);
     } else {
       toolbar.setNavigationIcon(null);
-      logoutItem.setVisible(true);
+      settingsItem.setVisible(true);
     }
   }
 }
