@@ -20,6 +20,8 @@ public interface SettingsView extends View {
 
   public Observable<DialogInterface> positiveClick();
 
+  public Observable<Object> backToMyStoreClick();
+
   public Observable<Object> autoUploadClick();
 
   public Observable<Object> sendFeedbackClick();

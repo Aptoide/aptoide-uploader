@@ -38,6 +38,7 @@ public class SettingsPresenter implements Presenter {
     handleSignOutClick();
     handlePositiveDialogClick();
 
+    handleBackButtonClick();
     handleAutoUploadClick();
     handleSendFeedbackClick();
     handleAboutUsClick();
@@ -100,6 +101,17 @@ public class SettingsPresenter implements Presenter {
             })
             .retry())
         .subscribe(() -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void handleBackButtonClick() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(created -> view.backToMyStoreClick())
+        .doOnNext(click -> settingsNavigator.navigateToMyStoreFragment())
+        .subscribe(click -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));

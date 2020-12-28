@@ -25,6 +25,7 @@ import io.reactivex.disposables.CompositeDisposable;
 import org.jetbrains.annotations.NotNull;
 
 public class SettingsFragment extends FragmentView implements SettingsView {
+  private ImageView backButton;
   private TextView signOut;
   private ImageView profileAvatar;
   private TextView storeNameText;
@@ -45,6 +46,7 @@ public class SettingsFragment extends FragmentView implements SettingsView {
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    backButton = view.findViewById(R.id.fragment_settings_back);
     profileAvatar = view.findViewById(R.id.fragment_settings_avatar);
     storeNameText = view.findViewById(R.id.fragment_settings_store_name);
     signOut = view.findViewById(R.id.fragment_settings_sign_out);
@@ -70,6 +72,7 @@ public class SettingsFragment extends FragmentView implements SettingsView {
   }
 
   @Override public void onDestroyView() {
+    backButton = null;
     profileAvatar = null;
     storeNameText = null;
     signOut = null;
@@ -132,6 +135,10 @@ public class SettingsFragment extends FragmentView implements SettingsView {
 
   @Override public Observable<DialogInterface> positiveClick() {
     return logoutConfirmation.positiveClicks();
+  }
+
+  @Override public Observable<Object> backToMyStoreClick() {
+    return RxView.clicks(backButton);
   }
 
   @Override public Observable<Object> autoUploadClick() {

@@ -42,6 +42,10 @@ class SettingsNavigator extends Navigator {
     navigateToWithoutBackSave(R.id.activity_main_container, fragment, true);
   }
 
+  public void navigateToMyStoreFragment() {
+    navigateToWithoutBackSave(R.id.activity_main_container, MyStoreFragment.newInstance(), true);
+  }
+
   private void navigateToWithoutBackSave(int containerId, Fragment fragment, boolean replace) {
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 
