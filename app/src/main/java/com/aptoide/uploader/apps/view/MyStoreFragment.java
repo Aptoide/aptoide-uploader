@@ -1,15 +1,10 @@
 package com.aptoide.uploader.apps.view;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
@@ -35,7 +30,6 @@ import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.permission.PermissionProvider;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
-import com.aptoide.uploader.view.Rx.RxAlertDialog;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.MemoryCategory;
@@ -62,7 +56,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private Spinner spinner;
   private MenuItem settingsItem;
   private Toolbar toolbar;
-  private RxAlertDialog logoutConfirmation;
   private View storeBanner;
   private View mainScreen;
   private Button submitButton;
@@ -115,13 +108,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     refreshEvent = PublishSubject.create();
     recyclerView.setAdapter(adapter);
     refreshLayout = view.findViewById(R.id.swipe_refresh);
-
-    logoutConfirmation = new RxAlertDialog.Builder(
-        new ContextThemeWrapper(getContext(), R.style.ConfirmationDialog)).setMessage(
-        R.string.logout_confirmation_message)
-        .setPositiveButton(R.string.yes)
-        .setNegativeButton(R.string.no)
-        .build();
     toolbar.setNavigationIcon(null);
     toolbar.setNavigationOnClickListener(click -> {
       adapter.clearAppsSelection();
@@ -151,8 +137,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView.setAdapter(null);
     recyclerView = null;
     selectionObservable.dispose();
-    logoutConfirmation.dismiss();
-    logoutConfirmation = null;
     settingsItem = null;
     toolbar = null;
     Glide.get(getContext())
@@ -253,22 +237,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
           .apply(RequestOptions.circleCropTransform())
           .into(profileAvatar);
     }
-  }
-
-  @Override public void showDialog() {
-    if (!logoutConfirmation.isShowing()) {
-      logoutConfirmation.show();
-    }
-  }
-
-  @Override public void dismissDialog() {
-    if (logoutConfirmation.isShowing()) {
-      logoutConfirmation.dismiss();
-    }
-  }
-
-  @Override public Observable<DialogInterface> positiveClick() {
-    return logoutConfirmation.positiveClicks();
   }
 
   @Override public void showError() {

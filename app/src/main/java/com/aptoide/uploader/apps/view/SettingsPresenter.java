@@ -118,6 +118,14 @@ public class SettingsPresenter implements Presenter {
   }
 
   private void handleAutoUploadClick() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(created -> view.autoUploadClick())
+        .doOnNext(click -> settingsNavigator.navigateToAutoUploadFragment())
+        .subscribe(click -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 
   private void handleSendFeedbackClick() {

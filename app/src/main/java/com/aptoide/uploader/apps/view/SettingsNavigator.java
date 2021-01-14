@@ -46,6 +46,17 @@ class SettingsNavigator extends Navigator {
     navigateToWithoutBackSave(R.id.activity_main_container, MyStoreFragment.newInstance(), true);
   }
 
+  public void navigateToAutoUploadFragment1() {
+    navigateToWithoutBackSave(R.id.activity_main_container, AutoUploadFragment.newInstance(), true);
+  }
+
+  public void navigateToAutoUploadFragment() {
+    fragmentManager.beginTransaction()
+        .replace(R.id.activity_main_container, AutoUploadFragment.newInstance())
+        .addToBackStack(String.valueOf(R.layout.fragment_settings))
+        .commit();
+  }
+
   private void navigateToWithoutBackSave(int containerId, Fragment fragment, boolean replace) {
     FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
 

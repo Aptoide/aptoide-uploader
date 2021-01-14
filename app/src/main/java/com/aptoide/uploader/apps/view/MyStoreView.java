@@ -1,6 +1,5 @@
 package com.aptoide.uploader.apps.view;
 
-import android.content.DialogInterface;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
@@ -19,12 +18,6 @@ public interface MyStoreView extends View {
   void showStoreName(@NotNull String storeName);
 
   void showAvatar(String avatarPath);
-
-  void showDialog();
-
-  void dismissDialog();
-
-  Observable<DialogInterface> positiveClick();
 
   void showError();
 
