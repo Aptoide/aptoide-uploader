@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
 import android.os.Bundle;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,10 +10,16 @@ import androidx.appcompat.widget.Toolbar;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import com.aptoide.uploader.R;
+import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.view.android.FragmentView;
+import io.reactivex.Observable;
 import io.reactivex.Single;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
@@ -20,7 +27,9 @@ import org.jetbrains.annotations.NotNull;
 public class AutoUploadFragment extends FragmentView implements AutoUploadView {
   private Toolbar toolbar;
   private RecyclerView recyclerView;
+  private SwipeRefreshLayout refreshLayout;
   private AutoUploadAppsAdapter adapter;
+  private PublishSubject<Boolean> refreshEvent;
 
   public static AutoUploadFragment newInstance() {
     return new AutoUploadFragment();
@@ -35,6 +44,18 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
         new DividerItemDecoration(getContext(), DividerItemDecoration.VERTICAL));
     adapter = new AutoUploadAppsAdapter(new ArrayList<>(), SortingOrder.DATE);
     recyclerView.setAdapter(adapter);
+    refreshLayout = view.findViewById(R.id.fragment_autoupload_swipe_refresh);
+    refreshEvent = PublishSubject.create();
+    refreshLayout.setOnRefreshListener(() -> refreshEvent.onNext(true));
+
+    toolbar.setNavigationOnClickListener(click -> {
+      adapter.clearAppsSelection();
+    });
+
+    new AutoUploadPresenter(this, new CompositeDisposable(), AndroidSchedulers.mainThread(),
+        ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
+        ((UploaderApplication) getContext().getApplicationContext()).getAppUploadStatusPersistence(),
+        ((UploaderApplication) getContext().getApplicationContext()).getUploadManager()).present();
   }
 
   @Override public void onDestroyView() {
@@ -53,12 +74,19 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
 
   @Override public void showApps(@NotNull List<InstalledApp> appsList) {
     adapter.setInstalledApps(appsList);
+    Log.d("APP-86", "AutoUploadFragment showApps: size" + adapter.getItemCount());
     recyclerView.scheduleLayoutAnimation();
+    recyclerView.setVisibility(View.VISIBLE);
   }
 
   @Override public void refreshApps(@NotNull List<InstalledApp> appsList) {
     adapter.refreshInstalledApps(appsList);
+    refreshLayout.setRefreshing(false);
     recyclerView.scheduleLayoutAnimation();
+  }
+
+  @Override public Observable<Boolean> refreshEvent() {
+    return refreshEvent;
   }
 
   @Override public Single<List<InstalledApp>> getSelectedApps() {

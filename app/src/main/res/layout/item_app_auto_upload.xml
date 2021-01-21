@@ -38,13 +38,10 @@
 
     <CheckBox
         android:id="@+id/fragment_autoupload_app_checkbox"
-        android:layout_width="18dp"
-        android:layout_height="18dp"
+        android:layout_width="25dp"
+        android:layout_height="25dp"
         android:layout_gravity="center_vertical"
-        android:layout_marginLeft="24dp"
-        android:layout_marginStart="24dp"
         android:layout_marginRight="24dp"
         android:layout_marginEnd="24dp"
-        android:onClick="onCheckboxClicked"
         />
 </LinearLayout>

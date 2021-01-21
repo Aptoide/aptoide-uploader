@@ -44,6 +44,7 @@
     </LinearLayout>
   </androidx.appcompat.widget.Toolbar>
   <LinearLayout
+      android:id="@+id/fragment_autoupload_infobar"
       android:layout_width="match_parent"
       android:layout_height="48dp"
       android:layout_marginTop="56dp">
@@ -60,14 +61,20 @@
         android:text="Select apps to be automatically uploaded">
     </TextView>
   </LinearLayout>
-  <androidx.recyclerview.widget.RecyclerView
-      android:id="@+id/fragment_autoupload_list"
+  <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
+      android:id="@+id/fragment_autoupload_swipe_refresh"
       android:layout_width="match_parent"
       android:layout_height="match_parent"
-      android:orientation="horizontal"
-      android:layout_marginTop="104dp">
-
-
-  </androidx.recyclerview.widget.RecyclerView>
+      android:layout_below="@id/fragment_autoupload_infobar"
+      >
+    <androidx.recyclerview.widget.RecyclerView
+        android:id="@+id/fragment_autoupload_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:layout_marginTop="104dp"
+        tools:listitem="@layout/item_app_auto_upload">
+    </androidx.recyclerview.widget.RecyclerView>
+  </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
 
 </RelativeLayout>

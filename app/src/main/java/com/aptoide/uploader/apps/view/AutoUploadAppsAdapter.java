@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -8,6 +9,7 @@ import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.InstalledApp;
 import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 
 public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppViewHolder> {
@@ -28,10 +30,11 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
 
   @Override public AutoUploadAppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     return new AutoUploadAppViewHolder(LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.item_app, parent, false), selectedAppListener);
+        .inflate(R.layout.item_app_auto_upload, parent, false), selectedAppListener);
   }
 
   @Override public void onBindViewHolder(AutoUploadAppViewHolder holder, int position) {
+    Log.d("APP-86", "onBindViewHolder: setting app in position " + position);
     holder.setApp(installedApps.get(position), selectedApps.contains(position));
   }
 
@@ -48,6 +51,8 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
       installedApps.clear();
       installedApps.addAll(appsList);
       clearAppsSelection(false);
+      setOrder(currentOrder);
+      notifyDataSetChanged();
     }
   }
 
@@ -55,6 +60,17 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     installedApps.clear();
     installedApps.addAll(appsList);
     clearAppsSelection(false);
+    setOrder(currentOrder);
+    notifyDataSetChanged();
+  }
+
+  public void setOrder(SortingOrder order) {
+    currentOrder = order;
+    if (order.equals(SortingOrder.DATE)) {
+      Collections.sort(installedApps,
+          (obj1, obj2) -> Long.compare(obj2.getInstalledDate(), obj1.getInstalledDate()));
+    }
+    selectedApps.clear();
   }
 
   public void setSelected(int position) {

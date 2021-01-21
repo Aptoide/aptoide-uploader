@@ -315,8 +315,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public Observable<Object> goToSettings() {
     return RxMenuItem.clicks(settingsItem)
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .unsubscribeOn(AndroidSchedulers.mainThread());
+        .subscribeOn(AndroidSchedulers.mainThread());
   }
 
   @Override public Single<List<InstalledApp>> getSelectedApps() {
