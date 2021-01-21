@@ -18,22 +18,37 @@ public class AutoUploadPresenter implements Presenter {
   private final StoreManager storeManager;
   private final AppUploadStatusPersistence persistence;
   private final UploadManager uploadManager;
+  private final AutoUploadNavigator autoUploadNavigator;
 
   public AutoUploadPresenter(AutoUploadView view, CompositeDisposable compositeDisposable,
       Scheduler viewScheduler, StoreManager storeManager, AppUploadStatusPersistence persistence,
-      UploadManager uploadManager) {
+      UploadManager uploadManager, AutoUploadNavigator autoUploadNavigator) {
     this.view = view;
     this.compositeDisposable = compositeDisposable;
     this.viewScheduler = viewScheduler;
     this.storeManager = storeManager;
     this.persistence = persistence;
     this.uploadManager = uploadManager;
+    this.autoUploadNavigator = autoUploadNavigator;
   }
 
   @Override public void present() {
+    handleBackButtonClick();
+
     showApps();
 
     refreshStoreAndApps();
+  }
+
+  private void handleBackButtonClick() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(created -> view.backToSettingsClick())
+        .doOnNext(click -> autoUploadNavigator.navigateToSettingsFragment())
+        .subscribe(click -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 
   private void showApps() {

@@ -8,6 +8,8 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public interface AutoUploadView extends View {
+  Observable<Object> backToSettingsClick();
+
   void showApps(@NotNull List<InstalledApp> appsList);
 
   void refreshApps(@NotNull List<InstalledApp> appsList);
