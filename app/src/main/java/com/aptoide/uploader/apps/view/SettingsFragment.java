@@ -36,6 +36,9 @@ public class SettingsFragment extends FragmentView implements SettingsView {
   private LinearLayout privacyPolicy;
   private RxAlertDialog logoutConfirmation;
 
+  public SettingsFragment() {
+  }
+
   public static SettingsFragment newInstance() {
     return new SettingsFragment();
   }

@@ -34,6 +34,9 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
   private AutoUploadAppsAdapter adapter;
   private PublishSubject<Boolean> refreshEvent;
 
+  public AutoUploadFragment() {
+  }
+
   public static AutoUploadFragment newInstance() {
     return new AutoUploadFragment();
   }
@@ -69,6 +72,8 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     backButton = null;
     recyclerView.setAdapter(null);
     recyclerView = null;
+    refreshLayout = null;
+    refreshEvent = null;
     adapter = null;
     super.onDestroyView();
   }

@@ -5,7 +5,6 @@ import android.net.Uri;
 import androidx.browser.customtabs.CustomTabsIntent;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentManager;
-import androidx.fragment.app.FragmentTransaction;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.account.Navigator;
 import com.aptoide.uploader.account.view.AutoLoginFragment;
@@ -29,44 +28,34 @@ class SettingsNavigator extends Navigator {
   }
 
   public void navigateToLoginFragment() {
-    navigateToWithoutBackSave(R.id.activity_main_container, LoginFragment.newInstance(), true);
+    navigateToWithoutBackSave(LoginFragment.newInstance());
   }
 
   public void navigateToAutoLoginFragment(String name, String avatarPath) {
     Fragment fragment = AutoLoginFragment.newInstance(name, avatarPath);
-    navigateToWithoutBackSave(R.id.activity_main_container, fragment, true);
+    navigateToWithoutBackSave(fragment);
   }
 
   public void navigateToAutoLoginFragment(String name) {
     Fragment fragment = AutoLoginFragment.newInstance(name, null);
-    navigateToWithoutBackSave(R.id.activity_main_container, fragment, true);
+    navigateToWithoutBackSave(fragment);
   }
 
   public void navigateToMyStoreFragment() {
-    navigateToWithoutBackSave(R.id.activity_main_container, MyStoreFragment.newInstance(), true);
+    navigateToWithoutBackSave(MyStoreFragment.newInstance());
   }
 
   public void navigateToAutoUploadFragment() {
-    navigateToWithoutBackSave(R.id.activity_main_container, AutoUploadFragment.newInstance(), false);
-  }
-
-  public void navigateToAutoUploadFragment1() {
     fragmentManager.beginTransaction()
-        .replace(R.id.activity_main_container, AutoUploadFragment.newInstance())
+        .add(R.id.activity_main_container, AutoUploadFragment.newInstance())
         .addToBackStack(String.valueOf(R.layout.fragment_settings))
-        .commit();
+        .commitAllowingStateLoss();
   }
 
-  private void navigateToWithoutBackSave(int containerId, Fragment fragment, boolean replace) {
-    FragmentTransaction fragmentTransaction = fragmentManager.beginTransaction();
-
-    if (replace) {
-      fragmentTransaction = fragmentTransaction.replace(containerId, fragment);
-    } else {
-      fragmentTransaction = fragmentTransaction.add(containerId, fragment);
-    }
-
-    fragmentTransaction.commit();
+  private void navigateToWithoutBackSave(Fragment fragment) {
+    fragmentManager.beginTransaction()
+        .replace(R.id.activity_main_container, fragment)
+        .commit();
   }
 
   public void openUrl(String url) {
