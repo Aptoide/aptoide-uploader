@@ -60,6 +60,8 @@ public class MyStorePresenter implements Presenter {
   }
 
   @Override public void present() {
+    checkFirstRun();
+
     showApps();
 
     showAvatarPath();
@@ -77,6 +79,17 @@ public class MyStorePresenter implements Presenter {
     onDestroyDisposeComposite();
 
     checkUploadedApps();
+  }
+
+  private void checkFirstRun() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .doOnNext(__ -> view.checkFirstRun())
+        .observeOn(viewScheduler)
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 
   private void showApps() {

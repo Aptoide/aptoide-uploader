@@ -9,6 +9,8 @@ import org.jetbrains.annotations.NotNull;
 
 public interface MyStoreView extends View {
 
+  void checkFirstRun();
+
   void showApps(@NotNull List<InstalledApp> appsList);
 
   void refreshApps(@NotNull List<InstalledApp> appsList);

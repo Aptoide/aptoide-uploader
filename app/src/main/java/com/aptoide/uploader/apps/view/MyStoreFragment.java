@@ -6,7 +6,6 @@ import android.content.pm.PackageManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -34,7 +33,6 @@ import com.aptoide.uploader.view.android.FragmentView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.MemoryCategory;
 import com.bumptech.glide.request.RequestOptions;
-import com.jakewharton.rxbinding2.view.RxMenuItem;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import io.reactivex.Observable;
@@ -50,11 +48,13 @@ import org.jetbrains.annotations.NotNull;
 public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   private GridRecyclerView recyclerView;
+  private ImageView featuretip_background;
+  private TextView featuretip_rectangle;
   private MyAppsAdapter adapter;
   private TextView storeNameText;
   private ImageView profileAvatar;
   private Spinner spinner;
-  private MenuItem settingsItem;
+  private Button settingsItem;
   private Toolbar toolbar;
   private View storeBanner;
   private View mainScreen;
@@ -78,12 +78,12 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    featuretip_background = view.findViewById(R.id.featuretip_background);
+    featuretip_rectangle = view.findViewById(R.id.featuretip_rectangle);
     loadingSpinner = view.findViewById(R.id.loadingSPinner);
     toolbar = view.findViewById(R.id.fragment_my_apps_toolbar);
     toolbar.inflateMenu(R.menu.app_grid_menu);
-    settingsItem = toolbar.getMenu()
-        .findItem(R.id.settings_button);
-
+    settingsItem = view.findViewById(R.id.settings_button);
     recyclerView = view.findViewById(R.id.fragment_my_apps_list);
     storeNameText = view.findViewById(R.id.fragment_my_apps_store_name);
     profileAvatar = view.findViewById(R.id.fragment_my_apps_profile_avatar);
@@ -91,7 +91,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     mainScreen = view.findViewById(R.id.grid_view_and_hint);
     storeBanner = view.findViewById(R.id.store_info);
     submitButton = view.findViewById(R.id.submit_button);
-    toolbar = view.findViewById(R.id.fragment_my_apps_toolbar);
     prepareSpinner(R.array.sort_spinner_array);
     setUpSubmitButtonAnimation();
     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
@@ -158,6 +157,25 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
           new Intent(Intent.ACTION_VIEW, Uri.parse("https://en.aptoide.com/store/" + storeName));
       sendIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
       startActivity(sendIntent);
+    }
+  }
+
+  @Override public void checkFirstRun() {
+    boolean isFirstRun = getContext().getSharedPreferences("PREFERENCE", 0)
+        .getBoolean("isFirstRun", true);
+    if (isFirstRun) {
+      featuretip_background.setVisibility(View.VISIBLE);
+      featuretip_rectangle.setVisibility(View.VISIBLE);
+      featuretip_background.setOnClickListener(new View.OnClickListener() {
+        public void onClick(View v) {
+          featuretip_background.setVisibility(View.GONE);
+          featuretip_rectangle.setVisibility(View.GONE);
+        }
+      });
+      getContext().getSharedPreferences("PREFERENCE", 0)
+          .edit()
+          .putBoolean("isFirstRun", false)
+          .apply();
     }
   }
 
@@ -314,7 +332,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   }
 
   @Override public Observable<Object> goToSettings() {
-    return RxMenuItem.clicks(settingsItem)
+    return RxView.clicks(settingsItem)
         .subscribeOn(AndroidSchedulers.mainThread());
   }
 
@@ -395,10 +413,10 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private void setToolbarVisibility(boolean shouldShow) {
     if (shouldShow) {
       toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
-      settingsItem.setVisible(false);
+      settingsItem.setVisibility(View.GONE);
     } else {
       toolbar.setNavigationIcon(null);
-      settingsItem.setVisible(true);
+      settingsItem.setVisibility(View.VISIBLE);
     }
   }
 }

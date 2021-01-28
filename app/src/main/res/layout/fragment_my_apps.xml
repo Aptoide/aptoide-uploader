@@ -6,6 +6,7 @@
     android:layout_height="match_parent"
     android:background="@color/white"
     >
+
   <FrameLayout
       android:id="@+id/regular_screen"
       android:layout_width="match_parent"
@@ -22,7 +23,6 @@
         android:visibility="visible"
         tools:visibility="gone"
         />
-
 
     <LinearLayout
         android:id="@+id/grid_view_and_hint"
@@ -141,6 +141,49 @@
       </LinearLayout>
 
     </androidx.appcompat.widget.Toolbar>
+
+    <ImageButton
+        android:id="@+id/featuretip_background"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/black_80_opacity"
+        android:visibility="gone"
+        >
+    </ImageButton>
+
+    <TextView
+        android:id="@+id/featuretip_rectangle"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:paddingRight="16dp"
+        android:paddingEnd="16dp"
+        android:paddingLeft="16dp"
+        android:paddingStart="16dp"
+        android:paddingTop="16dp"
+        android:paddingBottom="16dp"
+        android:layout_marginTop="60dp"
+        android:layout_marginEnd="16dp"
+        android:layout_marginRight="16dp"
+        android:layout_gravity="end"
+        android:text="Discover Auto upload"
+        android:textColor="@color/black"
+        android:textSize="14sp"
+        android:background="@drawable/tooltip_rectangle"
+        android:visibility="gone"
+        />
+
+    <Button
+        android:id="@+id/settings_button"
+        android:layout_height="40dp"
+        android:layout_width="40dp"
+        android:title="@string/action_settings"
+        android:background="@drawable/settings"
+        android:layout_gravity="end"
+        android:layout_marginTop="10dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginEnd="10dp"
+        >
+    </Button>
 
   </FrameLayout>
   <Button
