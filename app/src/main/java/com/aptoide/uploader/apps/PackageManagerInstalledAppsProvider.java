@@ -1,15 +1,11 @@
 package com.aptoide.uploader.apps;
 
-import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.os.Environment;
 import android.util.Log;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
-import java.io.File;
-import java.util.Arrays;
 import java.util.List;
 
 public class PackageManagerInstalledAppsProvider implements InstalledAppsProvider {
@@ -28,8 +24,9 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
         .filter(applicationInfo -> applicationInfo.packageName != null)
         .map(applicationInfo -> {
           PackageInfo packageInfo = packageManager.getPackageInfo(applicationInfo.packageName, 0);
-          return new InstalledApp(packageInfo,packageManager);
+          return new InstalledAppBuilder(packageInfo, packageManager).getInstalledApp();
         })
+        .filter(app -> !app.isSystem())
         .toList()
         .doOnSuccess(installedApps -> Log.d("nzxt", String.valueOf(installedApps.size())))
         .subscribeOn(scheduler);
@@ -40,7 +37,7 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
         () -> packageManager.getApplicationInfo(packageName, PackageManager.GET_META_DATA))
         .map(info -> {
           PackageInfo packageInfo = packageManager.getPackageInfo(info.packageName, 0);
-          return new InstalledApp(packageInfo,packageManager);
+          return new InstalledAppBuilder(packageInfo, packageManager).getInstalledApp();
         });
   }
 }

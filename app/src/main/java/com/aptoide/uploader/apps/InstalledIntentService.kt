@@ -43,7 +43,6 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
   }
 
   override fun onDestroy() {
-    //compositeDisposable.dispose()
     Log.d("APP-85", "onDestroy: InstalledIntentService")
     super.onDestroy()
   }
@@ -68,7 +67,8 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
     if (checkNullPackageInfo(packageInfo)) {
       return packageInfo
     }
-    val installed = InstalledApp(packageInfo, packageManager)
+    val installed = InstalledAppBuilder(packageInfo,
+        packageManager).installedApp
     compositeDisposable.add(installManager.onAppInstalled(installed)
         .subscribe({
         }, { throwable -> throwable.printStackTrace() }))
@@ -76,12 +76,14 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
   }
 
   private fun databaseOnPackageReplaced(packageName: String): PackageInfo {
-    val packageInfo: PackageInfo = myPackageManager.getPackageInfo(applicationInfo.packageName, 0);
+    val packageInfo: PackageInfo = myPackageManager.getPackageInfo(packageName, 0);
     if (checkNullPackageInfo(packageInfo)) {
       return packageInfo
     }
     compositeDisposable.add(
-        installManager.onUpdateConfirmed(InstalledApp(packageInfo, packageManager))
+        installManager.onUpdateConfirmed(
+            InstalledAppBuilder(packageInfo,
+                packageManager).installedApp)
             .subscribe({
             }, { throwable -> throwable.printStackTrace() }))
     return packageInfo

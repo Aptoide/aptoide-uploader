@@ -97,12 +97,23 @@ public class UploaderApplication extends Application {
     startFlurryAgent();
     initializeRakam();
     getUploadManager().start();
-    refreshInstalledApps();
+    checkFirstRun();
+  }
+
+  public void checkFirstRun() {
+    boolean isFirstRun = this.getSharedPreferences("PREFERENCE", 0)
+        .getBoolean("isFirstRun", true);
+    if (isFirstRun) {
+      refreshInstalledApps();
+      this.getSharedPreferences("PREFERENCE", 0)
+          .edit()
+          .putBoolean("isFirstRun", false)
+          .apply();
+    }
   }
 
   private void refreshInstalledApps() {
-    getInstallManager();
-    compositeDisposable.add(installManager.insertAllInstalled()
+    compositeDisposable.add(getInstallManager().insertAllInstalled()
         .subscribe(() -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -131,7 +142,7 @@ public class UploaderApplication extends Application {
   public InstallManager getInstallManager() {
     if (installManager == null) {
       RoomInstalledPersistence roomInstalledPersistence = new RoomInstalledPersistence(
-          AppUploadsDatabase.getInstance(getApplicationContext())
+          AppUploadsDatabase.getInstance(this)
               .installedDao());
       installManager =
           new InstallManager(new InstalledRepository(roomInstalledPersistence, getPackageManager()),

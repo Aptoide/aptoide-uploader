@@ -10,6 +10,8 @@ interface InstalledPersistence {
   fun allInstalledSorted(): Observable<MutableList<InstalledApp>>
 
   fun remove(packageName: String, versionCode: Int): Completable
+  fun removeAllPackageVersions(packageName: String): Completable
+
   fun getInstalled(packageName: String, versionCode: Int): Observable<InstalledApp>
 
   fun insert(installed: InstalledApp): Completable

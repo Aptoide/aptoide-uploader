@@ -21,6 +21,10 @@ interface InstalledDao {
   fun remove(packageName: String, versionCode: Int): Completable
 
   @Query(
+      "DELETE FROM Installed where packageName = :packageName")
+  fun removeAllPackageVersions(packageName: String): Completable
+
+  @Query(
       "SELECT * FROM Installed where packageName = :packageName AND versionCode = :versionCode LIMIT 1")
   fun getInstalled(packageName: String,
                    versionCode: Int): Observable<InstalledApp>

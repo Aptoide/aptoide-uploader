@@ -1,18 +1,13 @@
 package com.aptoide.uploader.apps;
 
 import android.content.pm.ApplicationInfo;
-import android.content.pm.PackageInfo;
-import android.content.pm.PackageManager;
 import android.os.Build;
-import android.os.Environment;
 import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
 import androidx.room.Entity;
 import androidx.room.Ignore;
 import androidx.room.PrimaryKey;
-import java.io.File;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
@@ -23,12 +18,11 @@ import org.jetbrains.annotations.NotNull;
   private String name;
   private String versionName;
   private int versionCode;
-  private boolean isSystemApp;
+  private boolean isSystem;
   private String apkPath;
   private String iconPath;
   private long installedDate;
-  @Ignore private Obb obbMain;
-  @Ignore private Obb obbPatch;
+  private List<Obb> obbList;
   private boolean isUploaded;
   private int status;
   @Ignore private ApplicationInfo appInfo;
@@ -36,23 +30,29 @@ import org.jetbrains.annotations.NotNull;
   public InstalledApp() {
   }
 
-  public InstalledApp(PackageInfo packageInfo, PackageManager packageManager) {
-    setAppInfo(packageInfo.applicationInfo);
-    setPackageAndVersionCode(packageInfo.packageName + packageInfo.versionCode);
-    setPackageName(packageInfo.packageName);
-    setName(appInfo.loadLabel(packageManager)
-        .toString());
-    setVersionName(packageInfo.versionName);
-    setVersionCode(packageInfo.versionCode);
-    setIsSystemApp((appInfo.flags & appInfo.FLAG_SYSTEM) != 0);
-    setApkPath(appInfo.sourceDir);
-    setIconPath(
-        "android.resource://" + packageInfo.packageName + "/" + packageInfo.applicationInfo.icon);
-    setInstalledDate(packageInfo.lastUpdateTime);
-    setIsUploaded(false);
-    setObbMain(getMainObb(packageName));
-    setObbPatch(getPatchObb(packageName));
-    setStatus(STATUS_COMPLETED);
+  public InstalledApp(ApplicationInfo applicationInfo, String packageAndVersionCode,
+      String packageName, String name, String versionName, int versionCode, boolean isSystem,
+      String apkPath, String iconPath, long lastUpdateTime, boolean isUploaded, Obb obbMain,
+      Obb obbPatch) {
+    this.appInfo = applicationInfo;
+    this.packageAndVersionCode = packageAndVersionCode;
+    this.packageName = packageName;
+    this.name = name;
+    this.versionName = versionName;
+    this.versionCode = versionCode;
+    this.isSystem = isSystem;
+    this.apkPath = apkPath;
+    this.iconPath = iconPath;
+    this.installedDate = lastUpdateTime;
+    this.isUploaded = isUploaded;
+    this.obbList.add(0, obbMain);
+    this.obbList.add(1, obbPatch);
+    this.status = STATUS_COMPLETED;
+
+    if (packageName.equals("com.tencent.ig")) {
+      //Log.d("APP-85", "printObb: packageName "+packageName+" - obbMain "+obbMain);
+      //Log.d("APP-85", "printObb: packageName "+packageName+" - obbPatch "+obbPatch);
+    }
   }
 
   @NonNull public String getPackageAndVersionCode() {
@@ -95,12 +95,12 @@ import org.jetbrains.annotations.NotNull;
     this.versionCode = versionCode;
   }
 
-  public boolean isSystemApp() {
-    return isSystemApp;
+  public boolean isSystem() {
+    return isSystem;
   }
 
-  public void setIsSystemApp(boolean systemApp) {
-    this.isSystemApp = systemApp;
+  public void setIsSystem(boolean systemApp) {
+    this.isSystem = systemApp;
   }
 
   public String getApkPath() {
@@ -128,19 +128,11 @@ import org.jetbrains.annotations.NotNull;
   }
 
   public Obb getObbMain() {
-    return obbMain;
-  }
-
-  public void setObbMain(Obb obbMain) {
-    this.obbMain = obbMain;
+    return obbList.get(0);
   }
 
   public Obb getObbPatch() {
-    return obbPatch;
-  }
-
-  public void setObbPatch(Obb obbPatch) {
-    this.obbPatch = obbPatch;
+    return obbList.get(1);
   }
 
   public boolean isUploaded() {
@@ -167,89 +159,50 @@ import org.jetbrains.annotations.NotNull;
     this.appInfo = appInfo;
   }
 
-  private Obb getMainObb(String packageName) {
-    String sdcard = Environment.getExternalStorageDirectory()
-        .getAbsolutePath();
-    File obbDir = new File(sdcard + "/Android/obb/" + packageName + "/");
-    if (obbDir.isDirectory()) {
-      File[] files = obbDir.listFiles();
-      if (files != null) {
-        Arrays.sort(files, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
-        for (File file : files) {
-          if (file.getName()
-              .contains("main") && !file.getName()
-              .contains("--downloading")) {
-            String obbMainPath = file.getAbsolutePath();
-            return new Obb(obbMainPath.substring(obbMainPath.lastIndexOf("/") + 1), null,
-                obbMainPath);
-          }
-        }
-      }
-    }
-    return null;
-  }
-
-  private Obb getPatchObb(String packageName) {
-    String sdcard = Environment.getExternalStorageDirectory()
-        .getAbsolutePath();
-    File obbDir = new File(sdcard + "/Android/obb/" + packageName + "/");
-    if (obbDir.isDirectory()) {
-      File[] files = obbDir.listFiles();
-      if (files != null) {
-        Arrays.sort(files, (f1, f2) -> Long.compare(f2.lastModified(), f1.lastModified()));
-        for (File file : files) {
-          String arr[] = file.getName()
-              .split("\\.", 2);
-          if (arr[0].equals("patch") && !file.getName()
-              .contains("--downloading")) {
-            String obbPatchPath = file.getAbsolutePath();
-            return new Obb(obbPatchPath.substring(obbPatchPath.lastIndexOf("/") + 1), null,
-                obbPatchPath);
-          }
-        }
-      }
-    }
-    return null;
-  }
-
   public String getObbMainPath() {
-    if (obbMain != null) {
-      return obbMain.getPath();
+    if (obbList.get(0) != null) {
+      return obbList.get(0)
+          .getPath();
     }
     return null;
   }
 
   public String getObbMainMd5() {
-    if (obbMain != null) {
-      return obbMain.getMd5sum();
+    if (obbList.get(0) != null) {
+      return obbList.get(0)
+          .getMd5sum();
     }
     return null;
   }
 
   public String getObbMainFilename() {
-    if (obbMain != null) {
-      return obbMain.getFilename();
+    if (obbList.get(0) != null) {
+      return obbList.get(0)
+          .getFilename();
     }
     return null;
   }
 
   public String getObbPatchPath() {
-    if (obbPatch != null) {
-      return obbPatch.getPath();
+    if (obbList.get(1) != null) {
+      return obbList.get(1)
+          .getPath();
     }
     return null;
   }
 
   public String getObbPatchMd5() {
-    if (obbPatch != null) {
-      return obbPatch.getMd5sum();
+    if (obbList.get(1) != null) {
+      return obbList.get(1)
+          .getMd5sum();
     }
     return null;
   }
 
   public String getObbPatchFilename() {
-    if (obbPatch != null) {
-      return obbPatch.getFilename();
+    if (obbList.get(1) != null) {
+      return obbList.get(1)
+          .getFilename();
     }
     return null;
   }
@@ -270,15 +223,12 @@ import org.jetbrains.annotations.NotNull;
     return "InstalledApp{" + "packageName='" + packageName + '\'' + '}';
   }
 
-  public List<String> getObbList() {
-    List<String> list = new ArrayList<>();
-    if (getObbMainPath() != null) {
-      list.add(getObbMainPath());
-    }
-    if (getObbPatchPath() != null) {
-      list.add(getObbPatchPath());
-    }
-    return list;
+  public List<Obb> getObbList() {
+    return this.obbList;
+  }
+
+  public void setObbList(List<Obb> obbList) {
+    this.obbList = obbList;
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP) public List<FileToUpload> getSplits() {

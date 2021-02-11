@@ -41,4 +41,11 @@ class InstalledRepository(private val installedPersistence: RoomInstalledPersist
     return installedPersistence.remove(packageName, versionCode)
   }
 
+  fun removeAll(): Completable {
+    return installedPersistence.removeAll()
+  }
+
+  fun removeAllPackageVersions(packageName: String): Completable {
+    return installedPersistence.removeAllPackageVersions(packageName)
+  }
 }

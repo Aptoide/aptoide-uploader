@@ -23,6 +23,11 @@ class RoomInstalledPersistence(private val installedDao: InstalledDao) :
         .subscribeOn(Schedulers.io())
   }
 
+  override fun removeAllPackageVersions(packageName: String): Completable {
+    return installedDao.removeAllPackageVersions(packageName)
+        .subscribeOn(Schedulers.io())
+  }
+
   override fun getInstalled(packageName: String, versionCode: Int): Observable<InstalledApp> {
     return installedDao.getInstalled(packageName, versionCode)
         .subscribeOn(Schedulers.io())
@@ -44,6 +49,12 @@ class RoomInstalledPersistence(private val installedDao: InstalledDao) :
     return Completable.fromAction {
       installedDao.removeAll()
       installedDao.insertAll(list)
+    }.subscribeOn(Schedulers.io())
+  }
+
+  fun removeAll(): Completable {
+    return Completable.fromAction {
+      installedDao.removeAll()
     }.subscribeOn(Schedulers.io())
   }
 
