@@ -48,11 +48,6 @@ import org.jetbrains.annotations.NotNull;
     this.obbList.add(0, obbMain);
     this.obbList.add(1, obbPatch);
     this.status = STATUS_COMPLETED;
-
-    if (packageName.equals("com.tencent.ig")) {
-      //Log.d("APP-85", "printObb: packageName "+packageName+" - obbMain "+obbMain);
-      //Log.d("APP-85", "printObb: packageName "+packageName+" - obbPatch "+obbPatch);
-    }
   }
 
   @NonNull public String getPackageAndVersionCode() {

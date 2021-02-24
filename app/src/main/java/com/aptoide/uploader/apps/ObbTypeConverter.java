@@ -1,18 +1,22 @@
 package com.aptoide.uploader.apps;
 
 import androidx.room.TypeConverter;
-import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
+import com.squareup.moshi.JsonAdapter;
+import com.squareup.moshi.Moshi;
+import java.io.IOException;
+import java.lang.reflect.Type;
 import java.util.List;
 
 public class ObbTypeConverter {
 
-  @TypeConverter public static List<Obb> restoreObbList(String listOfString) {
-    return new Gson().fromJson(listOfString, new TypeToken<List<Obb>>() {
-    }.getType());
+  private static final Moshi moshi = new Moshi.Builder().build();
+  private static final JsonAdapter<List<Obb>> jsonAdapter = moshi.adapter((Type) Obb.class);
+
+  @TypeConverter public static List<Obb> restoreObbList(String listOfString) throws IOException {
+    return jsonAdapter.fromJson(listOfString);
   }
 
   @TypeConverter public static String saveObbList(List<Obb> listOfString) {
-    return new Gson().toJson(listOfString);
+    return jsonAdapter.toJson(listOfString);
   }
 }
