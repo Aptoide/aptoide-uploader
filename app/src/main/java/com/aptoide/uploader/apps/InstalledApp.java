@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
   private String apkPath;
   private String iconPath;
   private long installedDate;
-  private List<Obb> obbList;
+  private List<Obb> obbList = new ArrayList<>();
   private boolean isUploaded;
   private int status;
   @Ignore private ApplicationInfo appInfo;
