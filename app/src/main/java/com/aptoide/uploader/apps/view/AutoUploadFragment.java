@@ -5,6 +5,9 @@ import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.ImageView;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
@@ -21,6 +24,7 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
 import java.util.List;
@@ -33,6 +37,10 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
   private SwipeRefreshLayout refreshLayout;
   private AutoUploadAppsAdapter adapter;
   private PublishSubject<Boolean> refreshEvent;
+  private Button submitButton;
+  private Disposable selectionObservable;
+  private Animation slideBottomDown;
+  private Animation slideBottomUp;
 
   public AutoUploadFragment() {
   }
@@ -45,6 +53,7 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     super.onViewCreated(view, savedInstanceState);
     toolbar = view.findViewById(R.id.fragment_autoupload_toolbar);
     backButton = view.findViewById(R.id.fragment_autoupload_back);
+    submitButton = view.findViewById(R.id.submit_autoupload_button);
     recyclerView = view.findViewById(R.id.fragment_autoupload_list);
     recyclerView.setLayoutManager(new LinearLayoutManager(getContext()));
     recyclerView.addItemDecoration(
@@ -54,7 +63,8 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     refreshLayout = view.findViewById(R.id.fragment_autoupload_swipe_refresh);
     refreshEvent = PublishSubject.create();
     refreshLayout.setOnRefreshListener(() -> refreshEvent.onNext(true));
-
+    setUpSubmitButtonAnimation();
+    setUpSelectionListener();
     toolbar.setNavigationOnClickListener(click -> {
       adapter.clearAppsSelection();
     });
@@ -75,6 +85,7 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     refreshLayout = null;
     refreshEvent = null;
     adapter = null;
+    selectionObservable.dispose();
     super.onDestroyView();
   }
 
@@ -107,5 +118,52 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
 
   @Override public Single<List<InstalledApp>> getSelectedApps() {
     return Single.just(adapter.getSelected());
+  }
+
+  public void setSubmitButtonVisibility(boolean appsSelected) {
+    if (appsSelected) {
+      submitButton.startAnimation(slideBottomUp);
+    } else {
+      submitButton.startAnimation(slideBottomDown);
+    }
+  }
+
+  private void setUpSelectionListener() {
+    selectionObservable = adapter.toggleSelection()
+        .distinctUntilChanged()
+        .doOnNext(appsSelected -> setSubmitButtonVisibility(appsSelected))
+        .subscribe();
+  }
+
+  public void setUpSubmitButtonAnimation() {
+
+    final Animation.AnimationListener showBottom = new Animation.AnimationListener() {
+      @Override public void onAnimationStart(Animation animation) {
+        submitButton.setVisibility(View.VISIBLE);
+      }
+
+      @Override public void onAnimationEnd(Animation animation) {
+      }
+
+      @Override public void onAnimationRepeat(Animation animation) {
+      }
+    };
+
+    final Animation.AnimationListener hideBottom = new Animation.AnimationListener() {
+      @Override public void onAnimationStart(Animation animation) {
+        submitButton.setVisibility(View.GONE);
+      }
+
+      @Override public void onAnimationEnd(Animation animation) {
+      }
+
+      @Override public void onAnimationRepeat(Animation animation) {
+      }
+    };
+
+    slideBottomDown = AnimationUtils.loadAnimation(getContext(), R.anim.slide_bottom_down);
+    slideBottomUp = AnimationUtils.loadAnimation(getContext(), R.anim.slide_bottom_up);
+    slideBottomUp.setAnimationListener(showBottom);
+    slideBottomDown.setAnimationListener(hideBottom);
   }
 }

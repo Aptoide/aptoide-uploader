@@ -14,14 +14,19 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
+import com.aptoide.uploader.apps.InstalledApp;
+import com.aptoide.uploader.glide.GlideApp;
 import com.aptoide.uploader.view.Rx.RxAlertDialog;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.jakewharton.rxbinding2.view.RxView;
 import io.reactivex.Observable;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.CompositeDisposable;
+import java.util.ArrayList;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public class SettingsFragment extends FragmentView implements SettingsView {
@@ -30,11 +35,16 @@ public class SettingsFragment extends FragmentView implements SettingsView {
   private ImageView profileAvatar;
   private TextView storeNameText;
   private LinearLayout autoUpload;
+  private ImageView selectedApp1;
+  private ImageView selectedApp2;
+  private ImageView selectedApp3;
+  private TextView selectedAppsExtra;
   private LinearLayout sendFeedback;
   private LinearLayout aboutUs;
   private LinearLayout termsConditions;
   private LinearLayout privacyPolicy;
   private RxAlertDialog logoutConfirmation;
+  private List<ImageView> imageViewList;
 
   public SettingsFragment() {
   }
@@ -54,6 +64,10 @@ public class SettingsFragment extends FragmentView implements SettingsView {
     storeNameText = view.findViewById(R.id.fragment_settings_store_name);
     signOut = view.findViewById(R.id.fragment_settings_sign_out);
     autoUpload = view.findViewById(R.id.fragment_settings_autoupload);
+    selectedApp1 = view.findViewById(R.id.fragment_settings_app_1);
+    selectedApp2 = view.findViewById(R.id.fragment_settings_app_2);
+    selectedApp3 = view.findViewById(R.id.fragment_settings_app_3);
+    selectedAppsExtra = view.findViewById(R.id.fragment_settings_apps_extra);
     sendFeedback = view.findViewById(R.id.fragment_settings_feedback);
     aboutUs = view.findViewById(R.id.fragment_settings_aboutus);
     termsConditions = view.findViewById(R.id.fragment_settings_terms);
@@ -80,6 +94,10 @@ public class SettingsFragment extends FragmentView implements SettingsView {
     storeNameText = null;
     signOut = null;
     autoUpload = null;
+    selectedApp1 = null;
+    selectedApp2 = null;
+    selectedApp3 = null;
+    selectedAppsExtra = null;
     sendFeedback = null;
     aboutUs = null;
     termsConditions = null;
@@ -138,6 +156,40 @@ public class SettingsFragment extends FragmentView implements SettingsView {
 
   @Override public Observable<DialogInterface> positiveClick() {
     return logoutConfirmation.positiveClicks();
+  }
+
+  @Override public void showSelectedApps(@NotNull List<InstalledApp> appsList) {
+    int SELECTED_APPS_IMAGES_NUMBER = 3;
+    if (appsList.size() < SELECTED_APPS_IMAGES_NUMBER) {
+      selectedAppsExtra.setVisibility(View.GONE);
+    } else {
+      int extraNumber = appsList.size() - SELECTED_APPS_IMAGES_NUMBER;
+      String extraNumberString = "+" + extraNumber;
+      selectedAppsExtra.setText(extraNumberString);
+      selectedAppsExtra.setVisibility(View.VISIBLE);
+    }
+    addToImageViewList();
+    setSelectedAppsImages(appsList, SELECTED_APPS_IMAGES_NUMBER);
+  }
+
+  private void addToImageViewList() {
+    imageViewList = new ArrayList<>();
+    imageViewList.add(selectedApp1);
+    imageViewList.add(selectedApp2);
+    imageViewList.add(selectedApp3);
+  }
+
+  private void setSelectedAppsImages(@NotNull List<InstalledApp> appsList, int imagesNumber) {
+    int size1 = Math.min(appsList.size(), imagesNumber);
+    int size = 2;
+    for (int i = 0; i != size; i++) {
+      GlideApp.with(this)
+          .load(appsList.get(i))
+          .transition(DrawableTransitionOptions.withCrossFade())
+          .into(imageViewList.get(i));
+      imageViewList.get(i)
+          .setVisibility(View.VISIBLE);
+    }
   }
 
   @Override public Observable<Object> backToMyStoreClick() {

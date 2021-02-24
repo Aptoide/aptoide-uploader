@@ -7,6 +7,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.InstalledApp;
+import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -44,6 +45,10 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
 
   @Override public int getItemCount() {
     return installedApps.size();
+  }
+
+  public Observable<Boolean> toggleSelection() {
+    return selectedPublisher;
   }
 
   public void setInstalledApps(List<InstalledApp> appsList) {

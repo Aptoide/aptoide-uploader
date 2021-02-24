@@ -76,5 +76,15 @@
         tools:listitem="@layout/item_app_auto_upload">
     </androidx.recyclerview.widget.RecyclerView>
   </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+  <Button
+      android:id="@+id/submit_autoupload_button"
+      android:layout_width="match_parent"
+      android:layout_height="68dp"
+      android:layout_alignParentBottom="true"
+      android:background="@color/light_blue_appbar"
+      android:gravity="center"
+      android:text="Confirm"
+      android:visibility="gone"
+      />
 
 </RelativeLayout>

@@ -2,12 +2,14 @@ package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
+import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
+import java.util.ArrayList;
 
 public class SettingsPresenter implements Presenter {
 
@@ -18,6 +20,7 @@ public class SettingsPresenter implements Presenter {
   private final AptoideAccountManager accountManager;
   private final StoreManager storeManager;
   private final SettingsNavigator settingsNavigator;
+  private ArrayList<InstalledApp> test = new ArrayList<>();
 
   public SettingsPresenter(CompositeDisposable compositeDisposable, SettingsView view,
       Scheduler viewScheduler, AutoLoginManager autoLoginManager,
@@ -37,7 +40,7 @@ public class SettingsPresenter implements Presenter {
     showStoreName();
     handleSignOutClick();
     handlePositiveDialogClick();
-
+    showSelectedApps();
     handleBackButtonClick();
     handleAutoUploadClick();
     handleSendFeedbackClick();
@@ -112,6 +115,16 @@ public class SettingsPresenter implements Presenter {
         .flatMap(created -> view.backToMyStoreClick())
         .doOnNext(click -> settingsNavigator.navigateToMyStoreFragment())
         .subscribe(click -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void showSelectedApps() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .doOnNext(__ -> view.showSelectedApps(test))
+        .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));

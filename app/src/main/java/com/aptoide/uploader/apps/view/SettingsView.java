@@ -1,8 +1,10 @@
 package com.aptoide.uploader.apps.view;
 
 import android.content.DialogInterface;
+import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
+import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public interface SettingsView extends View {
@@ -19,6 +21,8 @@ public interface SettingsView extends View {
   public void showError();
 
   public Observable<DialogInterface> positiveClick();
+
+  public void showSelectedApps(@NotNull List<InstalledApp> appsList);
 
   public Observable<Object> backToMyStoreClick();
 
