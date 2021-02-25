@@ -19,9 +19,12 @@ import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
 import com.aptoide.uploader.apps.AppUploadStatusManager;
 import com.aptoide.uploader.apps.CategoriesManager;
+import com.aptoide.uploader.apps.InstallManager;
+import com.aptoide.uploader.apps.InstalledRepository;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
+import com.aptoide.uploader.apps.RoomInstalledPersistence;
 import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
@@ -54,6 +57,8 @@ import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
 import io.rakam.api.Rakam;
 import io.rakam.api.RakamClient;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.exceptions.OnErrorNotImplementedException;
 import io.reactivex.schedulers.Schedulers;
 import io.reactivex.subjects.PublishSubject;
 import java.net.MalformedURLException;
@@ -68,9 +73,11 @@ import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
 import retrofit2.converter.moshi.MoshiConverterFactory;
 
 public class UploaderApplication extends Application {
+  private final CompositeDisposable compositeDisposable = new CompositeDisposable();
   private AptoideAccountManager accountManager;
   private StoreManager storeManager;
   private UploadManager uploadManager;
+  private InstallManager installManager;
   private LanguageManager languageManager;
   private AuthenticationProvider authenticationProvider;
   private AptoideAuthenticationRx aptoideAuthenticationRx;
@@ -90,6 +97,27 @@ public class UploaderApplication extends Application {
     startFlurryAgent();
     initializeRakam();
     getUploadManager().start();
+    checkFirstRun();
+  }
+
+  public void checkFirstRun() {
+    boolean isFirstRun = this.getSharedPreferences("PREFERENCE", 0)
+        .getBoolean("isFirstRun", true);
+    if (isFirstRun) {
+      refreshInstalledApps();
+      this.getSharedPreferences("PREFERENCE", 0)
+          .edit()
+          .putBoolean("isFirstRun", false)
+          .apply();
+    }
+  }
+
+  private void refreshInstalledApps() {
+    compositeDisposable.add(getInstallManager().insertAllInstalled()
+        .subscribe(() -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 
   public UploadManager getUploadManager() {
@@ -109,6 +137,18 @@ public class UploaderApplication extends Application {
           getDraftPersistence());
     }
     return uploadManager;
+  }
+
+  public InstallManager getInstallManager() {
+    if (installManager == null) {
+      RoomInstalledPersistence roomInstalledPersistence = new RoomInstalledPersistence(
+          AppUploadsDatabase.getInstance(this)
+              .installedDao());
+      installManager =
+          new InstallManager(new InstalledRepository(roomInstalledPersistence, getPackageManager()),
+              getPackageManagerInstalledAppsProvider());
+    }
+    return installManager;
   }
 
   public OkHttpClient.Builder buildOkHttpClient() {
