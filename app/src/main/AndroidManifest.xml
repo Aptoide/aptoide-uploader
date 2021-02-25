@@ -61,6 +61,16 @@
     </activity>
 
     <service android:name=".NotificationService" />
+    <receiver android:name=".apps.InstalledBroadcastReceiver">
+      <intent-filter android:priority="999">
+        <action android:name="android.intent.action.PACKAGE_ADDED" />
+        <action android:name="android.intent.action.PACKAGE_REMOVED" />
+        <action android:name="android.intent.action.PACKAGE_REPLACED" />
+
+        <data android:scheme="package" />
+      </intent-filter>
+    </receiver>
+    <service android:name=".apps.InstalledIntentService" />
   </application>
 
 </manifest>

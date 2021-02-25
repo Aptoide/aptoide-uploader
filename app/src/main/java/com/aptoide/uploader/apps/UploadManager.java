@@ -395,6 +395,7 @@ public class UploadManager {
                     .flatMapSingle(appUploadStatuses -> Observable.fromIterable(appUploadStatuses)
                         .toList())
                     .flatMap(appUploadStatuses -> appUploadStatusManager.getApks(appUploadStatuses))
+                    .doOnNext(appUploadStatuses -> Log.d("nzxt", "checkAppUploadStatus: after get APKs -> size " + appUploadStatuses.size()))
                     .flatMapCompletable(
                         appUploadStatuses -> appUploadStatusPersistence.saveAll(appUploadStatuses))
                     .toObservable());

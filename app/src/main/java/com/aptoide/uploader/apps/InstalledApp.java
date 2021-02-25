@@ -2,90 +2,204 @@ package com.aptoide.uploader.apps;
 
 import android.content.pm.ApplicationInfo;
 import android.os.Build;
+import androidx.annotation.NonNull;
 import androidx.annotation.RequiresApi;
+import androidx.room.Entity;
+import androidx.room.Ignore;
+import androidx.room.PrimaryKey;
 import java.util.ArrayList;
 import java.util.List;
+import org.jetbrains.annotations.NotNull;
 
-public class InstalledApp {
-
-  private final String name;
-  private final boolean isSystem;
-  private final String packageName;
-  private final String apkPath;
-  private final long installedDate;
-  private final int versionCode;
-  private final Obb obbMain;
-  private final Obb obbPatch;
+@Entity(tableName = "installed") public class InstalledApp {
+  @Ignore public static final int STATUS_COMPLETED = 4;
+  @PrimaryKey @NonNull private String packageAndVersionCode;
+  private String packageName;
+  private String name;
+  private String versionName;
+  private int versionCode;
+  private boolean isSystem;
+  private String apkPath;
+  private String iconPath;
+  private long installedDate;
+  private List<Obb> obbList = new ArrayList<>();
   private boolean isUploaded;
-  private ApplicationInfo appInfo;
+  private int status;
+  @Ignore private ApplicationInfo appInfo;
 
-  public InstalledApp(ApplicationInfo appInfo, String name, boolean isSystem, String packageName,
-      String apkPath, long installedDate, int versionCode, boolean isUploaded, Obb obbMain,
+  public InstalledApp() {
+  }
+
+  public InstalledApp(ApplicationInfo applicationInfo, String packageAndVersionCode,
+      String packageName, String name, String versionName, int versionCode, boolean isSystem,
+      String apkPath, String iconPath, long lastUpdateTime, boolean isUploaded, Obb obbMain,
       Obb obbPatch) {
-    this.appInfo = appInfo;
-    this.name = name;
-    this.isSystem = isSystem;
+    this.appInfo = applicationInfo;
+    this.packageAndVersionCode = packageAndVersionCode;
     this.packageName = packageName;
-    this.apkPath = apkPath;
-    this.installedDate = installedDate;
+    this.name = name;
+    this.versionName = versionName;
     this.versionCode = versionCode;
+    this.isSystem = isSystem;
+    this.apkPath = apkPath;
+    this.iconPath = iconPath;
+    this.installedDate = lastUpdateTime;
     this.isUploaded = isUploaded;
-    this.obbMain = obbMain;
-    this.obbPatch = obbPatch;
+    this.obbList.add(0, obbMain);
+    this.obbList.add(1, obbPatch);
+    this.status = STATUS_COMPLETED;
   }
 
-  public String getObbMainPath() {
-    if (obbMain != null) {
-      return obbMain.getPath();
-    }
-    return null;
+  @NonNull public String getPackageAndVersionCode() {
+    return packageAndVersionCode;
   }
 
-  public String getObbMainMd5() {
-    if (obbMain != null) {
-      return obbMain.getMd5sum();
-    }
-    return null;
+  public void setPackageAndVersionCode(@NotNull String packageAndVersionCode) {
+    this.packageAndVersionCode = packageAndVersionCode;
   }
 
-  public String getObbMainFilename() {
-    if (obbMain != null) {
-      return obbMain.getFilename();
-    }
-    return null;
+  public String getPackageName() {
+    return packageName;
   }
 
-  public String getObbPatchPath() {
-    if (obbPatch != null) {
-      return obbPatch.getPath();
-    }
-    return null;
-  }
-
-  public String getObbPatchMd5() {
-    if (obbPatch != null) {
-      return obbPatch.getMd5sum();
-    }
-    return null;
-  }
-
-  public String getObbPatchFilename() {
-    if (obbPatch != null) {
-      return obbPatch.getFilename();
-    }
-    return null;
+  public void setPackageName(String packageName) {
+    this.packageName = packageName;
   }
 
   public String getName() {
     return name;
   }
 
+  public void setName(String name) {
+    this.name = name;
+  }
+
+  public String getVersionName() {
+    return versionName;
+  }
+
+  public void setVersionName(String versionName) {
+    this.versionName = versionName;
+  }
+
+  public int getVersionCode() {
+    return versionCode;
+  }
+
+  public void setVersionCode(int versionCode) {
+    this.versionCode = versionCode;
+  }
+
   public boolean isSystem() {
     return isSystem;
   }
 
-  public String getPackageName() {
-    return packageName;
+  public void setIsSystem(boolean systemApp) {
+    this.isSystem = systemApp;
+  }
+
+  public String getApkPath() {
+    return apkPath;
+  }
+
+  public void setApkPath(String apkPath) {
+    this.apkPath = apkPath;
+  }
+
+  public String getIconPath() {
+    return iconPath;
+  }
+
+  public void setIconPath(String icon) {
+    this.iconPath = icon;
+  }
+
+  public long getInstalledDate() {
+    return installedDate;
+  }
+
+  public void setInstalledDate(long installedDate) {
+    this.installedDate = installedDate;
+  }
+
+  public Obb getObbMain() {
+    return obbList.get(0);
+  }
+
+  public Obb getObbPatch() {
+    return obbList.get(1);
+  }
+
+  public boolean isUploaded() {
+    return isUploaded;
+  }
+
+  public void setIsUploaded(boolean uploaded) {
+    isUploaded = uploaded;
+  }
+
+  public int getStatus() {
+    return status;
+  }
+
+  public void setStatus(int status) {
+    this.status = status;
+  }
+
+  public ApplicationInfo getAppInfo() {
+    return appInfo;
+  }
+
+  public void setAppInfo(ApplicationInfo appInfo) {
+    this.appInfo = appInfo;
+  }
+
+  public String getObbMainPath() {
+    if (obbList.get(0) != null) {
+      return obbList.get(0)
+          .getPath();
+    }
+    return null;
+  }
+
+  public String getObbMainMd5() {
+    if (obbList.get(0) != null) {
+      return obbList.get(0)
+          .getMd5sum();
+    }
+    return null;
+  }
+
+  public String getObbMainFilename() {
+    if (obbList.get(0) != null) {
+      return obbList.get(0)
+          .getFilename();
+    }
+    return null;
+  }
+
+  public String getObbPatchPath() {
+    if (obbList.get(1) != null) {
+      return obbList.get(1)
+          .getPath();
+    }
+    return null;
+  }
+
+  public String getObbPatchMd5() {
+    if (obbList.get(1) != null) {
+      return obbList.get(1)
+          .getMd5sum();
+    }
+    return null;
+  }
+
+  public String getObbPatchFilename() {
+    if (obbList.get(1) != null) {
+      return obbList.get(1)
+          .getFilename();
+    }
+    return null;
   }
 
   @Override public int hashCode() {
@@ -97,7 +211,6 @@ public class InstalledApp {
     if (o == null || getClass() != o.getClass()) return false;
 
     InstalledApp that = (InstalledApp) o;
-
     return packageName.equals(that.packageName);
   }
 
@@ -105,39 +218,12 @@ public class InstalledApp {
     return "InstalledApp{" + "packageName='" + packageName + '\'' + '}';
   }
 
-  public String getApkPath() {
-    return apkPath;
+  public List<Obb> getObbList() {
+    return this.obbList;
   }
 
-  public long getInstalledDate() {
-    return installedDate;
-  }
-
-  public int getVersionCode() {
-    return versionCode;
-  }
-
-  public boolean isUploaded() {
-    return isUploaded;
-  }
-
-  public void setIsUploaded(boolean value) {
-    isUploaded = value;
-  }
-
-  public ApplicationInfo getAppInfo() {
-    return appInfo;
-  }
-
-  public List<String> getObbList() {
-    List<String> list = new ArrayList<>();
-    if (getObbMainPath() != null) {
-      list.add(getObbMainPath());
-    }
-    if (getObbPatchPath() != null) {
-      list.add(getObbPatchPath());
-    }
-    return list;
+  public void setObbList(List<Obb> obbList) {
+    this.obbList = obbList;
   }
 
   @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP) public List<FileToUpload> getSplits() {
