@@ -6,6 +6,7 @@ import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.aptoide.uploader.R;
+import com.aptoide.uploader.apps.AutoUploadSelects;
 import com.aptoide.uploader.apps.InstalledApp;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -16,13 +17,16 @@ import java.util.List;
 public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppViewHolder> {
 
   private final List<InstalledApp> installedApps;
+  private final List<AutoUploadSelects> autoUploadSelects;
   private final List<Integer> selectedApps;
   private final AppSelectedListener selectedAppListener;
   private final PublishSubject<Boolean> selectedPublisher;
   private SortingOrder currentOrder;
 
-  public AutoUploadAppsAdapter(@NonNull List<InstalledApp> list, SortingOrder currentOrder) {
+  public AutoUploadAppsAdapter(@NonNull List<InstalledApp> list,
+      List<AutoUploadSelects> autoUploadSelects, SortingOrder currentOrder) {
     this.installedApps = list;
+    this.autoUploadSelects = autoUploadSelects;
     this.currentOrder = currentOrder;
     this.selectedApps = new ArrayList<>();
     this.selectedAppListener = (view, position) -> setSelected(position);
@@ -35,7 +39,6 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
   }
 
   @Override public void onBindViewHolder(AutoUploadAppViewHolder holder, int position) {
-    Log.d("APP-86", "onBindViewHolder: setting app in position " + position);
     holder.setApp(installedApps.get(position), selectedApps.contains(position));
   }
 
@@ -51,6 +54,24 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     return selectedPublisher;
   }
 
+  public void getPreviousSavedSelection(List<String> selectedPackageNames) {
+    for (int i = 0; i < installedApps.size(); i++) {
+      InstalledApp app = installedApps.get(i);
+      for (String packageName : selectedPackageNames) {
+        if (app.getPackageName()
+            .equals(packageName)) {
+          setSelected(i);
+        }
+      }
+    }
+  }
+
+  public void setInstalledAndSelectedApps(List<InstalledApp> appsList,
+      List<AutoUploadSelects> selectedList) {
+    setInstalledApps(appsList);
+    setAutoUploadSelectsApps(selectedList);
+  }
+
   public void setInstalledApps(List<InstalledApp> appsList) {
     if (!appsList.equals(installedApps)) {
       installedApps.clear();
@@ -61,12 +82,14 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     }
   }
 
-  public void refreshInstalledApps(List<InstalledApp> appsList) {
-    installedApps.clear();
-    installedApps.addAll(appsList);
-    clearAppsSelection(false);
-    setOrder(currentOrder);
-    notifyDataSetChanged();
+  public void setAutoUploadSelectsApps(List<AutoUploadSelects> selectsList) {
+    if (!selectsList.equals(autoUploadSelects)) {
+      autoUploadSelects.clear();
+      autoUploadSelects.addAll(selectsList);
+      clearAppsSelection(false);
+      setOrder(currentOrder);
+      notifyDataSetChanged();
+    }
   }
 
   public void setOrder(SortingOrder order) {
@@ -81,11 +104,7 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
   public void setSelected(int position) {
     if (selectedApps.contains(position)) {
       selectedApps.remove((Integer) position);
-      if (selectedApps.size() == 0) {
-        selectedPublisher.onNext(false);
-      } else {
-        selectedPublisher.onNext(true);
-      }
+      selectedPublisher.onNext(selectedApps.size() != 0);
     } else {
       selectedApps.add(position);
       selectedPublisher.onNext(true);
@@ -107,6 +126,30 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     if (notify) {
       notifyDataSetChanged();
     }
+  }
+
+  public List<AutoUploadSelects> saveSelectedOnSubmit(List<InstalledApp> selectedApps) {
+    Log.d("APP-86",
+        "AutoUploadAdapter: saveSelectedOnSubmit: installedApps size " + installedApps.size());
+    for (int i = 0; i < autoUploadSelects.size(); i++) {
+      boolean setted = false;
+      for (InstalledApp selectedApp : selectedApps) {
+        if (autoUploadSelects.get(i)
+            .getPackageName()
+            .equals(selectedApp.getPackageName())) {
+          autoUploadSelects.get(i)
+              .setSelectedAutoUpload(true);
+          setted = true;
+        }
+      }
+      if (!setted) {
+        autoUploadSelects.get(i)
+            .setSelectedAutoUpload(false);
+      }
+    }
+    Log.d("APP-86",
+        "AutoUploadAdapter: saveSelectedOnSubmit: end - list size: " + autoUploadSelects.size());
+    return autoUploadSelects;
   }
 
   public void clearAppsSelection() {

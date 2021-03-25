@@ -2,14 +2,14 @@ package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
-import com.aptoide.uploader.apps.InstalledApp;
+import com.aptoide.uploader.apps.InstalledAppsManager;
 import com.aptoide.uploader.apps.StoreManager;
+import com.aptoide.uploader.apps.persistence.InstalledPersistence;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
 import io.reactivex.exceptions.OnErrorNotImplementedException;
-import java.util.ArrayList;
 
 public class SettingsPresenter implements Presenter {
 
@@ -20,12 +20,14 @@ public class SettingsPresenter implements Presenter {
   private final AptoideAccountManager accountManager;
   private final StoreManager storeManager;
   private final SettingsNavigator settingsNavigator;
-  private ArrayList<InstalledApp> test = new ArrayList<>();
+  private final InstalledPersistence persistence;
+  private final InstalledAppsManager installedAppsManager;
 
   public SettingsPresenter(CompositeDisposable compositeDisposable, SettingsView view,
       Scheduler viewScheduler, AutoLoginManager autoLoginManager,
       AptoideAccountManager accountManager, StoreManager storeManager,
-      SettingsNavigator settingsNavigator) {
+      SettingsNavigator settingsNavigator, InstalledPersistence persistence,
+      InstalledAppsManager installedAppsManager) {
     this.compositeDisposable = compositeDisposable;
     this.view = view;
     this.viewScheduler = viewScheduler;
@@ -33,6 +35,8 @@ public class SettingsPresenter implements Presenter {
     this.accountManager = accountManager;
     this.storeManager = storeManager;
     this.settingsNavigator = settingsNavigator;
+    this.persistence = persistence;
+    this.installedAppsManager = installedAppsManager;
   }
 
   @Override public void present() {
@@ -123,7 +127,9 @@ public class SettingsPresenter implements Presenter {
   private void showSelectedApps() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .doOnNext(__ -> view.showSelectedApps(test))
+        .flatMap(__ -> installedAppsManager.getSelectedInstalledApps())
+        .observeOn(viewScheduler)
+        .doOnNext(selectedApps -> view.showSelectedApps(selectedApps))
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);

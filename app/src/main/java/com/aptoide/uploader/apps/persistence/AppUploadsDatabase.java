@@ -6,13 +6,14 @@ import androidx.room.Room;
 import androidx.room.RoomDatabase;
 import androidx.room.TypeConverters;
 import com.aptoide.uploader.apps.AppUploadStatus;
+import com.aptoide.uploader.apps.AutoUploadSelects;
 import com.aptoide.uploader.apps.InstalledApp;
-import com.aptoide.uploader.apps.InstalledDao;
 import com.aptoide.uploader.apps.ObbTypeConverter;
 
-@Database(entities = { AppUploadStatus.class , InstalledApp.class }, version = 1)
-@TypeConverters({ ObbTypeConverter.class})
-public abstract class AppUploadsDatabase extends RoomDatabase {
+@Database(entities = {
+    AppUploadStatus.class, InstalledApp.class, AutoUploadSelects.class
+}, version = 1) @TypeConverters({ ObbTypeConverter.class }) public abstract class AppUploadsDatabase
+    extends RoomDatabase {
   private static volatile AppUploadsDatabase INSTANCE;
 
   public static AppUploadsDatabase getInstance(Context context) {
@@ -31,4 +32,6 @@ public abstract class AppUploadsDatabase extends RoomDatabase {
   public abstract AppUploadStatusDao appUploadsStatusDao();
 
   public abstract InstalledDao installedDao();
+
+  public  abstract AutoUploadSelectsDao autoUploadSelectsDao();
 }
