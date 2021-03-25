@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import android.net.Uri;
 import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
@@ -15,10 +16,10 @@ public class AutoUploadAppViewHolder extends RecyclerView.ViewHolder
     implements View.OnClickListener {
 
   private final AppSelectedListener listener;
-  private ImageView appIcon;
-  private TextView appName;
-  private CheckBox checkBox;
-  private View background;
+  private final ImageView appIcon;
+  private final TextView appName;
+  private final CheckBox checkBox;
+  private final View background;
 
   public AutoUploadAppViewHolder(View itemView, AppSelectedListener listener) {
     super(itemView);
@@ -31,9 +32,9 @@ public class AutoUploadAppViewHolder extends RecyclerView.ViewHolder
   }
 
   public void setApp(InstalledApp app, boolean selected) {
-    Log.d("APP-86", "setApp: setapp " + app.getName());
+    Log.d("APP-86", "AutoUploadAppViewHolder: setApp: " + app.getName());
     GlideApp.with(itemView)
-        .load(app.getAppInfo())
+        .load(Uri.parse(app.getIconPath()))
         .transition(DrawableTransitionOptions.withCrossFade())
         .into(appIcon);
     appName.setText(app.getName());

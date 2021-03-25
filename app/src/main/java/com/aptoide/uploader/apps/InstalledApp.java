@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-@Entity(tableName = "installed") public class InstalledApp {
+@Entity(tableName = "Installed") public class InstalledApp {
   @Ignore public static final int STATUS_COMPLETED = 4;
   @PrimaryKey @NonNull private String packageAndVersionCode;
   private String packageName;
@@ -22,7 +22,7 @@ import org.jetbrains.annotations.NotNull;
   private String apkPath;
   private String iconPath;
   private long installedDate;
-  private List<Obb> obbList = new ArrayList<>();
+  @Ignore private List<Obb> obbList = new ArrayList<>();
   private boolean isUploaded;
   private int status;
   @Ignore private ApplicationInfo appInfo;

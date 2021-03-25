@@ -18,13 +18,14 @@ import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
 import com.aptoide.uploader.apps.AppUploadStatusManager;
+import com.aptoide.uploader.apps.AutoUploadSelectsManager;
 import com.aptoide.uploader.apps.CategoriesManager;
 import com.aptoide.uploader.apps.InstallManager;
+import com.aptoide.uploader.apps.InstalledAppsManager;
 import com.aptoide.uploader.apps.InstalledRepository;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
-import com.aptoide.uploader.apps.RoomInstalledPersistence;
 import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
@@ -41,6 +42,8 @@ import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.AppUploadsDatabase;
 import com.aptoide.uploader.apps.persistence.DraftPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
+import com.aptoide.uploader.apps.persistence.RoomAutoUploadSelectsPersistence;
+import com.aptoide.uploader.apps.persistence.RoomInstalledPersistence;
 import com.aptoide.uploader.apps.persistence.RoomUploadStatusDataSource;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
 import com.aptoide.uploader.security.AuthenticationPersistance;
@@ -78,12 +81,16 @@ public class UploaderApplication extends Application {
   private StoreManager storeManager;
   private UploadManager uploadManager;
   private InstallManager installManager;
+  private AutoUploadSelectsManager autoUploadSelectsManager;
+  private InstalledAppsManager installedAppsManager;
   private LanguageManager languageManager;
   private AuthenticationProvider authenticationProvider;
   private AptoideAuthenticationRx aptoideAuthenticationRx;
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
   private AppUploadStatusPersistence appUploadStatusPersistence;
+  private RoomInstalledPersistence roomInstalledPersistence;
+  private RoomAutoUploadSelectsPersistence roomAutoUploadSelectsPersistence;
   private DraftPersistence draftPersistence;
   private AppUploadStatusManager appUploadStatusManager;
   private UploaderAnalytics uploaderAnalytics;
@@ -105,6 +112,7 @@ public class UploaderApplication extends Application {
         .getBoolean("isFirstRun", true);
     if (isFirstRun) {
       refreshInstalledApps();
+      refreshAutoUploadSelection();
       this.getSharedPreferences("PREFERENCE", 0)
           .edit()
           .putBoolean("isFirstRun", false)
@@ -114,6 +122,14 @@ public class UploaderApplication extends Application {
 
   private void refreshInstalledApps() {
     compositeDisposable.add(getInstallManager().insertAllInstalled()
+        .subscribe(() -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void refreshAutoUploadSelection() {
+    compositeDisposable.add(getAutoUploadSelectsManager().insertAllInstalled()
         .subscribe(() -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -139,16 +155,49 @@ public class UploaderApplication extends Application {
     return uploadManager;
   }
 
+  public RoomInstalledPersistence getInstalledPersistence() {
+    if (roomInstalledPersistence == null) {
+      roomInstalledPersistence = new RoomInstalledPersistence(AppUploadsDatabase.getInstance(this)
+          .installedDao());
+    }
+    return roomInstalledPersistence;
+  }
+
+  public RoomAutoUploadSelectsPersistence getAutoUploadSelectsPersistence() {
+    if (roomAutoUploadSelectsPersistence == null) {
+      roomAutoUploadSelectsPersistence = new RoomAutoUploadSelectsPersistence(
+          AppUploadsDatabase.getInstance(this)
+              .autoUploadSelectsDao()) {
+      };
+    }
+    return roomAutoUploadSelectsPersistence;
+  }
+
   public InstallManager getInstallManager() {
     if (installManager == null) {
-      RoomInstalledPersistence roomInstalledPersistence = new RoomInstalledPersistence(
-          AppUploadsDatabase.getInstance(this)
-              .installedDao());
-      installManager =
-          new InstallManager(new InstalledRepository(roomInstalledPersistence, getPackageManager()),
-              getPackageManagerInstalledAppsProvider());
+      installManager = new InstallManager(
+          new InstalledRepository(getInstalledPersistence(), getPackageManager()),
+          getPackageManagerInstalledAppsProvider());
     }
     return installManager;
+  }
+
+  public AutoUploadSelectsManager getAutoUploadSelectsManager() {
+    if (autoUploadSelectsManager == null) {
+      autoUploadSelectsManager =
+          new AutoUploadSelectsManager(getAutoUploadSelectsPersistence(), getPackageManager());
+    }
+    return autoUploadSelectsManager;
+  }
+
+  public InstalledAppsManager getInstalledAppsManager() {
+    if (installedAppsManager == null) {
+
+      installedAppsManager =
+          new InstalledAppsManager(getInstalledPersistence(), getAppUploadStatusPersistence(),
+              getAutoUploadSelectsPersistence(), Schedulers.io());
+    }
+    return installedAppsManager;
   }
 
   public OkHttpClient.Builder buildOkHttpClient() {

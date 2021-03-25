@@ -8,31 +8,31 @@ import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 public interface SettingsView extends View {
-  public void showAvatar(String avatarPath);
+  void showAvatar(String avatarPath);
 
-  public void showStoreName(@NotNull String storeName);
+  void showStoreName(@NotNull String storeName);
 
-  public Observable<Object> signOutClick();
+  Observable<Object> signOutClick();
 
-  public void showDialog();
+  void showDialog();
 
-  public void dismissDialog();
+  void dismissDialog();
 
-  public void showError();
+  void showError();
 
-  public Observable<DialogInterface> positiveClick();
+  Observable<DialogInterface> positiveClick();
 
-  public void showSelectedApps(@NotNull List<InstalledApp> appsList);
+  void showSelectedApps(@NotNull List<InstalledApp> appsList);
 
-  public Observable<Object> backToMyStoreClick();
+  Observable<Object> backToMyStoreClick();
 
-  public Observable<Object> autoUploadClick();
+  Observable<Object> autoUploadClick();
 
-  public Observable<Object> sendFeedbackClick();
+  Observable<Object> sendFeedbackClick();
 
-  public Observable<Object> aboutUsClick();
+  Observable<Object> aboutUsClick();
 
-  public Observable<Object> termsConditionsClick();
+  Observable<Object> termsConditionsClick();
 
-  public Observable<Object> privacyPolicyClick();
+  Observable<Object> privacyPolicyClick();
 }

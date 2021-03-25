@@ -19,6 +19,7 @@ import com.aptoide.uploader.glide.GlideApp;
 import com.aptoide.uploader.view.Rx.RxAlertDialog;
 import com.aptoide.uploader.view.android.FragmentView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.MemoryCategory;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -84,8 +85,9 @@ public class SettingsFragment extends FragmentView implements SettingsView {
         ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager(),
         ((UploaderApplication) getContext().getApplicationContext()).getAccountManager(),
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
-        new SettingsNavigator(getFragmentManager(),
-            getContext().getApplicationContext())).present();
+        new SettingsNavigator(getFragmentManager(), getContext().getApplicationContext()),
+        ((UploaderApplication) getContext().getApplicationContext()).getInstalledPersistence(),
+        ((UploaderApplication) getContext().getApplicationContext()).getInstalledAppsManager()).present();
   }
 
   @Override public void onDestroyView() {
@@ -104,12 +106,16 @@ public class SettingsFragment extends FragmentView implements SettingsView {
     privacyPolicy = null;
     logoutConfirmation.dismiss();
     logoutConfirmation = null;
+    Glide.get(getContext())
+        .setMemoryCategory(MemoryCategory.NORMAL);
     super.onDestroyView();
   }
 
   @Nullable @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
+    Glide.get(getContext())
+        .setMemoryCategory(MemoryCategory.HIGH);
     return inflater.inflate(R.layout.fragment_settings, container, false);
   }
 
@@ -160,7 +166,7 @@ public class SettingsFragment extends FragmentView implements SettingsView {
 
   @Override public void showSelectedApps(@NotNull List<InstalledApp> appsList) {
     int SELECTED_APPS_IMAGES_NUMBER = 3;
-    if (appsList.size() < SELECTED_APPS_IMAGES_NUMBER) {
+    if (appsList.size() <= SELECTED_APPS_IMAGES_NUMBER) {
       selectedAppsExtra.setVisibility(View.GONE);
     } else {
       int extraNumber = appsList.size() - SELECTED_APPS_IMAGES_NUMBER;
@@ -180,11 +186,11 @@ public class SettingsFragment extends FragmentView implements SettingsView {
   }
 
   private void setSelectedAppsImages(@NotNull List<InstalledApp> appsList, int imagesNumber) {
-    int size1 = Math.min(appsList.size(), imagesNumber);
-    int size = 2;
+    int size = Math.min(appsList.size(), imagesNumber);
     for (int i = 0; i != size; i++) {
       GlideApp.with(this)
-          .load(appsList.get(i))
+          .load(Uri.parse(appsList.get(i)
+              .getIconPath()))
           .transition(DrawableTransitionOptions.withCrossFade())
           .into(imageViewList.get(i));
       imageViewList.get(i)

@@ -25,8 +25,6 @@ public class InstalledAppBuilder {
     String sdcard = Environment.getExternalStorageDirectory()
         .getAbsolutePath();
     File obbDir = new File(sdcard + "/Android/obb/" + packageName + "/");
-    boolean canRead = obbDir.canRead();
-    boolean isEmpty = obbDir.listFiles() == null;
     if (obbDir.isDirectory()) {
       File[] files = obbDir.listFiles();
 

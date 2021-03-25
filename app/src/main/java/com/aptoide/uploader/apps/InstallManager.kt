@@ -7,7 +7,7 @@ class InstallManager(private val installedRepository: InstalledRepository,
                      private val packageManagerInstalledAppsProvider: PackageManagerInstalledAppsProvider) {
 
   fun insertAllInstalled(): Completable {
-    return packageManagerInstalledAppsProvider.installedApps
+    return packageManagerInstalledAppsProvider.nonSystemInstalledApps
         .doOnError { throwable -> Log.e("APP-85", "Error " + throwable.printStackTrace()) }
         .flatMapCompletable { installed ->
           Log.d("APP-85", "insertAllInstalled: installedApps size " + installed.size)

@@ -3,6 +3,7 @@ package com.aptoide.uploader.apps.persistence;
 import com.aptoide.uploader.apps.AppUploadStatus;
 import io.reactivex.Completable;
 import io.reactivex.Observable;
+import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 
 public class RoomUploadStatusDataSource implements AppUploadStatusPersistence {
@@ -19,6 +20,11 @@ public class RoomUploadStatusDataSource implements AppUploadStatusPersistence {
 
   @Override public Observable<List<AppUploadStatus>> getAppsUnknownUploadStatus() {
     return appUploadStatusDao.getAppsUnknownUploadStatus(AppUploadStatus.Status.UNKNOWN.getCode());
+  }
+
+  @Override public Observable<List<AppUploadStatus>> getUploadedApps() {
+    return appUploadStatusDao.getUploadedApps()
+        .subscribeOn(Schedulers.io());
   }
 
   @Override public Completable save(AppUploadStatus appUploadStatus) {

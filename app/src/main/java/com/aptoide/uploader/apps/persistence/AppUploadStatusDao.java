@@ -22,5 +22,8 @@ import java.util.List;
   @Query("SELECT * FROM AppUploads WHERE status = :unknown")
   Observable<List<AppUploadStatus>> getAppsUnknownUploadStatus(int unknown);
 
+  @Query("SELECT * FROM AppUploads where status = 1")
+  Observable<List<AppUploadStatus>> getUploadedApps();
+
   @Delete Completable remove(AppUploadStatus appUploadStatus);
 }

@@ -1,5 +1,6 @@
-package com.aptoide.uploader.apps
+package com.aptoide.uploader.apps.persistence
 
+import com.aptoide.uploader.apps.InstalledApp
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single

@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps
 
 import android.content.pm.PackageManager
+import com.aptoide.uploader.apps.persistence.RoomInstalledPersistence
 import io.reactivex.Completable
 import io.reactivex.Observable
 

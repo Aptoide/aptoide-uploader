@@ -31,8 +31,8 @@ public class StoreManager {
   }
 
   public Single<Store> getStore() {
-    return Single.zip(getNonSystemApps(), storeNameProvider.getStoreName(),
-        (apps, storeName) -> new Store(storeName, apps))
+    return Single.zip(installedAppsProvider.getNonSystemInstalledApps(),
+        storeNameProvider.getStoreName(), (apps, storeName) -> new Store(storeName, apps))
         .subscribeOn(scheduler);
   }
 
@@ -49,12 +49,5 @@ public class StoreManager {
 
   public Completable logout() {
     return accountManager.logout();
-  }
-
-  private Single<List<InstalledApp>> getNonSystemApps() {
-    return installedAppsProvider.getInstalledApps()
-        .flatMapObservable(apps -> Observable.fromIterable(apps))
-        .filter(app -> !app.isSystem())
-        .toList();
   }
 }
