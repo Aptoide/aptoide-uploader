@@ -27,7 +27,7 @@ class MyStoreNavigator extends Navigator {
     fragmentManager.beginTransaction()
         .replace(R.id.activity_main_container, SettingsFragment.newInstance())
         .addToBackStack(String.valueOf(R.layout.fragment_my_apps))
-        .commitAllowingStateLoss();
+        .commit();
   }
 
   public void navigateToAutoLoginFragment(String name, String avatarPath) {

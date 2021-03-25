@@ -49,7 +49,7 @@ class SettingsNavigator extends Navigator {
     fragmentManager.beginTransaction()
         .add(R.id.activity_main_container, AutoUploadFragment.newInstance())
         .addToBackStack(String.valueOf(R.layout.fragment_settings))
-        .commitAllowingStateLoss();
+        .commit();
   }
 
   private void navigateToWithoutBackSave(Fragment fragment) {
