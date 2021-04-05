@@ -3,7 +3,6 @@ package com.aptoide.uploader.apps.persistence
 import com.aptoide.uploader.apps.InstalledApp
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
 class RoomInstalledPersistence(private val installedDao: InstalledDao) :
@@ -57,13 +56,5 @@ class RoomInstalledPersistence(private val installedDao: InstalledDao) :
     return Completable.fromAction {
       installedDao.removeAll()
     }.subscribeOn(Schedulers.io())
-  }
-
-  override fun isInstalled(packageName: String, versionCode: Int): Single<Boolean> {
-    return installedDao.isInstalledByVersion(packageName, versionCode)
-        .onErrorReturn { null }
-        .map { installed ->
-          (installed.status === InstalledApp.STATUS_COMPLETED)
-        }
   }
 }

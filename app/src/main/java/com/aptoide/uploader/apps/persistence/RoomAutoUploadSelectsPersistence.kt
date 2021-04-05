@@ -22,8 +22,8 @@ open class RoomAutoUploadSelectsPersistence(
     return autoUploadSelectsDao.isSelectedApp(installedPackageName) > 0
   }
 
-  override fun remove(packageName: String, versionCode: Int): Completable {
-    return autoUploadSelectsDao.remove(packageName, versionCode)
+  override fun remove(packageName: String): Completable {
+    return autoUploadSelectsDao.remove(packageName)
         .subscribeOn(Schedulers.io())
   }
 

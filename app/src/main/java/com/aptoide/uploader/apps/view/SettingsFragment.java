@@ -18,7 +18,6 @@ import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.glide.GlideApp;
 import com.aptoide.uploader.view.Rx.RxAlertDialog;
 import com.aptoide.uploader.view.android.FragmentView;
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.MemoryCategory;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 import com.bumptech.glide.request.RequestOptions;
@@ -106,7 +105,7 @@ public class SettingsFragment extends FragmentView implements SettingsView {
     privacyPolicy = null;
     logoutConfirmation.dismiss();
     logoutConfirmation = null;
-    Glide.get(getContext())
+    GlideApp.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
     super.onDestroyView();
   }
@@ -114,7 +113,7 @@ public class SettingsFragment extends FragmentView implements SettingsView {
   @Nullable @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
-    Glide.get(getContext())
+    GlideApp.get(getContext())
         .setMemoryCategory(MemoryCategory.HIGH);
     return inflater.inflate(R.layout.fragment_settings, container, false);
   }
@@ -123,12 +122,12 @@ public class SettingsFragment extends FragmentView implements SettingsView {
     if (avatarPath != null && !avatarPath.trim()
         .isEmpty()) {
       Uri uri = Uri.parse(avatarPath);
-      Glide.with(this)
+      GlideApp.with(this)
           .load(uri)
           .apply(RequestOptions.circleCropTransform())
           .into(profileAvatar);
     } else {
-      Glide.with(this)
+      GlideApp.with(this)
           .load(getResources().getDrawable(R.drawable.avatar_default))
           .apply(RequestOptions.circleCropTransform())
           .into(profileAvatar);

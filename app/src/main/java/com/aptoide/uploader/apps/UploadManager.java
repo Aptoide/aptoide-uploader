@@ -331,9 +331,8 @@ public class UploadManager {
             .equals(UploadDraft.Status.DUPLICATE))
         .flatMapCompletable(upload -> appUploadStatusPersistence.save(
             new AppUploadStatus(upload.getMd5(), upload.getInstalledApp()
-                .getPackageName(), AppUploadStatus.Status.IN_STORE, String.valueOf(
-                upload.getInstalledApp()
-                    .getVersionCode()))))
+                .getPackageName(), AppUploadStatus.Status.IN_STORE, upload.getInstalledApp()
+                .getVersionCode())))
         .subscribe();
   }
 
@@ -369,7 +368,7 @@ public class UploadManager {
         .flatMapIterable(apps -> apps)
         .flatMapSingle(installedApp -> md5Calculator.calculate(installedApp.getApkPath())
             .map(md5 -> new AppUploadStatus(md5, installedApp.getPackageName(),
-                AppUploadStatus.Status.UNKNOWN, String.valueOf(installedApp.getVersionCode()))))
+                AppUploadStatus.Status.UNKNOWN, installedApp.getVersionCode())))
         .toList()
         .flatMapCompletable(installedApps -> appUploadStatusPersistence.saveAll(installedApps))
         .subscribeOn(Schedulers.computation())
@@ -386,7 +385,7 @@ public class UploadManager {
                 .flatMapSingle(uploadStatuses -> Observable.fromIterable(uploadStatuses)
                     .map(appUploadStatus -> new AppUploadStatus(appUploadStatus.getMd5(),
                         appUploadStatus.getPackageName(), AppUploadStatus.Status.PROCESSING,
-                        appUploadStatus.getVercode()))
+                        appUploadStatus.getVersionCode()))
                     .toList()
                     .flatMap(uploadStatuses1 -> appUploadStatusPersistence.saveAll(uploadStatuses1)
                         .andThen(Single.just(uploadStatuses))))
@@ -395,7 +394,8 @@ public class UploadManager {
                     .flatMapSingle(appUploadStatuses -> Observable.fromIterable(appUploadStatuses)
                         .toList())
                     .flatMap(appUploadStatuses -> appUploadStatusManager.getApks(appUploadStatuses))
-                    .doOnNext(appUploadStatuses -> Log.d("nzxt", "checkAppUploadStatus: after get APKs -> size " + appUploadStatuses.size()))
+                    .doOnNext(appUploadStatuses -> Log.d("nzxt",
+                        "checkAppUploadStatus: after get APKs -> size " + appUploadStatuses.size()))
                     .flatMapCompletable(
                         appUploadStatuses -> appUploadStatusPersistence.saveAll(appUploadStatuses))
                     .toObservable());

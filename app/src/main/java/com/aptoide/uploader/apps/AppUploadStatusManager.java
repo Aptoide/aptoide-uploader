@@ -54,7 +54,7 @@ public class AppUploadStatusManager {
                 int newVersionCode = app.getVersionCode();
                 int oldVersionCode;
                 try {
-                  oldVersionCode = Integer.parseInt(appStatus.getVercode());
+                  oldVersionCode = appStatus.getVersionCode();
                 } catch (NumberFormatException e) {
                   oldVersionCode = 0;
                 }

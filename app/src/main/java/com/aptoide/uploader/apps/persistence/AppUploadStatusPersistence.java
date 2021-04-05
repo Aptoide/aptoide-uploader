@@ -17,5 +17,7 @@ public interface AppUploadStatusPersistence {
 
   Completable saveAll(List<AppUploadStatus> appUploadStatusList);
 
+  boolean isUploadedVersion(String installedPackageName, int versionCode);
+
   Completable remove(AppUploadStatus appUploadStatus);
 }

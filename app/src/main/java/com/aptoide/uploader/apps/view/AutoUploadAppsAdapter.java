@@ -1,6 +1,5 @@
 package com.aptoide.uploader.apps.view;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -129,8 +128,6 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
   }
 
   public List<AutoUploadSelects> saveSelectedOnSubmit(List<InstalledApp> selectedApps) {
-    Log.d("APP-86",
-        "AutoUploadAdapter: saveSelectedOnSubmit: installedApps size " + installedApps.size());
     for (int i = 0; i < autoUploadSelects.size(); i++) {
       boolean setted = false;
       for (InstalledApp selectedApp : selectedApps) {
@@ -147,8 +144,6 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
             .setSelectedAutoUpload(false);
       }
     }
-    Log.d("APP-86",
-        "AutoUploadAdapter: saveSelectedOnSubmit: end - list size: " + autoUploadSelects.size());
     return autoUploadSelects;
   }
 

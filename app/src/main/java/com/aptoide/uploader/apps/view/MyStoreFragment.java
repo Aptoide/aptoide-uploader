@@ -26,11 +26,12 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import cm.aptoide.aptoideviews.recyclerview.GridRecyclerView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
+import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.permission.PermissionProvider;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
+import com.aptoide.uploader.glide.GlideApp;
 import com.aptoide.uploader.view.android.FragmentView;
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.MemoryCategory;
 import com.bumptech.glide.request.RequestOptions;
 import com.jakewharton.rxbinding2.view.RxView;
@@ -98,7 +99,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
     recyclerView.setAdaptiveLayout(110, 126,
         GridRecyclerView.AdaptStrategy.SCALE_KEEP_ASPECT_RATIO);
-    adapter = new MyAppsAdapter(new ArrayList<>(), (view1, packageName) -> {
+    adapter = new MyAppsAdapter(new ArrayList<>(), new ArrayList<>(), (view1, packageName) -> {
       Uri packageURI = Uri.parse("package:" + packageName);
       Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
       startActivity(uninstallIntent);
@@ -126,7 +127,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(),
         ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager(),
-        ((UploaderApplication) getContext().getApplicationContext()).getAccountManager()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getAccountManager(),
+        ((UploaderApplication) getContext().getApplicationContext()).getInstalledAppsManager()).present();
   }
 
   @Override public void onDestroyView() {
@@ -138,7 +140,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     selectionObservable.dispose();
     settingsItem = null;
     toolbar = null;
-    Glide.get(getContext())
+    GlideApp.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
     super.onDestroyView();
   }
@@ -146,7 +148,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   @Nullable @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
-    Glide.get(getContext())
+    GlideApp.get(getContext())
         .setMemoryCategory(MemoryCategory.HIGH);
     return inflater.inflate(R.layout.fragment_my_apps, container, false);
   }
@@ -162,7 +164,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void checkFirstRun() {
     boolean isFirstRun = getContext().getSharedPreferences("PREFERENCE", 0)
-        .getBoolean("isFirstRun", true);
+        .getBoolean("isFirstRunTooltip", true);
     if (isFirstRun) {
       featuretip_background.setVisibility(View.VISIBLE);
       featuretip_rectangle.setVisibility(View.VISIBLE);
@@ -174,7 +176,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       });
       getContext().getSharedPreferences("PREFERENCE", 0)
           .edit()
-          .putBoolean("isFirstRun", false)
+          .putBoolean("isFirstRunTooltip", false)
           .apply();
     }
   }
@@ -221,14 +223,14 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     spinner.setAdapter(adapter);
   }
 
-  @Override public void showApps(@NotNull List<InstalledApp> appsList) {
-    adapter.setInstalledApps(appsList);
+  @Override public void showApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses) {
+    adapter.setInstalledAndUploadedApps(appsList, appUploadStatuses);
     loadingSpinner.setVisibility(View.GONE);
     recyclerView.scheduleLayoutAnimation();
   }
 
-  @Override public void refreshApps(@NotNull List<InstalledApp> appsList) {
-    adapter.refreshInstalledApps(appsList);
+  @Override public void refreshApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses) {
+    adapter.setInstalledAndUploadedApps(appsList, appUploadStatuses);
     refreshLayout.setRefreshing(false);
     recyclerView.scheduleLayoutAnimation();
   }
@@ -245,12 +247,12 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     if (avatarPath != null && !avatarPath.trim()
         .isEmpty()) {
       Uri uri = Uri.parse(avatarPath);
-      Glide.with(this)
+      GlideApp.with(this)
           .load(uri)
           .apply(RequestOptions.circleCropTransform())
           .into(profileAvatar);
     } else {
-      Glide.with(this)
+      GlideApp.with(this)
           .load(getResources().getDrawable(R.drawable.avatar_default))
           .apply(RequestOptions.circleCropTransform())
           .into(profileAvatar);
@@ -342,12 +344,6 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void clearSelection() {
     adapter.clearAppsSelection();
-  }
-
-  @Override public void setCloudIcon(List<String> packageList) {
-    if (packageList != null && adapter != null) {
-      adapter.setCloudIcon(packageList);
-    }
   }
 
   @Override public Observable<Boolean> refreshEvent() {

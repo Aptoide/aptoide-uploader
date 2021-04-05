@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import android.net.Uri;
 import android.os.Build;
 import android.view.View;
 import android.widget.ImageView;
@@ -7,6 +8,7 @@ import android.widget.TextView;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.aptoide.uploader.R;
+import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.glide.GlideApp;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
@@ -35,10 +37,10 @@ public class AppViewHolder extends RecyclerView.ViewHolder
     itemView.setOnLongClickListener(this);
   }
 
-  void setApp(InstalledApp app, boolean selected) {
+  void setApp(InstalledApp app, boolean selected, AppUploadStatus uploadStatus) {
     packageName = app.getPackageName();
     GlideApp.with(itemView)
-        .load(app.getAppInfo())
+        .load(Uri.parse(app.getIconPath()))
         .transition(DrawableTransitionOptions.withCrossFade())
         .into(image);
 
@@ -55,7 +57,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder
             .getDrawable(R.drawable.overlay_focused));
       }
     }
-    if (app.isUploaded()) {
+    if (uploadStatus.isUploaded()) {
       cloud.setVisibility(View.VISIBLE);
     } else {
       cloud.setVisibility(View.GONE);

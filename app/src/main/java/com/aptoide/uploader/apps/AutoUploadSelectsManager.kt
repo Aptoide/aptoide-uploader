@@ -20,7 +20,7 @@ class AutoUploadSelectsManager(
         .map { applicationInfo ->
           val packageInfo =
               packageManager.getPackageInfo(applicationInfo.packageName, 0)
-          AutoUploadSelects(packageInfo.packageName, packageInfo.versionCode, false)
+          AutoUploadSelects(packageInfo.packageName, false)
         }
         .toList()
         .subscribeOn(Schedulers.io())

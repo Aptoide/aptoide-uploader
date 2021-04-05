@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
@@ -11,9 +12,9 @@ public interface MyStoreView extends View {
 
   void checkFirstRun();
 
-  void showApps(@NotNull List<InstalledApp> appsList);
+  void showApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses);
 
-  void refreshApps(@NotNull List<InstalledApp> appsList);
+  void refreshApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses);
 
   void orderApps(SortingOrder order);
 
@@ -36,8 +37,6 @@ public interface MyStoreView extends View {
   Single<List<InstalledApp>> getSelectedApps();
 
   void clearSelection();
-
-  void setCloudIcon(List<String> md5List);
 
   Observable<Boolean> refreshEvent();
 }

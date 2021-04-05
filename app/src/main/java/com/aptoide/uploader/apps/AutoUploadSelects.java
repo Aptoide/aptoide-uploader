@@ -9,22 +9,15 @@ import org.jetbrains.annotations.NotNull;
 @Entity(tableName = "AutoUploadSelects") public class AutoUploadSelects {
 
   @NonNull @PrimaryKey @ColumnInfo(name = "packageName") private final String packageName;
-  @ColumnInfo(name = "versionCode") private final int versionCode;
   @ColumnInfo(name = "isSelectedAutoUpload") private boolean isSelectedAutoUpload;
 
-  public AutoUploadSelects(@NotNull String packageName, int versionCode,
-      boolean isSelectedAutoUpload) {
+  public AutoUploadSelects(@NotNull String packageName, boolean isSelectedAutoUpload) {
     this.packageName = packageName;
-    this.versionCode = versionCode;
     this.isSelectedAutoUpload = isSelectedAutoUpload;
   }
 
   public String getPackageName() {
     return packageName;
-  }
-
-  public int getVersionCode() {
-    return versionCode;
   }
 
   public boolean isSelectedAutoUpload() {

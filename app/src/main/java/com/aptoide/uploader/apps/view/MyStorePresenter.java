@@ -4,8 +4,8 @@ import android.util.Log;
 import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
-import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
+import com.aptoide.uploader.apps.InstalledAppsManager;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.network.ConnectivityProvider;
@@ -14,7 +14,6 @@ import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.Single;
@@ -38,13 +37,15 @@ public class MyStorePresenter implements Presenter {
   private final UploadManager uploadManager;
   private final AutoLoginManager autoLoginManager;
   private final AptoideAccountManager accountManager;
+  private final InstalledAppsManager installedAppsManager;
 
   public MyStorePresenter(MyStoreView view, StoreManager storeManager,
       CompositeDisposable compositeDisposable, MyStoreNavigator storeNavigator,
       Scheduler viewScheduler, UploadPermissionProvider uploadPermissionProvider,
       AppUploadStatusPersistence persistence, UploaderAnalytics uploaderAnalytics,
       ConnectivityProvider connectivityProvider, UploadManager uploadManager,
-      AutoLoginManager autoLoginManager, AptoideAccountManager accountManager) {
+      AutoLoginManager autoLoginManager, AptoideAccountManager accountManager,
+      InstalledAppsManager installedAppsManager) {
     this.connectivityProvider = connectivityProvider;
     this.view = view;
     this.storeManager = storeManager;
@@ -57,6 +58,7 @@ public class MyStorePresenter implements Presenter {
     this.uploadManager = uploadManager;
     this.autoLoginManager = autoLoginManager;
     this.accountManager = accountManager;
+    this.installedAppsManager = installedAppsManager;
   }
 
   @Override public void present() {
@@ -86,19 +88,6 @@ public class MyStorePresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .doOnNext(__ -> view.checkFirstRun())
         .observeOn(viewScheduler)
-        .subscribe(__ -> {
-        }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
-        }));
-  }
-
-  private void showApps() {
-    compositeDisposable.add(view.getLifecycleEvent()
-        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
-        .flatMapSingle(__ -> storeManager.getStore())
-        .observeOn(viewScheduler)
-        .doOnNext(store -> view.showApps(store.getApps()))
-        .flatMap(__ -> checkUploadedApps())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -135,14 +124,29 @@ public class MyStorePresenter implements Presenter {
         }));
   }
 
+  private void showApps() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> installedAppsManager.getInstalledAppsStatus())
+        .doOnNext(refresh -> uploadManager.fillAppUploadStatusPersistence())
+        .observeOn(viewScheduler)
+        .doOnNext(installedAppsStatus -> view.showApps(installedAppsStatus.getApps(),
+            installedAppsStatus.getUploadStatuses()))
+        .flatMap(__ -> checkUploadedApps())
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
   private void refreshStoreAndApps() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> view.refreshEvent()
-            .flatMapSingle(refreshEvent -> storeManager.getStore())
-            .doOnNext(refresh -> uploadManager.fillAppUploadStatusPersistence())
+            .flatMap(refreshEvent -> installedAppsManager.getInstalledAppsStatus())
             .observeOn(viewScheduler)
-            .doOnNext(store -> view.refreshApps(store.getApps()))
+            .doOnNext(installedAppsStatus -> view.refreshApps(installedAppsStatus.getApps(),
+                installedAppsStatus.getUploadStatuses()))
             .flatMap(apps -> checkUploadedApps()))
         .subscribe());
   }
@@ -152,7 +156,6 @@ public class MyStorePresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.goToSettings())
         .doOnNext(click -> storeNavigator.navigateToSettingsFragment())
-        .doOnNext(__ -> setPersistenceStatus())
         .subscribe(click -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -238,38 +241,7 @@ public class MyStorePresenter implements Presenter {
   }
 
   private Observable<List<String>> checkUploadedApps() {
-    return getAppUploadStatusFromPersistence().observeOn(viewScheduler)
-        .doOnNext(packageList -> view.setCloudIcon(packageList));
-  }
-
-  private Observable<List<String>> getAppUploadStatusFromPersistence() {
-    return persistence.getAppsUploadStatus()
-        .distinctUntilChanged((previous, current) -> !appsPersistenceHasChanged(previous, current))
-        .flatMapSingle(apps -> Observable.fromIterable(apps)
-            .filter(app -> app.isUploaded())
-            .map(appUploadStatus -> appUploadStatus.getPackageName())
-            .toList());
-  }
-
-  private boolean appsPersistenceHasChanged(List<AppUploadStatus> previousList,
-      List<AppUploadStatus> currentList) {
-    if (previousList.size() != currentList.size()) {
-      return true;
-    }
-    for (AppUploadStatus previous : previousList) {
-      AppUploadStatus current = currentList.get(previousList.indexOf(previous));
-      if (!previous.getMd5()
-          .equals(current.getMd5()) && !(previous.isUploaded() == current.isUploaded())) {
-        return true;
-      }
-    }
-    return !previousList.equals(currentList);
-  }
-
-  private Completable setPersistenceStatus() {
-    return persistence.getAppsUploadStatus()
-        .flatMap(apps -> Observable.fromIterable(apps)
-            .doOnNext(app -> app.setStatus(AppUploadStatus.Status.UNKNOWN)))
-        .ignoreElements();
+    return installedAppsManager.getUploadedFromAppUploadStatusPersistence()
+        .observeOn(viewScheduler);
   }
 }

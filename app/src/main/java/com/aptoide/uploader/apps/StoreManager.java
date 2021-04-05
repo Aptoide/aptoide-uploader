@@ -47,6 +47,16 @@ public class StoreManager {
                                 installedApp)))));
   }
 
+  public Completable uploadApp(InstalledApp app) {
+    return storeNameProvider.getStoreName()
+        .flatMapCompletable(storeName -> languageManager.getCurrentLanguageCode()
+            .flatMapCompletable(
+                languageCode -> installedAppsProvider.getInstalledApp(app.getPackageName())
+                    .flatMapCompletable(
+                        installedApp -> uploadManager.upload(storeName, languageCode,
+                            installedApp))));
+  }
+
   public Completable logout() {
     return accountManager.logout();
   }

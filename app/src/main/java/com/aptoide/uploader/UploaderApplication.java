@@ -22,7 +22,6 @@ import com.aptoide.uploader.apps.AutoUploadSelectsManager;
 import com.aptoide.uploader.apps.CategoriesManager;
 import com.aptoide.uploader.apps.InstallManager;
 import com.aptoide.uploader.apps.InstalledAppsManager;
-import com.aptoide.uploader.apps.InstalledRepository;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
@@ -175,9 +174,10 @@ public class UploaderApplication extends Application {
 
   public InstallManager getInstallManager() {
     if (installManager == null) {
-      installManager = new InstallManager(
-          new InstalledRepository(getInstalledPersistence(), getPackageManager()),
-          getPackageManagerInstalledAppsProvider());
+      installManager =
+          new InstallManager(getInstalledPersistence(), getAutoUploadSelectsPersistence(),
+              getPackageManagerInstalledAppsProvider(), getInstalledAppsManager(),
+              getAppsManager());
     }
     return installManager;
   }

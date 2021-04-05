@@ -3,7 +3,6 @@ package com.aptoide.uploader.apps.persistence
 import com.aptoide.uploader.apps.InstalledApp
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 
 interface InstalledPersistence {
 
@@ -21,6 +20,4 @@ interface InstalledPersistence {
 
   fun replaceAllBy(
       list: MutableList<InstalledApp>): Completable
-
-  fun isInstalled(packageName: String, versionCode: Int): Single<Boolean>
 }

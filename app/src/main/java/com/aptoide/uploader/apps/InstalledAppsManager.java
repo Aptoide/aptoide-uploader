@@ -13,7 +13,7 @@ public class InstalledAppsManager {
   private final InstalledPersistence installedPersistence;
   private final AppUploadStatusPersistence uploadPersistence;
   private final AutoUploadSelectsPersistence selectedPersistence;
-  private Scheduler scheduler;
+  private final Scheduler scheduler;
 
   public InstalledAppsManager(InstalledPersistence installedPersistence,
       AppUploadStatusPersistence uploadPersistence,
@@ -66,6 +66,16 @@ public class InstalledAppsManager {
             .toList());
   }
 
+  public Observable<List<InstalledApp>> getUploadedInstalledApps() {
+    return installedPersistence.allInstalledSorted()
+        .firstOrError()
+        .flatMapObservable(installedApps -> Observable.fromIterable(installedApps))
+        .filter(installedApp -> isUploadedVersion(installedApp.getPackageName(),
+            installedApp.getVersionCode()))
+        .toList()
+        .toObservable();
+  }
+
   public Observable<List<InstalledApp>> getSelectedInstalledApps() {
     return installedPersistence.allInstalledSorted()
         .firstOrError()
@@ -75,7 +85,11 @@ public class InstalledAppsManager {
         .toObservable();
   }
 
-  private boolean isSelectedApp(String installedPackageName) {
+  public boolean isUploadedVersion(String installedPackageName, int versionCode) {
+    return uploadPersistence.isUploadedVersion(installedPackageName, versionCode);
+  }
+
+  public boolean isSelectedApp(String installedPackageName) {
     return selectedPersistence.isSelectedApp(installedPackageName);
   }
 

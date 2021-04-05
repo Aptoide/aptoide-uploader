@@ -17,7 +17,7 @@ public class InstalledAppBuilder {
         (packageInfo.applicationInfo.flags & packageInfo.applicationInfo.FLAG_SYSTEM) != 0,
         packageInfo.applicationInfo.sourceDir,
         "android.resource://" + packageInfo.packageName + "/" + packageInfo.applicationInfo.icon,
-        packageInfo.lastUpdateTime, false, getMainObb(packageInfo.packageName),
+        packageInfo.lastUpdateTime, getMainObb(packageInfo.packageName),
         getPatchObb(packageInfo.packageName));
   }
 

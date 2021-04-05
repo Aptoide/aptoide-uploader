@@ -1,10 +1,13 @@
 package com.aptoide.uploader.apps.view;
 
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 import com.aptoide.uploader.R;
+import com.aptoide.uploader.apps.AppUploadStatus;
+import com.aptoide.uploader.apps.AutoUploadSelects;
 import com.aptoide.uploader.apps.InstalledApp;
 import io.reactivex.Observable;
 import io.reactivex.subjects.PublishSubject;
@@ -15,15 +18,17 @@ import java.util.List;
 public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
 
   private final List<InstalledApp> installedApps;
+  private final List<AppUploadStatus> uploadedList;
   private final List<Integer> selectedApps;
   private final AppSelectedListener selectedAppListener;
   private final AppLongClickListener longClickListener;
   private final PublishSubject<Boolean> selectedPublisher;
   private SortingOrder currentOrder;
 
-  public MyAppsAdapter(@NonNull List<InstalledApp> list, AppLongClickListener longClickListener,
-      SortingOrder currentOrder) {
+  public MyAppsAdapter(@NonNull List<InstalledApp> list, List<AppUploadStatus> uploadedList,
+      AppLongClickListener longClickListener, SortingOrder currentOrder) {
     this.installedApps = list;
+    this.uploadedList = uploadedList;
     this.longClickListener = longClickListener;
     this.currentOrder = currentOrder;
     this.selectedApps = new ArrayList<>();
@@ -37,7 +42,7 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   @Override public void onBindViewHolder(AppViewHolder holder, int position) {
-    holder.setApp(installedApps.get(position), selectedApps.contains(position));
+    holder.setApp(installedApps.get(position), selectedApps.contains(position), matchInstalledToUploadStatus(installedApps.get(position)));
   }
 
   @Override public int getItemViewType(int position) {
@@ -52,6 +57,12 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     return selectedPublisher;
   }
 
+  public void setInstalledAndUploadedApps(List<InstalledApp> appsList,
+      List<AppUploadStatus> appUploadStatuses) {
+    setInstalledApps(appsList);
+    setUploadStatusApps(appUploadStatuses);
+  }
+
   public void setInstalledApps(List<InstalledApp> appsList) {
     if (!appsList.equals(installedApps)) {
       installedApps.clear();
@@ -61,11 +72,25 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     }
   }
 
-  public void refreshInstalledApps(List<InstalledApp> appsList) {
-    installedApps.clear();
-    installedApps.addAll(appsList);
-    clearAppsSelection(false);
-    setOrder(currentOrder);
+  public void setUploadStatusApps(List<AppUploadStatus> appUploadStatuses) {
+    if (!appUploadStatuses.equals(uploadedList)) {
+      uploadedList.clear();
+      uploadedList.addAll(appUploadStatuses);
+      clearAppsSelection(false);
+      setOrder(currentOrder);
+      notifyDataSetChanged();
+    }
+  }
+
+  public AppUploadStatus matchInstalledToUploadStatus(InstalledApp installedApp) {
+    AppUploadStatus appUploadStatus = null;
+    for (AppUploadStatus appStatus : uploadedList) {
+      if (appStatus.getPackageName()
+          .equals(installedApp.getPackageName())) {
+        appUploadStatus = appStatus;
+      }
+    }
+    return appUploadStatus;
   }
 
   public void setOrder(SortingOrder order) {
@@ -121,21 +146,4 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     clearAppsSelection(true);
   }
 
-  public void setCloudIcon(List<String> uploadedPackageNames) {
-    for (int i = 0; i < installedApps.size(); i++) {
-      boolean setted = false;
-      InstalledApp app = installedApps.get(i);
-      for (String packageName : uploadedPackageNames) {
-        if (app.getPackageName()
-            .equals(packageName)) {
-          app.setIsUploaded(true);
-          setted = true;
-        }
-      }
-      if (!setted) {
-        app.setIsUploaded(false);
-      }
-    }
-    notifyDataSetChanged();
-  }
 }

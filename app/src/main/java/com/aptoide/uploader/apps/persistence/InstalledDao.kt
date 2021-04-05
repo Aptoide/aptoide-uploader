@@ -7,7 +7,6 @@ import androidx.room.Query
 import com.aptoide.uploader.apps.InstalledApp
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 
 @Dao
 interface InstalledDao {
@@ -43,9 +42,4 @@ interface InstalledDao {
 
   @Query("DELETE FROM Installed")
   fun removeAll()
-
-  @Query(
-      "SELECT * FROM Installed where packageName = :packageName AND versionCode = :versionCode")
-  fun isInstalledByVersion(packageName: String,
-                           versionCode: Int): Single<InstalledApp>
 }

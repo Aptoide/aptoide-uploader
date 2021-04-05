@@ -19,11 +19,16 @@ import java.util.List;
   @Insert(onConflict = OnConflictStrategy.REPLACE) Completable saveAll(
       List<AppUploadStatus> appUploadStatusList);
 
+  @Query("DELETE FROM AppUploads") void removeAll();
+
   @Query("SELECT * FROM AppUploads WHERE status = :unknown")
   Observable<List<AppUploadStatus>> getAppsUnknownUploadStatus(int unknown);
 
   @Query("SELECT * FROM AppUploads where status = 1")
   Observable<List<AppUploadStatus>> getUploadedApps();
+
+  @Query("SELECT COUNT(*) FROM AppUploads where packageName = :installedPackageName AND versionCode = :versionCode AND status = 1")
+  int isUploadedVersion(String installedPackageName, int versionCode);
 
   @Delete Completable remove(AppUploadStatus appUploadStatus);
 }

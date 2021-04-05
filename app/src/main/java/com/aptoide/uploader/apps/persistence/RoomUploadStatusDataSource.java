@@ -35,6 +35,10 @@ public class RoomUploadStatusDataSource implements AppUploadStatusPersistence {
     return appUploadStatusDao.saveAll(appUploadStatusList);
   }
 
+  @Override public boolean isUploadedVersion(String installedPackageName, int versionCode) {
+    return appUploadStatusDao.isUploadedVersion(installedPackageName, versionCode) > 0;
+  }
+
   @Override public Completable remove(AppUploadStatus packageName) {
     return appUploadStatusDao.remove(packageName);
   }

@@ -11,9 +11,9 @@ interface AutoUploadSelectsPersistence {
 
   fun isSelectedApp(installedPackageName: String): Boolean
 
-  fun remove(packageName: String, versionCode: Int): Completable
+  fun remove(packageName: String): Completable
 
-  fun insert(installed: AutoUploadSelects): Completable
+  fun insert(autoUploadSelects: AutoUploadSelects): Completable
 
   fun replaceAllBy(list: List<AutoUploadSelects>): Completable
 }

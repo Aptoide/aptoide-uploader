@@ -1,7 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
 import android.net.Uri;
-import android.util.Log;
 import android.view.View;
 import android.widget.CheckBox;
 import android.widget.ImageView;
@@ -32,7 +31,6 @@ public class AutoUploadAppViewHolder extends RecyclerView.ViewHolder
   }
 
   public void setApp(InstalledApp app, boolean selected) {
-    Log.d("APP-86", "AutoUploadAppViewHolder: setApp: " + app.getName());
     GlideApp.with(itemView)
         .load(Uri.parse(app.getIconPath()))
         .transition(DrawableTransitionOptions.withCrossFade())

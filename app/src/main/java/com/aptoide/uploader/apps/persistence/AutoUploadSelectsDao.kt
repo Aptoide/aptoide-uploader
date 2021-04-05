@@ -31,6 +31,6 @@ interface AutoUploadSelectsDao {
   fun removeAll()
 
   @Query(
-      "DELETE FROM AutoUploadSelects where packageName = :packageName AND versionCode = :versionCode")
-  fun remove(packageName: String, versionCode: Int): Completable
+      "DELETE FROM AutoUploadSelects where packageName = :packageName ")
+  fun remove(packageName: String): Completable
 }
