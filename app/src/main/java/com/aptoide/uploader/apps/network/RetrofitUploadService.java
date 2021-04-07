@@ -57,9 +57,7 @@ public class RetrofitUploadService implements UploaderService {
     this.md5Calculator = md5Calculator;
   }
 
-  @Override
-  public Single<UploadDraft> startUploadDraft(String md5, String language, String storeName,
-      InstalledApp installedApp) {
+  @Override public Single<UploadDraft> startUploadDraft(String md5, InstalledApp installedApp) {
     return Single.just(new UploadDraft(UploadDraft.Status.IN_QUEUE, installedApp, md5));
   }
 

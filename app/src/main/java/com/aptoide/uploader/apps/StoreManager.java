@@ -14,20 +14,17 @@ public class StoreManager {
   private final UploadManager uploadManager;
   private final LanguageManager languageManager;
   private final AptoideAccountManager accountManager;
-  private Scheduler scheduler;
-  private ServiceBackgroundService serviceBackgroundService;
+  private final Scheduler scheduler;
 
   public StoreManager(InstalledAppsProvider installedAppsProvider,
       StoreNameProvider storeNameProvider, UploadManager uploadManager,
-      LanguageManager languageManager, AptoideAccountManager accountManager, Scheduler scheduler,
-      ServiceBackgroundService serviceBackgroundService) {
+      LanguageManager languageManager, AptoideAccountManager accountManager, Scheduler scheduler) {
     this.installedAppsProvider = installedAppsProvider;
     this.storeNameProvider = storeNameProvider;
     this.uploadManager = uploadManager;
     this.languageManager = languageManager;
     this.accountManager = accountManager;
     this.scheduler = scheduler;
-    this.serviceBackgroundService = serviceBackgroundService;
   }
 
   public Single<Store> getStore() {
@@ -37,24 +34,14 @@ public class StoreManager {
   }
 
   public Completable upload(List<InstalledApp> apps) {
-    return storeNameProvider.getStoreName()
-        .flatMapCompletable(storeName -> languageManager.getCurrentLanguageCode()
-            .flatMapCompletable(languageCode -> Observable.fromIterable(apps)
-                .flatMapCompletable(
-                    app -> installedAppsProvider.getInstalledApp(app.getPackageName())
-                        .flatMapCompletable(
-                            installedApp -> uploadManager.upload(storeName, languageCode,
-                                installedApp)))));
+    return Observable.fromIterable(apps)
+        .flatMapCompletable(app -> installedAppsProvider.getInstalledApp(app.getPackageName())
+            .flatMapCompletable(installedApp -> uploadManager.upload(installedApp)));
   }
 
-  public Completable uploadApp(InstalledApp app) {
-    return storeNameProvider.getStoreName()
-        .flatMapCompletable(storeName -> languageManager.getCurrentLanguageCode()
-            .flatMapCompletable(
-                languageCode -> installedAppsProvider.getInstalledApp(app.getPackageName())
-                    .flatMapCompletable(
-                        installedApp -> uploadManager.upload(storeName, languageCode,
-                            installedApp))));
+  public Completable upload(InstalledApp app) {
+    return installedAppsProvider.getInstalledApp(app.getPackageName())
+        .flatMapCompletable(installedApp -> uploadManager.upload(installedApp));
   }
 
   public Completable logout() {

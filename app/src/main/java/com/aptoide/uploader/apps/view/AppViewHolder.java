@@ -57,7 +57,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder
             .getDrawable(R.drawable.overlay_focused));
       }
     }
-    if (uploadStatus.isUploaded()) {
+    if (uploadStatus != null && uploadStatus.isUploaded()) {
       cloud.setVisibility(View.VISIBLE);
     } else {
       cloud.setVisibility(View.GONE);

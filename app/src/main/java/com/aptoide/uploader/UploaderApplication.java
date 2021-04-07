@@ -176,8 +176,8 @@ public class UploaderApplication extends Application {
     if (installManager == null) {
       installManager =
           new InstallManager(getInstalledPersistence(), getAutoUploadSelectsPersistence(),
-              getPackageManagerInstalledAppsProvider(), getInstalledAppsManager(),
-              getAppsManager());
+              getPackageManagerInstalledAppsProvider(), getInstalledAppsManager(), getAppsManager(),
+              getUploaderAnalytics());
     }
     return installManager;
   }
@@ -296,8 +296,7 @@ public class UploaderApplication extends Application {
 
       storeManager = new StoreManager(getPackageManagerInstalledAppsProvider(),
           new AccountStoreNameProvider(getAccountManager()), getUploadManager(),
-          getLanguageManager(), getAccountManager(), Schedulers.io(),
-          new ServiceBackgroundService(getApplicationContext(), NotificationService.class));
+          getLanguageManager(), getAccountManager(), Schedulers.io());
     }
     return storeManager;
   }

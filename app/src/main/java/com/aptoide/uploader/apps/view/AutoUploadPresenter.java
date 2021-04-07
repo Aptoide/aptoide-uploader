@@ -1,6 +1,5 @@
 package com.aptoide.uploader.apps.view;
 
-import android.util.Log;
 import com.aptoide.uploader.apps.InstalledAppsManager;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.view.Presenter;
@@ -58,9 +57,6 @@ public class AutoUploadPresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> installedAppsManager.getInstalledAppsStatus())
         .observeOn(viewScheduler)
-        .doOnNext(installedAppsStatus -> Log.d("APP-86",
-            "AutoUploadPresenter: showApps(): size " + installedAppsStatus.getApps()
-                .size()))
         .doOnNext(installedAppsStatus -> view.showApps(installedAppsStatus.getApps(),
             installedAppsStatus.getAutoUploadSelects()))
         .flatMapCompletable(__ -> handleSelectedApps())

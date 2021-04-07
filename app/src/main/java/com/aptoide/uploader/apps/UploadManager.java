@@ -55,9 +55,9 @@ public class UploadManager {
     checkAppUploadStatus();
   }
 
-  public Completable upload(String storeName, String language, InstalledApp app) {
+  public Completable upload(InstalledApp app) {
     return md5Calculator.calculate(app.getApkPath())
-        .flatMapCompletable((md5 -> uploaderService.startUploadDraft(md5, language, storeName, app)
+        .flatMapCompletable((md5 -> uploaderService.startUploadDraft(md5, app)
             .flatMapCompletable(draft -> draftPersistence.save(draft))));
   }
 
