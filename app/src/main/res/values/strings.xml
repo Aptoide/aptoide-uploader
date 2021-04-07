@@ -87,6 +87,10 @@
   <!--Settings-->
   <string name="settings_dark_them_title">Dark Theme</string>
   <string name="settings_dark_them_body">It helps to relieve eye strain when using your device in the dark.</string>
+  <string name="settings_send_feedback_title">Send Feedback</string>
+  <string name="settings_about_us_title">About Us</string>
+  <string name="settings_t&cs_title">Terms and Conditions</string>
+  <string name="settings_pp_title">Privacy Policy</string>
 
   <!--New Login-->
   <string name="login_email_field_text">Your email here</string>
