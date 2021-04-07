@@ -7,6 +7,7 @@
   <string name="retry">retry</string>
   <string name="cancel">Cancel</string>
   <string name="or">Or</string>
+  <string name="confirm_button">Confirm</string>
 
   <!-- Error Messages -->
   <string name="loginFail">Login failed. Wrong username or password.</string>
@@ -110,5 +111,12 @@
   <!--Create Store flow-->
   <string name="create_store_body">You don\'t have a store yet! Create your own one and start uploading apps.</string>
   <string name="create_store_leave_confirmation">Are you sure you want to leave?</string>
+  
+  <!-- Auto upload-->
+  <string name="autoupload_tootltip">Discover auto upload!</string>
+  <string name="autoupload_settings_title">Auto upload</string>
+  <string name="autoupload_body">Select apps for automatic upload</string>
+
+  
 
 </resources>
