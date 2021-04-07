@@ -7,6 +7,7 @@
   <string name="retry">retry</string>
   <string name="cancel">Cancel</string>
   <string name="or">Or</string>
+  <string name="confirm_button">Confirm</string>
 
   <!-- Error Messages -->
   <string name="loginFail">Login failed. Wrong username or password.</string>
@@ -86,6 +87,10 @@
   <!--Settings-->
   <string name="settings_dark_them_title">Dark Theme</string>
   <string name="settings_dark_them_body">It helps to relieve eye strain when using your device in the dark.</string>
+  <string name="settings_send_feedback_title">Send Feedback</string>
+  <string name="settings_about_us_title">About Us</string>
+  <string name="settings_t&cs_title">Terms and Conditions</string>
+  <string name="settings_pp_title">Privacy Policy</string>
 
   <!--New Login-->
   <string name="login_email_field_text">Your email here</string>
@@ -110,5 +115,12 @@
   <!--Create Store flow-->
   <string name="create_store_body">You don\'t have a store yet! Create your own one and start uploading apps.</string>
   <string name="create_store_leave_confirmation">Are you sure you want to leave?</string>
+  
+  <!-- Auto upload-->
+  <string name="autoupload_tootltip">Discover auto upload!</string>
+  <string name="autoupload_settings_title">Auto upload</string>
+  <string name="autoupload_body">Select apps for automatic upload</string>
+
+  
 
 </resources>
