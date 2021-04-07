@@ -4,7 +4,6 @@ import com.aptoide.uploader.account.AptoideAccountManager;
 import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.apps.InstalledAppsManager;
 import com.aptoide.uploader.apps.StoreManager;
-import com.aptoide.uploader.apps.persistence.InstalledPersistence;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Scheduler;
@@ -20,14 +19,12 @@ public class SettingsPresenter implements Presenter {
   private final AptoideAccountManager accountManager;
   private final StoreManager storeManager;
   private final SettingsNavigator settingsNavigator;
-  private final InstalledPersistence persistence;
   private final InstalledAppsManager installedAppsManager;
 
   public SettingsPresenter(CompositeDisposable compositeDisposable, SettingsView view,
       Scheduler viewScheduler, AutoLoginManager autoLoginManager,
       AptoideAccountManager accountManager, StoreManager storeManager,
-      SettingsNavigator settingsNavigator, InstalledPersistence persistence,
-      InstalledAppsManager installedAppsManager) {
+      SettingsNavigator settingsNavigator, InstalledAppsManager installedAppsManager) {
     this.compositeDisposable = compositeDisposable;
     this.view = view;
     this.viewScheduler = viewScheduler;
@@ -35,7 +32,6 @@ public class SettingsPresenter implements Presenter {
     this.accountManager = accountManager;
     this.storeManager = storeManager;
     this.settingsNavigator = settingsNavigator;
-    this.persistence = persistence;
     this.installedAppsManager = installedAppsManager;
   }
 

@@ -19,7 +19,7 @@ public class AutoLoginNavigator {
   public void navigateToLoginFragment() {
     fragmentManager.beginTransaction()
         .replace(R.id.activity_main_container, LoginFragment.newInstance())
-        .addToBackStack(String.valueOf(R.layout.fragment_autologin))
+        .addToBackStack(String.valueOf(R.layout.fragment_login))
         .commit();
   }
 

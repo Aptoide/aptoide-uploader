@@ -48,7 +48,7 @@ class SettingsNavigator extends Navigator {
   public void navigateToAutoUploadFragment() {
     fragmentManager.beginTransaction()
         .add(R.id.activity_main_container, AutoUploadFragment.newInstance())
-        .addToBackStack(String.valueOf(R.layout.fragment_settings))
+        .addToBackStack(String.valueOf(R.layout.fragment_auto_upload))
         .commit();
   }
 

@@ -26,7 +26,7 @@ class MyStoreNavigator extends Navigator {
   public void navigateToSettingsFragment() {
     fragmentManager.beginTransaction()
         .replace(R.id.activity_main_container, SettingsFragment.newInstance())
-        .addToBackStack(String.valueOf(R.layout.fragment_my_apps))
+        .addToBackStack(String.valueOf(R.layout.fragment_settings))
         .commit();
   }
 
