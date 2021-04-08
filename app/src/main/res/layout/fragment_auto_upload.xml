@@ -39,7 +39,7 @@
           android:paddingEnd="15dp"
           android:textAppearance="@style/AppTheme.Toolbar.Title"
           android:textColor="@color/white"
-          android:text="Auto Upload"
+          android:text="@string/autoupload_settings_title"
           />
     </LinearLayout>
   </androidx.appcompat.widget.Toolbar>
@@ -58,7 +58,7 @@
         android:textSize="12sp"
         android:textColor="@color/black"
         android:lineSpacingExtra="2sp"
-        android:text="Select apps to be automatically uploaded">
+        android:text="@string/autoupload_body">
     </TextView>
   </LinearLayout>
   <androidx.swiperefreshlayout.widget.SwipeRefreshLayout
@@ -83,7 +83,7 @@
       android:layout_alignParentBottom="true"
       android:background="@color/light_blue_appbar"
       android:gravity="center"
-      android:text="Confirm"
+      android:text="@string/confirm_button"
       android:visibility="gone"
       />
 

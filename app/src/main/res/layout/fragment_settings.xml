@@ -14,7 +14,7 @@
 
   <LinearLayout
       android:layout_width="match_parent"
-      android:layout_height="match_parent"
+      android:layout_height="wrap_content"
       android:orientation="vertical"
       >
 
@@ -131,7 +131,7 @@
             android:layout_gravity="center_vertical"
             android:textSize="16sp"
             android:textColor="@color/black"
-            android:text="Auto upload"
+            android:text="@string/autoupload_settings_title"
             />
         <RelativeLayout
             android:id="@+id/fragment_settings_apps"
@@ -227,7 +227,7 @@
             android:layout_gravity="center_vertical"
             android:textSize="16sp"
             android:textColor="@color/black"
-            android:text="Send feedback"
+            android:text="@string/settings_send_feedback_title"
             />
       </LinearLayout>
       <LinearLayout
@@ -257,7 +257,7 @@
             android:layout_gravity="center_vertical"
             android:textSize="16sp"
             android:textColor="@color/black"
-            android:text="About us"
+            android:text="@string/settings_about_us_title"
             />
       </LinearLayout>
       <LinearLayout
@@ -317,7 +317,7 @@
             android:layout_gravity="center_vertical"
             android:textSize="16sp"
             android:textColor="@color/black"
-            android:text="Privacy Policy"
+            android:text="@string/settings_pp_title"
             />
       </LinearLayout>
     </LinearLayout>

@@ -165,7 +165,7 @@
         android:layout_marginEnd="16dp"
         android:layout_marginRight="16dp"
         android:layout_gravity="end"
-        android:text="Discover Auto upload"
+        android:text="@string/autoupload_tootltip"
         android:textColor="@color/black"
         android:textSize="14sp"
         android:background="@drawable/tooltip_rectangle"
