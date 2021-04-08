@@ -82,11 +82,11 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     toolbar = null;
     backButton = null;
     submitButton = null;
-    recyclerView.setAdapter(null);
-    recyclerView = null;
+    //recyclerView.setAdapter(null);
+    //recyclerView = null;
     refreshLayout = null;
     refreshEvent = null;
-    adapter = null;
+    //adapter = null;
     selectionObservable.dispose();
     super.onDestroyView();
   }

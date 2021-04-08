@@ -85,25 +85,24 @@ public class SettingsFragment extends FragmentView implements SettingsView {
         ((UploaderApplication) getContext().getApplicationContext()).getAccountManager(),
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
         new SettingsNavigator(getFragmentManager(), getContext().getApplicationContext()),
-        ((UploaderApplication) getContext().getApplicationContext()).getInstalledPersistence(),
         ((UploaderApplication) getContext().getApplicationContext()).getInstalledAppsManager()).present();
   }
 
   @Override public void onDestroyView() {
     backButton = null;
-    profileAvatar = null;
-    storeNameText = null;
+    //profileAvatar = null;
+    //storeNameText = null;
+    //selectedApp1 = null;
+    //selectedApp2 = null;
+    //selectedApp3 = null;
+    //selectedAppsExtra = null;
     signOut = null;
     autoUpload = null;
-    selectedApp1 = null;
-    selectedApp2 = null;
-    selectedApp3 = null;
-    selectedAppsExtra = null;
     sendFeedback = null;
     aboutUs = null;
     termsConditions = null;
     privacyPolicy = null;
-    logoutConfirmation.dismiss();
+    //logoutConfirmation.dismiss();
     logoutConfirmation = null;
     GlideApp.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
