@@ -27,7 +27,7 @@
         android:textSize="16sp"
         android:textColor="@color/black"
         android:lineSpacingExtra="3sp"
-        android:text="Auto upload"
+        android:text="@string/autoupload_settings_title"
         />
 
     <View
