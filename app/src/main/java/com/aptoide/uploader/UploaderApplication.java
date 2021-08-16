@@ -39,7 +39,9 @@ import com.aptoide.uploader.apps.network.TokenRevalidatorV7Alternate;
 import com.aptoide.uploader.apps.network.UserAgentInterceptor;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.AppUploadsDatabase;
+import com.aptoide.uploader.apps.persistence.AutoUploadSelectsPersistence;
 import com.aptoide.uploader.apps.persistence.DraftPersistence;
+import com.aptoide.uploader.apps.persistence.InstalledPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
 import com.aptoide.uploader.apps.persistence.RoomAutoUploadSelectsPersistence;
 import com.aptoide.uploader.apps.persistence.RoomInstalledPersistence;
@@ -154,7 +156,7 @@ public class UploaderApplication extends Application {
     return uploadManager;
   }
 
-  public RoomInstalledPersistence getInstalledPersistence() {
+  public InstalledPersistence getInstalledPersistence() {
     if (roomInstalledPersistence == null) {
       roomInstalledPersistence = new RoomInstalledPersistence(AppUploadsDatabase.getInstance(this)
           .installedDao());
@@ -162,7 +164,7 @@ public class UploaderApplication extends Application {
     return roomInstalledPersistence;
   }
 
-  public RoomAutoUploadSelectsPersistence getAutoUploadSelectsPersistence() {
+  public AutoUploadSelectsPersistence getAutoUploadSelectsPersistence() {
     if (roomAutoUploadSelectsPersistence == null) {
       roomAutoUploadSelectsPersistence = new RoomAutoUploadSelectsPersistence(
           AppUploadsDatabase.getInstance(this)

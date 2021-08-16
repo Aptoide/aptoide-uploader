@@ -3,14 +3,14 @@ package com.aptoide.uploader.apps
 import android.content.pm.ApplicationInfo
 import android.content.pm.PackageManager
 import android.util.Log
-import com.aptoide.uploader.apps.persistence.RoomAutoUploadSelectsPersistence
+import com.aptoide.uploader.apps.persistence.AutoUploadSelectsPersistence
 import io.reactivex.Completable
 import io.reactivex.Observable
 import io.reactivex.Single
 import io.reactivex.schedulers.Schedulers
 
 class AutoUploadSelectsManager(
-    private val roomAutoUploadSelectsPersistence: RoomAutoUploadSelectsPersistence,
+    private val roomAutoUploadSelectsPersistence: AutoUploadSelectsPersistence,
     private val packageManager: PackageManager) {
 
   private fun getInstalledToAutoUploadSelection(): Single<List<AutoUploadSelects>> {

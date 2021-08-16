@@ -3,10 +3,11 @@ package com.aptoide.uploader.apps
 import android.util.Log
 import com.aptoide.uploader.analytics.UploaderAnalytics
 import com.aptoide.uploader.apps.persistence.AutoUploadSelectsPersistence
+import com.aptoide.uploader.apps.persistence.InstalledPersistence
 import com.aptoide.uploader.apps.persistence.RoomInstalledPersistence
 import io.reactivex.Completable
 
-class InstallManager(private val installedPersistence: RoomInstalledPersistence,
+class InstallManager(private val installedPersistence: InstalledPersistence,
                      private val selectsPersistence: AutoUploadSelectsPersistence,
                      private val packageManagerInstalledAppsProvider: PackageManagerInstalledAppsProvider,
                      private val installedAppsManager: InstalledAppsManager,
