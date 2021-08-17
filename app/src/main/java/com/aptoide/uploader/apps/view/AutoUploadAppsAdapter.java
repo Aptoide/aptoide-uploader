@@ -100,6 +100,14 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     selectedApps.clear();
   }
 
+  public List<InstalledApp> getSelected() {
+    List<InstalledApp> selectedAppsList = new ArrayList<>();
+    for (Integer appId : selectedApps) {
+      selectedAppsList.add(installedApps.get(appId));
+    }
+    return selectedAppsList;
+  }
+
   public void setSelected(int position) {
     if (selectedApps.contains(position)) {
       selectedApps.remove((Integer) position);
@@ -109,14 +117,6 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
       selectedPublisher.onNext(true);
     }
     notifyItemChanged(position);
-  }
-
-  public List<InstalledApp> getSelected() {
-    List<InstalledApp> selectedAppsList = new ArrayList<>();
-    for (Integer appId : selectedApps) {
-      selectedAppsList.add(installedApps.get(appId));
-    }
-    return selectedAppsList;
   }
 
   private void clearAppsSelection(boolean notify) {
