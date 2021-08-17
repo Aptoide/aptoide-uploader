@@ -30,7 +30,6 @@ import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.UploadProgressManager;
 import com.aptoide.uploader.apps.network.AptoideConnectivityProvider;
-import com.aptoide.uploader.apps.network.ConnectivityInterceptor;
 import com.aptoide.uploader.apps.network.IdsRepository;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
@@ -206,7 +205,6 @@ public class UploaderApplication extends Application {
     return new OkHttpClient.Builder().writeTimeout(60, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .connectTimeout(60, TimeUnit.SECONDS)
-        .addInterceptor(getConnectivityInterceptor())
         .addInterceptor(getUserAgentInterceptor());
   }
 
@@ -229,10 +227,6 @@ public class UploaderApplication extends Application {
 
   public UserAgentInterceptor getUserAgentInterceptor() {
     return new UserAgentInterceptor(getIdsRepository());
-  }
-
-  public ConnectivityInterceptor getConnectivityInterceptor() {
-    return new ConnectivityInterceptor(getApplicationContext());
   }
 
   public AptoideAccountManager getAccountManager() {
