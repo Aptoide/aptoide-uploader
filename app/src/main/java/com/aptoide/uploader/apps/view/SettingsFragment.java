@@ -90,19 +90,12 @@ public class SettingsFragment extends FragmentView implements SettingsView {
 
   @Override public void onDestroyView() {
     backButton = null;
-    //profileAvatar = null;
-    //storeNameText = null;
-    //selectedApp1 = null;
-    //selectedApp2 = null;
-    //selectedApp3 = null;
-    //selectedAppsExtra = null;
     signOut = null;
     autoUpload = null;
     sendFeedback = null;
     aboutUs = null;
     termsConditions = null;
     privacyPolicy = null;
-    //logoutConfirmation.dismiss();
     logoutConfirmation = null;
     GlideApp.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
@@ -176,26 +169,6 @@ public class SettingsFragment extends FragmentView implements SettingsView {
     setSelectedAppsImages(appsList, SELECTED_APPS_IMAGES_NUMBER);
   }
 
-  private void addToImageViewList() {
-    imageViewList = new ArrayList<>();
-    imageViewList.add(selectedApp1);
-    imageViewList.add(selectedApp2);
-    imageViewList.add(selectedApp3);
-  }
-
-  private void setSelectedAppsImages(@NotNull List<InstalledApp> appsList, int imagesNumber) {
-    int size = Math.min(appsList.size(), imagesNumber);
-    for (int i = 0; i != size; i++) {
-      GlideApp.with(this)
-          .load(Uri.parse(appsList.get(i)
-              .getIconPath()))
-          .transition(DrawableTransitionOptions.withCrossFade())
-          .into(imageViewList.get(i));
-      imageViewList.get(i)
-          .setVisibility(View.VISIBLE);
-    }
-  }
-
   @Override public Observable<Object> backToMyStoreClick() {
     return RxView.clicks(backButton);
   }
@@ -218,5 +191,25 @@ public class SettingsFragment extends FragmentView implements SettingsView {
 
   @Override public Observable<Object> privacyPolicyClick() {
     return RxView.clicks(privacyPolicy);
+  }
+
+  private void addToImageViewList() {
+    imageViewList = new ArrayList<>();
+    imageViewList.add(selectedApp1);
+    imageViewList.add(selectedApp2);
+    imageViewList.add(selectedApp3);
+  }
+
+  private void setSelectedAppsImages(@NotNull List<InstalledApp> appsList, int imagesNumber) {
+    int size = Math.min(appsList.size(), imagesNumber);
+    for (int i = 0; i != size; i++) {
+      GlideApp.with(this)
+          .load(Uri.parse(appsList.get(i)
+              .getIconPath()))
+          .transition(DrawableTransitionOptions.withCrossFade())
+          .into(imageViewList.get(i));
+      imageViewList.get(i)
+          .setVisibility(View.VISIBLE);
+    }
   }
 }

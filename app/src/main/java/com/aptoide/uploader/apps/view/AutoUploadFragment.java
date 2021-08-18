@@ -82,11 +82,8 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     toolbar = null;
     backButton = null;
     submitButton = null;
-    //recyclerView.setAdapter(null);
-    //recyclerView = null;
     refreshLayout = null;
     refreshEvent = null;
-    //adapter = null;
     selectionObservable.dispose();
     super.onDestroyView();
   }
@@ -132,6 +129,19 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     return Single.just(adapter.getSelected());
   }
 
+  @Override public Observable<Object> submitSelectionClick() {
+    return RxView.clicks(submitButton);
+  }
+
+  @Override
+  public Observable<List<AutoUploadSelects>> saveSelectedOnSubmit(List<InstalledApp> packageList) {
+    return Observable.just(adapter.saveSelectedOnSubmit(packageList));
+  }
+
+  @Override public void clearSelection() {
+    adapter.clearAppsSelection();
+  }
+
   public void setSubmitButtonVisibility(boolean appsSelected) {
     if (appsSelected) {
       submitButton.startAnimation(slideBottomUp);
@@ -145,19 +155,6 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
         .distinctUntilChanged()
         .doOnNext(appsSelected -> setSubmitButtonVisibility(appsSelected))
         .subscribe();
-  }
-
-  @Override public Observable<Object> submitSelectionClick() {
-    return RxView.clicks(submitButton);
-  }
-
-  @Override
-  public Observable<List<AutoUploadSelects>> saveSelectedOnSubmit(List<InstalledApp> packageList) {
-    return Observable.just(adapter.saveSelectedOnSubmit(packageList));
-  }
-
-  @Override public void clearSelection() {
-    adapter.clearAppsSelection();
   }
 
   public void setUpSubmitButtonAnimation() {
