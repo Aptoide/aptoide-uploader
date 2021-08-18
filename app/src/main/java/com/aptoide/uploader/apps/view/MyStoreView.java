@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
 import com.aptoide.uploader.apps.AppUploadStatus;
+import com.aptoide.uploader.apps.AutoUploadSelects;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
@@ -12,9 +13,11 @@ public interface MyStoreView extends View {
 
   void checkFirstRun();
 
-  void showApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses);
+  void showApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses,
+      List<AutoUploadSelects> autoUploadSelects);
 
-  void refreshApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses);
+  void refreshApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses,
+      List<AutoUploadSelects> autoUploadSelects);
 
   void orderApps(SortingOrder order);
 

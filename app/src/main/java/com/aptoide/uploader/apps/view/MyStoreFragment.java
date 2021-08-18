@@ -27,6 +27,7 @@ import cm.aptoide.aptoideviews.recyclerview.GridRecyclerView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.AppUploadStatus;
+import com.aptoide.uploader.apps.AutoUploadSelects;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.permission.PermissionProvider;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
@@ -99,11 +100,12 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
     recyclerView.setAdaptiveLayout(110, 126,
         GridRecyclerView.AdaptStrategy.SCALE_KEEP_ASPECT_RATIO);
-    adapter = new MyAppsAdapter(new ArrayList<>(), new ArrayList<>(), (view1, packageName) -> {
-      Uri packageURI = Uri.parse("package:" + packageName);
-      Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
-      startActivity(uninstallIntent);
-    }, sortingOrder);
+    adapter = new MyAppsAdapter(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+        (view1, packageName) -> {
+          Uri packageURI = Uri.parse("package:" + packageName);
+          Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
+          startActivity(uninstallIntent);
+        }, sortingOrder);
     setUpSelectionListener();
     refreshEvent = PublishSubject.create();
     recyclerView.setAdapter(adapter);
@@ -181,56 +183,16 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     }
   }
 
-  private boolean showVersionDialog() {
-    PackageInfo pInfo;
-    try {
-      pInfo = getActivity().getPackageManager()
-          .getPackageInfo(getActivity().getPackageName(), 0);
-      String version = pInfo.versionName;
-      int versionCode = pInfo.versionCode;
-      String appName = pInfo.packageName;
-
-      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-      builder.setMessage("App : "
-          + appName
-          + "\n"
-          + "Version : "
-          + version
-          + "\n"
-          + "Version Code : "
-          + versionCode);
-
-      AlertDialog dialog = builder.create();
-      dialog.show();
-    } catch (PackageManager.NameNotFoundException e) {
-      e.printStackTrace();
-    }
-    return false;
-  }
-
-  private void setUpSelectionListener() {
-    selectionObservable = adapter.toggleSelection()
-        .doOnNext(appsSelected -> handleTitleChange())
-        .distinctUntilChanged()
-        .doOnNext(appsSelected -> setSubmitButtonVisibility(appsSelected))
-        .subscribe();
-  }
-
-  private void prepareSpinner(int arrayId) {
-    ArrayAdapter<CharSequence> adapter =
-        ArrayAdapter.createFromResource(getActivity(), arrayId, R.layout.spinner_item);
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    spinner.setAdapter(adapter);
-  }
-
-  @Override public void showApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses) {
-    adapter.setInstalledAndUploadedApps(appsList, appUploadStatuses);
+  @Override public void showApps(@NotNull List<InstalledApp> appsList,
+      List<AppUploadStatus> appUploadStatuses, List<AutoUploadSelects> autoUploadSelects) {
+    adapter.setInstalledAndUploadedApps(appsList, appUploadStatuses, autoUploadSelects);
     loadingSpinner.setVisibility(View.GONE);
     recyclerView.scheduleLayoutAnimation();
   }
 
-  @Override public void refreshApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses) {
-    adapter.setInstalledAndUploadedApps(appsList, appUploadStatuses);
+  @Override public void refreshApps(@NotNull List<InstalledApp> appsList,
+      List<AppUploadStatus> appUploadStatuses, List<AutoUploadSelects> autoUploadSelects) {
+    adapter.setInstalledAndUploadedApps(appsList, appUploadStatuses, autoUploadSelects);
     refreshLayout.setRefreshing(false);
     recyclerView.scheduleLayoutAnimation();
   }
@@ -348,6 +310,48 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public Observable<Boolean> refreshEvent() {
     return refreshEvent;
+  }
+
+  private boolean showVersionDialog() {
+    PackageInfo pInfo;
+    try {
+      pInfo = getActivity().getPackageManager()
+          .getPackageInfo(getActivity().getPackageName(), 0);
+      String version = pInfo.versionName;
+      int versionCode = pInfo.versionCode;
+      String appName = pInfo.packageName;
+
+      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+      builder.setMessage("App : "
+          + appName
+          + "\n"
+          + "Version : "
+          + version
+          + "\n"
+          + "Version Code : "
+          + versionCode);
+
+      AlertDialog dialog = builder.create();
+      dialog.show();
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  private void setUpSelectionListener() {
+    selectionObservable = adapter.toggleSelection()
+        .doOnNext(appsSelected -> handleTitleChange())
+        .distinctUntilChanged()
+        .doOnNext(appsSelected -> setSubmitButtonVisibility(appsSelected))
+        .subscribe();
+  }
+
+  private void prepareSpinner(int arrayId) {
+    ArrayAdapter<CharSequence> adapter =
+        ArrayAdapter.createFromResource(getActivity(), arrayId, R.layout.spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spinner.setAdapter(adapter);
   }
 
   public void setUpSubmitButtonAnimation() {

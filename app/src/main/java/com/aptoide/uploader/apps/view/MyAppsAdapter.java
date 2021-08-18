@@ -1,6 +1,5 @@
 package com.aptoide.uploader.apps.view;
 
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.ViewGroup;
 import androidx.annotation.NonNull;
@@ -20,15 +19,18 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   private final List<InstalledApp> installedApps;
   private final List<AppUploadStatus> uploadedList;
   private final List<Integer> selectedApps;
+  private final List<AutoUploadSelects> autoUploadSelectsList;
   private final AppSelectedListener selectedAppListener;
   private final AppLongClickListener longClickListener;
   private final PublishSubject<Boolean> selectedPublisher;
   private SortingOrder currentOrder;
 
   public MyAppsAdapter(@NonNull List<InstalledApp> list, List<AppUploadStatus> uploadedList,
-      AppLongClickListener longClickListener, SortingOrder currentOrder) {
+      List<AutoUploadSelects> autoUploadSelectsList, AppLongClickListener longClickListener,
+      SortingOrder currentOrder) {
     this.installedApps = list;
     this.uploadedList = uploadedList;
+    this.autoUploadSelectsList = autoUploadSelectsList;
     this.longClickListener = longClickListener;
     this.currentOrder = currentOrder;
     this.selectedApps = new ArrayList<>();
@@ -42,7 +44,9 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   }
 
   @Override public void onBindViewHolder(AppViewHolder holder, int position) {
-    holder.setApp(installedApps.get(position), selectedApps.contains(position), matchInstalledToUploadStatus(installedApps.get(position)));
+    holder.setApp(installedApps.get(position), selectedApps.contains(position),
+        matchInstalledToUploadStatus(installedApps.get(position)),
+        isAppOnAutoUpload(installedApps.get(position)));
   }
 
   @Override public int getItemViewType(int position) {
@@ -53,14 +57,35 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
     return installedApps.size();
   }
 
+  private boolean isAppOnAutoUpload(InstalledApp installedApp) {
+    for (AutoUploadSelects autoUploadSelect : autoUploadSelectsList) {
+      if (autoUploadSelect.getPackageName()
+          .equals(installedApp.getPackageName()) && autoUploadSelect.isSelectedAutoUpload()) {
+        return true;
+      }
+    }
+    return false;
+  }
+
   public Observable<Boolean> toggleSelection() {
     return selectedPublisher;
   }
 
   public void setInstalledAndUploadedApps(List<InstalledApp> appsList,
-      List<AppUploadStatus> appUploadStatuses) {
+      List<AppUploadStatus> appUploadStatuses, List<AutoUploadSelects> autoUploadSelects) {
     setInstalledApps(appsList);
     setUploadStatusApps(appUploadStatuses);
+    setAutoUploadApps(autoUploadSelects);
+  }
+
+  private void setAutoUploadApps(List<AutoUploadSelects> autoUploadSelects) {
+    if (!autoUploadSelects.equals(this.autoUploadSelectsList)) {
+      this.autoUploadSelectsList.clear();
+      this.autoUploadSelectsList.addAll(autoUploadSelects);
+      clearAppsSelection(false);
+      setOrder(currentOrder);
+      notifyDataSetChanged();
+    }
   }
 
   public void setInstalledApps(List<InstalledApp> appsList) {
@@ -145,5 +170,4 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   public void clearAppsSelection() {
     clearAppsSelection(true);
   }
-
 }

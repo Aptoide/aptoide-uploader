@@ -22,6 +22,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder
   private final AppSelectedListener listener;
   private final AppLongClickListener longClickListener;
   private final AppCompatImageView cloud;
+  //private final ImageView autoUploadCloud;
   private String packageName;
 
   AppViewHolder(View itemView, AppSelectedListener listener,
@@ -31,13 +32,15 @@ public class AppViewHolder extends RecyclerView.ViewHolder
     appName = itemView.findViewById(R.id.item_app_name);
     background = itemView.findViewById(R.id.item_app_layout);
     cloud = itemView.findViewById(R.id.appInCloud);
+    //autoUploadCloud = itemView.findViewById(R.id.auto_upload_cloud);
     this.listener = listener;
     this.longClickListener = longClickListener;
     itemView.setOnClickListener(this);
     itemView.setOnLongClickListener(this);
   }
 
-  void setApp(InstalledApp app, boolean selected, AppUploadStatus uploadStatus) {
+  void setApp(InstalledApp app, boolean selected, AppUploadStatus uploadStatus,
+      boolean isAppOnAutoUpload) {
     packageName = app.getPackageName();
     GlideApp.with(itemView)
         .load(Uri.parse(app.getIconPath()))
@@ -62,6 +65,12 @@ public class AppViewHolder extends RecyclerView.ViewHolder
     } else {
       cloud.setVisibility(View.GONE);
     }
+
+  /*  if (isAppOnAutoUpload) {
+      autoUploadCloud.setVisibility(View.VISIBLE);
+    } else {
+      autoUploadCloud.setVisibility(View.GONE);
+    }*/
   }
 
   @Override public void onClick(View view) {

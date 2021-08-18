@@ -131,7 +131,7 @@ public class MyStorePresenter implements Presenter {
         .doOnNext(refresh -> uploadManager.fillAppUploadStatusPersistence())
         .observeOn(viewScheduler)
         .doOnNext(installedAppsStatus -> view.showApps(installedAppsStatus.getApps(),
-            installedAppsStatus.getUploadStatuses()))
+            installedAppsStatus.getUploadStatuses(), installedAppsStatus.getAutoUploadSelects()))
         .flatMap(__ -> checkUploadedApps())
         .subscribe(__ -> {
         }, throwable -> {
@@ -146,7 +146,8 @@ public class MyStorePresenter implements Presenter {
             .flatMap(refreshEvent -> installedAppsManager.getInstalledAppsStatus())
             .observeOn(viewScheduler)
             .doOnNext(installedAppsStatus -> view.refreshApps(installedAppsStatus.getApps(),
-                installedAppsStatus.getUploadStatuses()))
+                installedAppsStatus.getUploadStatuses(),
+                installedAppsStatus.getAutoUploadSelects()))
             .flatMap(apps -> checkUploadedApps()))
         .subscribe());
   }
