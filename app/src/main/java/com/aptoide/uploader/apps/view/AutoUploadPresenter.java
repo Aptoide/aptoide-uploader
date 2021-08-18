@@ -57,7 +57,7 @@ public class AutoUploadPresenter implements Presenter {
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> installedAppsManager.getInstalledAppsStatus())
         .observeOn(viewScheduler)
-        .doOnNext(installedAppsStatus -> view.showApps(installedAppsStatus.getApps(),
+        .doOnNext(installedAppsStatus -> view.showApps(installedAppsStatus.getInstalledApps(),
             installedAppsStatus.getAutoUploadSelects()))
         .flatMapCompletable(__ -> handleSelectedApps())
         .subscribe(() -> {
@@ -72,7 +72,7 @@ public class AutoUploadPresenter implements Presenter {
         .flatMap(event -> view.refreshEvent()
             .flatMap(refreshEvent -> installedAppsManager.getInstalledAppsStatus())
             .observeOn(viewScheduler)
-            .doOnNext(installedAppsStatus -> view.refreshApps(installedAppsStatus.getApps(),
+            .doOnNext(installedAppsStatus -> view.refreshApps(installedAppsStatus.getInstalledApps(),
                 installedAppsStatus.getAutoUploadSelects())))
         .subscribe());
   }

@@ -14,7 +14,7 @@ public class InstalledAppsStatus {
     this.autoUploadSelects = autoUploadSelects;
   }
 
-  public List<InstalledApp> getApps() {
+  public List<InstalledApp> getInstalledApps() {
     return apps;
   }
 
