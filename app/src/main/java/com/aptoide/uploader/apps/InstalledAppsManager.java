@@ -25,22 +25,22 @@ public class InstalledAppsManager {
   }
 
   public Observable<InstalledAppsStatus> getInstalledAppsStatus() {
-    return Observable.zip(getInstalledAppsPersistence(), getAppUploadStatusPersistence(),
-        getAutoUploadSelectsPersistence(),
+    return Observable.zip(getInstalledApps(), getAppUploadStatusList(),
+        getAutoUploadSelectedAppsList(),
         (apps, uploadStatus, autoUploadSelects) -> new InstalledAppsStatus(apps, uploadStatus,
             autoUploadSelects))
         .subscribeOn(scheduler);
   }
 
-  private Observable<List<InstalledApp>> getInstalledAppsPersistence() {
+  private Observable<List<InstalledApp>> getInstalledApps() {
     return installedPersistence.allInstalledSorted();
   }
 
-  private Observable<List<AppUploadStatus>> getAppUploadStatusPersistence() {
+  private Observable<List<AppUploadStatus>> getAppUploadStatusList() {
     return uploadPersistence.getAppsUploadStatus();
   }
 
-  private Observable<List<AutoUploadSelects>> getAutoUploadSelectsPersistence() {
+  private Observable<List<AutoUploadSelects>> getAutoUploadSelectedAppsList() {
     return selectedPersistence.getAllAutoUploadSelectStatus();
   }
 
