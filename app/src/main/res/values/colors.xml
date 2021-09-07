@@ -17,4 +17,5 @@
   <color name="grey_fog_normal">#d8d8d8</color>
   <color name="light_blue_appbar">#478bc1</color>
   <color name="dark_blue_appbar">#0177ad</color>
+  <color name="light_green_700">#689f38</color>
 </resources>
