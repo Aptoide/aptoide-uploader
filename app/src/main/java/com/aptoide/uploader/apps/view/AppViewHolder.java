@@ -2,6 +2,7 @@ package com.aptoide.uploader.apps.view;
 
 import android.net.Uri;
 import android.os.Build;
+import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -11,6 +12,7 @@ import com.aptoide.uploader.R;
 import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.glide.GlideApp;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 public class AppViewHolder extends RecyclerView.ViewHolder
@@ -22,7 +24,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder
   private final AppSelectedListener listener;
   private final AppLongClickListener longClickListener;
   private final AppCompatImageView cloud;
-  //private final ImageView autoUploadCloud;
+  private final ImageView autoUploadCloud;
   private String packageName;
 
   AppViewHolder(View itemView, AppSelectedListener listener,
@@ -32,7 +34,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder
     appName = itemView.findViewById(R.id.item_app_name);
     background = itemView.findViewById(R.id.item_app_layout);
     cloud = itemView.findViewById(R.id.appInCloud);
-    //autoUploadCloud = itemView.findViewById(R.id.auto_upload_cloud);
+    autoUploadCloud = itemView.findViewById(R.id.auto_upload_cloud);
     this.listener = listener;
     this.longClickListener = longClickListener;
     itemView.setOnClickListener(this);
@@ -44,6 +46,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder
     packageName = app.getPackageName();
     GlideApp.with(itemView)
         .load(Uri.parse(app.getIconPath()))
+        .transform(new RoundedCorners(12))
         .transition(DrawableTransitionOptions.withCrossFade())
         .into(image);
 
@@ -66,11 +69,13 @@ public class AppViewHolder extends RecyclerView.ViewHolder
       cloud.setVisibility(View.GONE);
     }
 
-  /*  if (isAppOnAutoUpload) {
+    if (isAppOnAutoUpload) {
+      Log.d("lol", "setApp: setting isAutoUpload tag visible");
       autoUploadCloud.setVisibility(View.VISIBLE);
     } else {
+      Log.d("lol", "setApp: setting isAutoUpload tag invisible");
       autoUploadCloud.setVisibility(View.GONE);
-    }*/
+    }
   }
 
   @Override public void onClick(View view) {
