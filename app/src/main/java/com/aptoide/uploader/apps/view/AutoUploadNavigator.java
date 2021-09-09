@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
 import android.content.Context;
+import android.util.Log;
 import androidx.fragment.app.FragmentManager;
 import com.aptoide.uploader.R;
 

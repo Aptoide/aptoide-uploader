@@ -16,19 +16,19 @@ import java.util.List;
 public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppViewHolder> {
 
   private final List<InstalledApp> installedApps;
-  private final List<AutoUploadSelects> autoUploadSelects;
+  private final List<AutoUploadSelects> autoUploadAppsList;
   private final List<Integer> selectedApps;
   private final AppSelectedListener selectedAppListener;
   private final PublishSubject<Boolean> selectedPublisher;
   private SortingOrder currentOrder;
 
   public AutoUploadAppsAdapter(@NonNull List<InstalledApp> list,
-      List<AutoUploadSelects> autoUploadSelects, SortingOrder currentOrder) {
+      List<AutoUploadSelects> autoUploadAppsList, SortingOrder currentOrder) {
     this.installedApps = list;
-    this.autoUploadSelects = autoUploadSelects;
+    this.autoUploadAppsList = autoUploadAppsList;
     this.currentOrder = currentOrder;
     this.selectedApps = new ArrayList<>();
-    this.selectedAppListener = (view, position) -> setSelected(position);
+    this.selectedAppListener = (view, position) -> selectApp(position);
     this.selectedPublisher = PublishSubject.create();
   }
 
@@ -53,13 +53,13 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     return selectedPublisher;
   }
 
-  public void getPreviousSavedSelection(List<String> selectedPackageNames) {
+  public void loadPreviousAppsSelection(List<String> selectedPackageNames) {
     for (int i = 0; i < installedApps.size(); i++) {
       InstalledApp app = installedApps.get(i);
       for (String packageName : selectedPackageNames) {
         if (app.getPackageName()
             .equals(packageName)) {
-          setSelected(i);
+          selectApp(i);
         }
       }
     }
@@ -82,9 +82,9 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
   }
 
   public void setAutoUploadSelectsApps(List<AutoUploadSelects> selectsList) {
-    if (!selectsList.equals(autoUploadSelects)) {
-      autoUploadSelects.clear();
-      autoUploadSelects.addAll(selectsList);
+    if (!selectsList.equals(autoUploadAppsList)) {
+      autoUploadAppsList.clear();
+      autoUploadAppsList.addAll(selectsList);
       clearAppsSelection(false);
       setOrder(currentOrder);
       notifyDataSetChanged();
@@ -100,7 +100,7 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     selectedApps.clear();
   }
 
-  public List<InstalledApp> getSelected() {
+  public List<InstalledApp> getSelectedApps() {
     List<InstalledApp> selectedAppsList = new ArrayList<>();
     for (Integer appId : selectedApps) {
       selectedAppsList.add(installedApps.get(appId));
@@ -108,7 +108,7 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     return selectedAppsList;
   }
 
-  public void setSelected(int position) {
+  public void selectApp(int position) {
     if (selectedApps.contains(position)) {
       selectedApps.remove((Integer) position);
       selectedPublisher.onNext(selectedApps.size() != 0);
@@ -127,24 +127,24 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     }
   }
 
-  public List<AutoUploadSelects> saveSelectedOnSubmit(List<InstalledApp> selectedApps) {
-    for (int i = 0; i < autoUploadSelects.size(); i++) {
+  public List<AutoUploadSelects> setSelectedApps(List<InstalledApp> selectedApps) {
+    for (int i = 0; i < autoUploadAppsList.size(); i++) {
       boolean setted = false;
       for (InstalledApp selectedApp : selectedApps) {
-        if (autoUploadSelects.get(i)
+        if (autoUploadAppsList.get(i)
             .getPackageName()
             .equals(selectedApp.getPackageName())) {
-          autoUploadSelects.get(i)
+          autoUploadAppsList.get(i)
               .setSelectedAutoUpload(true);
           setted = true;
         }
       }
       if (!setted) {
-        autoUploadSelects.get(i)
+        autoUploadAppsList.get(i)
             .setSelectedAutoUpload(false);
       }
     }
-    return autoUploadSelects;
+    return autoUploadAppsList;
   }
 
   public void clearAppsSelection() {

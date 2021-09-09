@@ -72,27 +72,27 @@ public class AutoUploadPresenter implements Presenter {
         .flatMap(event -> view.refreshEvent()
             .flatMap(refreshEvent -> installedAppsManager.getInstalledAppsStatus())
             .observeOn(viewScheduler)
-            .doOnNext(installedAppsStatus -> view.refreshApps(installedAppsStatus.getInstalledApps(),
-                installedAppsStatus.getAutoUploadSelects())))
+            .doOnNext(
+                installedAppsStatus -> view.refreshApps(installedAppsStatus.getInstalledApps(),
+                    installedAppsStatus.getAutoUploadSelects())))
         .subscribe());
   }
 
-  private Observable<List<String>> checkSelectedApps() {
+  private Observable<List<String>> loadSelectedApps() {
     return installedAppsManager.getSelectedFromAutoUploadSelectsPersistence()
         .observeOn(viewScheduler)
-        .doOnNext(packageList -> view.getPreviousSavedSelection(packageList));
+        .doOnNext(packageList -> view.loadPreviousAppsSelection(packageList));
   }
 
   private Completable handleSelectedApps() {
-    return checkSelectedApps().flatMap(__ -> view.submitSelectionClick())
+    return loadSelectedApps().flatMap(__ -> view.submitSelectionClick())
         .doOnNext(__ -> uploadPermissionProvider.requestExternalStoragePermission())
         .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
         .filter(granted -> granted)
         .flatMapSingle(__ -> view.getSelectedApps())
-        .flatMap(selected -> view.saveSelectedOnSubmit(selected))
-        .flatMapCompletable(
-            changedList -> installedAppsManager.replaceSelectsListOnPersistence(changedList)
-                .doOnComplete(() -> autoUploadNavigator.navigateToSettingsFragment()))
+        .flatMap(selected -> view.getAutoUploadSelectedApps(selected))
+        .flatMapCompletable(changedList -> installedAppsManager.updateAutoUploadApps(changedList)
+            .doOnComplete(() -> autoUploadNavigator.navigateToSettingsFragment()))
         .observeOn(viewScheduler)
         .doOnError(throwable -> {
           if (throwable instanceof SocketTimeoutException) {

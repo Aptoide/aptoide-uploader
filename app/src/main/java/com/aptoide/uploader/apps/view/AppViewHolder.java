@@ -2,7 +2,6 @@ package com.aptoide.uploader.apps.view;
 
 import android.net.Uri;
 import android.os.Build;
-import android.util.Log;
 import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
@@ -70,10 +69,8 @@ public class AppViewHolder extends RecyclerView.ViewHolder
     }
 
     if (isAppOnAutoUpload) {
-      Log.d("lol", "setApp: setting isAutoUpload tag visible");
       autoUploadCloud.setVisibility(View.VISIBLE);
     } else {
-      Log.d("lol", "setApp: setting isAutoUpload tag invisible");
       autoUploadCloud.setVisibility(View.GONE);
     }
   }

@@ -19,13 +19,13 @@ public interface AutoUploadView extends View {
 
   Observable<Boolean> refreshEvent();
 
-  void getPreviousSavedSelection(List<String> packageList);
+  void loadPreviousAppsSelection(List<String> packageList);
 
   Single<List<InstalledApp>> getSelectedApps();
 
   Observable<Object> submitSelectionClick();
 
-  Observable<List<AutoUploadSelects>> saveSelectedOnSubmit(List<InstalledApp> packageList);
+  Observable<List<AutoUploadSelects>> getAutoUploadSelectedApps(List<InstalledApp> packageList);
 
   public void clearSelection();
 }

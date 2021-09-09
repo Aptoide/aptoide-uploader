@@ -121,21 +121,21 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     return refreshEvent;
   }
 
-  @Override public void getPreviousSavedSelection(List<String> packageList) {
-    adapter.getPreviousSavedSelection(packageList);
+  @Override public void loadPreviousAppsSelection(List<String> packageList) {
+    adapter.loadPreviousAppsSelection(packageList);
   }
 
   @Override public Single<List<InstalledApp>> getSelectedApps() {
-    return Single.just(adapter.getSelected());
+    return Single.just(adapter.getSelectedApps());
   }
 
   @Override public Observable<Object> submitSelectionClick() {
     return RxView.clicks(submitButton);
   }
 
-  @Override
-  public Observable<List<AutoUploadSelects>> saveSelectedOnSubmit(List<InstalledApp> packageList) {
-    return Observable.just(adapter.saveSelectedOnSubmit(packageList));
+  @Override public Observable<List<AutoUploadSelects>> getAutoUploadSelectedApps(
+      List<InstalledApp> packageList) {
+    return Observable.just(adapter.setSelectedApps(packageList));
   }
 
   @Override public void clearSelection() {
