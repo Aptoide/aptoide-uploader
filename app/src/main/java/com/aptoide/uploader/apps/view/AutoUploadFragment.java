@@ -68,12 +68,10 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     refreshLayout.setOnRefreshListener(() -> refreshEvent.onNext(true));
     setUpSubmitButtonAnimation();
     setUpSelectionListener();
-    toolbar.setNavigationOnClickListener(click -> {
-      adapter.clearAppsSelection();
-    });
+    toolbar.setNavigationOnClickListener(click -> adapter.clearAppsSelection());
 
     new AutoUploadPresenter(this, new CompositeDisposable(), AndroidSchedulers.mainThread(),
-        new AutoUploadNavigator(getFragmentManager(), getContext().getApplicationContext()),
+        new AutoUploadNavigator(getFragmentManager()),
         new UploadPermissionProvider((PermissionProvider) getContext()),
         ((UploaderApplication) getContext().getApplicationContext()).getInstalledAppsManager()).present();
   }
