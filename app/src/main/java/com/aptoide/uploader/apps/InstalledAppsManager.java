@@ -12,15 +12,15 @@ public class InstalledAppsManager {
 
   private final InstalledPersistence installedPersistence;
   private final AppUploadStatusPersistence uploadPersistence;
-  private final AutoUploadSelectsPersistence selectedPersistence;
+  private final AutoUploadSelectsPersistence autoUploadAppsPersistence;
   private final Scheduler scheduler;
 
   public InstalledAppsManager(InstalledPersistence installedPersistence,
       AppUploadStatusPersistence uploadPersistence,
-      AutoUploadSelectsPersistence selectedPersistence, Scheduler scheduler) {
+      AutoUploadSelectsPersistence autoUploadAppsPersistence, Scheduler scheduler) {
     this.installedPersistence = installedPersistence;
     this.uploadPersistence = uploadPersistence;
-    this.selectedPersistence = selectedPersistence;
+    this.autoUploadAppsPersistence = autoUploadAppsPersistence;
     this.scheduler = scheduler;
   }
 
@@ -41,11 +41,11 @@ public class InstalledAppsManager {
   }
 
   private Observable<List<AutoUploadSelects>> getAutoUploadSelectedAppsList() {
-    return selectedPersistence.getAllAutoUploadSelectStatus();
+    return autoUploadAppsPersistence.getAllAutoUploadSelectStatus();
   }
 
-  public Completable replaceSelectsListOnPersistence(List<AutoUploadSelects> selectsList) {
-    return selectedPersistence.replaceAllBy(selectsList);
+  public Completable updateAutoUploadApps(List<AutoUploadSelects> selectsList) {
+    return autoUploadAppsPersistence.replaceAllBy(selectsList);
   }
 
   public Observable<List<String>> getUploadedFromAppUploadStatusPersistence() {
@@ -58,7 +58,7 @@ public class InstalledAppsManager {
   }
 
   public Observable<List<String>> getSelectedFromAutoUploadSelectsPersistence() {
-    return selectedPersistence.getSelectedApps()
+    return autoUploadAppsPersistence.getSelectedApps()
         .distinctUntilChanged(
             (previous, current) -> !selectedPersistenceHasChanged(previous, current))
         .flatMapSingle(apps -> Observable.fromIterable(apps)
@@ -90,7 +90,7 @@ public class InstalledAppsManager {
   }
 
   public boolean isSelectedApp(String installedPackageName) {
-    return selectedPersistence.isSelectedApp(installedPackageName);
+    return autoUploadAppsPersistence.isSelectedApp(installedPackageName);
   }
 
   private boolean uploadedPersistenceHasChanged(List<AppUploadStatus> previousList,
