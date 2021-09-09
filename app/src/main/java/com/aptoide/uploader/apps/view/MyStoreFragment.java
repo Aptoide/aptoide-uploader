@@ -98,8 +98,8 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
     recyclerView.addItemDecoration(new GridDividerItemDecoration(
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
-    recyclerView.setAdaptiveLayout(110, 126,
-        GridRecyclerView.AdaptStrategy.SCALE_KEEP_ASPECT_RATIO);
+    recyclerView.setAdaptiveLayout(108, 152,
+        GridRecyclerView.AdaptStrategy.SCALE_WIDTH_ONLY);
     adapter = new MyAppsAdapter(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
         (view1, packageName) -> {
           Uri packageURI = Uri.parse("package:" + packageName);
