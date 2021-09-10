@@ -145,9 +145,10 @@ public class MyStorePresenter implements Presenter {
         .flatMap(__ -> view.refreshEvent()
             .flatMap(refreshEvent -> installedAppsManager.getInstalledAppsStatus())
             .observeOn(viewScheduler)
-            .doOnNext(installedAppsStatus -> view.refreshApps(installedAppsStatus.getInstalledApps(),
-                installedAppsStatus.getUploadStatuses(),
-                installedAppsStatus.getAutoUploadSelects()))
+            .doOnNext(
+                installedAppsStatus -> view.refreshApps(installedAppsStatus.getInstalledApps(),
+                    installedAppsStatus.getUploadStatuses(),
+                    installedAppsStatus.getAutoUploadSelects()))
             .flatMap(apps -> checkUploadedApps()))
         .subscribe());
   }

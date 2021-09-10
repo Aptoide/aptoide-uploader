@@ -2,9 +2,9 @@ package com.aptoide.uploader.apps
 
 import android.util.Log
 import com.aptoide.uploader.analytics.UploaderAnalytics
+import com.aptoide.uploader.apps.network.ConnectivityProvider
 import com.aptoide.uploader.apps.persistence.AutoUploadSelectsPersistence
 import com.aptoide.uploader.apps.persistence.InstalledPersistence
-import com.aptoide.uploader.apps.persistence.RoomInstalledPersistence
 import io.reactivex.Completable
 
 class InstallManager(private val installedPersistence: InstalledPersistence,
@@ -12,7 +12,8 @@ class InstallManager(private val installedPersistence: InstalledPersistence,
                      private val packageManagerInstalledAppsProvider: PackageManagerInstalledAppsProvider,
                      private val installedAppsManager: InstalledAppsManager,
                      private val storeManager: StoreManager,
-                     private val uploaderAnalytics: UploaderAnalytics) {
+                     private val uploaderAnalytics: UploaderAnalytics,
+                     private val aptoideConnectivityProvider: ConnectivityProvider) {
 
   fun insertAllInstalled(): Completable {
     return packageManagerInstalledAppsProvider.nonSystemInstalledApps
@@ -42,7 +43,7 @@ class InstallManager(private val installedPersistence: InstalledPersistence,
   private fun uploadApp(installed: InstalledApp): Completable {
     return if (!installedAppsManager.isUploadedVersion(installed.packageName,
             installed.versionCode) and installedAppsManager.isSelectedApp(
-            installed.packageName)) {
+            installed.packageName) and aptoideConnectivityProvider.isOnWifiNetwork) {
       storeManager.upload(installed)
     } else {
       Completable.complete()

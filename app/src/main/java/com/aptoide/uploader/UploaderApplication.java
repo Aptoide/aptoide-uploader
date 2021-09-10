@@ -1,6 +1,8 @@
 package com.aptoide.uploader;
 
 import android.app.Application;
+import android.content.Context;
+import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.aptoide.authentication.AptoideAuthentication;
@@ -30,6 +32,7 @@ import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.UploadProgressManager;
 import com.aptoide.uploader.apps.network.AptoideConnectivityProvider;
+import com.aptoide.uploader.apps.network.ConnectivityProvider;
 import com.aptoide.uploader.apps.network.IdsRepository;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
@@ -98,6 +101,7 @@ public class UploaderApplication extends Application {
   private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
   private LoginManager loginManager;
   private AgentPersistence agentPersistence;
+  private ConnectivityProvider connectivityProvider;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -178,7 +182,7 @@ public class UploaderApplication extends Application {
       installManager =
           new InstallManager(getInstalledPersistence(), getAutoUploadSelectsPersistence(),
               getPackageManagerInstalledAppsProvider(), getInstalledAppsManager(), getAppsManager(),
-              getUploaderAnalytics());
+              getUploaderAnalytics(), getConnectivityProvider());
     }
     return installManager;
   }
@@ -327,8 +331,12 @@ public class UploaderApplication extends Application {
     return new AptoideAccountProvider(getAccountManager(), getAuthenticationProvider());
   }
 
-  public AptoideConnectivityProvider getConnectivityProvider() {
-    return new AptoideConnectivityProvider(getApplicationContext());
+  public ConnectivityProvider getConnectivityProvider() {
+    if (connectivityProvider == null) {
+      connectivityProvider = new AptoideConnectivityProvider(
+          (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE));
+    }
+    return connectivityProvider;
   }
 
   public LanguageManager getLanguageManager() {
