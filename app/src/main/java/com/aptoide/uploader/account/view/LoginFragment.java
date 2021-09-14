@@ -132,8 +132,7 @@ public class LoginFragment extends FragmentView implements LoginView, MagicLinkV
     new LoginPresenter(this, accountManager,
         new LoginNavigator(getFragmentManager(), getContext().getApplicationContext()),
         new CompositeDisposable(), AndroidSchedulers.mainThread(),
-        ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
-        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics()).present();
     new SendMagicLinkPresenter(this, accountManager,
         new SendMagicLinkNavigator(getFragmentManager()), AndroidSchedulers.mainThread(),
         ((UploaderApplication) getContext().getApplicationContext()).getAgentPersistence()).present();

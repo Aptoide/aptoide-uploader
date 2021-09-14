@@ -19,8 +19,8 @@ public class AutoLoginNavigator {
   public void navigateToLoginFragment() {
     fragmentManager.beginTransaction()
         .replace(R.id.activity_main_container, LoginFragment.newInstance())
-        .addToBackStack(String.valueOf(R.layout.fragment_autologin))
-        .commitAllowingStateLoss();
+        .addToBackStack(String.valueOf(R.layout.fragment_login))
+        .commit();
   }
 
   public void navigateToCreateStoreView() {
@@ -34,6 +34,6 @@ public class AutoLoginNavigator {
   private void navigateTo(Fragment fragment) {
     fragmentManager.beginTransaction()
         .replace(R.id.activity_main_container, fragment)
-        .commitAllowingStateLoss();
+        .commit();
   }
 }

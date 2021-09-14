@@ -10,7 +10,7 @@ import android.util.Log
 import com.aptoide.uploader.UploaderApplication
 import io.reactivex.disposables.CompositeDisposable
 
-class InstalledIntentService : IntentService("InstalledIntentService") {
+open class InstalledIntentService : IntentService("InstalledIntentService") {
   lateinit var myPackageManager: PackageManager
   lateinit var installManager: InstallManager
   var compositeDisposable: CompositeDisposable = CompositeDisposable()
@@ -42,22 +42,17 @@ class InstalledIntentService : IntentService("InstalledIntentService") {
     }
   }
 
-  override fun onDestroy() {
-    Log.d("APP-85", "onDestroy: InstalledIntentService")
-    super.onDestroy()
-  }
-
-  protected fun onPackageAdded(packageName: String) {
+  private fun onPackageAdded(packageName: String) {
     Log.d("APP-85", "InstalledIntentService: Package added: $packageName")
     databaseOnPackageAdded(packageName)
   }
 
-  protected fun onPackageReplaced(packageName: String) {
+  private fun onPackageReplaced(packageName: String) {
     Log.d("APP-85", "InstalledIntentService: Packaged replaced: $packageName")
     databaseOnPackageReplaced(packageName)
   }
 
-  protected fun onPackageRemoved(packageName: String) {
+  private fun onPackageRemoved(packageName: String) {
     Log.d("APP-85", "InstalledIntentService: Packaged removed: $packageName")
     databaseOnPackageRemoved(packageName)
   }

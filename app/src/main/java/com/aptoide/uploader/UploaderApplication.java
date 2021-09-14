@@ -1,6 +1,8 @@
 package com.aptoide.uploader;
 
 import android.app.Application;
+import android.content.Context;
+import android.net.ConnectivityManager;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import com.aptoide.authentication.AptoideAuthentication;
@@ -18,19 +20,19 @@ import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
 import com.aptoide.uploader.apps.AppUploadStatusManager;
+import com.aptoide.uploader.apps.AutoUploadSelectsManager;
 import com.aptoide.uploader.apps.CategoriesManager;
 import com.aptoide.uploader.apps.InstallManager;
-import com.aptoide.uploader.apps.InstalledRepository;
+import com.aptoide.uploader.apps.InstalledAppsManager;
 import com.aptoide.uploader.apps.LanguageManager;
 import com.aptoide.uploader.apps.OkioMd5Calculator;
 import com.aptoide.uploader.apps.PackageManagerInstalledAppsProvider;
-import com.aptoide.uploader.apps.RoomInstalledPersistence;
 import com.aptoide.uploader.apps.ServiceBackgroundService;
 import com.aptoide.uploader.apps.StoreManager;
 import com.aptoide.uploader.apps.UploadManager;
 import com.aptoide.uploader.apps.UploadProgressManager;
 import com.aptoide.uploader.apps.network.AptoideConnectivityProvider;
-import com.aptoide.uploader.apps.network.ConnectivityInterceptor;
+import com.aptoide.uploader.apps.network.ConnectivityProvider;
 import com.aptoide.uploader.apps.network.IdsRepository;
 import com.aptoide.uploader.apps.network.RetrofitAppsUploadStatusService;
 import com.aptoide.uploader.apps.network.RetrofitCategoriesService;
@@ -39,8 +41,12 @@ import com.aptoide.uploader.apps.network.TokenRevalidatorV7Alternate;
 import com.aptoide.uploader.apps.network.UserAgentInterceptor;
 import com.aptoide.uploader.apps.persistence.AppUploadStatusPersistence;
 import com.aptoide.uploader.apps.persistence.AppUploadsDatabase;
+import com.aptoide.uploader.apps.persistence.AutoUploadSelectsPersistence;
 import com.aptoide.uploader.apps.persistence.DraftPersistence;
+import com.aptoide.uploader.apps.persistence.InstalledPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
+import com.aptoide.uploader.apps.persistence.RoomAutoUploadSelectsPersistence;
+import com.aptoide.uploader.apps.persistence.RoomInstalledPersistence;
 import com.aptoide.uploader.apps.persistence.RoomUploadStatusDataSource;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
 import com.aptoide.uploader.security.AuthenticationPersistance;
@@ -78,12 +84,16 @@ public class UploaderApplication extends Application {
   private StoreManager storeManager;
   private UploadManager uploadManager;
   private InstallManager installManager;
+  private AutoUploadSelectsManager autoUploadSelectsManager;
+  private InstalledAppsManager installedAppsManager;
   private LanguageManager languageManager;
   private AuthenticationProvider authenticationProvider;
   private AptoideAuthenticationRx aptoideAuthenticationRx;
   private CategoriesManager categoriesManager;
   private OkioMd5Calculator md5Calculator;
   private AppUploadStatusPersistence appUploadStatusPersistence;
+  private RoomInstalledPersistence roomInstalledPersistence;
+  private RoomAutoUploadSelectsPersistence roomAutoUploadSelectsPersistence;
   private DraftPersistence draftPersistence;
   private AppUploadStatusManager appUploadStatusManager;
   private UploaderAnalytics uploaderAnalytics;
@@ -91,6 +101,7 @@ public class UploaderApplication extends Application {
   private PackageManagerInstalledAppsProvider packageManagerInstalledAppsProvider;
   private LoginManager loginManager;
   private AgentPersistence agentPersistence;
+  private ConnectivityProvider connectivityProvider;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -105,6 +116,7 @@ public class UploaderApplication extends Application {
         .getBoolean("isFirstRun", true);
     if (isFirstRun) {
       refreshInstalledApps();
+      refreshAutoUploadSelection();
       this.getSharedPreferences("PREFERENCE", 0)
           .edit()
           .putBoolean("isFirstRun", false)
@@ -114,6 +126,14 @@ public class UploaderApplication extends Application {
 
   private void refreshInstalledApps() {
     compositeDisposable.add(getInstallManager().insertAllInstalled()
+        .subscribe(() -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+  }
+
+  private void refreshAutoUploadSelection() {
+    compositeDisposable.add(getAutoUploadSelectsManager().insertAllInstalled()
         .subscribe(() -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
@@ -139,23 +159,56 @@ public class UploaderApplication extends Application {
     return uploadManager;
   }
 
+  public InstalledPersistence getInstalledPersistence() {
+    if (roomInstalledPersistence == null) {
+      roomInstalledPersistence = new RoomInstalledPersistence(AppUploadsDatabase.getInstance(this)
+          .installedDao());
+    }
+    return roomInstalledPersistence;
+  }
+
+  public AutoUploadSelectsPersistence getAutoUploadSelectsPersistence() {
+    if (roomAutoUploadSelectsPersistence == null) {
+      roomAutoUploadSelectsPersistence = new RoomAutoUploadSelectsPersistence(
+          AppUploadsDatabase.getInstance(this)
+              .autoUploadSelectsDao()) {
+      };
+    }
+    return roomAutoUploadSelectsPersistence;
+  }
+
   public InstallManager getInstallManager() {
     if (installManager == null) {
-      RoomInstalledPersistence roomInstalledPersistence = new RoomInstalledPersistence(
-          AppUploadsDatabase.getInstance(this)
-              .installedDao());
       installManager =
-          new InstallManager(new InstalledRepository(roomInstalledPersistence, getPackageManager()),
-              getPackageManagerInstalledAppsProvider());
+          new InstallManager(getInstalledPersistence(), getAutoUploadSelectsPersistence(),
+              getPackageManagerInstalledAppsProvider(), getInstalledAppsManager(), getAppsManager(),
+              getUploaderAnalytics(), getConnectivityProvider());
     }
     return installManager;
+  }
+
+  public AutoUploadSelectsManager getAutoUploadSelectsManager() {
+    if (autoUploadSelectsManager == null) {
+      autoUploadSelectsManager =
+          new AutoUploadSelectsManager(getAutoUploadSelectsPersistence(), getPackageManager());
+    }
+    return autoUploadSelectsManager;
+  }
+
+  public InstalledAppsManager getInstalledAppsManager() {
+    if (installedAppsManager == null) {
+
+      installedAppsManager =
+          new InstalledAppsManager(getInstalledPersistence(), getAppUploadStatusPersistence(),
+              getAutoUploadSelectsPersistence(), Schedulers.io());
+    }
+    return installedAppsManager;
   }
 
   public OkHttpClient.Builder buildOkHttpClient() {
     return new OkHttpClient.Builder().writeTimeout(60, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .connectTimeout(60, TimeUnit.SECONDS)
-        .addInterceptor(getConnectivityInterceptor())
         .addInterceptor(getUserAgentInterceptor());
   }
 
@@ -178,10 +231,6 @@ public class UploaderApplication extends Application {
 
   public UserAgentInterceptor getUserAgentInterceptor() {
     return new UserAgentInterceptor(getIdsRepository());
-  }
-
-  public ConnectivityInterceptor getConnectivityInterceptor() {
-    return new ConnectivityInterceptor(getApplicationContext());
   }
 
   public AptoideAccountManager getAccountManager() {
@@ -247,8 +296,7 @@ public class UploaderApplication extends Application {
 
       storeManager = new StoreManager(getPackageManagerInstalledAppsProvider(),
           new AccountStoreNameProvider(getAccountManager()), getUploadManager(),
-          getLanguageManager(), getAccountManager(), Schedulers.io(),
-          new ServiceBackgroundService(getApplicationContext(), NotificationService.class));
+          getLanguageManager(), getAccountManager(), Schedulers.io());
     }
     return storeManager;
   }
@@ -283,8 +331,12 @@ public class UploaderApplication extends Application {
     return new AptoideAccountProvider(getAccountManager(), getAuthenticationProvider());
   }
 
-  public AptoideConnectivityProvider getConnectivityProvider() {
-    return new AptoideConnectivityProvider(getApplicationContext());
+  public ConnectivityProvider getConnectivityProvider() {
+    if (connectivityProvider == null) {
+      connectivityProvider = new AptoideConnectivityProvider(
+          (ConnectivityManager) getSystemService(Context.CONNECTIVITY_SERVICE));
+    }
+    return connectivityProvider;
   }
 
   public LanguageManager getLanguageManager() {

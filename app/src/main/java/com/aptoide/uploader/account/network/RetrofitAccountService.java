@@ -81,7 +81,8 @@ public class RetrofitAccountService implements AccountService {
               .isOk()) {
             return Single.just(mapper.map(response.body(), BaseAccount.LoginType.APTOIDE));
           }
-          return Single.just(AccountFactory.of(false, false, null, BaseAccount.LoginType.APTOIDE));
+          return Single.just(
+              AccountFactory.of(false, false, null, BaseAccount.LoginType.APTOIDE, null));
         });
   }
 

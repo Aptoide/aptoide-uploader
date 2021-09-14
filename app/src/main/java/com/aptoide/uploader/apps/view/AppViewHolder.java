@@ -1,5 +1,6 @@
 package com.aptoide.uploader.apps.view;
 
+import android.net.Uri;
 import android.os.Build;
 import android.view.View;
 import android.widget.ImageView;
@@ -7,8 +8,10 @@ import android.widget.TextView;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.aptoide.uploader.R;
+import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.glide.GlideApp;
+import com.bumptech.glide.load.resource.bitmap.RoundedCorners;
 import com.bumptech.glide.load.resource.drawable.DrawableTransitionOptions;
 
 public class AppViewHolder extends RecyclerView.ViewHolder
@@ -20,6 +23,7 @@ public class AppViewHolder extends RecyclerView.ViewHolder
   private final AppSelectedListener listener;
   private final AppLongClickListener longClickListener;
   private final AppCompatImageView cloud;
+  private final ImageView autoUploadCloud;
   private String packageName;
 
   AppViewHolder(View itemView, AppSelectedListener listener,
@@ -29,16 +33,19 @@ public class AppViewHolder extends RecyclerView.ViewHolder
     appName = itemView.findViewById(R.id.item_app_name);
     background = itemView.findViewById(R.id.item_app_layout);
     cloud = itemView.findViewById(R.id.appInCloud);
+    autoUploadCloud = itemView.findViewById(R.id.auto_upload_cloud);
     this.listener = listener;
     this.longClickListener = longClickListener;
     itemView.setOnClickListener(this);
     itemView.setOnLongClickListener(this);
   }
 
-  void setApp(InstalledApp app, boolean selected) {
+  void setApp(InstalledApp app, boolean selected, AppUploadStatus uploadStatus,
+      boolean isAppOnAutoUpload) {
     packageName = app.getPackageName();
     GlideApp.with(itemView)
-        .load(app.getAppInfo())
+        .load(Uri.parse(app.getIconPath()))
+        .transform(new RoundedCorners(12))
         .transition(DrawableTransitionOptions.withCrossFade())
         .into(image);
 
@@ -55,10 +62,16 @@ public class AppViewHolder extends RecyclerView.ViewHolder
             .getDrawable(R.drawable.overlay_focused));
       }
     }
-    if (app.isUploaded()) {
+    if (uploadStatus != null && uploadStatus.isUploaded()) {
       cloud.setVisibility(View.VISIBLE);
     } else {
       cloud.setVisibility(View.GONE);
+    }
+
+    if (isAppOnAutoUpload) {
+      autoUploadCloud.setVisibility(View.VISIBLE);
+    } else {
+      autoUploadCloud.setVisibility(View.GONE);
     }
   }
 

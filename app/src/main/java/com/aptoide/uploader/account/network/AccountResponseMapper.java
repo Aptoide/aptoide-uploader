@@ -15,7 +15,11 @@ public class AccountResponseMapper {
         .getMeta()
         .getData()
         .getStore();
-    return AccountFactory.of(store != null, true, store != null ? store.getName() : null,
-        loginType);
+    String profileAvatar = response.getNodes()
+        .getMeta()
+        .getData()
+        .getAvatar();
+    return AccountFactory.of(store != null, true, store != null ? store.getName() : null, loginType,
+        profileAvatar);
   }
 }

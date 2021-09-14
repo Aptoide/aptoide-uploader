@@ -47,19 +47,19 @@ public class RetrofitAppsUploadStatusService {
 
     for (AppUploadStatus status : uploadStatuses) {
       appUploadStatusList.add(new AppUploadStatus(status.getMd5(), status.getPackageName(),
-          AppUploadStatus.Status.NOT_IN_STORE, status.getVercode()));
+          AppUploadStatus.Status.NOT_IN_STORE, status.getVersionCode()));
     }
     for (GetApksResponse.Data apk : getApksResponse.getDatalist()
         .getList()) {
       appUploadStatusList.set(appUploadStatusList.indexOf(new AppUploadStatus(apk.getFile()
           .getMd5sum(), apk.getFile()
           .getaPackage()
-          .getName(), AppUploadStatus.Status.NOT_IN_STORE, apk.getFile()
-          .getVercode())), new AppUploadStatus(apk.getFile()
+          .getName(), AppUploadStatus.Status.NOT_IN_STORE, Integer.parseInt(apk.getFile()
+          .getVercode()))), new AppUploadStatus(apk.getFile()
           .getMd5sum(), apk.getFile()
           .getaPackage()
-          .getName(), AppUploadStatus.Status.IN_STORE, apk.getFile()
-          .getVercode()));
+          .getName(), AppUploadStatus.Status.IN_STORE, Integer.parseInt(apk.getFile()
+          .getVercode())));
     }
     return appUploadStatusList;
   }

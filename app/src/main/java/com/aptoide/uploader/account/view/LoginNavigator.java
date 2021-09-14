@@ -30,7 +30,7 @@ public class LoginNavigator extends Navigator {
     fragmentManager.beginTransaction()
         .replace(R.id.activity_main_container, CreateStoreFragment.newInstance())
         .addToBackStack(String.valueOf(R.layout.fragment_create_store))
-        .commitAllowingStateLoss();
+        .commit();
   }
 
   public void navigateToLoginFragment() {
@@ -50,7 +50,7 @@ public class LoginNavigator extends Navigator {
   private void navigateTo(Fragment fragment) {
     fragmentManager.beginTransaction()
         .replace(R.id.activity_main_container, fragment)
-        .commitAllowingStateLoss();
+        .commit();
   }
 
   public void openNewAuthenticationBlogUrl() {

@@ -1,6 +1,7 @@
 package com.aptoide.uploader.apps.view;
 
-import android.content.DialogInterface;
+import com.aptoide.uploader.apps.AppUploadStatus;
+import com.aptoide.uploader.apps.AutoUploadSelects;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.view.View;
 import io.reactivex.Observable;
@@ -10,19 +11,19 @@ import org.jetbrains.annotations.NotNull;
 
 public interface MyStoreView extends View {
 
-  void showApps(@NotNull List<InstalledApp> appsList);
+  void checkFirstRun();
 
-  void refreshApps(@NotNull List<InstalledApp> appsList);
+  void showApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses,
+      List<AutoUploadSelects> autoUploadSelects);
+
+  void refreshApps(@NotNull List<InstalledApp> appsList, List<AppUploadStatus> appUploadStatuses,
+      List<AutoUploadSelects> autoUploadSelects);
 
   void orderApps(SortingOrder order);
 
   void showStoreName(@NotNull String storeName);
 
-  void showDialog();
-
-  void dismissDialog();
-
-  Observable<DialogInterface> positiveClick();
+  void showAvatar(String avatarPath);
 
   void showError();
 
@@ -34,13 +35,11 @@ public interface MyStoreView extends View {
 
   void setSubmitButtonVisibility(boolean status);
 
-  Observable<Object> logoutEvent();
+  Observable<Object> goToSettings();
 
   Single<List<InstalledApp>> getSelectedApps();
 
   void clearSelection();
-
-  void setCloudIcon(List<String> md5List);
 
   Observable<Boolean> refreshEvent();
 }

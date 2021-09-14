@@ -1,16 +1,23 @@
 package com.aptoide.uploader.apps.network;
 
-import android.content.Context;
+import android.net.ConnectivityManager;
+import android.net.NetworkInfo;
 
 public class AptoideConnectivityProvider implements ConnectivityProvider {
 
-  private final Context context;
+  private final ConnectivityManager connectivityManager;
 
-  public AptoideConnectivityProvider(Context context) {
-    this.context = context;
+  public AptoideConnectivityProvider(ConnectivityManager connectivityManager) {
+    this.connectivityManager = connectivityManager;
   }
 
   @Override public Boolean hasConnectivity() {
-    return NetworkUtil.isOnline(context);
+    NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+    return (netInfo != null && netInfo.isConnected());
+  }
+
+  @Override public Boolean isOnWifiNetwork() {
+    NetworkInfo netInfo = connectivityManager.getActiveNetworkInfo();
+    return netInfo != null && netInfo.getType() == ConnectivityManager.TYPE_WIFI;
   }
 }

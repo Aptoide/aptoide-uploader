@@ -1,17 +1,11 @@
 package com.aptoide.uploader.apps.view;
 
-import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
-import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
-import android.text.SpannableString;
-import android.text.style.ForegroundColorSpan;
-import android.view.ContextThemeWrapper;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
@@ -19,6 +13,7 @@ import android.view.animation.AnimationUtils;
 import android.view.animation.TranslateAnimation;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
+import android.widget.ImageView;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TextView;
@@ -31,14 +26,15 @@ import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import cm.aptoide.aptoideviews.recyclerview.GridRecyclerView;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
+import com.aptoide.uploader.apps.AppUploadStatus;
+import com.aptoide.uploader.apps.AutoUploadSelects;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.permission.PermissionProvider;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
-import com.aptoide.uploader.view.Rx.RxAlertDialog;
+import com.aptoide.uploader.glide.GlideApp;
 import com.aptoide.uploader.view.android.FragmentView;
-import com.bumptech.glide.Glide;
 import com.bumptech.glide.MemoryCategory;
-import com.jakewharton.rxbinding2.view.RxMenuItem;
+import com.bumptech.glide.request.RequestOptions;
 import com.jakewharton.rxbinding2.view.RxView;
 import com.jakewharton.rxbinding2.widget.RxAdapterView;
 import io.reactivex.Observable;
@@ -54,12 +50,14 @@ import org.jetbrains.annotations.NotNull;
 public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   private GridRecyclerView recyclerView;
+  private ImageView featuretip_background;
+  private TextView featuretip_rectangle;
   private MyAppsAdapter adapter;
   private TextView storeNameText;
+  private ImageView profileAvatar;
   private Spinner spinner;
-  private MenuItem logoutItem;
+  private Button settingsItem;
   private Toolbar toolbar;
-  private RxAlertDialog logoutConfirmation;
   private View storeBanner;
   private View mainScreen;
   private Button submitButton;
@@ -82,46 +80,36 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    featuretip_background = view.findViewById(R.id.featuretip_background);
+    featuretip_rectangle = view.findViewById(R.id.featuretip_rectangle);
     loadingSpinner = view.findViewById(R.id.loadingSPinner);
     toolbar = view.findViewById(R.id.fragment_my_apps_toolbar);
     toolbar.inflateMenu(R.menu.app_grid_menu);
-    logoutItem = toolbar.getMenu()
-        .findItem(R.id.logout_button);
-
-    SpannableString s = new SpannableString(getResources().getString(R.string.signout));
-    s.setSpan(new ForegroundColorSpan(Color.WHITE), 0, s.length(), 0);
-    logoutItem.setTitle(s);
-
+    settingsItem = view.findViewById(R.id.settings_button);
     recyclerView = view.findViewById(R.id.fragment_my_apps_list);
     storeNameText = view.findViewById(R.id.fragment_my_apps_store_name);
+    profileAvatar = view.findViewById(R.id.fragment_my_apps_profile_avatar);
     spinner = view.findViewById(R.id.sort_spinner);
     mainScreen = view.findViewById(R.id.grid_view_and_hint);
     storeBanner = view.findViewById(R.id.store_info);
     submitButton = view.findViewById(R.id.submit_button);
-    toolbar = view.findViewById(R.id.fragment_my_apps_toolbar);
     prepareSpinner(R.array.sort_spinner_array);
     setUpSubmitButtonAnimation();
     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
     recyclerView.addItemDecoration(new GridDividerItemDecoration(
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
-    recyclerView.setAdaptiveLayout(110, 126,
-        GridRecyclerView.AdaptStrategy.SCALE_KEEP_ASPECT_RATIO);
-    adapter = new MyAppsAdapter(new ArrayList<>(), (view1, packageName) -> {
-      Uri packageURI = Uri.parse("package:" + packageName);
-      Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
-      startActivity(uninstallIntent);
-    }, sortingOrder);
+    recyclerView.setAdaptiveLayout(108, 152,
+        GridRecyclerView.AdaptStrategy.SCALE_WIDTH_ONLY);
+    adapter = new MyAppsAdapter(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
+        (view1, packageName) -> {
+          Uri packageURI = Uri.parse("package:" + packageName);
+          Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
+          startActivity(uninstallIntent);
+        }, sortingOrder);
     setUpSelectionListener();
     refreshEvent = PublishSubject.create();
     recyclerView.setAdapter(adapter);
     refreshLayout = view.findViewById(R.id.swipe_refresh);
-
-    logoutConfirmation = new RxAlertDialog.Builder(
-        new ContextThemeWrapper(getContext(), R.style.ConfirmationDialog)).setMessage(
-        R.string.logout_confirmation_message)
-        .setPositiveButton(R.string.yes)
-        .setNegativeButton(R.string.no)
-        .build();
     toolbar.setNavigationIcon(null);
     toolbar.setNavigationOnClickListener(click -> {
       adapter.clearAppsSelection();
@@ -140,7 +128,9 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         ((UploaderApplication) getContext().getApplicationContext()).getUploaderAnalytics(),
         ((UploaderApplication) getContext().getApplicationContext()).getConnectivityProvider(),
         ((UploaderApplication) getContext().getApplicationContext()).getUploadManager(),
-        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager()).present();
+        ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager(),
+        ((UploaderApplication) getContext().getApplicationContext()).getAccountManager(),
+        ((UploaderApplication) getContext().getApplicationContext()).getInstalledAppsManager()).present();
   }
 
   @Override public void onDestroyView() {
@@ -150,11 +140,9 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView.setAdapter(null);
     recyclerView = null;
     selectionObservable.dispose();
-    logoutConfirmation.dismiss();
-    logoutConfirmation = null;
-    logoutItem = null;
+    settingsItem = null;
     toolbar = null;
-    Glide.get(getContext())
+    GlideApp.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
     super.onDestroyView();
   }
@@ -162,7 +150,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   @Nullable @Override
   public View onCreateView(LayoutInflater inflater, @Nullable ViewGroup container,
       @Nullable Bundle savedInstanceState) {
-    Glide.get(getContext())
+    GlideApp.get(getContext())
         .setMemoryCategory(MemoryCategory.HIGH);
     return inflater.inflate(R.layout.fragment_my_apps, container, false);
   }
@@ -176,56 +164,35 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     }
   }
 
-  private boolean showVersionDialog() {
-    PackageInfo pInfo;
-    try {
-      pInfo = getActivity().getPackageManager()
-          .getPackageInfo(getActivity().getPackageName(), 0);
-      String version = pInfo.versionName;
-      int versionCode = pInfo.versionCode;
-      String appName = pInfo.packageName;
-
-      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
-      builder.setMessage("App : "
-          + appName
-          + "\n"
-          + "Version : "
-          + version
-          + "\n"
-          + "Version Code : "
-          + versionCode);
-
-      AlertDialog dialog = builder.create();
-      dialog.show();
-    } catch (PackageManager.NameNotFoundException e) {
-      e.printStackTrace();
+  @Override public void checkFirstRun() {
+    boolean isFirstRun = getContext().getSharedPreferences("PREFERENCE", 0)
+        .getBoolean("isFirstRunTooltip", true);
+    if (isFirstRun) {
+      featuretip_background.setVisibility(View.VISIBLE);
+      featuretip_rectangle.setVisibility(View.VISIBLE);
+      featuretip_background.setOnClickListener(new View.OnClickListener() {
+        public void onClick(View v) {
+          featuretip_background.setVisibility(View.GONE);
+          featuretip_rectangle.setVisibility(View.GONE);
+        }
+      });
+      getContext().getSharedPreferences("PREFERENCE", 0)
+          .edit()
+          .putBoolean("isFirstRunTooltip", false)
+          .apply();
     }
-    return false;
   }
 
-  private void setUpSelectionListener() {
-    selectionObservable = adapter.toggleSelection()
-        .doOnNext(appsSelected -> handleTitleChange())
-        .distinctUntilChanged()
-        .doOnNext(appsSelected -> setSubmitButtonVisibility(appsSelected))
-        .subscribe();
-  }
-
-  private void prepareSpinner(int arrayId) {
-    ArrayAdapter<CharSequence> adapter =
-        ArrayAdapter.createFromResource(getActivity(), arrayId, R.layout.spinner_item);
-    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
-    spinner.setAdapter(adapter);
-  }
-
-  @Override public void showApps(@NotNull List<InstalledApp> appsList) {
-    adapter.setInstalledApps(appsList);
+  @Override public void showApps(@NotNull List<InstalledApp> appsList,
+      List<AppUploadStatus> appUploadStatuses, List<AutoUploadSelects> autoUploadSelects) {
+    adapter.setInstalledAndUploadedApps(appsList, appUploadStatuses, autoUploadSelects);
     loadingSpinner.setVisibility(View.GONE);
     recyclerView.scheduleLayoutAnimation();
   }
 
-  @Override public void refreshApps(@NotNull List<InstalledApp> appsList) {
-    adapter.refreshInstalledApps(appsList);
+  @Override public void refreshApps(@NotNull List<InstalledApp> appsList,
+      List<AppUploadStatus> appUploadStatuses, List<AutoUploadSelects> autoUploadSelects) {
+    adapter.setInstalledAndUploadedApps(appsList, appUploadStatuses, autoUploadSelects);
     refreshLayout.setRefreshing(false);
     recyclerView.scheduleLayoutAnimation();
   }
@@ -238,20 +205,20 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     storeNameText.setText(storeName);
   }
 
-  @Override public void showDialog() {
-    if (!logoutConfirmation.isShowing()) {
-      logoutConfirmation.show();
+  @Override public void showAvatar(String avatarPath) {
+    if (avatarPath != null && !avatarPath.trim()
+        .isEmpty()) {
+      Uri uri = Uri.parse(avatarPath);
+      GlideApp.with(this)
+          .load(uri)
+          .apply(RequestOptions.circleCropTransform())
+          .into(profileAvatar);
+    } else {
+      GlideApp.with(this)
+          .load(getResources().getDrawable(R.drawable.avatar_default))
+          .apply(RequestOptions.circleCropTransform())
+          .into(profileAvatar);
     }
-  }
-
-  @Override public void dismissDialog() {
-    if (logoutConfirmation.isShowing()) {
-      logoutConfirmation.dismiss();
-    }
-  }
-
-  @Override public Observable<DialogInterface> positiveClick() {
-    return logoutConfirmation.positiveClicks();
   }
 
   @Override public void showError() {
@@ -328,10 +295,9 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     }
   }
 
-  @Override public Observable<Object> logoutEvent() {
-    return RxMenuItem.clicks(logoutItem)
-        .subscribeOn(AndroidSchedulers.mainThread())
-        .unsubscribeOn(AndroidSchedulers.mainThread());
+  @Override public Observable<Object> goToSettings() {
+    return RxView.clicks(settingsItem)
+        .subscribeOn(AndroidSchedulers.mainThread());
   }
 
   @Override public Single<List<InstalledApp>> getSelectedApps() {
@@ -342,14 +308,50 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     adapter.clearAppsSelection();
   }
 
-  @Override public void setCloudIcon(List<String> packageList) {
-    if (packageList != null && adapter != null) {
-      adapter.setCloudIcon(packageList);
-    }
-  }
-
   @Override public Observable<Boolean> refreshEvent() {
     return refreshEvent;
+  }
+
+  private boolean showVersionDialog() {
+    PackageInfo pInfo;
+    try {
+      pInfo = getActivity().getPackageManager()
+          .getPackageInfo(getActivity().getPackageName(), 0);
+      String version = pInfo.versionName;
+      int versionCode = pInfo.versionCode;
+      String appName = pInfo.packageName;
+
+      AlertDialog.Builder builder = new AlertDialog.Builder(getActivity());
+      builder.setMessage("App : "
+          + appName
+          + "\n"
+          + "Version : "
+          + version
+          + "\n"
+          + "Version Code : "
+          + versionCode);
+
+      AlertDialog dialog = builder.create();
+      dialog.show();
+    } catch (PackageManager.NameNotFoundException e) {
+      e.printStackTrace();
+    }
+    return false;
+  }
+
+  private void setUpSelectionListener() {
+    selectionObservable = adapter.toggleSelection()
+        .doOnNext(appsSelected -> handleTitleChange())
+        .distinctUntilChanged()
+        .doOnNext(appsSelected -> setSubmitButtonVisibility(appsSelected))
+        .subscribe();
+  }
+
+  private void prepareSpinner(int arrayId) {
+    ArrayAdapter<CharSequence> adapter =
+        ArrayAdapter.createFromResource(getActivity(), arrayId, R.layout.spinner_item);
+    adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+    spinner.setAdapter(adapter);
   }
 
   public void setUpSubmitButtonAnimation() {
@@ -411,10 +413,10 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
   private void setToolbarVisibility(boolean shouldShow) {
     if (shouldShow) {
       toolbar.setNavigationIcon(R.drawable.ic_arrow_back_24dp);
-      logoutItem.setVisible(false);
+      settingsItem.setVisibility(View.GONE);
     } else {
       toolbar.setNavigationIcon(null);
-      logoutItem.setVisible(true);
+      settingsItem.setVisibility(View.VISIBLE);
     }
   }
 }

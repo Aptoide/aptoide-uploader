@@ -12,14 +12,14 @@ import org.jetbrains.annotations.NotNull;
 
   @ColumnInfo(name = "md5") private final String md5;
   @NonNull @PrimaryKey @ColumnInfo(name = "packageName") private final String packageName;
-  @ColumnInfo(name = "versionCode") private final String vercode;
+  @ColumnInfo(name = "versionCode") private final int versionCode;
   @ColumnInfo(name = "status") @TypeConverters(StatusConverter.class) private Status status;
 
-  public AppUploadStatus(String md5, @NotNull String packageName, Status status, String vercode) {
+  public AppUploadStatus(String md5, @NotNull String packageName, Status status, int versionCode) {
     this.md5 = md5;
     this.packageName = packageName;
     this.status = status;
-    this.vercode = vercode;
+    this.versionCode = versionCode;
   }
 
   public String getMd5() {
@@ -45,7 +45,7 @@ import org.jetbrains.annotations.NotNull;
   @Override public int hashCode() {
     int result = md5 != null ? md5.hashCode() : 0;
     result = 31 * result + packageName.hashCode();
-    result = 31 * result + (vercode != null ? vercode.hashCode() : 0);
+    result = 31 * result + (getStringVersionCode() != null ? getStringVersionCode().hashCode() : 0);
     result = 31 * result + (status != null ? status.hashCode() : 0);
     return result;
   }
@@ -58,12 +58,19 @@ import org.jetbrains.annotations.NotNull;
 
     if (md5 != null ? !md5.equals(that.md5) : that.md5 != null) return false;
     if (!packageName.equals(that.packageName)) return false;
-    if (vercode != null ? !vercode.equals(that.vercode) : that.vercode != null) return false;
+    if (getStringVersionCode() != null ? !getStringVersionCode().equals(that.getStringVersionCode())
+        : that.getStringVersionCode() != null) {
+      return false;
+    }
     return status == that.status;
   }
 
-  public String getVercode() {
-    return vercode;
+  public int getVersionCode() {
+    return versionCode;
+  }
+
+  public String getStringVersionCode() {
+    return String.valueOf(versionCode);
   }
 
   public enum Status {

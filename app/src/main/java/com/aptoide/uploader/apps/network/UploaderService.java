@@ -8,8 +8,7 @@ import java.util.List;
 
 public interface UploaderService {
 
-  Single<UploadDraft> startUploadDraft(String md5, String language, String storeName,
-      InstalledApp installedApp);
+  Single<UploadDraft> startUploadDraft(String md5, InstalledApp installedApp);
 
   Observable<UploadDraft> createDraft(String md5, InstalledApp installedApp);
 
@@ -26,5 +25,4 @@ public interface UploaderService {
   Observable<UploadDraft> uploadSplits(UploadDraft draft, List<String> paths);
 
   Observable<UploadDraft> setDraftMd5s(UploadDraft draft);
-
 }

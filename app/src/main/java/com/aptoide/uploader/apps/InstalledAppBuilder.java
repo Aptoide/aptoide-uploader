@@ -17,7 +17,7 @@ public class InstalledAppBuilder {
         (packageInfo.applicationInfo.flags & packageInfo.applicationInfo.FLAG_SYSTEM) != 0,
         packageInfo.applicationInfo.sourceDir,
         "android.resource://" + packageInfo.packageName + "/" + packageInfo.applicationInfo.icon,
-        packageInfo.lastUpdateTime, false, getMainObb(packageInfo.packageName),
+        packageInfo.lastUpdateTime, getMainObb(packageInfo.packageName),
         getPatchObb(packageInfo.packageName));
   }
 
@@ -25,8 +25,6 @@ public class InstalledAppBuilder {
     String sdcard = Environment.getExternalStorageDirectory()
         .getAbsolutePath();
     File obbDir = new File(sdcard + "/Android/obb/" + packageName + "/");
-    boolean canRead = obbDir.canRead();
-    boolean isEmpty = obbDir.listFiles() == null;
     if (obbDir.isDirectory()) {
       File[] files = obbDir.listFiles();
 

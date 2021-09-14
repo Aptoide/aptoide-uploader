@@ -1,7 +1,6 @@
 package com.aptoide.uploader.account.view;
 
 import com.aptoide.uploader.account.AptoideAccountManager;
-import com.aptoide.uploader.account.AutoLoginManager;
 import com.aptoide.uploader.analytics.UploaderAnalytics;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
@@ -18,19 +17,16 @@ public class LoginPresenter implements Presenter {
   private final CompositeDisposable compositeDisposable;
   private final Scheduler viewScheduler;
   private final UploaderAnalytics uploaderAnalytics;
-  private final AutoLoginManager autoLoginManager;
 
   public LoginPresenter(LoginView view, AptoideAccountManager accountManager,
       LoginNavigator loginNavigator, CompositeDisposable compositeDisposable,
-      Scheduler viewScheduler, UploaderAnalytics uploaderAnalytics,
-      AutoLoginManager autoLoginManager) {
+      Scheduler viewScheduler, UploaderAnalytics uploaderAnalytics) {
     this.view = view;
     this.accountManager = accountManager;
     this.loginNavigator = loginNavigator;
     this.compositeDisposable = compositeDisposable;
     this.viewScheduler = viewScheduler;
     this.uploaderAnalytics = uploaderAnalytics;
-    this.autoLoginManager = autoLoginManager;
   }
 
   @Override public void present() {

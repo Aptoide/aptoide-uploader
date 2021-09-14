@@ -26,7 +26,6 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
           PackageInfo packageInfo = packageManager.getPackageInfo(applicationInfo.packageName, 0);
           return new InstalledAppBuilder(packageInfo, packageManager).getInstalledApp();
         })
-        .filter(app -> !app.isSystem())
         .toList()
         .doOnSuccess(installedApps -> Log.d("nzxt", String.valueOf(installedApps.size())))
         .subscribeOn(scheduler);
@@ -39,5 +38,11 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
           PackageInfo packageInfo = packageManager.getPackageInfo(info.packageName, 0);
           return new InstalledAppBuilder(packageInfo, packageManager).getInstalledApp();
         });
+  }
+
+  @Override public Single<List<InstalledApp>> getNonSystemInstalledApps() {
+    return getInstalledApps().flatMapObservable(apps -> Observable.fromIterable(apps))
+        .filter(app -> !app.isSystem())
+        .toList();
   }
 }

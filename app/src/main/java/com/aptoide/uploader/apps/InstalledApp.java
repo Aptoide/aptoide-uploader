@@ -11,8 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
-@Entity(tableName = "installed") public class InstalledApp {
-  @Ignore public static final int STATUS_COMPLETED = 4;
+@Entity(tableName = "Installed") public class InstalledApp {
   @PrimaryKey @NonNull private String packageAndVersionCode;
   private String packageName;
   private String name;
@@ -22,9 +21,7 @@ import org.jetbrains.annotations.NotNull;
   private String apkPath;
   private String iconPath;
   private long installedDate;
-  private List<Obb> obbList = new ArrayList<>();
-  private boolean isUploaded;
-  private int status;
+  @Ignore private List<Obb> obbList = new ArrayList<>();
   @Ignore private ApplicationInfo appInfo;
 
   public InstalledApp() {
@@ -32,8 +29,7 @@ import org.jetbrains.annotations.NotNull;
 
   public InstalledApp(ApplicationInfo applicationInfo, String packageAndVersionCode,
       String packageName, String name, String versionName, int versionCode, boolean isSystem,
-      String apkPath, String iconPath, long lastUpdateTime, boolean isUploaded, Obb obbMain,
-      Obb obbPatch) {
+      String apkPath, String iconPath, long lastUpdateTime, Obb obbMain, Obb obbPatch) {
     this.appInfo = applicationInfo;
     this.packageAndVersionCode = packageAndVersionCode;
     this.packageName = packageName;
@@ -44,10 +40,8 @@ import org.jetbrains.annotations.NotNull;
     this.apkPath = apkPath;
     this.iconPath = iconPath;
     this.installedDate = lastUpdateTime;
-    this.isUploaded = isUploaded;
     this.obbList.add(0, obbMain);
     this.obbList.add(1, obbPatch);
-    this.status = STATUS_COMPLETED;
   }
 
   @NonNull public String getPackageAndVersionCode() {
@@ -128,22 +122,6 @@ import org.jetbrains.annotations.NotNull;
 
   public Obb getObbPatch() {
     return obbList.get(1);
-  }
-
-  public boolean isUploaded() {
-    return isUploaded;
-  }
-
-  public void setIsUploaded(boolean uploaded) {
-    isUploaded = uploaded;
-  }
-
-  public int getStatus() {
-    return status;
-  }
-
-  public void setStatus(int status) {
-    this.status = status;
   }
 
   public ApplicationInfo getAppInfo() {

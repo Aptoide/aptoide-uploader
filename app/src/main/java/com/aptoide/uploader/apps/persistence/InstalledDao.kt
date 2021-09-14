@@ -1,12 +1,12 @@
-package com.aptoide.uploader.apps
+package com.aptoide.uploader.apps.persistence
 
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
 import androidx.room.Query
+import com.aptoide.uploader.apps.InstalledApp
 import io.reactivex.Completable
 import io.reactivex.Observable
-import io.reactivex.Single
 
 @Dao
 interface InstalledDao {
@@ -39,11 +39,7 @@ interface InstalledDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun insert(roomInstalledApp: InstalledApp)
 
-  @Query("DELETE FROM installed")
-  fun removeAll()
 
-  @Query(
-      "SELECT * FROM installed where packageName = :packageName AND versionCode = :versionCode")
-  fun isInstalledByVersion(packageName: String,
-                           versionCode: Int): Single<InstalledApp>
+  @Query("DELETE FROM Installed")
+  fun removeAll()
 }

@@ -11,9 +11,13 @@ public interface AppUploadStatusPersistence {
 
   Observable<List<AppUploadStatus>> getAppsUnknownUploadStatus();
 
+  Observable<List<AppUploadStatus>> getUploadedApps();
+
   Completable save(AppUploadStatus appUploadStatus);
 
   Completable saveAll(List<AppUploadStatus> appUploadStatusList);
+
+  boolean isUploadedVersion(String installedPackageName, int versionCode);
 
   Completable remove(AppUploadStatus appUploadStatus);
 }

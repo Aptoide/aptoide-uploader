@@ -1,36 +1,60 @@
 package com.aptoide.uploader.apps
 
 import android.util.Log
+import com.aptoide.uploader.analytics.UploaderAnalytics
+import com.aptoide.uploader.apps.network.ConnectivityProvider
+import com.aptoide.uploader.apps.persistence.AutoUploadSelectsPersistence
+import com.aptoide.uploader.apps.persistence.InstalledPersistence
 import io.reactivex.Completable
 
-class InstallManager(private val installedRepository: InstalledRepository,
-                     private val packageManagerInstalledAppsProvider: PackageManagerInstalledAppsProvider) {
+class InstallManager(private val installedPersistence: InstalledPersistence,
+                     private val selectsPersistence: AutoUploadSelectsPersistence,
+                     private val packageManagerInstalledAppsProvider: PackageManagerInstalledAppsProvider,
+                     private val installedAppsManager: InstalledAppsManager,
+                     private val storeManager: StoreManager,
+                     private val uploaderAnalytics: UploaderAnalytics,
+                     private val aptoideConnectivityProvider: ConnectivityProvider) {
 
   fun insertAllInstalled(): Completable {
-    return packageManagerInstalledAppsProvider.installedApps
+    return packageManagerInstalledAppsProvider.nonSystemInstalledApps
         .doOnError { throwable -> Log.e("APP-85", "Error " + throwable.printStackTrace()) }
         .flatMapCompletable { installed ->
           Log.d("APP-85", "insertAllInstalled: installedApps size " + installed.size)
-          installedRepository.replaceAllBy(installed)
+          installedPersistence.replaceAllBy(installed)
         }
   }
 
   fun onAppInstalled(installed: InstalledApp): Completable {
-    Log.d("APP-85", "onAppInstalled: packageName " + installed.packageName)
-    return installedRepository.save(installed)
+    return if (!installed.isSystem) {
+      installedPersistence.insert(installed)
+          .andThen(selectsPersistence.insert(
+              AutoUploadSelects(installed.packageName, false)))
+    } else {
+      Completable.complete()
+    }
   }
 
   fun onUpdateConfirmed(installed: InstalledApp): Completable {
-    Log.d("APP-85", "onUpdateConfirmed: packageName " + installed.packageName)
-    return installedRepository.removeAllPackageVersions(installed.packageName)
-        .andThen(installedRepository.save(installed))
+    return installedPersistence.removeAllPackageVersions(installed.packageName)
+        .andThen(installedPersistence.insert(installed))
+        .andThen(uploadApp(installed)).doOnComplete { uploaderAnalytics.sendSubmitAppsEvent(1) }
+  }
+
+  private fun uploadApp(installed: InstalledApp): Completable {
+    return if (!installedAppsManager.isUploadedVersion(installed.packageName,
+            installed.versionCode) and installedAppsManager.isSelectedApp(
+            installed.packageName) and aptoideConnectivityProvider.isOnWifiNetwork) {
+      storeManager.upload(installed)
+    } else {
+      Completable.complete()
+    }.retry()
   }
 
   fun onAppRemoved(packageName: String): Completable {
-    return installedRepository.getInstalledVersionsList(packageName)
+    return installedPersistence.getInstalledVersionsList(packageName)
         .flatMapIterable { installeds -> installeds }
         .flatMapCompletable { installed ->
-          installedRepository.remove(packageName, installed.versionCode)
+          installedPersistence.remove(packageName, installed.versionCode)
         }
   }
 }
