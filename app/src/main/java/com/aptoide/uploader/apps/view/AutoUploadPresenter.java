@@ -39,6 +39,18 @@ public class AutoUploadPresenter implements Presenter {
     showApps();
 
     refreshStoreAndApps();
+
+    disposeComposite();
+  }
+
+  private void disposeComposite() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
+        .doOnNext(__ -> compositeDisposable.clear())
+        .subscribe(click -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 
   private void handleBackButtonClick() {
