@@ -33,7 +33,8 @@ public class InstalledAppsManager {
   }
 
   private Observable<List<InstalledApp>> getInstalledApps() {
-    return installedPersistence.allInstalledSorted();
+    return installedPersistence.allInstalledSorted()
+        .filter(list -> !list.isEmpty());
   }
 
   private Observable<List<AppUploadStatus>> getAppUploadStatusList() {
