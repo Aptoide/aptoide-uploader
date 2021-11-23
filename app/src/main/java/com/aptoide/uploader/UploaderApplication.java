@@ -47,6 +47,7 @@ import com.aptoide.uploader.apps.persistence.InstalledPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
 import com.aptoide.uploader.apps.persistence.RoomAutoUploadSelectsPersistence;
 import com.aptoide.uploader.apps.persistence.RoomInstalledPersistence;
+import com.aptoide.uploader.apps.persistence.RoomMigrationProvider;
 import com.aptoide.uploader.apps.persistence.RoomUploadStatusDataSource;
 import com.aptoide.uploader.security.AptoideAccessTokenProvider;
 import com.aptoide.uploader.security.AuthenticationPersistance;
@@ -102,6 +103,7 @@ public class UploaderApplication extends Application {
   private LoginManager loginManager;
   private AgentPersistence agentPersistence;
   private ConnectivityProvider connectivityProvider;
+  private RoomMigrationProvider roomMigrationProvider;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -161,8 +163,9 @@ public class UploaderApplication extends Application {
 
   public InstalledPersistence getInstalledPersistence() {
     if (roomInstalledPersistence == null) {
-      roomInstalledPersistence = new RoomInstalledPersistence(AppUploadsDatabase.getInstance(this)
-          .installedDao());
+      roomInstalledPersistence = new RoomInstalledPersistence(
+          AppUploadsDatabase.getInstance(this, getRoomMigrationProvider())
+              .installedDao());
     }
     return roomInstalledPersistence;
   }
@@ -170,7 +173,7 @@ public class UploaderApplication extends Application {
   public AutoUploadSelectsPersistence getAutoUploadSelectsPersistence() {
     if (roomAutoUploadSelectsPersistence == null) {
       roomAutoUploadSelectsPersistence = new RoomAutoUploadSelectsPersistence(
-          AppUploadsDatabase.getInstance(this)
+          AppUploadsDatabase.getInstance(this, getRoomMigrationProvider())
               .autoUploadSelectsDao()) {
       };
     }
@@ -364,7 +367,7 @@ public class UploaderApplication extends Application {
   public AppUploadStatusPersistence getAppUploadStatusPersistence() {
     if (appUploadStatusPersistence == null) {
       appUploadStatusPersistence = new RoomUploadStatusDataSource(
-          AppUploadsDatabase.getInstance(getApplicationContext())
+          AppUploadsDatabase.getInstance(getApplicationContext(), getRoomMigrationProvider())
               .appUploadsStatusDao());
     }
     return appUploadStatusPersistence;
@@ -452,5 +455,12 @@ public class UploaderApplication extends Application {
           new AgentPersistence(PreferenceManager.getDefaultSharedPreferences(this));
     }
     return agentPersistence;
+  }
+
+  public RoomMigrationProvider getRoomMigrationProvider() {
+    if (roomMigrationProvider == null) {
+      roomMigrationProvider = new RoomMigrationProvider();
+    }
+    return roomMigrationProvider;
   }
 }
