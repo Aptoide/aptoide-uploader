@@ -97,20 +97,20 @@ public class AutoUploadPresenter implements Presenter {
   }
 
   private Completable handleSelectedApps() {
-    return loadSelectedApps().flatMap(__ -> view.submitSelectionClick())
-        .doOnNext(__ -> uploadPermissionProvider.requestExternalStoragePermission())
-        .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
+    return loadSelectedApps().flatMapCompletable(__ -> view.submitSelectionClick()
+        .doOnNext(_1 -> uploadPermissionProvider.requestExternalStoragePermission())
+        .flatMap(_2 -> uploadPermissionProvider.permissionResultExternalStorage())
         .filter(granted -> granted)
-        .flatMapSingle(__ -> view.getSelectedApps())
+        .flatMapSingle(_3 -> view.getSelectedApps())
         .flatMap(selected -> view.getAutoUploadSelectedApps(selected))
         .flatMapCompletable(changedList -> installedAppsManager.updateAutoUploadApps(changedList)
             .doOnComplete(() -> autoUploadNavigator.navigateToSettingsFragment()))
+        .retry())
         .observeOn(viewScheduler)
         .doOnError(throwable -> {
           if (throwable instanceof SocketTimeoutException) {
             view.showError();
           }
-        })
-        .retry();
+        });
   }
 }
