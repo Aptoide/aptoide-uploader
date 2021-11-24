@@ -111,6 +111,7 @@ public class AutoUploadPresenter implements Presenter {
           if (throwable instanceof SocketTimeoutException) {
             view.showError();
           }
+          throwable.printStackTrace();
         });
   }
 }
