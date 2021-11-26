@@ -47,6 +47,7 @@ public class SettingsPresenter implements Presenter {
     handleAboutUsClick();
     handleTermsConditionsClick();
     handlePrivacyPolicyClick();
+    disposeComposite();
   }
 
   private void showAvatarPath() {
@@ -184,6 +185,16 @@ public class SettingsPresenter implements Presenter {
             .retry())
         .subscribe(__ -> {
         }, throwable -> {
+        }));
+  }
+
+  private void disposeComposite() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
+        .doOnNext(__ -> compositeDisposable.clear())
+        .subscribe(click -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
         }));
   }
 }
