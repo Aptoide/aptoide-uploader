@@ -4,7 +4,6 @@ import com.aptoide.uploader.apps.InstalledAppsManager;
 import com.aptoide.uploader.apps.permission.UploadPermissionProvider;
 import com.aptoide.uploader.view.Presenter;
 import com.aptoide.uploader.view.View;
-import io.reactivex.Completable;
 import io.reactivex.Observable;
 import io.reactivex.Scheduler;
 import io.reactivex.disposables.CompositeDisposable;
@@ -39,6 +38,20 @@ public class AutoUploadPresenter implements Presenter {
     showApps();
 
     refreshStoreAndApps();
+
+    handleSubmitApp();
+
+    disposeComposite();
+  }
+
+  private void disposeComposite() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.DESTROY))
+        .doOnNext(__ -> compositeDisposable.clear())
+        .subscribe(click -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
   }
 
   private void handleBackButtonClick() {
@@ -59,8 +72,8 @@ public class AutoUploadPresenter implements Presenter {
         .observeOn(viewScheduler)
         .doOnNext(installedAppsStatus -> view.showApps(installedAppsStatus.getInstalledApps(),
             installedAppsStatus.getAutoUploadSelects()))
-        .flatMapCompletable(__ -> handleSelectedApps())
-        .subscribe(() -> {
+        .flatMap(__ -> loadSelectedApps())
+        .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
@@ -84,21 +97,34 @@ public class AutoUploadPresenter implements Presenter {
         .doOnNext(packageList -> view.loadPreviousAppsSelection(packageList));
   }
 
-  private Completable handleSelectedApps() {
-    return loadSelectedApps().flatMap(__ -> view.submitSelectionClick())
-        .doOnNext(__ -> uploadPermissionProvider.requestExternalStoragePermission())
-        .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
-        .filter(granted -> granted)
-        .flatMapSingle(__ -> view.getSelectedApps())
-        .flatMap(selected -> view.getAutoUploadSelectedApps(selected))
-        .flatMapCompletable(changedList -> installedAppsManager.updateAutoUploadApps(changedList)
-            .doOnComplete(() -> autoUploadNavigator.navigateToSettingsFragment()))
+  private void handleSubmitApp() {
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(created -> view.submitSelectionClick()
+            .doOnNext(_1 -> uploadPermissionProvider.requestExternalStoragePermission())
+            .retry())
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMapCompletable(_2 -> uploadPermissionProvider.permissionResultExternalStorage()
+            .filter(granted -> granted)
+            .flatMapSingle(_3 -> view.getSelectedApps())
+            .flatMap(selected -> view.getAutoUploadSelectedApps(selected))
+            .flatMapCompletable(
+                changedList -> installedAppsManager.updateAutoUploadApps(changedList)
+                    .doOnComplete(() -> autoUploadNavigator.navigateToSettingsFragment()))
+            .retry())
         .observeOn(viewScheduler)
-        .doOnError(throwable -> {
+        .subscribe(() -> {
+        }, throwable -> {
           if (throwable instanceof SocketTimeoutException) {
             view.showError();
           }
-        })
-        .retry();
+          throwable.printStackTrace();
+        }));
   }
 }
