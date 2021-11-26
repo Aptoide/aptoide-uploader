@@ -61,11 +61,11 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
       for (String packageName : selectedPackageNames) {
         if (app.getPackageName()
             .equals(packageName)) {
+          initialSelectedApps.add(i);
           selectApp(i);
         }
       }
     }
-    initialSelectedApps.addAll(selectedApps);
   }
 
   public void setInstalledAndSelectedApps(List<InstalledApp> appsList,
