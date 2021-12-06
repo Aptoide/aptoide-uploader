@@ -232,12 +232,7 @@ import org.jetbrains.annotations.NotNull;
     List<FileToUpload> list = new ArrayList<>();
     list.add(new FileToUpload(getApkPath(), FileType.BASE));
     List<FileToUpload> splits = getSplits();
-    for (FileToUpload split : splits) {
-      if (split.getPath()
-          .contains("split_config")) {
-        list.add(split);
-      }
-    }
+    list.addAll(splits);
     return list;
   }
 

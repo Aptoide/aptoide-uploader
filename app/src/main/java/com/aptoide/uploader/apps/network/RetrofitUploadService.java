@@ -340,11 +340,8 @@ public class RetrofitUploadService implements UploaderService {
       if (!installedApp.getSplits()
           .isEmpty()) {
         for (InstalledApp.FileToUpload split : installedApp.getSplits()) {
-          if (split.getPath()
-              .contains("split_config")) {
-            list.add(md5Calculator.calculate(split.getPath())
-                .blockingGet());
-          }
+          list.add(md5Calculator.calculate(split.getPath())
+              .blockingGet());
         }
       }
     }
