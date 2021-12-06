@@ -12,16 +12,18 @@ import com.aptoide.uploader.apps.ObbTypeConverter;
 
 @Database(entities = {
     AppUploadStatus.class, InstalledApp.class, AutoUploadSelects.class
-}, version = 1) @TypeConverters({ ObbTypeConverter.class }) public abstract class AppUploadsDatabase
+}, version = 2) @TypeConverters({ ObbTypeConverter.class }) public abstract class AppUploadsDatabase
     extends RoomDatabase {
   private static volatile AppUploadsDatabase INSTANCE;
 
-  public static AppUploadsDatabase getInstance(Context context) {
+  public static AppUploadsDatabase getInstance(Context context,
+      RoomMigrationProvider roomMigrationProvider) {
     if (INSTANCE == null) {
       synchronized (AppUploadsDatabase.class) {
         if (INSTANCE == null) {
           INSTANCE = Room.databaseBuilder(context.getApplicationContext(), AppUploadsDatabase.class,
               "AppUploadsDatabase.db")
+              .addMigrations(roomMigrationProvider.getMigration())
               .build();
         }
       }
@@ -33,5 +35,5 @@ import com.aptoide.uploader.apps.ObbTypeConverter;
 
   public abstract InstalledDao installedDao();
 
-  public  abstract AutoUploadSelectsDao autoUploadSelectsDao();
+  public abstract AutoUploadSelectsDao autoUploadSelectsDao();
 }

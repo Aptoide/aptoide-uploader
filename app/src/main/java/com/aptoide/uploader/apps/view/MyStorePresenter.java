@@ -119,16 +119,13 @@ public class MyStorePresenter implements Presenter {
         .observeOn(viewScheduler)
         .doOnNext(avatarPath -> view.showAvatar(avatarPath))
         .subscribe(__ -> {
-        }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
-        }));
+        }, throwable -> throwable.printStackTrace()));
   }
 
   private void showApps() {
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> installedAppsManager.getInstalledAppsStatus())
-        .doOnNext(refresh -> uploadManager.fillAppUploadStatusPersistence())
         .observeOn(viewScheduler)
         .doOnNext(installedAppsStatus -> view.showApps(installedAppsStatus.getInstalledApps(),
             installedAppsStatus.getUploadStatuses(), installedAppsStatus.getAutoUploadSelects()))

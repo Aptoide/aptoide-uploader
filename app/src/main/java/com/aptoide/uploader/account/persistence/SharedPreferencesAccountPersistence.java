@@ -65,6 +65,6 @@ public class SharedPreferencesAccountPersistence implements AccountPersistence {
         preferences.getBoolean(IS_LOGGED_IN, false), preferences.getString(STORE_NAME, null),
         BaseAccount.LoginType.valueOf(
             preferences.getString(LOGIN_TYPE, BaseAccount.LoginType.NONE.name())),
-        preferences.getString(AVATAR_PATH, null));
+        preferences.getString(AVATAR_PATH, ""));
   }
 }
