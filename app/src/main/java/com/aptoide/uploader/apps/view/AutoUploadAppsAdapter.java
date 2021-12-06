@@ -20,6 +20,7 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
   private final List<Integer> selectedApps;
   private final AppSelectedListener selectedAppListener;
   private final PublishSubject<Boolean> selectedPublisher;
+  private final List<Integer> initialSelectedApps;
   private SortingOrder currentOrder;
 
   public AutoUploadAppsAdapter(@NonNull List<InstalledApp> list,
@@ -30,6 +31,7 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
     this.selectedApps = new ArrayList<>();
     this.selectedAppListener = (view, position) -> selectApp(position);
     this.selectedPublisher = PublishSubject.create();
+    this.initialSelectedApps = new ArrayList<>();
   }
 
   @Override public AutoUploadAppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
@@ -59,6 +61,7 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
       for (String packageName : selectedPackageNames) {
         if (app.getPackageName()
             .equals(packageName)) {
+          initialSelectedApps.add(i);
           selectApp(i);
         }
       }
@@ -111,12 +114,24 @@ public class AutoUploadAppsAdapter extends RecyclerView.Adapter<AutoUploadAppVie
   public void selectApp(int position) {
     if (selectedApps.contains(position)) {
       selectedApps.remove((Integer) position);
-      selectedPublisher.onNext(selectedApps.size() != 0);
     } else {
       selectedApps.add(position);
-      selectedPublisher.onNext(true);
     }
+    selectedPublisher.onNext(hasListChanged(selectedApps, initialSelectedApps));
     notifyItemChanged(position);
+  }
+
+  private boolean hasListChanged(List<Integer> selectedApps, List<Integer> initialSelectedApps) {
+    if (selectedApps.size() != initialSelectedApps.size()) {
+      return true;
+    } else {
+      for (Integer selectedApp : selectedApps) {
+        if (!initialSelectedApps.contains(selectedApp)) {
+          return true;
+        }
+      }
+    }
+    return false;
   }
 
   private void clearAppsSelection(boolean notify) {

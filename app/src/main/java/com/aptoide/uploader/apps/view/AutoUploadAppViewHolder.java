@@ -37,6 +37,7 @@ public class AutoUploadAppViewHolder extends RecyclerView.ViewHolder
         .into(appIcon);
     appName.setText(app.getName());
     checkBox.setChecked(selected);
+    checkBox.setClickable(false);
     if (!selected) {
       background.setBackgroundColor(itemView.getResources()
           .getColor(R.color.white));
