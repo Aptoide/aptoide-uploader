@@ -1,2 +1,6 @@
-include ':app', ':aptoide-authentication-core',
-    ':aptoide-authentication-rx'
+dependencies {
+    implementation project(':app')
+    implementation project(':aptoide-authentication-core')
+    implementation project(':aptoide-authentication-rx')
+    // additional dependencies can be added here
+}
