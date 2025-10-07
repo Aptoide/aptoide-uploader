@@ -78,7 +78,7 @@ public class RetrofitUploadService implements UploaderService {
     return accountProvider.getToken()
         .flatMapObservable(
             accessToken -> serviceV7.setStatus(accessToken, String.valueOf(draft.getDraftId()),
-                draftStatus.toString())
+                    draftStatus.toString())
                 .map(response -> mapSetDraftStatusResponse(response, draft, draftStatus))
                 .onErrorReturn(throwable -> {
                   throwable.printStackTrace();
@@ -132,7 +132,7 @@ public class RetrofitUploadService implements UploaderService {
   @Override public Observable<UploadDraft> setDraftMetadata(UploadDraft draft) {
     return accountProvider.getToken()
         .flatMapObservable(accessToken -> serviceV7.setMetadata(accessToken,
-            getSetMetadataParams(draft.getDraftId(), draft.getMetadata()))
+                getSetMetadataParams(draft.getDraftId(), draft.getMetadata()))
             .map(response -> mapSetMetadataResponse(response, draft))
             .onErrorReturn(throwable -> {
               throwable.printStackTrace();
@@ -155,7 +155,7 @@ public class RetrofitUploadService implements UploaderService {
         .getSplits()
         .isEmpty()) {
       return Observable.fromIterable(draft.getInstalledApp()
-          .getRegularApkFiles())
+              .getRegularApkFiles())
           .concatMap(fileToUpload -> mapTypesToAction(fileToUpload, draft))
           .doOnNext(response -> {
             if (!response.isSuccessful()) {
@@ -168,7 +168,7 @@ public class RetrofitUploadService implements UploaderService {
           .onErrorReturn(throwableUploadDraftFunction);
     } else {
       return Observable.fromIterable(draft.getInstalledApp()
-          .getAppBundleFiles())
+              .getAppBundleFiles())
           .concatMap(fileToUpload -> mapTypesToAction(fileToUpload, draft))
           .doOnNext(response -> {
             if (!response.isSuccessful()) {
@@ -205,15 +205,15 @@ public class RetrofitUploadService implements UploaderService {
     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.LOLLIPOP) {
       return accountProvider.getToken()
           .flatMapObservable(accessToken -> serviceV7.setDraftMd5sAboveLollipop(
-              new SetDraftSplitMd5sRequest(accessToken, draft.getDraftId(),
-                  getSplitsList(draft.getInstalledApp()), draft.getMd5()))
+                  new SetDraftSplitMd5sRequest(accessToken, draft.getDraftId(),
+                      getSplitsList(draft.getInstalledApp()), draft.getMd5()))
               .map(response -> mapSetDraftMd5sResponse(response, draft))
               .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR,
                   draft.getInstalledApp(), draft.getMd5(), draft.getDraftId())));
     }
     return accountProvider.getToken()
         .flatMapObservable(accessToken -> serviceV7.setDraftMd5sBelowLollipop(
-            getParamsSetDraftMd5s(accessToken, draft.getMd5(), draft.getDraftId()))
+                getParamsSetDraftMd5s(accessToken, draft.getMd5(), draft.getDraftId()))
             .map(response -> mapSetDraftMd5sResponse(response, draft))
             .onErrorReturn(throwable -> new UploadDraft(UploadDraft.Status.CLIENT_ERROR,
                 draft.getInstalledApp(), draft.getMd5(), draft.getDraftId())));

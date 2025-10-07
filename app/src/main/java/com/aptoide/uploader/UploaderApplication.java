@@ -145,7 +145,7 @@ public class UploaderApplication extends Application {
   public UploadManager getUploadManager() {
     if (uploadManager == null) {
 
-      final Retrofit retrofitV7 = retrofitBuilder("http://ws75-primary.aptoide.com/api/",
+      final Retrofit retrofitV7 = retrofitBuilder("https://ws75-primary.aptoide.com/api/",
           buildOkHttpClient().addInterceptor(getTokenRevalidatorV7Alternate()));
 
       UploadProgressManager uploadProgressManager = new UploadProgressManager();
@@ -217,7 +217,7 @@ public class UploaderApplication extends Application {
 
   public Retrofit retrofitBuilder(String baseUrl, OkHttpClient.Builder okHttpClient) {
     return new Retrofit.Builder().addCallAdapterFactory(
-        RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
+            RxJava2CallAdapterFactory.createWithScheduler(Schedulers.io()))
         .baseUrl(baseUrl)
         .addConverterFactory(MoshiConverterFactory.create())
         .client(okHttpClient.build())
