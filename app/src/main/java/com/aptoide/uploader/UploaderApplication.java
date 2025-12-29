@@ -54,6 +54,7 @@ import com.aptoide.uploader.security.AuthenticationPersistance;
 import com.aptoide.uploader.security.AuthenticationProvider;
 import com.aptoide.uploader.security.SharedPreferencesAuthenticationPersistence;
 import com.aptoide.uploader.upload.AptoideAccountProvider;
+import android.content.SharedPreferences;
 import com.facebook.CallbackManager;
 import com.facebook.appevents.AppEventsLogger;
 import com.facebook.internal.CallbackManagerImpl;
@@ -107,10 +108,39 @@ public class UploaderApplication extends Application {
 
   @Override public void onCreate() {
     super.onCreate();
+    if (BuildConfig.DEBUG) {
+      setupDebugLoginBypass();
+    }
     startFlurryAgent();
     initializeRakam();
     getUploadManager().start();
     checkFirstRun();
+  }
+
+  /**
+   * Sets up a mock logged-in account for UI testing in debug builds.
+   * This bypasses the need for Google/Facebook/Magic Link authentication.
+   */
+  private void setupDebugLoginBypass() {
+    SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+    
+    // Set up mock account in SharedPreferences
+    preferences.edit()
+        .putBoolean("IS_LOGGED_IN", true)
+        .putBoolean("HAS_STORE", true)
+        .putString("store_name", "debug-store")
+        .putString("LOGIN_TYPE", "APTOIDE")
+        .putString("AVATAR_PATH", "")
+        .putString("access_token", "debug_mock_token")
+        .putString("refresh_token", "debug_mock_refresh_token")
+        .apply();
+    
+    // Set up mock credentials in AutoLoginManager
+    getAutoLoginManager().getAutoLoginCredentials().setAccessToken("debug_mock_token");
+    getAutoLoginManager().getAutoLoginCredentials().setRefreshToken("debug_mock_refresh_token");
+    getAutoLoginManager().getAutoLoginCredentials().setStoreName("debug-store");
+    getAutoLoginManager().getAutoLoginCredentials().setEmail("debug@aptoide.com");
+    getAutoLoginManager().getAutoLoginCredentials().setName("Debug User");
   }
 
   public void checkFirstRun() {
