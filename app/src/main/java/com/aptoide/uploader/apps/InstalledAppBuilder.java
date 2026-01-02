@@ -10,6 +10,10 @@ public class InstalledAppBuilder {
   private final InstalledApp installedApp;
 
   public InstalledAppBuilder(PackageInfo packageInfo, PackageManager packageManager) {
+    int minSdk = 1;
+    if (android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.N) {
+      minSdk = packageInfo.applicationInfo.minSdkVersion;
+    }
     installedApp = new InstalledApp(packageInfo.applicationInfo,
         packageInfo.packageName + packageInfo.versionCode, packageInfo.packageName,
         packageInfo.applicationInfo.loadLabel(packageManager)
@@ -17,8 +21,9 @@ public class InstalledAppBuilder {
         (packageInfo.applicationInfo.flags & packageInfo.applicationInfo.FLAG_SYSTEM) != 0,
         packageInfo.applicationInfo.sourceDir,
         "android.resource://" + packageInfo.packageName + "/" + packageInfo.applicationInfo.icon,
-        packageInfo.lastUpdateTime, getMainObb(packageInfo.packageName),
-        getPatchObb(packageInfo.packageName));
+        packageInfo.lastUpdateTime, packageInfo.firstInstallTime,
+        packageInfo.applicationInfo.targetSdkVersion, minSdk,
+        getMainObb(packageInfo.packageName), getPatchObb(packageInfo.packageName));
   }
 
   public Obb getMainObb(String packageName) {

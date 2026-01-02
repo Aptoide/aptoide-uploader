@@ -121,6 +121,20 @@
   <string name="autoupload_settings_title">Auto upload</string>
   <string name="autoupload_body">Select apps for automatic upload</string>
 
-  
+  <!-- App Details -->
+  <string name="app_details_title">APP DETAILS</string>
+  <string name="app_version_label">App Version</string>
+  <string name="version_code_label">Version Code</string>
+  <string name="target_sdk_label">Target SDK</string>
+  <string name="min_sdk_label">Min SDK</string>
+  <string name="package_name_label">Package Name</string>
+  <string name="app_path_label">App Path</string>
+  <string name="app_size_label">App Size</string>
+  <string name="app_type_label">App Type</string>
+  <string name="app_type_universal">Universal APK</string>
+  <string name="app_type_bundle">App Bundle</string>
+  <string name="install_date_label">Installed Date</string>
+  <string name="update_date_label">Last Updated</string>
+  <string name="file_paths_label">File Paths</string>
 
 </resources>

@@ -351,13 +351,17 @@ public class UploaderApplication extends Application {
     return appUploadStatusManager;
   }
 
-  private PackageManagerInstalledAppsProvider getPackageManagerInstalledAppsProvider() {
+  public PackageManagerInstalledAppsProvider getInstalledAppsProvider() {
     if (packageManagerInstalledAppsProvider == null) {
       packageManagerInstalledAppsProvider =
           new PackageManagerInstalledAppsProvider(getPackageManager(), Schedulers.io());
       return packageManagerInstalledAppsProvider;
     }
     return packageManagerInstalledAppsProvider;
+  }
+
+  private PackageManagerInstalledAppsProvider getPackageManagerInstalledAppsProvider() {
+    return getInstalledAppsProvider();
   }
 
   private AptoideAccountProvider getAccessTokenProvider() {

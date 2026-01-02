@@ -22,25 +22,30 @@ public class MyAppsAdapter extends RecyclerView.Adapter<AppViewHolder> {
   private final List<AutoUploadSelects> autoUploadSelectsList;
   private final AppSelectedListener selectedAppListener;
   private final AppLongClickListener longClickListener;
+  private final AppInfoClickListener infoClickListener;
   private final PublishSubject<Boolean> selectedPublisher;
+  private final PublishSubject<String> infoClickPublisher;
   private SortingOrder currentOrder;
 
   public MyAppsAdapter(@NonNull List<InstalledApp> list, List<AppUploadStatus> uploadedList,
       List<AutoUploadSelects> autoUploadSelectsList, AppLongClickListener longClickListener,
-      SortingOrder currentOrder) {
+      AppInfoClickListener infoClickListener, SortingOrder currentOrder) {
     this.installedApps = list;
     this.uploadedList = uploadedList;
     this.autoUploadSelectsList = autoUploadSelectsList;
     this.longClickListener = longClickListener;
+    this.infoClickListener = infoClickListener;
     this.currentOrder = currentOrder;
     this.selectedApps = new ArrayList<>();
     this.selectedAppListener = (view, position) -> setSelected(position);
     this.selectedPublisher = PublishSubject.create();
+    this.infoClickPublisher = PublishSubject.create();
   }
 
   @Override public AppViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
     return new AppViewHolder(LayoutInflater.from(parent.getContext())
-        .inflate(R.layout.item_app, parent, false), selectedAppListener, longClickListener);
+        .inflate(R.layout.item_app, parent, false), selectedAppListener, longClickListener,
+        infoClickListener);
   }
 
   @Override public void onBindViewHolder(AppViewHolder holder, int position) {

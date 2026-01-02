@@ -30,6 +30,13 @@ class MyStoreNavigator extends Navigator {
         .commit();
   }
 
+  public void navigateToAppDetails(String packageName) {
+    fragmentManager.beginTransaction()
+        .replace(R.id.activity_main_container, AppDetailsFragment.newInstance(packageName))
+        .addToBackStack(String.valueOf(R.layout.fragment_app_details))
+        .commit();
+  }
+
   public void navigateToAutoLoginFragment(String name, String avatarPath) {
     Fragment fragment = AutoLoginFragment.newInstance(name, avatarPath);
     navigateToWithoutBackSave(fragment);

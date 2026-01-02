@@ -21,6 +21,9 @@ import org.jetbrains.annotations.NotNull;
   private String apkPath;
   private String iconPath;
   private long installedDate;
+  private long firstInstallTime;
+  private int targetSdkVersion;
+  private int minSdkVersion;
   @Ignore private List<Obb> obbList = new ArrayList<>();
   @Ignore private ApplicationInfo appInfo;
 
@@ -29,7 +32,8 @@ import org.jetbrains.annotations.NotNull;
 
   public InstalledApp(ApplicationInfo applicationInfo, String packageAndVersionCode,
       String packageName, String name, String versionName, int versionCode, boolean isSystem,
-      String apkPath, String iconPath, long lastUpdateTime, Obb obbMain, Obb obbPatch) {
+      String apkPath, String iconPath, long lastUpdateTime, long firstInstallTime,
+      int targetSdkVersion, int minSdkVersion, Obb obbMain, Obb obbPatch) {
     this.appInfo = applicationInfo;
     this.packageAndVersionCode = packageAndVersionCode;
     this.packageName = packageName;
@@ -40,6 +44,9 @@ import org.jetbrains.annotations.NotNull;
     this.apkPath = apkPath;
     this.iconPath = iconPath;
     this.installedDate = lastUpdateTime;
+    this.firstInstallTime = firstInstallTime;
+    this.targetSdkVersion = targetSdkVersion;
+    this.minSdkVersion = minSdkVersion;
     this.obbList.add(0, obbMain);
     this.obbList.add(1, obbPatch);
   }
@@ -114,6 +121,30 @@ import org.jetbrains.annotations.NotNull;
 
   public void setInstalledDate(long installedDate) {
     this.installedDate = installedDate;
+  }
+
+  public long getFirstInstallTime() {
+    return firstInstallTime;
+  }
+
+  public void setFirstInstallTime(long firstInstallTime) {
+    this.firstInstallTime = firstInstallTime;
+  }
+
+  public int getTargetSdkVersion() {
+    return targetSdkVersion;
+  }
+
+  public void setTargetSdkVersion(int targetSdkVersion) {
+    this.targetSdkVersion = targetSdkVersion;
+  }
+
+  public int getMinSdkVersion() {
+    return minSdkVersion;
+  }
+
+  public void setMinSdkVersion(int minSdkVersion) {
+    this.minSdkVersion = minSdkVersion;
   }
 
   public Obb getObbMain() {

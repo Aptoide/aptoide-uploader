@@ -99,12 +99,15 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     recyclerView.addItemDecoration(new GridDividerItemDecoration(
         getResources().getDimensionPixelSize(R.dimen.apps_grid_item_margin)));
     recyclerView.setAdaptiveLayout(108, 152, GridRecyclerView.AdaptStrategy.SCALE_WIDTH_ONLY);
+    MyStoreNavigator navigator = new MyStoreNavigator(getFragmentManager());
     adapter = new MyAppsAdapter(new ArrayList<>(), new ArrayList<>(), new ArrayList<>(),
         (view1, packageName) -> {
           Uri packageURI = Uri.parse("package:" + packageName);
           Intent uninstallIntent = new Intent(Intent.ACTION_DELETE, packageURI);
           startActivity(uninstallIntent);
-        }, sortingOrder);
+        },
+        (view1, packageName) -> navigator.navigateToAppDetails(packageName),
+        sortingOrder);
     setUpSelectionListener();
     refreshEvent = PublishSubject.create();
     recyclerView.setAdapter(adapter);

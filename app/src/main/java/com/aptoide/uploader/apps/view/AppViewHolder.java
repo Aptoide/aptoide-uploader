@@ -22,22 +22,31 @@ public class AppViewHolder extends RecyclerView.ViewHolder
   private final View background;
   private final AppSelectedListener listener;
   private final AppLongClickListener longClickListener;
+  private final AppInfoClickListener infoClickListener;
   private final AppCompatImageView cloud;
   private final ImageView autoUploadCloud;
+  private final ImageView infoIcon;
   private String packageName;
 
   AppViewHolder(View itemView, AppSelectedListener listener,
-      AppLongClickListener longClickListener) {
+      AppLongClickListener longClickListener, AppInfoClickListener infoClickListener) {
     super(itemView);
     image = itemView.findViewById(R.id.item_app_icon);
     appName = itemView.findViewById(R.id.item_app_name);
     background = itemView.findViewById(R.id.item_app_layout);
     cloud = itemView.findViewById(R.id.appInCloud);
     autoUploadCloud = itemView.findViewById(R.id.auto_upload_cloud);
+    infoIcon = itemView.findViewById(R.id.item_app_info_icon);
     this.listener = listener;
     this.longClickListener = longClickListener;
+    this.infoClickListener = infoClickListener;
     itemView.setOnClickListener(this);
     itemView.setOnLongClickListener(this);
+    infoIcon.setOnClickListener(v -> {
+      if (infoClickListener != null && packageName != null) {
+        infoClickListener.onInfoClick(v, packageName);
+      }
+    });
   }
 
   void setApp(InstalledApp app, boolean selected, AppUploadStatus uploadStatus,
