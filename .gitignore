@@ -35,7 +35,6 @@ proguard/
 captures/
 
 signing.properties
-google-services.json
 fabric.properties
 
 .idea/instapk.xml
