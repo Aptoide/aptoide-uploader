@@ -1,6 +1,8 @@
 apply plugin: 'com.android.application'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.crashlytics'
 
 android {
   namespace 'com.aptoide.uploader'
@@ -95,6 +97,11 @@ android {
 }
 
 dependencies {
+
+  // Firebase
+  implementation platform('com.google.firebase:firebase-bom:33.7.0')
+  implementation 'com.google.firebase:firebase-crashlytics'
+  implementation 'com.google.firebase:firebase-analytics'
 
   // Support Libraries
   implementation 'androidx.appcompat:appcompat:1.6.1'

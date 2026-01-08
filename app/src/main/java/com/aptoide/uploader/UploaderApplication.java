@@ -60,6 +60,7 @@ import com.facebook.appevents.AppEventsLogger;
 import com.facebook.internal.CallbackManagerImpl;
 import com.facebook.login.LoginManager;
 import com.flurry.android.FlurryAgent;
+import com.google.firebase.crashlytics.FirebaseCrashlytics;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
 import com.google.android.gms.common.Scopes;
 import com.google.android.gms.common.api.Scope;
@@ -112,10 +113,20 @@ public class UploaderApplication extends Application {
     if (BuildConfig.DEBUG) {
       setupDebugLoginBypass();
     }
+    initializeFirebase();
     startFlurryAgent();
     initializeRakam();
     getUploadManager().start();
     syncInstalledApps();
+  }
+
+  private void initializeFirebase() {
+    FirebaseCrashlytics crashlytics = FirebaseCrashlytics.getInstance();
+    // Disable crash collection in debug builds to avoid noise during development
+    crashlytics.setCrashlyticsCollectionEnabled(!BuildConfig.DEBUG);
+    // Set custom keys for better crash context
+    crashlytics.setCustomKey("app_version", BuildConfig.VERSION_NAME);
+    crashlytics.setCustomKey("version_code", BuildConfig.VERSION_CODE);
   }
 
   /**
