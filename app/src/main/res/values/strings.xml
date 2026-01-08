@@ -59,6 +59,7 @@
   <string name="logging_as">Logging in as</string>
   <string name="logging_in">Logging in</string>
   <string name="no_connectivity_error">Sorry, no internet connection available</string>
+  <string name="notification_permission_required">Please grant notification permission to track upload progress</string>
 
   <!-- Notifications -->
   <string name="application_notification_short_app_success_upload">App successfully uploaded</string>

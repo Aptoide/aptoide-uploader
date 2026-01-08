@@ -1,11 +1,17 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-  package="com.aptoide.uploader">
+    xmlns:tools="http://schemas.android.com/tools">
 
   <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
-  <uses-permission android:name="android.permission.GET_ACCOUNTS" />
   <uses-permission android:name="android.permission.INTERNET" />
-  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
+  <uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" android:maxSdkVersion="32" />
+  <uses-permission android:name="android.permission.READ_MEDIA_IMAGES" />
+  <uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
+  <uses-permission android:name="android.permission.FOREGROUND_SERVICE_DATA_SYNC" />
+  <!-- Required for Android 11+ to query all installed packages -->
+  <uses-permission android:name="android.permission.QUERY_ALL_PACKAGES"
+      tools:ignore="QueryAllPackagesPermission" />
 
   <application
     android:name=".UploaderApplication"
@@ -14,7 +20,9 @@
     android:icon="@mipmap/ic_launcher"
     android:label="@string/app_name"
     android:networkSecurityConfig="@xml/network_security_config"
-    android:theme="@style/AppTheme">
+    android:theme="@style/AppTheme"
+    android:appComponentFactory="androidx.core.app.CoreComponentFactory"
+    tools:replace="android:appComponentFactory">
 
     <meta-data
       android:name="com.facebook.sdk.ApplicationId"
@@ -23,7 +31,8 @@
     <activity
       android:name="com.facebook.FacebookActivity"
       android:configChanges="keyboard|keyboardHidden|screenLayout|screenSize|orientation"
-      android:label="@string/app_name" />
+      android:label="@string/app_name"
+      android:exported="false" />
 
     <activity
       android:name="com.facebook.CustomTabActivity"
@@ -40,7 +49,8 @@
 
     <activity
       android:name=".MainActivity"
-      android:launchMode="singleTask">
+      android:launchMode="singleTask"
+      android:exported="true">
       <intent-filter>
         <action android:name="android.intent.action.VIEW" />
         <action android:name="android.intent.action.MAIN" />
@@ -60,8 +70,13 @@
       </intent-filter>
     </activity>
 
-    <service android:name=".NotificationService" />
-    <receiver android:name=".apps.InstalledBroadcastReceiver">
+    <service 
+        android:name=".NotificationService"
+        android:foregroundServiceType="dataSync"
+        android:exported="false" />
+    <receiver 
+        android:name=".apps.InstalledBroadcastReceiver"
+        android:exported="true">
       <intent-filter android:priority="999">
         <action android:name="android.intent.action.PACKAGE_ADDED" />
         <action android:name="android.intent.action.PACKAGE_REMOVED" />
@@ -70,7 +85,9 @@
         <data android:scheme="package" />
       </intent-filter>
     </receiver>
-    <service android:name=".apps.InstalledIntentService" />
+    <service 
+        android:name=".apps.InstalledIntentService"
+        android:exported="false" />
   </application>
 
 </manifest>

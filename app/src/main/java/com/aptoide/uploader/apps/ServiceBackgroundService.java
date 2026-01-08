@@ -3,6 +3,7 @@ package com.aptoide.uploader.apps;
 import android.content.Context;
 import android.content.Intent;
 import android.util.Log;
+import androidx.core.content.ContextCompat;
 import com.aptoide.uploader.NotificationService;
 import com.aptoide.uploader.upload.BackgroundService;
 
@@ -20,7 +21,7 @@ public class ServiceBackgroundService implements BackgroundService {
   }
 
   @Override public void enable() {
-    context.startService(new Intent(context, serviceClass));
+    ContextCompat.startForegroundService(context, new Intent(context, serviceClass));
   }
 
   @Override public void disable() {

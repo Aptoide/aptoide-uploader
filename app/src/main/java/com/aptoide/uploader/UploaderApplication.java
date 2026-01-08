@@ -74,6 +74,7 @@ import java.net.URL;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 import okhttp3.OkHttpClient;
+import okhttp3.logging.HttpLoggingInterceptor;
 import org.json.JSONException;
 import org.json.JSONObject;
 import retrofit2.Retrofit;
@@ -114,7 +115,7 @@ public class UploaderApplication extends Application {
     startFlurryAgent();
     initializeRakam();
     getUploadManager().start();
-    checkFirstRun();
+    syncInstalledApps();
   }
 
   /**
@@ -143,17 +144,9 @@ public class UploaderApplication extends Application {
     getAutoLoginManager().getAutoLoginCredentials().setName("Debug User");
   }
 
-  public void checkFirstRun() {
-    boolean isFirstRun = this.getSharedPreferences("PREFERENCE", 0)
-        .getBoolean("isFirstRun", true);
-    if (isFirstRun) {
-      refreshInstalledApps();
-      refreshAutoUploadSelection();
-      this.getSharedPreferences("PREFERENCE", 0)
-          .edit()
-          .putBoolean("isFirstRun", false)
-          .apply();
-    }
+  public void syncInstalledApps() {
+    refreshInstalledApps();
+    refreshAutoUploadSelection();
   }
 
   private void refreshInstalledApps() {
@@ -239,10 +232,20 @@ public class UploaderApplication extends Application {
   }
 
   public OkHttpClient.Builder buildOkHttpClient() {
-    return new OkHttpClient.Builder().writeTimeout(60, TimeUnit.SECONDS)
+    OkHttpClient.Builder builder = new OkHttpClient.Builder()
+        .writeTimeout(60, TimeUnit.SECONDS)
         .readTimeout(60, TimeUnit.SECONDS)
         .connectTimeout(60, TimeUnit.SECONDS)
         .addInterceptor(getUserAgentInterceptor());
+
+    if (BuildConfig.DEBUG) {
+      HttpLoggingInterceptor loggingInterceptor = new HttpLoggingInterceptor(
+          message -> Log.d("OkHttp", message));
+      loggingInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
+      builder.addInterceptor(loggingInterceptor);
+    }
+
+    return builder;
   }
 
   public Retrofit retrofitBuilder(String baseUrl, OkHttpClient.Builder okHttpClient) {
@@ -428,7 +431,6 @@ public class UploaderApplication extends Application {
 
   public GoogleSignInOptions getGSO() {
     return new GoogleSignInOptions.Builder(GoogleSignInOptions.DEFAULT_SIGN_IN).requestEmail()
-        .requestScopes(new Scope("https://www.googleapis.com/auth/contacts.readonly"))
         .requestScopes(new Scope(Scopes.PROFILE))
         .requestServerAuthCode(getString(R.string.google_id))
         .build();

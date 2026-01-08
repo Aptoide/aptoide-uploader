@@ -183,6 +183,7 @@ public class MyStorePresenter implements Presenter {
   }
 
   private void handleSubmitAppEvent() {
+    // Step 1: On submit click, check connectivity and request notification permission
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.submitAppEvent()
@@ -195,13 +196,32 @@ public class MyStorePresenter implements Presenter {
               }
             })
             .filter(hasConnection -> hasConnection)
-            .doOnNext(apps -> uploadPermissionProvider.requestExternalStoragePermission())
+            .doOnNext(__ -> uploadPermissionProvider.requestNotificationPermission())
             .retry())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
 
+    // Step 2: Handle notification permission result
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> uploadPermissionProvider.permissionResultNotification())
+        .observeOn(viewScheduler)
+        .doOnNext(granted -> {
+          if (granted) {
+            uploadPermissionProvider.requestExternalStoragePermission();
+          } else {
+            view.showNotificationPermissionRequired();
+          }
+        })
+        .retry()
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    // Step 3: Handle storage permission result and start upload
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())

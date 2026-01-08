@@ -29,6 +29,8 @@ public interface MyStoreView extends View {
 
   void showNoConnectivityError();
 
+  void showNotificationPermissionRequired();
+
   Observable<Object> submitAppEvent();
 
   Observable<SortingOrder> orderByEvent();
