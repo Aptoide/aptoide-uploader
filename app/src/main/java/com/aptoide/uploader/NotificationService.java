@@ -30,13 +30,13 @@ public class NotificationService extends Service implements NotificationView {
 
   @Override public void onCreate() {
     super.onCreate();
+    notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    setupChannels();
     lifecycleSubject = BehaviorSubject.create();
     lifecycleSubject.onNext(LifecycleEvent.CREATE);
     uploadManager = ((UploaderApplication) getApplicationContext()).getUploadManager();
-    notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     systemNotificationShower = new NotificationPresenter(this, getUploadManager());
     attachPresenter();
-    setupChannels();
   }
 
   @Override public int onStartCommand(Intent intent, int flags, int startId) {
@@ -85,6 +85,7 @@ public class NotificationService extends Service implements NotificationView {
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
+            .setContentText(getString(R.string.notification_preparing_upload))
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(0, 0, true);
@@ -176,10 +177,12 @@ public class NotificationService extends Service implements NotificationView {
   public void updateUploadProgress(String applicationName, String packageName, int progress) {
     Log.d("notificationz4",
         "showing progress notification " + packageName + " " + applicationName + " " + progress);
+
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
+            .setContentText(getString(R.string.notification_uploading_progress, progress))
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(100, progress, false);

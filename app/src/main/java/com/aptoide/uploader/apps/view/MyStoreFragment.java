@@ -323,6 +323,42 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     return refreshEvent;
   }
 
+  @Override public void showPreparingUploadsNotification(String firstAppName, String firstAppPackageName, int appCount) {
+    // Show a simple notification without starting the foreground service
+    // The service will be started automatically when the actual upload begins
+    android.app.NotificationManager notificationManager =
+        (android.app.NotificationManager) getContext().getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+
+    String title;
+    String message;
+
+    if (appCount == 1) {
+      // Single app: show app name as title
+      title = firstAppName;
+      message = getString(R.string.notification_preparing_upload);
+    } else {
+      // Multiple apps: show Aptoide Uploader as title
+      title = getString(R.string.app_name);
+      message = getString(R.string.notification_preparing_multiple_apps, appCount);
+    }
+
+    // Use the same notification ID that the upload notification will use
+    // This matches the ID used in NotificationService: packageName.hashCode() + NOTIFICATION_ID_CHANGER (50)
+    int notificationId = firstAppPackageName.hashCode() + 50;
+
+    androidx.core.app.NotificationCompat.Builder builder =
+        new androidx.core.app.NotificationCompat.Builder(getContext(), "Upload")
+            .setSmallIcon(R.drawable.notification_icon)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_LOW)
+            .setProgress(0, 0, true);
+
+    notificationManager.notify(notificationId, builder.build());
+  }
+
   private boolean showVersionDialog() {
     PackageInfo pInfo;
     try {

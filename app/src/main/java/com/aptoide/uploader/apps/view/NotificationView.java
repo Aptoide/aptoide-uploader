@@ -38,4 +38,3 @@ public interface NotificationView extends View {
 
   void showCatappultCertifiedNotification(String appName, String packageName);
 }
-

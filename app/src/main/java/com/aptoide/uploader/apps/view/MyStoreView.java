@@ -44,4 +44,6 @@ public interface MyStoreView extends View {
   void clearSelection();
 
   Observable<Boolean> refreshEvent();
+
+  void showPreparingUploadsNotification(String firstAppName, String firstAppPackageName, int appCount);
 }

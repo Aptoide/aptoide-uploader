@@ -227,6 +227,13 @@ public class MyStorePresenter implements Presenter {
         .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
         .filter(granted -> granted)
         .flatMapSingle(__ -> view.getSelectedApps())
+        .doOnNext(apps -> {
+          if (!apps.isEmpty()) {
+            String firstAppName = apps.get(0).getName();
+            String firstAppPackageName = apps.get(0).getPackageName();
+            view.showPreparingUploadsNotification(firstAppName, firstAppPackageName, apps.size());
+          }
+        })
         .doOnNext(__ -> view.clearSelection())
         .flatMapCompletable(apps -> storeManager.upload(apps)
             .doOnComplete(() -> uploaderAnalytics.sendSubmitAppsEvent(apps.size())))
