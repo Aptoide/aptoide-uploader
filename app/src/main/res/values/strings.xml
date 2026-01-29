@@ -79,6 +79,7 @@
   <string name="application_notification_short_anti_spam">Oops&#8230; Your app seems to be spam. Please contact support@aptoide.com.</string>
   <string name="notification_preparing_upload">Preparing upload…</string>
   <string name="notification_uploading_progress">Uploading… %1$d%%</string>
+  <string name="notification_finalizing_upload">Finalizing upload…</string>
   <string name="notification_preparing_single_app">Preparing 1 app for upload…</string>
   <string name="notification_preparing_multiple_apps">Preparing %1$d apps for upload…</string>
 

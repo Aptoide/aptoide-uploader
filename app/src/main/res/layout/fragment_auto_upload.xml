@@ -2,7 +2,7 @@
 <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_width="wrap_content"
+    android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/white"
     >
@@ -25,14 +25,17 @@
           android:id="@+id/fragment_autoupload_back"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
-          android:layout_gravity="center_horizontal"
-          android:background="@drawable/ic_arrow_back_24dp"
+          android:layout_gravity="center_vertical"
+          android:padding="8dp"
+          android:src="@drawable/ic_arrow_back_24dp"
+          android:background="?attr/selectableItemBackgroundBorderless"
           />
 
       <TextView
           android:id="@+id/fragment_autoupload_title"
           android:layout_width="wrap_content"
           android:layout_height="wrap_content"
+          android:layout_gravity="center_vertical"
           android:paddingLeft="15dp"
           android:paddingStart="15dp"
           android:paddingRight="15dp"
@@ -47,7 +50,7 @@
       android:id="@+id/fragment_autoupload_infobar"
       android:layout_width="match_parent"
       android:layout_height="48dp"
-      android:layout_marginTop="56dp">
+      android:layout_below="@id/fragment_autoupload_toolbar">
     <TextView
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -72,7 +75,6 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:layout_marginTop="104dp"
         tools:listitem="@layout/item_app_auto_upload">
     </androidx.recyclerview.widget.RecyclerView>
   </androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

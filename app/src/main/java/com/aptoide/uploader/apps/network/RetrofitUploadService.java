@@ -455,11 +455,11 @@ public class RetrofitUploadService implements UploaderService {
             parts++;
             if (percentageTicks > 0 && parts % percentageTicks == 0) {
               progress = (int) (parts * (double) buffer.length / fileSize * 100.0);
-              uploadProgressListener.updateProgress(progress, packageName);
+              uploadProgressListener.updateProgress(progress, packageName, apk.getName());
             }
           }
           if (read == -1) {
-            uploadProgressListener.updateProgress(100, packageName);
+            uploadProgressListener.updateProgress(100, packageName, apk.getName());
           }
         } catch (IOException e) {
           Log.e("RetrofitUploadService", "Error uploading file: " + apk.getName(), e);

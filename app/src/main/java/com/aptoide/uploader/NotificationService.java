@@ -93,6 +93,21 @@ public class NotificationService extends Service implements NotificationView {
     startForegroundWithType(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
   }
 
+  @Override public void showFinalizingUploadNotification(String applicationName, String packageName) {
+    Log.d("notificationz4", "showing finalizing notification " + packageName + " " + applicationName);
+
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(applicationName)
+            .setContentText(getString(R.string.notification_finalizing_upload))
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setProgress(0, 0, true);
+    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH);
+    startForegroundWithType(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
+  }
+
   @Override
   public void showNoMetaDataNotification(String applicationName, String packageName, String md5) {
 
@@ -174,15 +189,20 @@ public class NotificationService extends Service implements NotificationView {
   }
 
   @Override
-  public void updateUploadProgress(String applicationName, String packageName, int progress) {
+  public void updateUploadProgress(String applicationName, String packageName, int progress, String filename) {
     Log.d("notificationz4",
-        "showing progress notification " + packageName + " " + applicationName + " " + progress);
+        "showing progress notification " + packageName + " " + applicationName + " " + progress + " " + filename);
+
+    String contentText = getString(R.string.notification_uploading_progress, progress);
+    if (filename != null && !filename.isEmpty()) {
+      contentText = contentText + " - " + filename;
+    }
 
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
-            .setContentText(getString(R.string.notification_uploading_progress, progress))
+            .setContentText(contentText)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(100, progress, false);
