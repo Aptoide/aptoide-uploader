@@ -87,6 +87,12 @@ android {
     jvmTarget = "1.8"
   }
 
+  testOptions {
+    unitTests.all {
+      useJUnitPlatform()
+    }
+  }
+
   dexOptions {
     javaMaxHeapSize "4g"
     dexInProcess = false
@@ -120,11 +126,9 @@ dependencies {
   // Kotlin
   implementation "org.jetbrains.kotlin:kotlin-stdlib:$kotlin_version"
 
-  // Unit Test
-  testImplementation 'org.jetbrains.spek:spek-api:1.1.5'
-  testImplementation 'org.jetbrains.spek:spek-junit-platform-engine:1.1.5'
-  testImplementation 'org.junit.platform:junit-platform-runner:1.0.1'
-  testImplementation 'org.junit.jupiter:junit-jupiter-api:5.0.1'
+  // Unit Test - Kotest
+  testImplementation 'io.kotest:kotest-runner-junit5-jvm:4.0.7'
+  testImplementation 'io.kotest:kotest-assertions-core-jvm:4.0.7'
   testImplementation "com.nhaarman:mockito-kotlin:1.5.0"
   testImplementation 'org.mockito:mockito-core:2.28.2'
   testImplementation 'io.reactivex.rxjava2:rxkotlin:2.1.0'
