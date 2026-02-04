@@ -1,3 +1,8 @@
+/**
+ * DISABLED: This test uses the legacy Spek framework which is being migrated to Kotest.
+ * Re-enable by renaming to .kt once migrated to Kotest BehaviorSpec.
+ * Tracking: Part of test framework migration initiative.
+ */
 package com.aptoide.uploader.account.view
 
 import com.aptoide.uploader.TestData

@@ -389,8 +389,8 @@ class UploadManagerTest : BehaviorSpec({
                 draftsSubject.onNext(listOf(createUploadDraft(md5 = "md5-1")))
                 draftsSubject.onNext(listOf(createUploadDraft(md5 = "md5-1"), createUploadDraft(md5 = "md5-2")))
 
-                // Assert
-                testObserver.assertValueCount(3) // initial empty + 2 updates
+                // Assert: initial empty list from BehaviorSubject.createDefault + 2 manual emissions = 3 total
+                testObserver.assertValueCount(3)
             }
         }
     }
@@ -415,7 +415,8 @@ class UploadManagerTest : BehaviorSpec({
                 // Act
                 uploadManager.start()
 
-                // Assert
+                // Assert: using atLeast=1 because start() subscribes to draft changes
+                // and may call enable() multiple times as reactive streams emit
                 verify(atLeast = 1) { backgroundService.enable() }
             }
         }

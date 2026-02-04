@@ -53,12 +53,4 @@ object UploadManagerTestFixtures {
         }
     }
 
-    fun createAppUploadStatus(
-        md5: String = TEST_MD5,
-        packageName: String = TEST_PACKAGE_NAME,
-        status: AppUploadStatus.Status = AppUploadStatus.Status.UNKNOWN,
-        versionCode: Int = 1
-    ): AppUploadStatus {
-        return AppUploadStatus(md5, packageName, status, versionCode)
-    }
 }
