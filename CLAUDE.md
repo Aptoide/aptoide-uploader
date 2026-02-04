@@ -57,6 +57,42 @@ Tests use **Spek** (Kotlin BDD framework) with Mockito. Test files are in `app/s
 - `aptoide-authentication-core` - Authentication API (Retrofit + Moshi)
 - `aptoide-authentication-rx` - RxJava2 wrapper for authentication
 
+## Upload Flow
+
+The Aptoide Uploader uses a **MD5-first optimization** approach to avoid unnecessary file uploads when APKs already exist on the server.
+
+**Complete technical documentation**: See [UPLOAD_FLOW.md](./UPLOAD_FLOW.md)
+
+### Quick Reference
+
+**Standard Flow:**
+1. Create draft → Set MD5 → Set PENDING → Get status
+2. If DUPLICATE (APK-103): Done! No file upload needed ✅
+3. If NOT_EXISTENT (APK-5): Upload files → Set PENDING → Get status
+4. If MISSING_ARGUMENTS (MARG-*): Add metadata → Set PENDING → Get status
+
+**Key Implementation Details:**
+- Always call `setPending()` BEFORE `uploadFiles()` (MD5-first!)
+- Extract filename only, not full path: `new File(path).getName()`
+- Override `RequestBody.contentLength()` for multipart uploads
+- Validate files exist/readable/not-empty before upload
+
+**Critical Files:**
+- `UploadManager.java` - Main upload orchestration logic
+- `RetrofitUploadService.java` - API call implementations (Retrofit)
+- `UploadDraft.java` - Status enum mapping (APK-5 → NOT_EXISTENT, etc.)
+- `NotificationPresenter.java` - Notification flow based on upload status
+
+**Error Code Examples:**
+- APK-103: Duplicate (already exists)
+- APK-5: Not existent (need file upload)
+- FILE-5: File missing on server
+- MARG-*: Missing metadata
+
+**API Base URL:** `https://ws75.aptoide.com/`
+
+**Official Specification:** `Uploader_3.0_client.pdf` (in Downloads folder)
+
 ## Key Dependencies
 
 - **Networking**: Retrofit2 2.5.0 with Moshi JSON
@@ -75,4 +111,35 @@ Required properties in `gradle.properties` or `local.properties`:
 
 - Unit tests required for: Kotlin code, presenter flows, mappers/validators with logic
 - Database schema changes require migrations
-- Jira tickets use format: APP-XXXX
+- Jira tickets use format: AND-XXXX
+
+---
+
+## TPO Configuration
+
+Workflows for bug reporting and ticket completion.
+
+### Workflows
+
+| Command | Description |
+|---------|-------------|
+| `report-bug <desc>` | Investigate code → Create Jira Bug with dev directive |
+| `complete-ticket` | Summarize changes → Jira Review → PR to dev |
+
+### Jira
+
+- **Project Key**: AND
+- **Ticket Prefix**: `[Uploader]`
+- **Labels**: android, po, qa
+
+### Branch Naming
+
+```
+Pattern: <type>/AND-<number>_<title-with-hyphens>
+Types: feature, bugfix, task
+Example: feature/AND-631_improve-upload-notification
+```
+
+### State File
+
+Runtime context stored in `.claude/state/tpo-context.json`
