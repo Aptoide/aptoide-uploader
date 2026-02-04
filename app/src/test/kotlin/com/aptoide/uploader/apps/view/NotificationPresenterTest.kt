@@ -1,10 +1,7 @@
 package com.aptoide.uploader.apps.view
 
-import org.jetbrains.spek.api.Spek
-import org.junit.platform.runner.JUnitPlatform
-import org.junit.runner.RunWith
+import io.kotest.core.spec.style.DescribeSpec
 
-@RunWith(JUnitPlatform::class)
-class NotificationPresenterTest : Spek({
+class NotificationPresenterTest : DescribeSpec({
 
 })
