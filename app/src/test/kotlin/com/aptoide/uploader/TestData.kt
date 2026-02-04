@@ -12,7 +12,7 @@ class TestData {
         val STORE_USER = "marcelo@aptoide.com"
         val STORE_PASSWORD = "aptoide1234"
         val SUCCESS_RESPONSE = Response.success(OAuth("abc", "def",
-                null, null, null))
+                null, null, "OK"))
 
         val APPINFO_NAME = "Testing"
         val PROPOSED_APP_RATING = 1
