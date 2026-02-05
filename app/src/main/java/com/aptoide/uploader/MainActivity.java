@@ -5,6 +5,7 @@ import android.content.Context;
 import android.os.Bundle;
 import android.view.ContextThemeWrapper;
 import android.view.MenuItem;
+import androidx.activity.EdgeToEdge;
 import androidx.annotation.Nullable;
 import androidx.fragment.app.Fragment;
 import com.aptoide.uploader.account.view.CreateStoreFragment;
@@ -23,6 +24,7 @@ public class MainActivity extends PermissionProviderActivity implements MainView
 
   @Override protected void onCreate(@Nullable Bundle savedInstanceState) {
     super.onCreate(savedInstanceState);
+    EdgeToEdge.enable(this);
 
     mainActivityNavigator = new MainActivityNavigator(getSupportFragmentManager());
 

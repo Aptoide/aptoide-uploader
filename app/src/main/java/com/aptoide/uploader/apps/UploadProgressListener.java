@@ -2,5 +2,5 @@ package com.aptoide.uploader.apps;
 
 public interface UploadProgressListener {
 
-  void updateProgress(int progress, String packageName);
+  void updateProgress(int progress, String packageName, String filename);
 }

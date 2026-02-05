@@ -35,8 +35,11 @@ proguard/
 captures/
 
 signing.properties
-google-services.json
 fabric.properties
 
 .idea/instapk.xml
 instapk.log*
+
+# Claude Code local files
+.claude/state/
+.claude/plans/

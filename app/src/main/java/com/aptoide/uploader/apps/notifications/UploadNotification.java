@@ -6,6 +6,7 @@ public class UploadNotification {
   private final String md5;
   private final Type type;
   private final int progress;
+  private final String filename;
 
   public UploadNotification(String appName, String packageName, String md5, Type type) {
     this.appName = appName;
@@ -13,6 +14,7 @@ public class UploadNotification {
     this.md5 = md5;
     this.type = type;
     this.progress = -1;
+    this.filename = null;
   }
 
   public UploadNotification(String appName, String packageName, String md5, Type type,
@@ -22,6 +24,17 @@ public class UploadNotification {
     this.md5 = md5;
     this.type = type;
     this.progress = progress;
+    this.filename = null;
+  }
+
+  public UploadNotification(String appName, String packageName, String md5, Type type,
+      int progress, String filename) {
+    this.appName = appName;
+    this.packageName = packageName;
+    this.md5 = md5;
+    this.type = type;
+    this.progress = progress;
+    this.filename = filename;
   }
 
   public String getAppName() {
@@ -72,7 +85,11 @@ public class UploadNotification {
     return progress;
   }
 
+  public String getFilename() {
+    return filename;
+  }
+
   public enum Type {
-    MORE_INFO_NEEDED, COMPLETED, ALREADY_IN_STORE, CLIENT_TIMEOUT, INFECTED, PUBLISHER_ONLY, INVALID_SIGNATURE, CANNOT_DISTRIBUTE, CATAPPULT_CERTIFIED, APP_BUNDLE_NOT_SUPPORTED, ANTI_SPAM, TRY_AGAIN, FAILED, ERROR_TRY_AGAIN, UNKNOWN_ERROR, HIDDEN, PROGRESS, INDETERMINATE
+    MORE_INFO_NEEDED, COMPLETED, ALREADY_IN_STORE, CLIENT_TIMEOUT, INFECTED, PUBLISHER_ONLY, INVALID_SIGNATURE, CANNOT_DISTRIBUTE, CATAPPULT_CERTIFIED, APP_BUNDLE_NOT_SUPPORTED, ANTI_SPAM, TRY_AGAIN, FAILED, ERROR_TRY_AGAIN, UNKNOWN_ERROR, HIDDEN, PROGRESS, INDETERMINATE, FINALIZING
   }
 }

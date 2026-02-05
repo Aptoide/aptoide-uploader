@@ -9,6 +9,7 @@ import android.view.ViewGroup
 import android.widget.Button
 import android.widget.TextView
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.Toolbar
 import com.aptoide.uploader.R
 import com.aptoide.uploader.UploaderApplication
 import com.aptoide.uploader.account.view.LoginNavigator
@@ -16,13 +17,17 @@ import com.aptoide.uploader.view.android.FragmentView
 import com.jakewharton.rxbinding2.view.RxView
 import io.reactivex.Observable
 import io.reactivex.android.schedulers.AndroidSchedulers
-import kotlinx.android.synthetic.main.fragment_check_your_email.*
 
 class CheckYourEmailFragment : FragmentView(), CheckYourEmailView {
 
   lateinit var openEmailAppButton: Button
   lateinit var openEmailBody: TextView
   private var email: String? = null
+
+  private lateinit var toolbar: Toolbar
+  private lateinit var fragmentLoginLoadingTextView: TextView
+  private lateinit var checkYourEmailLayout: View
+  private lateinit var fragmentLoginProgressContainer: View
 
   companion object {
     private const val EMAIL = "email"
@@ -48,12 +53,20 @@ class CheckYourEmailFragment : FragmentView(), CheckYourEmailView {
 
   override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
     super.onViewCreated(view, savedInstanceState)
+    bindViews(view)
     setupToolbar()
     setupViews(view)
     val app = (requireContext().applicationContext as UploaderApplication)
     CheckYourEmailPresenter(this, CheckYourEmailNavigator(activity), app.accountManager,
         AndroidSchedulers.mainThread(),
         LoginNavigator(fragmentManager, requireContext().applicationContext)).present()
+  }
+
+  private fun bindViews(view: View) {
+    toolbar = view.findViewById(R.id.toolbar)
+    fragmentLoginLoadingTextView = view.findViewById(R.id.fragment_login_loading_text_view)
+    checkYourEmailLayout = view.findViewById(R.id.check_your_email_layout)
+    fragmentLoginProgressContainer = view.findViewById(R.id.fragment_login_progress_container)
   }
 
   private fun setupViews(view: View) {
@@ -84,14 +97,14 @@ class CheckYourEmailFragment : FragmentView(), CheckYourEmailView {
   }
 
   override fun showLoadingWithoutUserName() {
-    fragment_login_loading_text_view.text = getString(R.string.logging_in)
-    check_your_email_layout.visibility = View.GONE
-    fragment_login_progress_container.visibility = View.VISIBLE
+    fragmentLoginLoadingTextView.text = getString(R.string.logging_in)
+    checkYourEmailLayout.visibility = View.GONE
+    fragmentLoginProgressContainer.visibility = View.VISIBLE
   }
 
   override fun hideLoading() {
-    check_your_email_layout.visibility = View.VISIBLE
-    fragment_login_progress_container.visibility = View.GONE
+    checkYourEmailLayout.visibility = View.VISIBLE
+    fragmentLoginProgressContainer.visibility = View.GONE
   }
 
 }

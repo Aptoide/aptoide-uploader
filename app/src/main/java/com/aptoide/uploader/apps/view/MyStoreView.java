@@ -29,6 +29,8 @@ public interface MyStoreView extends View {
 
   void showNoConnectivityError();
 
+  void showNotificationPermissionRequired();
+
   Observable<Object> submitAppEvent();
 
   Observable<SortingOrder> orderByEvent();
@@ -42,4 +44,6 @@ public interface MyStoreView extends View {
   void clearSelection();
 
   Observable<Boolean> refreshEvent();
+
+  void showPreparingUploadsNotification(String firstAppName, String firstAppPackageName, int appCount);
 }

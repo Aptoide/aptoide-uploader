@@ -59,6 +59,7 @@
   <string name="logging_as">Logging in as</string>
   <string name="logging_in">Logging in</string>
   <string name="no_connectivity_error">Sorry, no internet connection available</string>
+  <string name="notification_permission_required">Please grant notification permission to track upload progress</string>
 
   <!-- Notifications -->
   <string name="application_notification_short_app_success_upload">App successfully uploaded</string>
@@ -76,6 +77,11 @@
   <string name="application_notification_message_error">Unknown error occurred.</string>
   <string name="application_notification_short_app_bundle">This type of app is not supported... yet. But, it\'ll be supported soon!</string>
   <string name="application_notification_short_anti_spam">Oops&#8230; Your app seems to be spam. Please contact support@aptoide.com.</string>
+  <string name="notification_preparing_upload">Preparing upload…</string>
+  <string name="notification_uploading_progress">Uploading… %1$d%%</string>
+  <string name="notification_finalizing_upload">Finalizing upload…</string>
+  <string name="notification_preparing_single_app">Preparing 1 app for upload…</string>
+  <string name="notification_preparing_multiple_apps">Preparing %1$d apps for upload…</string>
 
   <string name="logout_confirmation_message">You are about to sign out from Uploader, are you sure? </string>
   <string name="app_selected">App Selected</string>

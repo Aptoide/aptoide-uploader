@@ -21,6 +21,9 @@ import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import cm.aptoide.aptoideviews.recyclerview.GridRecyclerView;
@@ -93,6 +96,7 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
     mainScreen = view.findViewById(R.id.grid_view_and_hint);
     storeBanner = view.findViewById(R.id.store_info);
     submitButton = view.findViewById(R.id.submit_button);
+    setupEdgeToEdgeInsets(view);
     prepareSpinner(R.array.sort_spinner_array);
     setUpSubmitButtonAnimation();
     recyclerView.setLayoutManager(new GridLayoutManager(getContext(), 3));
@@ -233,6 +237,11 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
         .show();
   }
 
+  @Override public void showNotificationPermissionRequired() {
+    Toast.makeText(getContext(), R.string.notification_permission_required, Toast.LENGTH_LONG)
+        .show();
+  }
+
   @Override public Observable<Object> submitAppEvent() {
     return RxView.clicks(submitButton)
         .map(o -> "");
@@ -312,6 +321,42 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
 
   @Override public Observable<Boolean> refreshEvent() {
     return refreshEvent;
+  }
+
+  @Override public void showPreparingUploadsNotification(String firstAppName, String firstAppPackageName, int appCount) {
+    // Show a simple notification without starting the foreground service
+    // The service will be started automatically when the actual upload begins
+    android.app.NotificationManager notificationManager =
+        (android.app.NotificationManager) getContext().getSystemService(android.content.Context.NOTIFICATION_SERVICE);
+
+    String title;
+    String message;
+
+    if (appCount == 1) {
+      // Single app: show app name as title
+      title = firstAppName;
+      message = getString(R.string.notification_preparing_upload);
+    } else {
+      // Multiple apps: show Aptoide Uploader as title
+      title = getString(R.string.app_name);
+      message = getString(R.string.notification_preparing_multiple_apps, appCount);
+    }
+
+    // Use the same notification ID that the upload notification will use
+    // This matches the ID used in NotificationService: packageName.hashCode() + NOTIFICATION_ID_CHANGER (50)
+    int notificationId = firstAppPackageName.hashCode() + 50;
+
+    androidx.core.app.NotificationCompat.Builder builder =
+        new androidx.core.app.NotificationCompat.Builder(getContext(), "Upload")
+            .setSmallIcon(R.drawable.notification_icon)
+            .setContentTitle(title)
+            .setContentText(message)
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setPriority(androidx.core.app.NotificationCompat.PRIORITY_LOW)
+            .setProgress(0, 0, true);
+
+    notificationManager.notify(notificationId, builder.build());
   }
 
   private boolean showVersionDialog() {
@@ -420,5 +465,66 @@ public class MyStoreFragment extends FragmentView implements MyStoreView {
       toolbar.setNavigationIcon(null);
       settingsItem.setVisibility(View.VISIBLE);
     }
+  }
+
+  private void setupEdgeToEdgeInsets(View view) {
+    // Handle top insets for toolbar (status bar) - toolbar extends behind status bar
+    ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
+      return insets;
+    });
+
+    // Handle top insets for main content - needs to account for status bar + toolbar
+    ViewCompat.setOnApplyWindowInsetsListener(mainScreen, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+      // Get actionBarSize in pixels
+      int actionBarSize = 0;
+      android.util.TypedValue tv = new android.util.TypedValue();
+      if (getContext().getTheme().resolveAttribute(android.R.attr.actionBarSize, tv, true)) {
+        actionBarSize = android.util.TypedValue.complexToDimensionPixelSize(tv.data, getResources().getDisplayMetrics());
+      }
+      params.topMargin = systemBars.top + actionBarSize;
+      v.setLayoutParams(params);
+      return insets;
+    });
+
+    // Handle top insets for settings button
+    ViewCompat.setOnApplyWindowInsetsListener(settingsItem, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+      int dpMargin = (int) (10 * getResources().getDisplayMetrics().density);
+      params.topMargin = systemBars.top + dpMargin;
+      v.setLayoutParams(params);
+      return insets;
+    });
+
+    // Handle top insets for feature tip rectangle
+    ViewCompat.setOnApplyWindowInsetsListener(featuretip_rectangle, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+      int dpMargin = (int) (60 * getResources().getDisplayMetrics().density);
+      params.topMargin = systemBars.top + dpMargin;
+      v.setLayoutParams(params);
+      return insets;
+    });
+
+    // Handle bottom insets for submit button
+    ViewCompat.setOnApplyWindowInsetsListener(submitButton, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+      params.bottomMargin = systemBars.bottom;
+      v.setLayoutParams(params);
+      return insets;
+    });
+
+    // Handle bottom insets for RecyclerView to ensure last row is visible
+    ViewCompat.setOnApplyWindowInsetsListener(recyclerView, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), systemBars.bottom);
+      return insets;
+    });
+    recyclerView.setClipToPadding(false);
   }
 }

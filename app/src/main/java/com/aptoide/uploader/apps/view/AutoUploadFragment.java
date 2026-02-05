@@ -11,6 +11,9 @@ import android.widget.ImageView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -68,6 +71,7 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     refreshLayout.setOnRefreshListener(() -> refreshEvent.onNext(true));
     setUpSubmitButtonAnimation();
     setUpSelectionListener();
+    setupEdgeToEdgeInsets(view);
     toolbar.setNavigationOnClickListener(click -> adapter.clearAppsSelection());
 
     new AutoUploadPresenter(this, new CompositeDisposable(), AndroidSchedulers.mainThread(),
@@ -185,5 +189,31 @@ public class AutoUploadFragment extends FragmentView implements AutoUploadView {
     slideBottomUp = AnimationUtils.loadAnimation(getContext(), R.anim.slide_bottom_up);
     slideBottomUp.setAnimationListener(showBottom);
     slideBottomDown.setAnimationListener(hideBottom);
+  }
+
+  private void setupEdgeToEdgeInsets(View view) {
+    // Toolbar padding for status bar
+    ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
+      return insets;
+    });
+
+    // RecyclerView bottom padding for navigation bar
+    ViewCompat.setOnApplyWindowInsetsListener(recyclerView, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), systemBars.bottom);
+      return insets;
+    });
+    recyclerView.setClipToPadding(false);
+
+    // Submit button bottom margin for navigation bar
+    ViewCompat.setOnApplyWindowInsetsListener(submitButton, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      ViewGroup.MarginLayoutParams params = (ViewGroup.MarginLayoutParams) v.getLayoutParams();
+      params.bottomMargin = systemBars.bottom;
+      v.setLayoutParams(params);
+      return insets;
+    });
   }
 }

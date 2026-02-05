@@ -16,6 +16,9 @@
     <item name="colorPrimaryDark">#006294</item>
     <item name="android:windowBackground">@drawable/splash_screen</item>
     <item name="actionButtonStyle">@style/Widget.Aptoide.AppCompat.ActionButton</item>
+    <!-- Edge-to-edge support -->
+    <item name="android:statusBarColor">@android:color/transparent</item>
+    <item name="android:navigationBarColor">@android:color/transparent</item>
   </style>
 
   <style name="DialogTheme">

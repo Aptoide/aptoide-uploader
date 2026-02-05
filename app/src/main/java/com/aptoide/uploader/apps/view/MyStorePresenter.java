@@ -183,6 +183,7 @@ public class MyStorePresenter implements Presenter {
   }
 
   private void handleSubmitAppEvent() {
+    // Step 1: On submit click, check connectivity and request notification permission
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(created -> view.submitAppEvent()
@@ -195,18 +196,44 @@ public class MyStorePresenter implements Presenter {
               }
             })
             .filter(hasConnection -> hasConnection)
-            .doOnNext(apps -> uploadPermissionProvider.requestExternalStoragePermission())
+            .doOnNext(__ -> uploadPermissionProvider.requestNotificationPermission())
             .retry())
         .subscribe(__ -> {
         }, throwable -> {
           throw new OnErrorNotImplementedException(throwable);
         }));
 
+    // Step 2: Handle notification permission result
+    compositeDisposable.add(view.getLifecycleEvent()
+        .filter(event -> event.equals(View.LifecycleEvent.CREATE))
+        .flatMap(__ -> uploadPermissionProvider.permissionResultNotification())
+        .observeOn(viewScheduler)
+        .doOnNext(granted -> {
+          if (granted) {
+            uploadPermissionProvider.requestExternalStoragePermission();
+          } else {
+            view.showNotificationPermissionRequired();
+          }
+        })
+        .retry()
+        .subscribe(__ -> {
+        }, throwable -> {
+          throw new OnErrorNotImplementedException(throwable);
+        }));
+
+    // Step 3: Handle storage permission result and start upload
     compositeDisposable.add(view.getLifecycleEvent()
         .filter(event -> event.equals(View.LifecycleEvent.CREATE))
         .flatMap(__ -> uploadPermissionProvider.permissionResultExternalStorage())
         .filter(granted -> granted)
         .flatMapSingle(__ -> view.getSelectedApps())
+        .doOnNext(apps -> {
+          if (!apps.isEmpty()) {
+            String firstAppName = apps.get(0).getName();
+            String firstAppPackageName = apps.get(0).getPackageName();
+            view.showPreparingUploadsNotification(firstAppName, firstAppPackageName, apps.size());
+          }
+        })
         .doOnNext(__ -> view.clearSelection())
         .flatMapCompletable(apps -> storeManager.upload(apps)
             .doOnComplete(() -> uploaderAnalytics.sendSubmitAppsEvent(apps.size())))

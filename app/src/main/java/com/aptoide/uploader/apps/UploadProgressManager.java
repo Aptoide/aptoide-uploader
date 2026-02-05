@@ -11,8 +11,8 @@ public class UploadProgressManager implements UploadProgressListener {
     this.uploadProgressListener = PublishSubject.create();
   }
 
-  @Override public void updateProgress(int progress, String packageName) {
-    uploadProgressListener.onNext(new UploadProgress(progress, packageName));
+  @Override public void updateProgress(int progress, String packageName, String filename) {
+    uploadProgressListener.onNext(new UploadProgress(progress, packageName, filename));
   }
 
   Observable<UploadProgress> getProgress(String packageName) {

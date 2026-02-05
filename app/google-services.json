@@ -1,0 +1,48 @@
+{
+  "project_info": {
+    "project_number": "1065092705126",
+    "project_id": "aptoide-uploader",
+    "storage_bucket": "aptoide-uploader.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1065092705126:android:03deff031b20eae09bb6a7",
+        "android_client_info": {
+          "package_name": "pt.caixamagica.aptoide.uploader"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTgXf-UYJQJcsfv4WCmX-_rbC9A3kfzrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:1065092705126:android:c364d8c1e5084b5e9bb6a7",
+        "android_client_info": {
+          "package_name": "pt.caixamagica.aptoide.uploader.debug"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBTgXf-UYJQJcsfv4WCmX-_rbC9A3kfzrY"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

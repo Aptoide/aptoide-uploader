@@ -28,8 +28,7 @@ open class InstalledIntentService : IntentService("InstalledIntentService") {
   override fun onHandleIntent(intent: Intent?) {
     if (intent != null) {
       val action = intent.action
-      val packageName = intent.data
-          .encodedSchemeSpecificPart
+      val packageName = intent.data?.encodedSchemeSpecificPart ?: return
       if (!TextUtils.equals(action, Intent.ACTION_PACKAGE_REPLACED) && intent.getBooleanExtra(
               Intent.EXTRA_REPLACING, false)) {
         return

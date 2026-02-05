@@ -9,9 +9,14 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.InstalledApp;
@@ -45,6 +50,8 @@ public class SettingsFragment extends FragmentView implements SettingsView {
   private LinearLayout privacyPolicy;
   private RxAlertDialog logoutConfirmation;
   private List<ImageView> imageViewList;
+  private Toolbar toolbar;
+  private ScrollView scrollView;
 
   public SettingsFragment() {
   }
@@ -59,6 +66,8 @@ public class SettingsFragment extends FragmentView implements SettingsView {
 
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
+    toolbar = view.findViewById(R.id.fragment_settings_toolbar);
+    scrollView = view.findViewById(R.id.fragment_settings_scrollview);
     backButton = view.findViewById(R.id.fragment_settings_back);
     profileAvatar = view.findViewById(R.id.fragment_settings_avatar);
     storeNameText = view.findViewById(R.id.fragment_settings_store_name);
@@ -73,6 +82,8 @@ public class SettingsFragment extends FragmentView implements SettingsView {
     termsConditions = view.findViewById(R.id.fragment_settings_terms);
     privacyPolicy = view.findViewById(R.id.fragment_settings_privacy);
 
+    setupEdgeToEdgeInsets(view);
+
     logoutConfirmation = new RxAlertDialog.Builder(
         new ContextThemeWrapper(getContext(), R.style.ConfirmationDialog)).setMessage(
         R.string.logout_confirmation_message)
@@ -84,7 +95,7 @@ public class SettingsFragment extends FragmentView implements SettingsView {
         ((UploaderApplication) getContext().getApplicationContext()).getAutoLoginManager(),
         ((UploaderApplication) getContext().getApplicationContext()).getAccountManager(),
         ((UploaderApplication) getContext().getApplicationContext()).getAppsManager(),
-        new SettingsNavigator(getFragmentManager(), getContext().getApplicationContext()),
+        new SettingsNavigator(getFragmentManager(), getContext()),
         ((UploaderApplication) getContext().getApplicationContext()).getInstalledAppsManager()).present();
   }
 
@@ -97,6 +108,8 @@ public class SettingsFragment extends FragmentView implements SettingsView {
     termsConditions = null;
     privacyPolicy = null;
     logoutConfirmation = null;
+    toolbar = null;
+    scrollView = null;
     GlideApp.get(getContext())
         .setMemoryCategory(MemoryCategory.NORMAL);
     super.onDestroyView();
@@ -211,5 +224,22 @@ public class SettingsFragment extends FragmentView implements SettingsView {
       imageViewList.get(i)
           .setVisibility(View.VISIBLE);
     }
+  }
+
+  private void setupEdgeToEdgeInsets(View view) {
+    // Handle top insets for toolbar (status bar)
+    ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
+      return insets;
+    });
+
+    // Handle bottom insets for scroll view content
+    ViewCompat.setOnApplyWindowInsetsListener(scrollView, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), systemBars.bottom);
+      return insets;
+    });
+    scrollView.setClipToPadding(false);
   }
 }

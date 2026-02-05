@@ -8,9 +8,14 @@ import android.view.ViewGroup;
 import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.Toolbar;
+import androidx.core.graphics.Insets;
+import androidx.core.view.ViewCompat;
+import androidx.core.view.WindowInsetsCompat;
 import com.aptoide.uploader.R;
 import com.aptoide.uploader.UploaderApplication;
 import com.aptoide.uploader.apps.AppDetailsDataProvider;
@@ -47,6 +52,8 @@ public class AppDetailsFragment extends FragmentView implements AppDetailsView {
   private TextView installDate;
   private TextView updateDate;
   private ProgressBar loadingSpinner;
+  private Toolbar toolbar;
+  private ScrollView scrollView;
 
   public AppDetailsFragment() {
   }
@@ -72,6 +79,8 @@ public class AppDetailsFragment extends FragmentView implements AppDetailsView {
   @Override public void onViewCreated(View view, @Nullable Bundle savedInstanceState) {
     super.onViewCreated(view, savedInstanceState);
 
+    toolbar = view.findViewById(R.id.fragment_app_details_toolbar);
+    scrollView = view.findViewById(R.id.fragment_app_details_scroll);
     backButton = view.findViewById(R.id.fragment_app_details_back);
     appIcon = view.findViewById(R.id.fragment_app_details_icon);
     appName = view.findViewById(R.id.fragment_app_details_app_name);
@@ -88,6 +97,8 @@ public class AppDetailsFragment extends FragmentView implements AppDetailsView {
     installDate = view.findViewById(R.id.fragment_app_details_install_date);
     updateDate = view.findViewById(R.id.fragment_app_details_update_date);
     loadingSpinner = view.findViewById(R.id.fragment_app_details_loading);
+
+    setupEdgeToEdgeInsets(view);
 
     String pkgName = getArguments() != null ? getArguments().getString(ARG_PACKAGE_NAME) : null;
 
@@ -119,6 +130,8 @@ public class AppDetailsFragment extends FragmentView implements AppDetailsView {
     installDate = null;
     updateDate = null;
     loadingSpinner = null;
+    toolbar = null;
+    scrollView = null;
     super.onDestroyView();
   }
 
@@ -207,5 +220,22 @@ public class AppDetailsFragment extends FragmentView implements AppDetailsView {
 
   @Override public Observable<Object> backButtonClick() {
     return RxView.clicks(backButton);
+  }
+
+  private void setupEdgeToEdgeInsets(View view) {
+    // Handle top insets for toolbar (status bar)
+    ViewCompat.setOnApplyWindowInsetsListener(toolbar, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      v.setPadding(v.getPaddingLeft(), systemBars.top, v.getPaddingRight(), v.getPaddingBottom());
+      return insets;
+    });
+
+    // Handle bottom insets for scroll view content
+    ViewCompat.setOnApplyWindowInsetsListener(scrollView, (v, insets) -> {
+      Insets systemBars = insets.getInsets(WindowInsetsCompat.Type.systemBars());
+      v.setPadding(v.getPaddingLeft(), v.getPaddingTop(), v.getPaddingRight(), systemBars.bottom);
+      return insets;
+    });
+    scrollView.setClipToPadding(false);
   }
 }

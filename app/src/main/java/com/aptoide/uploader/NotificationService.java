@@ -6,6 +6,7 @@ import android.app.PendingIntent;
 import android.app.Service;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ServiceInfo;
 import android.os.Build;
 import android.os.IBinder;
 import android.util.Log;
@@ -29,13 +30,13 @@ public class NotificationService extends Service implements NotificationView {
 
   @Override public void onCreate() {
     super.onCreate();
+    notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
+    setupChannels();
     lifecycleSubject = BehaviorSubject.create();
     lifecycleSubject.onNext(LifecycleEvent.CREATE);
     uploadManager = ((UploaderApplication) getApplicationContext()).getUploadManager();
-    notificationManager = (NotificationManager) getSystemService(NOTIFICATION_SERVICE);
     systemNotificationShower = new NotificationPresenter(this, getUploadManager());
     attachPresenter();
-    setupChannels();
   }
 
   @Override public int onStartCommand(Intent intent, int flags, int startId) {
@@ -84,11 +85,27 @@ public class NotificationService extends Service implements NotificationView {
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
+            .setContentText(getString(R.string.notification_preparing_upload))
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(0, 0, true);
     ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH);
-    startForeground(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
+    startForegroundWithType(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
+  }
+
+  @Override public void showFinalizingUploadNotification(String applicationName, String packageName) {
+    Log.d("notificationz4", "showing finalizing notification " + packageName + " " + applicationName);
+
+    NotificationCompat.Builder mBuilder =
+        new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
+            R.drawable.notification_icon)
+            .setContentTitle(applicationName)
+            .setContentText(getString(R.string.notification_finalizing_upload))
+            .setOngoing(true)
+            .setOnlyAlertOnce(true)
+            .setProgress(0, 0, true);
+    ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH);
+    startForegroundWithType(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
   }
 
   @Override
@@ -100,7 +117,7 @@ public class NotificationService extends Service implements NotificationView {
     intent.putExtra("md5", md5);
     intent.putExtra("appName", applicationName);
     final PendingIntent contentIntent =
-        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent.getActivity(this, 0, intent, getPendingIntentFlags());
 
     final Intent deleteIntent = new Intent(this, MainActivity.class);
     deleteIntent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
@@ -108,7 +125,7 @@ public class NotificationService extends Service implements NotificationView {
     deleteIntent.putExtra("md5", md5);
     deleteIntent.putExtra("appName", applicationName);
     final PendingIntent dismissIntent =
-        PendingIntent.getActivity(this, 0, deleteIntent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent.getActivity(this, 0, deleteIntent, getPendingIntentFlags());
 
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
@@ -172,18 +189,25 @@ public class NotificationService extends Service implements NotificationView {
   }
 
   @Override
-  public void updateUploadProgress(String applicationName, String packageName, int progress) {
+  public void updateUploadProgress(String applicationName, String packageName, int progress, String filename) {
     Log.d("notificationz4",
-        "showing progress notification " + packageName + " " + applicationName + " " + progress);
+        "showing progress notification " + packageName + " " + applicationName + " " + progress + " " + filename);
+
+    String contentText = getString(R.string.notification_uploading_progress, progress);
+    if (filename != null && !filename.isEmpty()) {
+      contentText = contentText + " - " + filename;
+    }
+
     NotificationCompat.Builder mBuilder =
         new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
             R.drawable.notification_icon)
             .setContentTitle(applicationName)
+            .setContentText(contentText)
             .setOngoing(true)
             .setOnlyAlertOnce(true)
             .setProgress(100, progress, false);
     ServiceCompat.stopForeground(this, ServiceCompat.STOP_FOREGROUND_DETACH);
-    startForeground(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
+    startForegroundWithType(packageName.hashCode() + NOTIFICATION_ID_CHANGER, mBuilder.build());
   }
 
   @Override
@@ -242,7 +266,7 @@ public class NotificationService extends Service implements NotificationView {
     intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
     intent.setAction("navigateToMyStoreFragment");
     final PendingIntent contentIntent =
-        PendingIntent.getActivity(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        PendingIntent.getActivity(this, 0, intent, getPendingIntentFlags());
 
     return new NotificationCompat.Builder(this, NOTIFICATION_CHANNEL_ID).setSmallIcon(
         R.drawable.notification_icon)
@@ -272,5 +296,20 @@ public class NotificationService extends Service implements NotificationView {
 
   public UploadManager getUploadManager() {
     return this.uploadManager;
+  }
+
+  private void startForegroundWithType(int id, android.app.Notification notification) {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE) {
+      startForeground(id, notification, ServiceInfo.FOREGROUND_SERVICE_TYPE_DATA_SYNC);
+    } else {
+      startForeground(id, notification);
+    }
+  }
+
+  private int getPendingIntentFlags() {
+    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+      return PendingIntent.FLAG_UPDATE_CURRENT | PendingIntent.FLAG_IMMUTABLE;
+    }
+    return PendingIntent.FLAG_UPDATE_CURRENT;
   }
 }

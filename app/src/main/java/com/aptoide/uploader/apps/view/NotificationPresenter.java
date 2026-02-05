@@ -86,7 +86,11 @@ public class NotificationPresenter implements Presenter {
         view.showPendingUploadNotification(appName, packageName);
         break;
       case PROGRESS:
-        view.updateUploadProgress(appName, packageName, notification.getProgress());
+        view.updateUploadProgress(appName, packageName, notification.getProgress(), notification.getFilename());
+        break;
+      case FINALIZING:
+        view.showFinalizingUploadNotification(appName, packageName);
+        break;
       case HIDDEN:
         break;
       case MORE_INFO_NEEDED:
@@ -184,10 +188,12 @@ public class NotificationPresenter implements Presenter {
       case DRAFT_CREATED:
       case MD5S_SET:
       case STATUS_SET_DRAFT:
-      case STATUS_SET_PENDING:
         return new UploadNotification(appName, packageName, md5,
             UploadNotification.Type.INDETERMINATE);
+      case STATUS_SET_PENDING:
+        return new UploadNotification(appName, packageName, md5, UploadNotification.Type.HIDDEN);
       case WAITING_UPLOAD_CONFIRMATION:
+        return new UploadNotification(appName, packageName, md5, UploadNotification.Type.FINALIZING);
       case MISSING_SPLITS:
       case META_DATA_ADDED:
       case SET_STATUS_TO_DRAFT:
@@ -254,7 +260,7 @@ public class NotificationPresenter implements Presenter {
         .map(uploadProgress -> new UploadNotification(draft.getInstalledApp()
             .getName(), draft.getInstalledApp()
             .getPackageName(), draft.getMd5(), UploadNotification.Type.PROGRESS,
-            uploadProgress.getProgress()))
+            uploadProgress.getProgress(), uploadProgress.getFilename()))
         .doOnNext(uploadNotification -> notify(uploadNotification))
         .map(__ -> draft)
         .doOnError(__ -> view.showUnknownErrorRetryNotification(draft.getInstalledApp()

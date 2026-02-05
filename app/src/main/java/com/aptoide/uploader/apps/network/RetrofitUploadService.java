@@ -240,12 +240,15 @@ public class RetrofitUploadService implements UploaderService {
         .firstOrError()
         .flatMapObservable(aptoideAccount -> accountProvider.getToken()
             .toObservable()
-            .flatMap(accessToken -> serviceV7.uploadBaseApkFile(
-                getParamsSetApkFile(accessToken, draft.getDraftId()),
-                MultipartBody.Part.createFormData("apk_file", draft.getInstalledApp()
-                    .getApkPath(), createFileRequestBody("apk", draft.getInstalledApp()
-                    .getApkPath(), draft.getInstalledApp()
-                    .getPackageName())))))
+            .flatMap(accessToken -> {
+              String apkPath = draft.getInstalledApp().getApkPath();
+              String filename = new File(apkPath).getName();
+              return serviceV7.uploadBaseApkFile(
+                  getParamsSetApkFile(accessToken, draft.getDraftId()),
+                  MultipartBody.Part.createFormData("apk_file", filename,
+                      createFileRequestBody("apk", apkPath, draft.getInstalledApp()
+                          .getPackageName())));
+            }))
         .doOnNext(
             genericDraftResponseResponse -> handleUploadError(draft, genericDraftResponseResponse));
   }
@@ -257,14 +260,13 @@ public class RetrofitUploadService implements UploaderService {
       JsonAdapter<ResponseV7> jsonAdapter = moshi.adapter(ResponseV7.class);
       ResponseV7 errorResponse;
       if (genericDraftResponseResponse.errorBody() != null) {
-        errorResponse = jsonAdapter.fromJson(genericDraftResponseResponse.errorBody()
-            .string());
-        uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App To Repo",
-            errorResponse.getError()
-                .getCode(), errorResponse.getError()
-                .getDescription(), draft.getInstalledApp()
-                .getPackageName(), draft.getInstalledApp()
-                .getVersionCode());
+        String errorBodyString = genericDraftResponseResponse.errorBody().string();
+        errorResponse = jsonAdapter.fromJson(errorBodyString);
+        if (errorResponse != null && errorResponse.getError() != null) {
+          uploaderAnalytics.sendUploadCompleteEvent("fail", "Upload App To Repo",
+              errorResponse.getError().getCode(), errorResponse.getError().getDescription(),
+              draft.getInstalledApp().getPackageName(), draft.getInstalledApp().getVersionCode());
+        }
       }
     }
   }
@@ -274,12 +276,15 @@ public class RetrofitUploadService implements UploaderService {
         .firstOrError()
         .flatMapObservable(aptoideAccount -> accountProvider.getToken()
             .toObservable()
-            .flatMap(accessToken -> serviceV7.uploadObbMainFile(
-                getParamsSetApkFile(accessToken, draft.getDraftId()),
-                MultipartBody.Part.createFormData("obb_main_file", draft.getInstalledApp()
-                    .getObbMainPath(), createFileRequestBody("obb", draft.getInstalledApp()
-                    .getObbMainPath(), draft.getInstalledApp()
-                    .getPackageName())))))
+            .flatMap(accessToken -> {
+              String obbPath = draft.getInstalledApp().getObbMainPath();
+              String filename = new File(obbPath).getName();
+              return serviceV7.uploadObbMainFile(
+                  getParamsSetApkFile(accessToken, draft.getDraftId()),
+                  MultipartBody.Part.createFormData("obb_main_file", filename,
+                      createFileRequestBody("obb", obbPath, draft.getInstalledApp()
+                          .getPackageName())));
+            }))
         .doOnNext(
             genericDraftResponseResponse -> handleUploadError(draft, genericDraftResponseResponse));
   }
@@ -289,12 +294,15 @@ public class RetrofitUploadService implements UploaderService {
         .firstOrError()
         .flatMapObservable(aptoideAccount -> accountProvider.getToken()
             .toObservable()
-            .flatMap(accessToken -> serviceV7.uploadObbPatchFile(
-                getParamsSetApkFile(accessToken, draft.getDraftId()),
-                MultipartBody.Part.createFormData("obb_patch_file", draft.getInstalledApp()
-                    .getObbPatchPath(), createFileRequestBody("obb", draft.getInstalledApp()
-                    .getObbPatchPath(), draft.getInstalledApp()
-                    .getPackageName())))))
+            .flatMap(accessToken -> {
+              String obbPath = draft.getInstalledApp().getObbPatchPath();
+              String filename = new File(obbPath).getName();
+              return serviceV7.uploadObbPatchFile(
+                  getParamsSetApkFile(accessToken, draft.getDraftId()),
+                  MultipartBody.Part.createFormData("obb_patch_file", filename,
+                      createFileRequestBody("obb", obbPath, draft.getInstalledApp()
+                          .getPackageName())));
+            }))
         .doOnNext(
             genericDraftResponseResponse -> handleUploadError(draft, genericDraftResponseResponse));
   }
@@ -305,10 +313,13 @@ public class RetrofitUploadService implements UploaderService {
         .firstOrError()
         .flatMapObservable(aptoideAccount -> accountProvider.getToken()
             .toObservable()
-            .flatMap(accessToken -> serviceV7.uploadSplitFile(
-                getParamsSetApkFile(accessToken, draft.getDraftId()),
-                MultipartBody.Part.createFormData("file", splitPath,
-                    createFileRequestBody("apk", splitPath, packageName)))))
+            .flatMap(accessToken -> {
+              String filename = new File(splitPath).getName();
+              return serviceV7.uploadSplitFile(
+                  getParamsSetApkFile(accessToken, draft.getDraftId()),
+                  MultipartBody.Part.createFormData("file", filename,
+                      createFileRequestBody("apk", splitPath, packageName)));
+            }))
         .doOnNext(
             genericDraftResponseResponse -> handleUploadError(draft, genericDraftResponseResponse));
   }
@@ -396,6 +407,25 @@ public class RetrofitUploadService implements UploaderService {
 
   @NonNull
   private RequestBody createFileRequestBody(String extension, String apkPath, String packageName) {
+    File apk = new File(apkPath);
+
+    // Validate file exists and is readable
+    if (!apk.exists()) {
+      Log.e("RetrofitUploadService", "File does not exist: " + apkPath);
+      throw new IllegalArgumentException("File does not exist: " + apkPath);
+    }
+    if (!apk.canRead()) {
+      Log.e("RetrofitUploadService", "File is not readable: " + apkPath);
+      throw new IllegalArgumentException("File is not readable: " + apkPath);
+    }
+
+    final long fileSize = apk.length();
+
+    if (fileSize == 0) {
+      Log.e("RetrofitUploadService", "File is empty: " + apkPath);
+      throw new IllegalArgumentException("File is empty: " + apkPath);
+    }
+
     return new RequestBody() {
       @Override public MediaType contentType() {
         String mimeType = MimeTypeMap.getSingleton()
@@ -404,12 +434,13 @@ public class RetrofitUploadService implements UploaderService {
         return MediaType.parse(mimeType);
       }
 
+      @Override public long contentLength() {
+        return fileSize;
+      }
+
       @Override public void writeTo(BufferedSink sink) throws IOException {
         byte[] buffer = new byte[4096];
-        File apk = new File(apkPath);
         FileInputStream in = new FileInputStream(apk);
-
-        long fileSize = apk.length();
 
         long percentageTicks = fileSize / 1024 / 100;
 
@@ -424,12 +455,15 @@ public class RetrofitUploadService implements UploaderService {
             parts++;
             if (percentageTicks > 0 && parts % percentageTicks == 0) {
               progress = (int) (parts * (double) buffer.length / fileSize * 100.0);
-              uploadProgressListener.updateProgress(progress, packageName);
+              uploadProgressListener.updateProgress(progress, packageName, apk.getName());
             }
           }
           if (read == -1) {
-            uploadProgressListener.updateProgress(100, packageName);
+            uploadProgressListener.updateProgress(100, packageName, apk.getName());
           }
+        } catch (IOException e) {
+          Log.e("RetrofitUploadService", "Error uploading file: " + apk.getName(), e);
+          throw e;
         } finally {
           in.close();
         }

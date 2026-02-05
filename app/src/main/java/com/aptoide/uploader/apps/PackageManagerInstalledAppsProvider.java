@@ -41,7 +41,21 @@ public class PackageManagerInstalledAppsProvider implements InstalledAppsProvide
   }
 
   @Override public Single<List<InstalledApp>> getNonSystemInstalledApps() {
-    return getInstalledApps().flatMapObservable(apps -> Observable.fromIterable(apps))
+    return getInstalledApps()
+        .doOnSuccess(apps -> {
+          int systemCount = 0;
+          int nonSystemCount = 0;
+          for (InstalledApp app : apps) {
+            if (app.isSystem()) {
+              systemCount++;
+            } else {
+              nonSystemCount++;
+              Log.d("APP-85", "Non-system app: " + app.getPackageName() + " - " + app.getName());
+            }
+          }
+          Log.d("APP-85", "Total apps: " + apps.size() + ", System: " + systemCount + ", Non-system: " + nonSystemCount);
+        })
+        .flatMapObservable(apps -> Observable.fromIterable(apps))
         .filter(app -> !app.isSystem())
         .toList();
   }

@@ -10,6 +10,8 @@ public interface NotificationView extends View {
 
   void showPendingUploadNotification(String applicationName, String packageName);
 
+  void showFinalizingUploadNotification(String applicationName, String packageName);
+
   void showNoMetaDataNotification(String applicationName, String packageName, String md5);
 
   void showPublisherOnlyNotification(String applicationName, String packageName);
@@ -24,7 +26,7 @@ public interface NotificationView extends View {
 
   void showInvalidSignatureNotification(String applicationName, String packageName);
 
-  void updateUploadProgress(String name, String packageName, int progress);
+  void updateUploadProgress(String name, String packageName, int progress, String filename);
 
   void showUnknownErrorRetryNotification(String name, String packageName);
 
@@ -38,4 +40,3 @@ public interface NotificationView extends View {
 
   void showCatappultCertifiedNotification(String appName, String packageName);
 }
-

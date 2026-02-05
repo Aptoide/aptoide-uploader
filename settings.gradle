@@ -1,2 +1,18 @@
-include ':app', ':aptoide-authentication-core',
-    ':aptoide-authentication-rx'
+pluginManagement {
+    repositories {
+        google()
+        mavenCentral()
+        gradlePluginPortal()
+    }
+}
+
+dependencyResolutionManagement {
+    repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
+    repositories {
+        google()
+        mavenCentral()
+    }
+}
+
+rootProject.name = "aptoide-uploader"
+include ':app', ':aptoide-authentication-core', ':aptoide-authentication-rx'

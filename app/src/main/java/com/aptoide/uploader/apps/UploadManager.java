@@ -14,7 +14,6 @@ import io.reactivex.Observable;
 import io.reactivex.Single;
 import io.reactivex.SingleSource;
 import io.reactivex.functions.Function;
-import io.reactivex.functions.Predicate;
 import io.reactivex.schedulers.Schedulers;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
@@ -175,14 +174,20 @@ public class UploadManager {
           uploadDraft1 -> Log.d("upload", "setted STATUS_SET_DRAFT " + uploadDraft1.toString()))
           .flatMap(this::setDraftToProgress)
           .flatMap(this::uploadFiles)
-          .filter(waitingUploadConfirmation())
-          .doOnSuccess(
-              uploadDraft1 -> Log.d("upload", "upload complete " + uploadDraft1.toString()))
-          .flatMapSingle(uploadedDraft -> setPending(uploadedDraft).doOnSuccess(
-              uploadDraft1 -> Log.d("upload", "setted PENDING " + uploadDraft1.toString()))
-              .flatMap(this::getDraftStatus)
-              .doOnSuccess(
-                  uploadDraft1 -> Log.d("upload", "got status " + uploadDraft1.toString())));
+          .flatMap(uploadedDraft -> {
+            if (uploadedDraft.getStatus()
+                .equals(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION)) {
+              Log.d("upload", "upload complete " + uploadedDraft.toString());
+              return setPending(uploadedDraft).doOnSuccess(
+                  uploadDraft1 -> Log.d("upload", "setted PENDING " + uploadDraft1.toString()))
+                  .flatMap(this::getDraftStatus)
+                  .doOnSuccess(
+                      uploadDraft1 -> Log.d("upload", "got status " + uploadDraft1.toString()));
+            } else {
+              Log.d("upload", "upload failed " + uploadedDraft.toString());
+              return draftPersistence.save(uploadedDraft).toSingleDefault(uploadedDraft);
+            }
+          });
     } else if (uploadDraft.getStatus()
         .equals(UploadDraft.Status.MISSING_SPLITS)) {
       return setDraft(uploadDraft, UploadDraft.Status.STATUS_SET_DRAFT).doOnSuccess(
@@ -193,14 +198,22 @@ public class UploadManager {
               splits -> Log.d("upload", "split_paths " + splits))
               .flatMap(splits -> uploaderService.uploadSplits(uploadDraft1, splits)
                   .singleOrError()
-                  .filter(waitingUploadConfirmation())
-                  .doOnSuccess(
-                      uploadDraft2 -> Log.d("upload", "upload complete " + uploadDraft2.toString()))
-                  .flatMapSingle(uploadedDraft -> setPending(uploadedDraft).doOnSuccess(
-                      uploadDraft2 -> Log.d("upload", "setted PENDING " + uploadDraft2.toString()))
-                      .flatMap(this::getDraftStatus)
-                      .doOnSuccess(uploadDraft2 -> Log.d("upload",
-                          "got status " + uploadDraft2.toString())))));
+                  .flatMap(uploadedDraft -> {
+                    if (uploadedDraft.getStatus()
+                        .equals(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION)) {
+                      Log.d("upload", "upload complete " + uploadedDraft.toString());
+                      return setPending(uploadedDraft).doOnSuccess(
+                          uploadDraft2 -> Log.d("upload",
+                              "setted PENDING " + uploadDraft2.toString()))
+                          .flatMap(this::getDraftStatus)
+                          .doOnSuccess(uploadDraft2 -> Log.d("upload",
+                              "got status " + uploadDraft2.toString()));
+                    } else {
+                      Log.d("upload", "upload failed " + uploadedDraft.toString());
+                      return draftPersistence.save(uploadedDraft)
+                          .toSingleDefault(uploadedDraft);
+                    }
+                  })));
     }
     return Single.just(uploadDraft);
   }
@@ -231,11 +244,6 @@ public class UploadManager {
         .filter(uploadDrafts -> !uploadDrafts.isEmpty())
         .firstOrError()
         .map(uploadDrafts -> uploadDrafts.get(0));
-  }
-
-  @NotNull private Predicate<UploadDraft> waitingUploadConfirmation() {
-    return uploadedDraft -> uploadedDraft.getStatus()
-        .equals(UploadDraft.Status.WAITING_UPLOAD_CONFIRMATION);
   }
 
   private Single<UploadDraft> uploadFiles(UploadDraft draftDraft) {

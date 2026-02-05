@@ -104,3 +104,7 @@
  }
 
  -keep class com.aptoide.** {*;}
+
+ # Firebase Crashlytics
+ -keepattributes SourceFile,LineNumberTable
+ -keep public class * extends java.lang.Exception
