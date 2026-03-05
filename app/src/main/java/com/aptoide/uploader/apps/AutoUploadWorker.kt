@@ -8,6 +8,7 @@ import androidx.work.NetworkType
 import androidx.work.OneTimeWorkRequestBuilder
 import androidx.work.WorkManager
 import androidx.work.Worker
+import androidx.work.ExistingWorkPolicy
 import androidx.work.WorkerParameters
 import com.aptoide.uploader.UploaderApplication
 import java.util.concurrent.TimeUnit
@@ -40,7 +41,7 @@ class AutoUploadWorker(
           .build()
 
       WorkManager.getInstance(context)
-          .enqueue(request)
+          .enqueueUniqueWork("auto_upload_$packageName", ExistingWorkPolicy.KEEP, request)
     }
   }
 
