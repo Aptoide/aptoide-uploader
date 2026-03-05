@@ -27,6 +27,9 @@ interface AutoUploadSelectsDao {
   @Insert(onConflict = OnConflictStrategy.REPLACE)
   fun saveAll(AutoUploadSelectStatusList: List<AutoUploadSelects>)
 
+  @Insert(onConflict = OnConflictStrategy.IGNORE)
+  fun insertIfNotExists(list: List<AutoUploadSelects>)
+
   @Query("DELETE FROM AutoUploadSelects")
   fun removeAll()
 

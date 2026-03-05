@@ -28,10 +28,10 @@ class AutoUploadSelectsManager(
 
   fun insertAllInstalled(): Completable {
     return getInstalledToAutoUploadSelection()
-        .doOnError { throwable -> Log.e("APP-86", "Error " + throwable.printStackTrace()) }
+        .doOnError { throwable -> Log.e("APP-86", "Error syncing auto-upload selects", throwable) }
         .flatMapCompletable { installed ->
           Log.d("APP-86", "insertAllInstalled: autoUploadSelectsList size " + installed.size)
-          roomAutoUploadSelectsPersistence.replaceAllBy(installed)
+          roomAutoUploadSelectsPersistence.syncInstalled(installed)
         }
   }
 }
