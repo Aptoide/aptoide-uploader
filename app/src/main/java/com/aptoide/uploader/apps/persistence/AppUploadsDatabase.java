@@ -9,10 +9,11 @@ import com.aptoide.uploader.apps.AppUploadStatus;
 import com.aptoide.uploader.apps.AutoUploadSelects;
 import com.aptoide.uploader.apps.InstalledApp;
 import com.aptoide.uploader.apps.ObbTypeConverter;
+import com.aptoide.uploader.apps.PendingAutoUpload;
 
 @Database(entities = {
-    AppUploadStatus.class, InstalledApp.class, AutoUploadSelects.class
-}, version = 3) @TypeConverters({ ObbTypeConverter.class }) public abstract class AppUploadsDatabase
+    AppUploadStatus.class, InstalledApp.class, AutoUploadSelects.class, PendingAutoUpload.class
+}, version = 4) @TypeConverters({ ObbTypeConverter.class }) public abstract class AppUploadsDatabase
     extends RoomDatabase {
   private static volatile AppUploadsDatabase INSTANCE;
 
@@ -37,4 +38,6 @@ import com.aptoide.uploader.apps.ObbTypeConverter;
   public abstract InstalledDao installedDao();
 
   public abstract AutoUploadSelectsDao autoUploadSelectsDao();
+
+  public abstract PendingAutoUploadDao pendingAutoUploadDao();
 }

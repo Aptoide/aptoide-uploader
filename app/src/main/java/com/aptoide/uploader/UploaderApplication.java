@@ -21,6 +21,8 @@ import com.aptoide.uploader.apps.AccountStoreNameProvider;
 import com.aptoide.uploader.apps.AndroidLanguageManager;
 import com.aptoide.uploader.apps.AppUploadStatusManager;
 import com.aptoide.uploader.apps.AutoUploadSelectsManager;
+import com.aptoide.uploader.apps.AutoUploadWorker;
+import com.aptoide.uploader.apps.PendingAutoUpload;
 import com.aptoide.uploader.apps.CategoriesManager;
 import com.aptoide.uploader.apps.InstallManager;
 import com.aptoide.uploader.apps.InstalledAppsManager;
@@ -45,6 +47,7 @@ import com.aptoide.uploader.apps.persistence.AutoUploadSelectsPersistence;
 import com.aptoide.uploader.apps.persistence.DraftPersistence;
 import com.aptoide.uploader.apps.persistence.InstalledPersistence;
 import com.aptoide.uploader.apps.persistence.MemoryDraftPersistence;
+import com.aptoide.uploader.apps.persistence.PendingAutoUploadDao;
 import com.aptoide.uploader.apps.persistence.RoomAutoUploadSelectsPersistence;
 import com.aptoide.uploader.apps.persistence.RoomInstalledPersistence;
 import com.aptoide.uploader.apps.persistence.RoomMigrationProvider;
@@ -107,6 +110,7 @@ public class UploaderApplication extends Application {
   private AgentPersistence agentPersistence;
   private ConnectivityProvider connectivityProvider;
   private RoomMigrationProvider roomMigrationProvider;
+  private PendingAutoUploadDao pendingAutoUploadDaoInstance;
 
   @Override public void onCreate() {
     super.onCreate();
@@ -118,6 +122,7 @@ public class UploaderApplication extends Application {
     initializeRakam();
     getUploadManager().start();
     syncInstalledApps();
+    processPendingAutoUploads();
   }
 
   private void initializeFirebase() {
@@ -176,6 +181,29 @@ public class UploaderApplication extends Application {
           Log.e("UploaderApplication", "Error refreshing auto-upload selection", throwable);
           FirebaseCrashlytics.getInstance().recordException(throwable);
         }));
+  }
+
+  private void processPendingAutoUploads() {
+    Schedulers.io().scheduleDirect(() -> {
+      try {
+        java.util.List<PendingAutoUpload> pending = getPendingAutoUploadDao().getAll();
+        for (PendingAutoUpload p : pending) {
+          Log.d("UploaderApplication", "Re-enqueueing pending auto-upload: " + p.getPackageName());
+          AutoUploadWorker.enqueue(this, p.getPackageName());
+        }
+      } catch (Exception e) {
+        Log.e("UploaderApplication", "Error processing pending auto-uploads", e);
+        FirebaseCrashlytics.getInstance().recordException(e);
+      }
+    });
+  }
+
+  public PendingAutoUploadDao getPendingAutoUploadDao() {
+    if (pendingAutoUploadDaoInstance == null) {
+      pendingAutoUploadDaoInstance = AppUploadsDatabase.getInstance(this, getRoomMigrationProvider())
+          .pendingAutoUploadDao();
+    }
+    return pendingAutoUploadDaoInstance;
   }
 
   public UploadManager getUploadManager() {

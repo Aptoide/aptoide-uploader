@@ -173,6 +173,9 @@ dependencies {
   //Chrome Custom tabs
   implementation 'androidx.browser:browser:1.7.0'
 
+  // WorkManager
+  implementation "androidx.work:work-runtime-ktx:2.9.1"
+
   //Rakam
   implementation "io.rakam:android-sdk:${RAKAM_VERSION}"
 }

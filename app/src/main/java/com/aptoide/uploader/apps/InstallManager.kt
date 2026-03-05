@@ -40,10 +40,15 @@ class InstallManager(private val installedPersistence: InstalledPersistence,
         .andThen(uploadApp(installed)).doOnComplete { uploaderAnalytics.sendSubmitAppsEvent(1) }
   }
 
+  fun onUpdateConfirmedWithoutUpload(installed: InstalledApp): Completable {
+    return installedPersistence.removeAllPackageVersions(installed.packageName)
+        .andThen(installedPersistence.insert(installed))
+  }
+
   private fun uploadApp(installed: InstalledApp): Completable {
     return if (!installedAppsManager.isUploadedVersion(installed.packageName,
-            installed.versionCode) and installedAppsManager.isSelectedApp(
-            installed.packageName) and aptoideConnectivityProvider.isOnWifiNetwork) {
+            installed.versionCode) && installedAppsManager.isSelectedApp(
+            installed.packageName) && aptoideConnectivityProvider.isOnWifiNetwork) {
       storeManager.upload(installed)
     } else {
       Completable.complete()
