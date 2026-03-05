@@ -120,7 +120,7 @@ When modifying any `@Entity` class (adding/removing/renaming fields or changing 
 1. **Add a migration** in `RoomMigrationProvider.kt` (e.g., `migration3to4`)
 2. **Bump the version** in `AppUploadsDatabase.java` to match
 3. **Register the migration** in `getAllMigrations()` so it's included in the migration array
-4. **Never use `OnErrorNotImplementedException`** in RxJava error handlers for database operations — use `Log.e` + `FirebaseCrashlytics.recordException()` instead
+4. **Never use `OnErrorNotImplementedException`** in RxJava error handlers for database operations — prefer `Log.e` or `FirebaseCrashlytics.recordException()` instead
 
 ---
 

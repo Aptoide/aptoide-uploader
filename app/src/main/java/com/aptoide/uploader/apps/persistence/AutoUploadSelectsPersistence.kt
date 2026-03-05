@@ -16,4 +16,6 @@ interface AutoUploadSelectsPersistence {
   fun insert(autoUploadSelects: AutoUploadSelects): Completable
 
   fun replaceAllBy(list: List<AutoUploadSelects>): Completable
+
+  fun syncInstalled(list: List<AutoUploadSelects>): Completable
 }

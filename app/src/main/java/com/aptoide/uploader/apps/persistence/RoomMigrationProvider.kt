@@ -32,5 +32,12 @@ class RoomMigrationProvider {
     }
   }
 
-  fun getAllMigrations(): Array<Migration> = arrayOf(migration, migration2to3)
+  val migration3to4 = object : Migration(3, 4) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+          "CREATE TABLE IF NOT EXISTS `PendingAutoUpload` (`packageName` TEXT NOT NULL, `createdTimestamp` INTEGER NOT NULL, PRIMARY KEY(`packageName`))")
+    }
+  }
+
+  fun getAllMigrations(): Array<Migration> = arrayOf(migration, migration2to3, migration3to4)
 }

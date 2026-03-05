@@ -39,4 +39,10 @@ open class RoomAutoUploadSelectsPersistence(
       autoUploadSelectsDao.saveAll(list)
     }.subscribeOn(Schedulers.io())
   }
+
+  override fun syncInstalled(list: List<AutoUploadSelects>): Completable {
+    return Completable.fromAction {
+      autoUploadSelectsDao.insertIfNotExists(list)
+    }.subscribeOn(Schedulers.io())
+  }
 }
