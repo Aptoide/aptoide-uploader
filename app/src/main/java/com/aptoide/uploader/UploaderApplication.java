@@ -164,7 +164,8 @@ public class UploaderApplication extends Application {
     compositeDisposable.add(getInstallManager().insertAllInstalled()
         .subscribe(() -> {
         }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
+          Log.e("UploaderApplication", "Error refreshing installed apps", throwable);
+          FirebaseCrashlytics.getInstance().recordException(throwable);
         }));
   }
 
@@ -172,7 +173,8 @@ public class UploaderApplication extends Application {
     compositeDisposable.add(getAutoUploadSelectsManager().insertAllInstalled()
         .subscribe(() -> {
         }, throwable -> {
-          throw new OnErrorNotImplementedException(throwable);
+          Log.e("UploaderApplication", "Error refreshing auto-upload selection", throwable);
+          FirebaseCrashlytics.getInstance().recordException(throwable);
         }));
   }
 

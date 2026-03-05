@@ -20,4 +20,17 @@ class RoomMigrationProvider {
           "CREATE TABLE IF NOT EXISTS `AutoUploadSelects` (`packageName` TEXT NOT NULL, `isSelectedAutoUpload` INTEGER NOT NULL, PRIMARY KEY(`packageName`))")
     }
   }
+
+  val migration2to3 = object : Migration(2, 3) {
+    override fun migrate(database: SupportSQLiteDatabase) {
+      database.execSQL(
+          "ALTER TABLE `Installed` ADD COLUMN `firstInstallTime` INTEGER NOT NULL DEFAULT 0")
+      database.execSQL(
+          "ALTER TABLE `Installed` ADD COLUMN `targetSdkVersion` INTEGER NOT NULL DEFAULT 0")
+      database.execSQL(
+          "ALTER TABLE `Installed` ADD COLUMN `minSdkVersion` INTEGER NOT NULL DEFAULT 0")
+    }
+  }
+
+  fun getAllMigrations(): Array<Migration> = arrayOf(migration, migration2to3)
 }

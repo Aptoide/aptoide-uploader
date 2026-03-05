@@ -113,6 +113,15 @@ Required properties in `gradle.properties` or `local.properties`:
 - Database schema changes require migrations
 - Jira tickets use format: AND-XXXX
 
+### Room Database Change Checklist
+
+When modifying any `@Entity` class (adding/removing/renaming fields or changing types):
+
+1. **Add a migration** in `RoomMigrationProvider.kt` (e.g., `migration3to4`)
+2. **Bump the version** in `AppUploadsDatabase.java` to match
+3. **Register the migration** in `getAllMigrations()` so it's included in the migration array
+4. **Never use `OnErrorNotImplementedException`** in RxJava error handlers for database operations — use `Log.e` + `FirebaseCrashlytics.recordException()` instead
+
 ---
 
 ## TPO Configuration
